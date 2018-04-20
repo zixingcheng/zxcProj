@@ -1,0 +1,2 @@
+第一列为提示，第二列为对应信息，以tab分隔
+Repeater	True	myWxDo_Repeater	myWxDo_Repeater	复读功能

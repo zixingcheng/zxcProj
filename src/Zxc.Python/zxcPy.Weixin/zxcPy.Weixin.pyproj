@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{a0dccad3-0a28-4efe-9dba-e6d3d5feb346}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>myWeixin_API.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>Global|PythonCore|3.5</InterpreterId>
+    <Name>zxcPy_Weixin</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="zxcPy.APIs\myWeixin.py" />
+    <Compile Include="zxcPy.Test\myTest_Chat.py" />
+    <Compile Include="myWeixin_API.py" />
+    <Compile Include="zxcPy.Test\myTest_Event.py" />
+    <Compile Include="zxcPy.Weixin\myWeixin_ItChat.py" />
+    <Compile Include="zxcPy.Weixin\Weixin_Reply\myReply_Factory.py" />
+    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWxDo\myWxDo.py" />
+    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWxDo\myWxDo_Root.py" />
+    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWxDo\myWxDo_Repeater.py" />
+    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWx_UserRoot.py" />
+    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWx_User.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\myWxDo.cpython-35.pyc" />
+    <Content Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\myWxDo_Repeater.cpython-35.pyc" />
+    <Content Include="zxcPy.Weixin\Weixin_Reply\Setting.txt" />
+    <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myImport.cpython-35.pyc" />
+    <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myReply_Factory.cpython-35.pyc" />
+    <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myReply_Text.cpython-35.pyc" />
+    <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myWx_User.cpython-35.pyc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="zxcPy.Test\" />
+    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.APIs\" />
+    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\" />
+    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\Weixin_Reply\" />
+    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\Weixin_Reply\myWxDo\" />
+    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\" />
+    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\Weixin_Reply\__pycache__\" />
+    <Folder Include="zxcPy.Weixin\" />
+    <Folder Include="zxcPy.Weixin\Weixin_Reply\" />
+    <Folder Include="zxcPy.Weixin\Weixin_Reply\myWxDo\" />
+    <Folder Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\" />
+    <Folder Include="zxcPy.Weixin\Weixin_Reply\__pycache__\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.5" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>
