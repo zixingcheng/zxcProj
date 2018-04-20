@@ -25,6 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="mySystem.py" />
+    <Compile Include="zxcPy.Base\myWeb_urlLib.py" />
     <Compile Include="zxcPy.Install\Install.py" />
     <Compile Include="zxcPy.Base\myArgv.py" />
     <Compile Include="zxcPy.Base\myData.py" />

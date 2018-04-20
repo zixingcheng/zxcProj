@@ -45,8 +45,6 @@ def Append_Us(path = "", bPrint = False):
     #返回当前文件路径
     return sysDir
         
-    
-    
 #定义默认的系统目录引用，路径下的相对文件夹自由定义为系统引用
 def Append(path, floders, bPrint = False):
     #获取文件路径信息
@@ -57,7 +55,6 @@ def Append(path, floders, bPrint = False):
     for i in floders: 
         pDir = strDir + i
         Append_Dir(pDir, bPrint)
-        
  
 #增加的系统目录引用
 def Append_Dir(strDir, bPrint = False):        
@@ -66,8 +63,6 @@ def Append_Dir(strDir, bPrint = False):
     if(bPrint):
         print (strDir) 
 
-    
-     
 if __name__ == '__main__':   
     #添加当前默认路径到系统目录
     Append_Us("", True)

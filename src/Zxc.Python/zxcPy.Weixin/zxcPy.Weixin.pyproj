@@ -42,6 +42,7 @@
     <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myWx_User.cpython-35.pyc" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Test\" />
     <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.APIs\" />
     <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\" />

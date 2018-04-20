@@ -1,0 +1,146 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>15a0a06f-3917-46fd-b1d4-f3a7530a0a94</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>
+    </StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>PythonApplication1</Name>
+    <RootNamespace>PythonApplication1</RootNamespace>
+    <InterpreterId>Global|PythonCore|3.5</InterpreterId>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="myFunction\" />
+    <Folder Include="myFunction\__pycache__\" />
+    <Folder Include="myNotes\" />
+    <Folder Include="myNotes\2017\" />
+    <Folder Include="myNotes\2017\09月日志\" />
+    <Folder Include="myNotes\2017\10月日志\" />
+    <Folder Include="myNotes\2017\11月日志\" />
+    <Folder Include="myNotes\2017\12月日志\" />
+    <Folder Include="myNotes\2018\" />
+    <Folder Include="myNotes\2018\03月日志\" />
+    <Folder Include="myNotes\2018\04月日志\" />
+    <Folder Include="mySetting\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="myFunction\__pycache__\myDataSet.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myData_Trans.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myEnum.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myIO.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\mySetting_Note.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myWebFun.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myWebFun_gsafety.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myWebFun_gsafety_prj.cpython-35.pyc" />
+    <Content Include="myNotes\2017\09月日志\2017-09-18.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-19.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-20.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-21.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-22.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-25.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-26.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-27.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-28.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-29.md" />
+    <Content Include="myNotes\2017\09月日志\2017-09-30.md" />
+    <Content Include="myNotes\2017\10月日志\2017-10-23.md" />
+    <Content Include="myNotes\2017\10月日志\2017-10-24.md" />
+    <Content Include="myNotes\2017\10月日志\2017-10-25.md" />
+    <Content Include="myNotes\2017\10月日志\2017-10-26.md" />
+    <Content Include="myNotes\2017\10月日志\2017-10-27.md" />
+    <Content Include="myNotes\2017\10月日志\2017-10-30.md" />
+    <Content Include="myNotes\2017\10月日志\2017-10-31.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-01.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-02.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-03.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-06.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-07.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-08.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-09.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-10.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-12.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-13.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-14.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-15.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-16.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-17.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-19.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-20.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-21.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-22.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-23.md" />
+    <Content Include="myNotes\2017\11月日志\2017-11-24.md" />
+    <Content Include="myNotes\2017\12月日志\2017-12-10.md" />
+    <Content Include="myNotes\2017\12月日志\2017-12-11.md" />
+    <Content Include="myNotes\2017\12月日志\2017-12-12.md" />
+    <Content Include="myNotes\2017\12月日志\2017-12-13.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-04.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-05.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-06.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-07.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-08.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-09.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-11.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-12.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-13.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-14.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-15.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-16.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-18.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-19.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-20.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-21.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-22.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-23.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-26.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-27.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-28.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-29.md" />
+    <Content Include="myNotes\2018\03月日志\2018-03-30.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-02.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-03.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-04.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-08.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-09.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-10.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-11.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-12.md" />
+    <Content Include="myNotes\2018\04月日志\2018-04-13.md" />
+    <Content Include="myNotes\Note_Now.md" />
+    <Content Include="mySetting\Note_Now.md" />
+    <Content Include="mySetting\Prj_Dict.csv" />
+    <Content Include="mySetting\Setting.txt" />
+    <Content Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="myFunction\mySetting_Note.py" />
+    <Compile Include="myFunction\myWebFun_gsafety.py" />
+    <Compile Include="myFunction\myWebFun_gsafety_prj.py" />
+    <Compile Include="自动提交日报.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.5" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>
