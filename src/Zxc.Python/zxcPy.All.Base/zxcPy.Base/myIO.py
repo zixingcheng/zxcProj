@@ -69,6 +69,7 @@ def getFiles(path, wildcard = "", iswalk = True):
                     list_Files.append(Trans_NoBOM(root) + "\\" + Trans_NoBOM(name))
                     break
     return list_Files
+
 def getFileName(path, isNosuffix = True):
     #提取文件后缀
     name = os.path.basename(path)
@@ -79,24 +80,29 @@ def getFileName(path, isNosuffix = True):
 
 
 #提取文件信息
-def getContend(path):
+def getContend(path, noBOM = False):
     #提取文件Json串
     if (os.path.exists(path) == False):
         return ""
     f = codecs.open(path, 'r', 'utf-8')   
     content = f.read() 
+    if(noBOM):
+        content = Trans_NoBOM(content)
  
     #关闭文件      
     f.close()
     return content
+
 #提取文件信息
-def getContents(path, strTag = "@@"):
+def getContents(path, strTag = "@@", noBOM = False):
     #提取文件Json串
     if (os.path.exists(path) == False):
         return ""
     f = codecs.open(path, 'r', 'utf-8')    
     lists = f.readlines()
- 
+    if(noBOM and len(lists[0]) > 0):
+        lists[0] = Trans_NoBOM(lists[0])
+        
     bEnd = False;
     list_content = []
     content = ""
@@ -118,16 +124,17 @@ def getContents(path, strTag = "@@"):
     #关闭文件      
     f.close()
     return list_content
+    
 #提取文件信息, 指定标识处终止
-def getContend_EndByTag(path, strTag = "@@"):
+def getContend_EndByTag(path, strTag = "@@", noBOM = False):
     #打开文件提取数据
     if (os.path.exists(path) == False):
         return "",[] 
     f = codecs.open(path, 'r', 'utf-8')   
     lists = f.readlines()
-    #if(len(lists) > 0):
-    #    lists[0] = Trans_NoBOM(lists[0])
-
+    if(noBOM and len(lists[0]) > 0):
+        lists[0] = Trans_NoBOM(lists[0])
+        
     bEnd = False;
     list_content = []
     content = ""
