@@ -16,30 +16,47 @@ from itchat.content import *
 mySystem.m_strFloders.append('/Weixin_Reply')
 mySystem.m_strFloders.append('/Weixin_Reply/myWxDo')
 mySystem.Append_Us("", False) 
-import myWeb, myError, myData_Json, myIO, myThread, myReply_Factory  #myDataSet, myData, myData_Trans 
+import myError, myData_Json, myIO, myMMap, myThread, myReply_Factory  #myDataSet, myData, myData_Trans 
 
 
 #webWeixin接口封装类
 class myWeixin_ItChat(myThread.myThread):
-    def __init__(self, Tag = "zxcWeixin"):
+    def __init__(self, Tag = "zxcWeixin", useCmdMMap = True):
         super().__init__("", 0) # 必须调用
         self.usrTag = Tag       #类实例标识
         self.usrName = ""       #类实例用户名
         self.wxReply = myReply_Factory.myWx_Reply(Tag)     #回复消息处理工厂对象类
         self.dirData = self.wxReply.wxRoot.Dir_Data
         self.dirPic = self.wxReply.wxRoot.Dir_Data + "Pic/" 
+        self.managerMMap = None
+        self.ind = 0
+        self.max = 5
+        #self.cmdWeixin = None
         
         self.Runing = False             #是否运行中
         self.Auto_RreplyText = True     #是否开启自动回复--文本
         self.Auto_RreplyText_G = True   #是否开启自动回复--文本-群
         self.funStatus_RText = False    #状态自动回复--文本
         self.funStatus_RText_G = False  #状态自动回复--文本-群
+        self.Init_MMap(useCmdMMap)      #创建命令内存映射
         self.Init()        
     def Init(self, pathPicDir = ""):
         if (pathPicDir == ""):
             self.dirData = self.wxReply.wxRoot.Dir_Data
             self.dirPic = self.wxReply.wxRoot.Dir_Data + "Pic/"
             myIO.mkdir(self.dirPic)
+    #创建命令内存映射 
+    def Init_MMap(self, useCmdMMap = True):
+        # 创建内存映射（读）
+        try:
+            self.managerMMap = myMMap.myMMap_Manager(self.dirData + "zxcMMap.dat")
+            pMMdata_M2, ind2 = self.managerMMap.Read(0)
+            if(pMMdata_M2 != None):
+                print(pMMdata_M2.value, ind2)
+            return True
+        except:
+            print("创建内存映射失败.")
+            return False
     #运行
     def run(self): 
         self.Run_ByThread();
@@ -107,6 +124,8 @@ class myWeixin_ItChat(myThread.myThread):
         else:
             return False
 
+        #增加记录日志 
+
         #调用 
         return Send_Ms(msg['FromUserName'], msg['Text'], msg['Type'])
     #发送消息接口
@@ -122,7 +141,12 @@ class myWeixin_ItChat(myThread.myThread):
             userFrom = user[0]['UserName']
 
         #发送消息
-        itchat.send('%s: %s' % (typeMsg, msgInfo), userFrom)
+        if(typeMsg == "TEXT"):
+            itchat.send('%s: %s' % (typeMsg, msgInfo), userFrom)
+        elif(typeMsg == "TEXT"):
+            itchat.send_image('%s: %s' % (typeMsg, msgInfo), userFrom)
+        else:
+            print("No this type.")
             
     #二维码信息下载完回调函数
     def _DownloadQRed(self, uuid, status, qrcode): 
@@ -156,11 +180,19 @@ class myWeixin_ItChat(myThread.myThread):
         thrd_Replay = threading.Thread(target = itchat.run)
         thrd_Replay.setDaemon(False)
         thrd_Replay.start()
+
+        #内存映射cmd命令监测线程
+        #if(self.managerMMap != None):
+        #    self.cmdWeixin = myWeixin_CmdThread(self.managerMMap)
+        #    self.cmdWeixin.run()
         
         #线程循环
         self.Runing = True
         while self.Runing:
-            self.Run_Monitor()
+            self.Run_Monitor()  
+            
+            #命令监测--共享内存方式 
+            self.Run_Monitor_Cmd()
             time.sleep(nSleep)
 
         print('Thread is exiting...')
@@ -187,14 +219,54 @@ class myWeixin_ItChat(myThread.myThread):
                     pReply = self.wxReply.Done_ByMsg(msg, True)
                     if(pReply != None): return pReply['Text']   #返回消息
             self.funStatus_RText_G = self.Auto_RreplyText_G
-           
+            
+    #命令监测--共享内存方式 
+    def Run_Monitor_Cmd(self):     
+        if(self.managerMMap == None): 
+            return False
+        nNum = 0
+        pMMdata_M, self.ind = self.managerMMap.Read(self.ind, True)
+        while(pMMdata_M != None):
+            #调用发送消息
+            msg = pMMdata_M.value
+            if(msg != None and msg != 0):
+                self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
+                print(msg)
+                
+                #再次提取命令
+                pMMdata_M, self.ind = self.managerMMap.Read(self.ind, True)
 
-class myAPI_p(myWeb.myAPI):
-    def get(self, param):
-        strReturn = "参数：" + param
-        ps_Weixin.Send_Msg("茶叶一主号",strReturn)
-        return strReturn
+            nNum += 1
+            if(nNum >= self.max):
+                return 
+            
+#webWeixin接口--命令封装类--未使用
+#线程
+class myWeixin_CmdThread (threading.Thread):  #继承父类threading.Thread
+    def __init__(self, managerMMap):
+        super().__init__()              #必须调用
+        self.managerMMap = managerMMap  #内存映射
+        self.ind = 0
+        self.exitFlag = False
 
+    #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
+    def run(self):                   #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
+        print("Starting " + self.name)
+        i = 0
+        while not self.exitFlag: 
+            self.ind = 0
+            pMMdata_M, self.ind = self.managerMMap.Read(0, False)
+            if(pMMdata_M != None):
+                #发送消息
+                dict0 = pMMdata_M.value
+                itchat.send(dict0["Text"], dict0["FromUserName"])
+                #itchat.send('%s: %s' % (typeMsg, msgInfo), userFrom)
+        print("Exiting Manager MMap.")
+
+    #退出接口
+    def _stop(self):   
+        threading.Thread._stop(self)     
+        self.exitFlag = True     
    
 #主启动程序
 if __name__ == "__main__":
@@ -206,7 +278,7 @@ if __name__ == "__main__":
  
     #消息测试
     pWeixin.Send_Msg("茶叶一主号","登陆")
-    pWeixin.run()
+    #pWeixin.run()
 
     #运行 
     #pWeixin.Run();

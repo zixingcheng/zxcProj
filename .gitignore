@@ -283,3 +283,5 @@ __pycache__/
 /src/Zxc.Python/zxcPy.gsLog_Submits/myNotes/2019
 /src/Zxc.Python/zxcPy.gsLog_Submits/myNotes/2020
 /src/Zxc.Python/zxcPy.gsLog_Submits/mySetting/Note_Now.md
+*.dat
+/src/Zxc.Python/zxcPy.Weixin/Data

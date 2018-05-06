@@ -23,8 +23,6 @@ class Json_Object2:
         strJson = json.dumps(self, default = __serialize_instance__, indent = 4) 
         return strJson
 
-
-
 #自定义Json对象 
 class Json_Object:        
     def __init__(self, pDict = OrderedDict()):
@@ -155,15 +153,12 @@ class Json_Object:
         if(item != "_dict_"):
             self._dict_[item]  = value  
         
-        
-        
 #字符串转Json对象
 def Trans_ToJson(objStr):
     #字符串转对象
     #data = json.loads(objStr, object_hook = Json_Object2)
     data = json.loads(objStr, object_hook = OrderedDict)
     return data
-
 
     
 #序列化对象实例，提供一个函数，它的输入是一个实例，返回一个可序列化的字典

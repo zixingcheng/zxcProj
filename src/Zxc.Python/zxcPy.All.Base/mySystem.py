@@ -20,7 +20,6 @@ def Append_Us(path = "", bPrint = False):
     if(rootDir == "") :
         rootDir = sys.path[0]
 
-
     #定义系统文件夹myPy_Libs、GModel_Py_Base
     strFloders = m_strFloders   
 

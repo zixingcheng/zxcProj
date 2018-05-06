@@ -7,7 +7,7 @@ Created on  张斌 2018-04-18 11:00:00
     myMMap, Api接口操作, 共享内存，兼容linux
 """
 import sys, os, string, time 
-import mmap, contextlib
+import mmap, contextlib, ast
 import mySystem, myEnum, myData, myThread, myData_Trans 
 myMMap_DataType = myEnum.enum_index('str', 'int', 'float', 'list', 'dict', 'object')
 
@@ -191,7 +191,6 @@ class myMMap(myThread.myThread):
         nOffet += value.length + nLen_Head
         self.offset = myData.iif(nOffet < self.maxSize, nOffet, self.maxSize)
         return nOffet
-
     
 #共享内存管理类(索引、内存数据对象结构,轮次写入)
 class myMMap_Manager(): 
@@ -271,7 +270,7 @@ class myMMap_Manager():
             if(self.Check_Ind(ind) == False):       #过界则忽略    
                 return None, ind
         self.offset = self.Read_Ind(ind)            #记录的索引偏移
-        if(self.offset < 0):
+        if(self.offset <= 0):
             return None, ind
 
         #读取内存数据
@@ -287,8 +286,6 @@ class myMMap_Manager():
         if(self.ind_read >= self.indNum):           
             self.ind_read = 0                       #索引初始，版本更新
             self.verR += 1                          #版本步进
-        if(pData.Get_Value() == -1):
-            aa =0
         return pData, self.ind_read                 #返回内存对象
     #读取索引偏移信息
     def Read_Ind(self, ind = -1): 
@@ -311,7 +308,6 @@ class myMMap_Manager():
             return True                             #版本未过界
 
 
-import ast  
 def main():
     # 创建内存映射
     pMMap = myMMap()  

@@ -5,9 +5,11 @@ Created on  张斌 2018-04-04 11:00:00
     @email:  zhangbin@gsafety.com
 
     myWeb, Api接口操作, 基于flask
+    @依赖库： flask
 """
 import sys, string
 from flask import Flask
+from flask import jsonify
 from flask_restful import reqparse, Api, Resource
 import mySystem, myThread 
 import logging
@@ -32,6 +34,11 @@ class myWeb(myThread.myThread):
         @self.app.route('/HelloWorld')
         def hello_world():
             return "Hello World......!" 
+        
+        #添加一个页面(错误页面)
+        @self.app.errorhandler(404)  
+        def not_found(error):  
+            return jsonify({'error':'Not found'}), 404  
 
     #添加API类
     def add_API(self, pyApi, url): 
@@ -55,6 +62,7 @@ class myAPI(Resource):
         return "Put: This is myWeixin_API's Test web page..."
     def delete(self): 
         return "Delete: This is myWeixin_API's Test web page..."
+    
 class myAPI_p(myAPI):
     def get(self, param):
         strReturn = "参数：" + param

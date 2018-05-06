@@ -9,7 +9,6 @@ Created on  张斌 2016-09-02 16:30:00
 import os, time, codecs
 import shutil
 
-
  
 #创建文件夹，存在则忽略
 def mkdir(path, bTitle = True, bNew = False): 
@@ -43,7 +42,6 @@ def mkdir(path, bTitle = True, bNew = False):
         if(bTitle): print (path + ' 目录已存在')
         return False
     
-    
 #提取文件名集(递归子文件)
 def getFiles(path, wildcard = "", iswalk = True):
     #提取文件后缀
@@ -69,7 +67,6 @@ def getFiles(path, wildcard = "", iswalk = True):
                     list_Files.append(Trans_NoBOM(root) + "\\" + Trans_NoBOM(name))
                     break
     return list_Files
-
 def getFileName(path, isNosuffix = True):
     #提取文件后缀
     name = os.path.basename(path)
@@ -92,7 +89,6 @@ def getContend(path, noBOM = False):
     #关闭文件      
     f.close()
     return content
-
 #提取文件信息
 def getContents(path, strTag = "@@", noBOM = False):
     #提取文件Json串
@@ -124,7 +120,6 @@ def getContents(path, strTag = "@@", noBOM = False):
     #关闭文件      
     f.close()
     return list_content
-    
 #提取文件信息, 指定标识处终止
 def getContend_EndByTag(path, strTag = "@@", noBOM = False):
     #打开文件提取数据

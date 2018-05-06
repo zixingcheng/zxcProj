@@ -5,6 +5,7 @@ Created on  张斌 2018-01-03 18:00:00
     @email:  zhangbin@gsafety.com
 
     Excel操作 
+    @依赖库： xlrd、xlwt
 """
 import sys, os, codecs
 import xlrd, xlwt 

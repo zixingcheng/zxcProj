@@ -13,13 +13,10 @@ import getopt
 import myData_Trans, myData_Json
 
 
-
 #自定义错误
 class Usage(Exception):
     def __init__(self, msg):
         self.msg = msg
-
-
 
 #自定义参数(获取cmd等shell到的参数，并以该类返回便于直接参数调用) 
 class Usargv():
@@ -177,15 +174,12 @@ class Usargv():
         return pValues  
 
 
-
 if __name__ == '__main__':
     #main()
     #pArgv = Usargv("",["help","output="])
     pArgv = Usargv("",["prj="])
     print(pArgv._GetParamValue("prj"))
     print(pArgv.basePath)
-    
-
     #直接编译会发生错误，但通过cmd可以正确执行
     #d = int(pArgv.b) * 10
     #print(d)

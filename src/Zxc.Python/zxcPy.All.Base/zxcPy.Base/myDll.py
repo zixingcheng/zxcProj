@@ -5,13 +5,11 @@ Created on  张斌 2018-04-02 18:00:00
     @email:  zhangbin@gsafety.com
 
     动态库接口操作
-
 """
 import sys, string, re, ctypes
 import time
  
 
- 
 #转换为str由char* 
 def Create_Dll(pathDll): 
     return ctypes.CDLL(pathDll);  

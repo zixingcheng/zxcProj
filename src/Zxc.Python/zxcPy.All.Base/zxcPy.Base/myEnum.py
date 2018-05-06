@@ -5,13 +5,11 @@ Created on  张斌 2016-10-07 14:05:00
     @email:  zhangbin@gsafety.com
 
     枚举类型操作
-
 """
 from collections import namedtuple 
  
 def enum(*keys):
     return namedtuple('Enum', keys)(*keys)
- 
  
 # 带字符数字映射的，像C/C++
 def enum_index(*keys):

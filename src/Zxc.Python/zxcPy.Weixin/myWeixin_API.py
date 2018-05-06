@@ -8,38 +8,35 @@ Created on  张斌 2017-11-19 14:58:00
 """
 import os  
 import mySystem 
-from flask import Flask
-from flask_restful import reqparse, abort, Api, Resource
-
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-mySystem.m_strFloders.append('/zxcAPIs')
-mySystem.m_strFloders.append('/zxcWeixin')
-mySystem.m_strFloders.append('/zxcWeixin/Weixin_Reply')
-mySystem.m_strFloders.append('/zxcWeixin/Weixin_Reply/myWxDo')
-mySystem.Append_Us("", True)    
-import myWeb, myWeixin_ItChat
+mySystem.m_strFloders.append('/zxcPy.APIs')
+mySystem.m_strFloders.append('/zxcPy.Weixin')
+mySystem.m_strFloders.append('/zxcPy.Weixin/Weixin_Reply')
+mySystem.m_strFloders.append('/zxcPy.Weixin/Weixin_Reply/myWxDo')
+mySystem.Append_Us("", False)    
+import myWeb, myMMap, myWeixin_Cmd
+from myGlobal import gol 
+
 
 
 #主程序启动
 if __name__ == '__main__': 
-    myWeixin_ItChat.main()
+    gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
+    
+    # 创建内存映射（写）
+    try:
+        pMMap_Manager = myMMap.myMMap_Manager("Data/zxcMMap.dat")
+        gol._Set_Value('manageMMap', pMMap_Manager)
+    except:
+        print("创建内存映射失败.")
+        exit()
 
     # 创建新线程
-    pWeb = myWeb.myWeb("0.0.0.0", 8080)
+    pWeb = myWeb.myWeb("0.0.0.0", 8088)
     pWeb.add_API(myWeb.myAPI, '/test')
-    pWeb.add_API(myWeixin_ItChat.myAPI_p, '/test/<param>')
+    pWeb.add_API(myWeb.myAPI_p, '/test1/<param>')
+    pWeb.add_API(myWeixin_Cmd.myAPI_Weixin_Cmd, '/weixin/<user>/<text>/<type>')
     pWeb.run()
-
-    
-    #声明Weixin操作对象
-    pWeixin = myWeixin_ItChat.myWeixin_ItChat()
-    
-    #登录微信网页版(二维码扫码)
-    pWeixin.Logion();
- 
-    #运行 
-    #pWeixin.Run();
-    pWeixin.Run_ByThread();
-    
+        
 exit()

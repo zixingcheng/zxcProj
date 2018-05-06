@@ -8,10 +8,10 @@ Created on  张斌 2018-04-03 11:30:00
 """
 import os, math, time, datetime
 import myData_Trans
+from myGlobal import gol   
 
 #全局变量
-global ms_Msgs 
-ms_Msgs = {}
+ms_Msgs = gol._Get_Value("ms_Msgs") 
 
 
 #打印调试信息并记录时间

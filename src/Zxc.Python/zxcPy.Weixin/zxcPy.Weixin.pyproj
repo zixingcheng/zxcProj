@@ -24,6 +24,7 @@
     <Compile Include="zxcPy.Test\myTest_Chat.py" />
     <Compile Include="myWeixin_API.py" />
     <Compile Include="zxcPy.Test\myTest_Event.py" />
+    <Compile Include="zxcPy.Weixin\myWeixin_Cmd.py" />
     <Compile Include="zxcPy.Weixin\myWeixin_ItChat.py" />
     <Compile Include="zxcPy.Weixin\Weixin_Reply\myReply_Factory.py" />
     <Compile Include="zxcPy.Weixin\Weixin_Reply\myWxDo\myWxDo.py" />
@@ -44,12 +45,6 @@
   <ItemGroup>
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Test\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.APIs\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\Weixin_Reply\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\Weixin_Reply\myWxDo\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.Weixin\zxcPy.Weixin\Weixin_Reply\__pycache__\" />
     <Folder Include="zxcPy.Weixin\" />
     <Folder Include="zxcPy.Weixin\Weixin_Reply\" />
     <Folder Include="zxcPy.Weixin\Weixin_Reply\myWxDo\" />

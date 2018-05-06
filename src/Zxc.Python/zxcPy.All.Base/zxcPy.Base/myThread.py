@@ -5,7 +5,6 @@ Created on  张斌 2018-04-03 18:00:00
     @email:  zhangbin@gsafety.com
 
     线程操作接口操作
-
 """
 import sys, string, threading
 

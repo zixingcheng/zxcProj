@@ -5,6 +5,7 @@ Created on  张斌 2016-09-02 16:30:00
     @email:  zhangbin@gsafety.com
 
     Web操作模拟类
+    @依赖库： urllib
 """
 
 import urllib,urllib.request
@@ -26,19 +27,14 @@ class myWeb:
         #通过handler来构建opener
         self.opener = urllib.request.build_opener(self.handler)
         
-        
     #定义param
     def __set_param__(self , Path): 
         self.Path = Path
         self.Referer =self.Host + "/" + Path
-
     #定义cookies
     def __set_cookies__(self , Path): 
         self.Path = Path
         self.Referer =self.Host + "/" + Path
-
-
-        
     
     #定义Post方法
     def Do_Post(self, Path , strPostData, strTag = "", bUseHeaders = True, bInitCookie = False):
@@ -117,8 +113,6 @@ class myWeb:
         #print(strInfo)
         #print(strData)
         return strData
-        
-
     #登录信息  
     #strLoginInfo = { 
     #    'method':'login', 

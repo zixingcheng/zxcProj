@@ -25,6 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="mySystem.py" />
+    <Compile Include="zxcPy.Base\myGlobal.py" />
     <Compile Include="zxcPy.Base\myWeb_urlLib.py" />
     <Compile Include="zxcPy.Install\Install.py" />
     <Compile Include="zxcPy.Base\myArgv.py" />
@@ -54,16 +55,11 @@
     <Content Include="zxcPy.Base\__pycache__\myEnum.cpython-35.pyc" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.All.Base\zxcPy.Install\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.All.Base\zxcPy.Base\" />
     <Folder Include="zxcPy.Base\" />
     <Folder Include="zxcPy.Base\myWeb\" />
     <Folder Include="zxcPy.Base\myWeb\__pycache__\" />
     <Folder Include="zxcPy.Base\__pycache__\" />
     <Folder Include="zxcPy.Install\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.All.Base\zxcPy.Base\myWeb\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.All.Base\zxcPy.Base\myWeb\__pycache__\" />
-    <Folder Include="D:\我的工作\学习\MyProject\zxcProj\src\Zxc.Python\zxcPy.All.Base\zxcPy.Base\__pycache__\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.5" />

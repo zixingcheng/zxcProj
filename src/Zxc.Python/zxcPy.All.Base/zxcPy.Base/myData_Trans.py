@@ -5,7 +5,6 @@ Created on  张斌 2016-10-08 10:00:00
     @email:  zhangbin@gsafety.com
 
     自定义数据类型--数据转换操作
-
 """
 import sys, string, re
 import time

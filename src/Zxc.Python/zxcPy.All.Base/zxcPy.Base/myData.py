@@ -5,7 +5,7 @@ Created on  张斌 2016-10-07 16:45:00
     @email:  zhangbin@gsafety.com
 
     自定义数据类型操作
-
+    @依赖库：interval
 """
 import sys, string
 import interval 
