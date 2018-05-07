@@ -8,10 +8,10 @@ Created on  张斌 2018-04-03 11:30:00
 """
 import os, math, time, datetime
 import myData_Trans
-from myGlobal import gol   
 
 #全局变量
-ms_Msgs = gol._Get_Value("ms_Msgs") 
+global ms_Msgs 
+ms_Msgs = {}
 
 
 #打印调试信息并记录时间
@@ -27,6 +27,10 @@ def Debug(tag, msg, bRecord = False, bTitle = True, ErrType = "Error"):
             print("->>", tag, "", msg, "\n              ", "--End at", datetime.datetime.fromtimestamp(nTime).strftime('%H:%M:%S.%f'), "\n      ", "--耗时:", round(nInterval, 3), "秒")  
         return nInterval
     
+#打印调试信息并记录时间
+def Debug(msg, ErrType = "Debug"):
+    #if(ms_Msgs["Can_Debug"] == True):
+    print("->>", ErrType, "::", msg)
 
 def main(): 
     Debug("Test", "测试", True, False, "Info")

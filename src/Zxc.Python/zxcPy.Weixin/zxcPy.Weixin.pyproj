@@ -34,6 +34,7 @@
     <Compile Include="zxcPy.Weixin\Weixin_Reply\myWx_User.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="README.md" />
     <Content Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\myWxDo.cpython-35.pyc" />
     <Content Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\myWxDo_Repeater.cpython-35.pyc" />
     <Content Include="zxcPy.Weixin\Weixin_Reply\Setting.txt" />

@@ -11,9 +11,11 @@ Created on  张斌 2016-09-02 16:30:00
 import urllib,urllib.request
 import http.cookiejar
 
+import myDebug;
+
 class myWeb:
     #初始构造 
-    def __init__(self, Host = "127.0.0.1",Path = ''):
+    def __init__(self, Host = "127.0.0.1",Path = '',bPrint = True):
         self.Host = Host
         self.Path = Path
         self.Referer = Host + "/" + Path
@@ -31,17 +33,19 @@ class myWeb:
     def __set_param__(self , Path): 
         self.Path = Path
         self.Referer =self.Host + "/" + Path
+
     #定义cookies
     def __set_cookies__(self , Path): 
         self.Path = Path
         self.Referer =self.Host + "/" + Path
+        
     
     #定义Post方法
     def Do_Post(self, Path , strPostData, strTag = "", bUseHeaders = True, bInitCookie = False):
         self.__set_param__(Path)    #更新属性
         
         #urlencode转换，并强制为UTF8
-        print("请求" + strTag + "页面：" + self.Referer) 
+        myDebug.Debug("请求" + strTag + "页面：" + self.Referer, "Debug" )
         postdata = urllib.parse.urlencode(strPostData) 
         postdata = postdata.encode(encoding='UTF8')
 
@@ -57,31 +61,28 @@ class myWeb:
         #urllib.request.install_opener(self.opener)  #初始cookie的handler
         if(bInitCookie == True):         
             self.opener = urllib.request.build_opener(self.handler)     # 通过handler来构建opener
-            print("    页面Cookie重建")   
-
+            myDebug.Debug("    页面Cookie重建") 
         else:     
             self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cookie))    # 利用urllib2的build_opener方法创建一个opener
-            print("    页面Cookie重置ok")   
-
+            myDebug.Debug("    页面Cookie重置ok") 
             
         #构造Requset
         request= urllib.request.Request( 
                    url = self.Referer, 
                    data = postdata, 
                    headers = header)
-        
             
         #请求响应 
         #response = urllib.request.urlopen(request) 
-        print("    页面请求中。。。")   
+        myDebug.Debug("    页面请求中。。。") 
         response = self.opener.open(request)         
 
              
         #此处的open方法同urllib2的urlopen方法，也可以传入request
         #response = self.opener.open('http://www.baidu.com')
         for item in self.cookie:
-            print ('Name = '+ item.name)
-            print ('Value = '+ item.value)
+            myDebug.Debug('Name = '+ item.name)
+            myDebug.Debug('Value = '+ item.value)
 
         #更新相关记录信息，并返回相应
         page = response.read()
@@ -93,9 +94,9 @@ class myWeb:
         #print(response.read().decode("UTF8"))
         
         if(self.status == 200 or self.reason.tolower() == "ok"):
-            print("    请求完毕。")
+            myDebug.Debug("    请求完毕。")
         else:
-            print("    请求出错。") 
+            myDebug.Debug("    请求出错。")
         print("") 
         return page
 
@@ -113,6 +114,8 @@ class myWeb:
         #print(strInfo)
         #print(strData)
         return strData
+        
+
     #登录信息  
     #strLoginInfo = { 
     #    'method':'login', 
@@ -124,3 +127,9 @@ class myWeb:
     #print(r.read().decode("UTF8"))
  
  
+#主启动程序 
+if __name__ == "__main__":
+    pWeb = myWeb("http://hq.sinajs.cn/")
+    aa = pWeb.Do_Post("list=sh600006,sh510050", "",)
+    bb = aa.decode(encoding = "gbk")
+    print(bb)
