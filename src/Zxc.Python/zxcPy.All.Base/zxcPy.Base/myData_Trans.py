@@ -7,7 +7,7 @@ Created on  张斌 2016-10-08 10:00:00
     自定义数据类型--数据转换操作
 """
 import sys, string, re
-import time
+import time, datetime
 from struct import pack, unpack 
 
 
@@ -118,7 +118,13 @@ def Tran_ToTimes(List, strFormat="%Y-%m-%d %H:%M:%S"):
     for i in range(0, len(List)):
         values.append(Tran_ToTime(List[i], strFormat))    
     return values 
+datetime.datetime.now()
 
+# 字符串转datetime
+def Tran_ToDatetime(strTime, strFormat="%Y-%m-%d %H:%M:%S"):
+    # 时间转换 
+    dtDatetime = datetime.datetime.strptime(strTime, strFormat)   
+    return dtDatetime
 
 # time转字符串
 def Tran_ToTime_str(Time = None, strFormat="%Y-%m-%d %H:%M:%S"):

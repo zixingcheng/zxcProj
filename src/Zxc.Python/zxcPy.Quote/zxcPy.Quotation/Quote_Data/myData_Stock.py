@@ -11,12 +11,13 @@ import sys, os, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/zxcPy.Quotation')
 mySystem.Append_Us("", False)    
-import myQuote_Data
+import myQuote_Data, myData_Trans
 
 
 #行情数据对象
 class Data_Stock(myQuote_Data.Quote_Data):
     def __init__(self):
+        super().__init__()
         self.id = ''
         self.rawLine = ''
         #sorted with sina interface
@@ -132,7 +133,9 @@ class Data_Stock(myQuote_Data.Quote_Data):
     #转换为值组
     def toValueList(self):
         lstV = []
-        lstV.append(string.atof(self.lastPrice))
+        lstV.append(myData_Trans.To_Float(self.lastPrice))
+        lstV.append(myData_Trans.To_Float(self.tradeValume))
+        lstV.append(myData_Trans.To_Float(self.tradeTurnover))
         return lstV
          
     #输出
@@ -140,56 +143,42 @@ class Data_Stock(myQuote_Data.Quote_Data):
         print (self.toString())
 
 #行情数据对象--统计 
-class Data_Stock__Statistics(myQuote_Data.Quote_Data_Statistics):
-    def __init__(selff, tag, value = 0): 
-        myQuote_Data.Quote_Data_Statistics.__init__(tag, value)
-        self.Valume = 0        #成交量
-        self.Turnover = 0      #成交额    
+class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
+    def __init__(self, tagTime, data = Data_Stock(), interval_M = -1): 
+        super().__init__(tagTime, data, interval_M)
+        datas = data.toValueList()
+        self.Valume_S = datas[1]      #成交量_S
+        self.Turnover_S = datas[2]    #成交额_S
+        self.Valume = 0               #成交量
+        self.Turnover = 0             #成交额   
+
+    #其他统计接口
+    def setData_Statics(self, pData):
+        datas = pData.toValueList()
+        self.Valume = datas[1] - self.Valume_S
+        self.Turnover = datas[2] - self.Turnover_S
+       
+#数据对象--统计集 
+class Data_CKDs_Stock(myQuote_Data.Quote_Data_CKDs):
+    #依次：时间标签，初始值，统计间隔
+    def __init__(self, data = Data_Stock(), interval_M = -1): 
+        super().__init__(data, interval_M)
         
+    #初始统计对象 
+    def newDataCKD(self, tagTime, data):
+        pCDK = Data_CKD_Stock(tagTime, data, self.interval_M)
+        self.CKDs[tagTime] = pCDK
+        return pCDK
+
 #行情数据对象集
-class Datas_Stock:
-    def __init__(self):
-        self.name = ''
-        self.dates = {}             #原始数据
-        self.date = Quote_Data()    #当前数据
-        self.keyMinutes = {}
-
-        self.name = ''
-        self.dates = {}             #原始数据
-        self.dates_Statics_M = {}   #统计数据--分钟级
-        self.date_Statics = Quote_Data_Statistics() #统计数据-当前
-        self.date = Quote_Data()    #当前数据
-        self.keyMinutes = {}
+class Datas_Stock(myQuote_Data.Quote_Datas):
+    def __init__(self, pData, interval = 1):
+        super().__init__(pData, interval)
         
-    #设置值 
-    def setData(self, pDate):
-        if(self.date.time == pDate.time):
-            return 
-        self.dates[pDate.time] = pDate
-        self.date = pData
-        
-        #统计
-        setData_Statistics(pDate)
+    #初始统计对象 
+    def newData_CKDs(self, pData):
+        return Data_CKDs_Stock(pData, self.interval_M)
 
-    #设置统计信息 
-    def setData_Statistics(self, pDate):
-        dValue = pDate.lastPrice
-
-        #分钟级数据处理
-        time = pDate.getTime()
-        if(self.date_Statics.tag + 1 >= time):
-            self.dates_Statics_M[time] = self.date_Statics
-            self.date_Statics = Data_Stock__Statistics(time, pDate) 
-
-        #更新统计信息
-        if(dValue > self.date_Statics.high):
-            self.date_Statics.high = dValue
-        if(dValue < self.date_Statics.low):
-            self.date_Statics.low = dValue
-        self.date_Statics.last = dValue
-        self.date_Statics.average = average
-        self.date_Statics.setValues(time, pDate.toValueList())
-        
 
 #主启动程序
 if __name__ == "__main__":

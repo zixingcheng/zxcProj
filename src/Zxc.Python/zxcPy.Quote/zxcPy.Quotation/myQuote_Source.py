@@ -19,8 +19,9 @@ import myQuote_Data, myQuote_Listener
 class Quote_Source:
     def __init__(self, params):
         self.params = params
-        self.datas = None
+        self.datas = {}
         self.listeners = []
+        self.interval_M = 1       #分钟级间隔
      
     #添加监听
     def addListener(self, listener):
@@ -33,6 +34,22 @@ class Quote_Source:
     
     #查询行情
     def query(self):pass
+
+    #生成数据对象
+    def newData(self):pass
+    #生成数据集对象
+    def newDatas(self, data, interval):pass
+    #生成数据对象
+    def setData(self, data):
+        #提取数据对象
+        pDatas = self.datas.get(data.name, None)
+        if(pDatas == None):
+            pDatas = self.newDatas(data, self.interval_M)
+            self.datas[data.name] = pDatas
+            
+        #设置值
+        pDatas.setData(data)
+        return pDatas
      
 
 #行情监听线程
@@ -69,7 +86,7 @@ def mainloop(s):
 if __name__ == "__main__":
     import mySource_Sina_Stock, myListener_Printer
 
-    stockids = 'sh600006,sh510050'
+    stockids = 'sh601288'
     s = mySource_Sina_Stock.Source_Sina_Stock(stockids)
     s.addListener(myListener_Printer.Quote_Listener_Printer())
     

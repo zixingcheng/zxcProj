@@ -20,8 +20,7 @@ class Quote_Listener:
         self.name = name
     def getName(self):
         return self.name  
-    def OnRecvQuote(self, quoteData):pass 
-
+    def OnRecvQuote(self, quoteDatas):pass 
     
 
 #主启动程序

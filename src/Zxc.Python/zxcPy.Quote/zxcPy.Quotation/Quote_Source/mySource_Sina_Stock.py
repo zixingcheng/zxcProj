@@ -13,6 +13,7 @@ import urllib, urllib.request
 mySystem.m_strFloders.append('/zxcPy.Quotation')
 mySystem.m_strFloders.append('/zxcPy.Quotation/Quote_Data')
 mySystem.Append_Us("", False)    
+import myData_Trans
 import myQuote_Data, myData_Stock, myQuote_Listener, myQuote_Source  
 
 
@@ -27,7 +28,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
         res = res_data.read().decode(encoding = "gbk")
         
         #解析所有返回数据
-        qd = myData_Stock.Data_Stock()
+        qd = self.newData()
         lines = res.split('\n')
         for line in lines:
             if len(line) < 50 :
@@ -70,14 +71,25 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
             qd.sell5Price = vargs[29]
             qd.date = vargs[30]
             qd.time = vargs[31]
+
+            #测试步进时间
+            qd.time = myData_Trans.Tran_ToTime_str(None, "%H:%M:%S")
             
             #通知所有监听对象
-            self.notifyListeners(qd)
-
+            qd.value = myData_Trans.To_Float(qd.lastPrice)
+            pDatas = self.setData(qd)
+            self.notifyListeners(pDatas)
+            
+    #生成数据对象
+    def newData(self):
+        return myData_Stock.Data_Stock()
+    #生成数据集对象
+    def newDatas(self, data, interval):
+        return myData_Stock.Datas_Stock(data, interval)
    
 #主启动程序
 if __name__ == "__main__":
-    stockids = 'sh600006,sh510050'
+    stockids = 'sh601288'
     s = Source_Sina_Stock(stockids)
     
     while True:

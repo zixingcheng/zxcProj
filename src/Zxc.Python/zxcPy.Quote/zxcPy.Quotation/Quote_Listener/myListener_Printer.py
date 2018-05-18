@@ -20,6 +20,6 @@ class Quote_Listener_Printer(myQuote_Listener.Quote_Listener):
         myQuote_Listener.Quote_Listener.__init__(self, 'Printer')
 
     #处理接收信息
-    def OnRecvQuote(self, quoteData):
-        quoteData.Print()
+    def OnRecvQuote(self, quoteDatas): 
+        quoteDatas.data.Print()
 
