@@ -26,11 +26,11 @@ def Debug(tag, msg, bRecord = False, bTitle = True, ErrType = "Error"):
         if(bTitle):
             print("->>", tag, "", msg, "\n              ", "--End at", datetime.datetime.fromtimestamp(nTime).strftime('%H:%M:%S.%f'), "\n      ", "--耗时:", round(nInterval, 3), "秒")  
         return nInterval
-    
+
 #打印调试信息并记录时间
 def Debug(msg, ErrType = "Debug"):
     #if(ms_Msgs["Can_Debug"] == True):
-    print("->>", ErrType, "::", msg)
+    print("->>", ErrType, "::", msg)  
 
 def main(): 
     Debug("Test", "测试", True, False, "Info")

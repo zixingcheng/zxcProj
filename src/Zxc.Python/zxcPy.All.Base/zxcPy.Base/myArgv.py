@@ -9,17 +9,13 @@ Created on  张斌 2016-10-16 09:00:00
 
 import sys
 import getopt
-
 import myData_Trans, myData_Json
-
 
 
 #自定义错误
 class Usage(Exception):
     def __init__(self, msg):
         self.msg = msg
-
-
 
 #自定义参数(获取cmd等shell到的参数，并以该类返回便于直接参数调用) 
 class Usargv():
@@ -48,11 +44,8 @@ class Usargv():
             self.baseLong_Options.append(strOpt)
             self.baseLong_Options_N.append(strOptName)            
  
-        
         #提取参数信息
         self._GetParam(argv)        
-    
-
         
     #提取参数信息
     def _GetParam(self, argv = None):
@@ -112,7 +105,6 @@ class Usargv():
             #print(sys.stderr, "for help use --help")
             return 2
 
-
     #提取指定项值
     def _GetParamValue(self, strParam):        
         #判断是否有=好，无的为布尔类型  
@@ -141,7 +133,6 @@ class Usargv():
             pValues.append(myData_Trans.To_Floats(value, strSplit, default_Value))
             
         return pValues
-
 
     #提取指定项值集,提取多值,单项设置多值方式返回
     def _GetParamValues_ByJson(self, strParams, default):
@@ -175,7 +166,6 @@ class Usargv():
                 pValues.append(default_Value)
                 
         return pValues  
-
 
 
 if __name__ == '__main__':

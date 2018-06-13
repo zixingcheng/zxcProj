@@ -77,7 +77,7 @@ else:
         #写入日志记录
         tTime_Day = time.strptime(pNote.Time, "%Y-%m-%d %H:%M")
         dirNote_Now = dirNotes + "/" + time.strftime("%Y", tTime_Day) + "/" + time.strftime("%m", tTime_Day) + "月日志/"
-        myIO.mkdir(dirNotes)
+        myIO.mkdir(dirNote_Now)
             
         pathNote2 = dirNote_Now + time.strftime("%Y-%m-%d", tTime_Day) + ".md"    #Note_Now配置文件路径，py脚本上级目录
         print("备份日志：" +  pathNote2)

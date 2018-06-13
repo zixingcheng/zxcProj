@@ -24,7 +24,7 @@ import interval
 import myEnum, myData, myData_Trans
   
 #定义数据结构枚举
-myDataType = myEnum.enum('object', 'int', 'long', 'double', 'datetime', 'string', 'enum', 'array', 'str_obj', 'array_boj')
+myDataType = myEnum.enum('object', 'int', 'long', 'double', 'arrays', 'array_d', 'bool', 'datetime', 'string', 'enum', 'array', 'str_obj', 'array_obj')
 #DataType = myDataType.int
 #print (myDataType)
 #print (DataType)
@@ -222,9 +222,13 @@ class Dict_Field:
             nIndex = pDicts_Index.index(pDict.ID_Parent)
             pParent = pDicts_Value[nIndex]
             
+            if(pDict.ID == 110530):
+                pp = 1
             pDict.Unit = pParent.Unit
             pDict.Unit_En = pParent.Unit_En
-            pDict.DataType = pParent.DataType
+
+            if(pDict.DataType.count('array') <= 0):
+                pDict.DataType = pParent.DataType
             if(pDict.ValueRange_str == ""):
                 pDict.ValueRange_str = pParent.ValueRange_str
                 pDict.ValueRange = myData.Interval(pDict.ValueRange_str)    #参数范围字串
@@ -278,9 +282,9 @@ class Dict_Field:
         #初始对象             
         pDict.Name = pList[0]           #参数名称 
         pDict.Name_En = pList[1]        #参数_英文
-        
         pDict.ID_Node = 10                                  #参数编号-所在节点编号
         pDict.ID = myData_Trans.To_Int(pList[2])           #参数集编号
+            
         pDict.ID_Start = myData_Trans.To_Int(pList[3])     #参数集起始编号 
         pDict.ID_End = myData_Trans.To_Int(pList[4])       #参数集结束编号
         pDict.ID_Parent = 0                                #参数编号-父编号
@@ -293,8 +297,11 @@ class Dict_Field:
             pDict.IsNode = True 
             
         pDict.Unit = pList[6]           #参数单位                             
-        pDict.Unit_En = pList[7]        #参数单位_英文                
-        pDict.DataType = myEnum.Tran_ToEnum(pList[8], myDataType) #参数类型                
+        pDict.Unit_En = pList[7]        #参数单位_英文      
+        
+        if(pDict.ID == 110530):
+            pp = 2
+        pDict.DataType = myData_Trans.Tran_ToEnum(pList[8], myDataType) #参数类型                
         pDict.ValueRange_str = pList[9] #参数范围字串
         if(pList[9] != ""):
             pDict.ValueRange = myData.Interval(pDict.ValueRange_str)    #参数范围字串
@@ -420,13 +427,16 @@ sys.path.append(r'../myFunction')
 baseDir = os.getcwd()
 baseDir_Root = os.path.abspath(os.path.join(os.getcwd(), "..//..//.."))
 
-pathDict = baseDir_Root + "/Public/Tools/参数字典归集/Dict_Files/Dicts__Test.csv"    #Note_Now配置文件路径，py脚本上级目录  
+pathDict = baseDir_Root + "/Public/Program/ModelData/Base/Dicts/Model_FieldDict.csv"    #Note_Now配置文件路径，py脚本上级目录  
 #print("test %s" % (pathDict))
 
      
 if __name__ == '__main__':
     #print(pathDict)
     pDict_Fields = Dict_Field(pathDict)
+    pField = pDict_Fields.Find(110051)
+    
+    pField = pDict_Fields.Find(110530)
 
     #循环输出结果      
     #pDict_Fields.OutPut(pDict_Fields.pDicts)    
@@ -436,3 +446,4 @@ if __name__ == '__main__':
     
     ss = U'{"name":"Think","share":50, "price":12, "other":{"H":"a","GG":"aa","A":"aa"},"other2" : [{"aa2":0},{"aa3":0}]}'
     keys_En,keys = pDict_Fields.Get_IDs_All(ss) 
+ 

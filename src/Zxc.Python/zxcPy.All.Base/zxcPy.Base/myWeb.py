@@ -62,7 +62,7 @@ class myAPI(Resource):
         return "Put: This is myWeixin_API's Test web page..."
     def delete(self): 
         return "Delete: This is myWeixin_API's Test web page..."
-    
+
 class myAPI_p(myAPI):
     def get(self, param):
         strReturn = "参数：" + param

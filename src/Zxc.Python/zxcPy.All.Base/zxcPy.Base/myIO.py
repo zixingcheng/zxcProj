@@ -42,6 +42,7 @@ def mkdir(path, bTitle = True, bNew = False):
         if(bTitle): print (path + ' 目录已存在')
         return False
     
+    
 #提取文件名集(递归子文件)
 def getFiles(path, wildcard = "", iswalk = True):
     #提取文件后缀
@@ -77,18 +78,52 @@ def getFileName(path, isNosuffix = True):
 
 
 #提取文件信息
-def getContend(path, noBOM = False):
+def getContent(path, noBOM = False, bList = False):
     #提取文件Json串
     if (os.path.exists(path) == False):
-        return ""
+        if(bList): return None
+        else: return ""
     f = codecs.open(path, 'r', 'utf-8')   
-    content = f.read() 
-    if(noBOM):
-        content = Trans_NoBOM(content)
- 
+    if(bList == False):
+        content = f.read() 
+        if(noBOM):
+            content = Trans_NoBOM(content)
+    else:
+        lists = f.readlines()
+        if(noBOM and len(lists[0]) > 0):
+            lists[0] = Trans_NoBOM(lists[0])
+            
+        content = []
+        for strLine in lists: 
+            strLine = Trans_NoBOM(strLine)
+            content.append(strLine)
+
     #关闭文件      
     f.close()
     return content
+
+#提取文件信息
+def getContents(path, noBOM = False):
+    #提取文件Json串
+    if (os.path.exists(path) == False):
+        return ""
+    f = codecs.open(path, 'r', 'utf-8')    
+    lists = f.readlines()
+    if(noBOM and len(lists[0]) > 0):
+        lists[0] = Trans_NoBOM(lists[0])
+        
+    bEnd = False;
+    list_content = []
+    content = ""
+    for strLine in lists: 
+        strLine = Trans_NoBOM(strLine)
+        list_content.append(strLine)
+                
+    #关闭文件      
+    f.close()
+    return list_content
+    
+
 #提取文件信息
 def getContents(path, strTag = "@@", noBOM = False):
     #提取文件Json串
@@ -120,8 +155,9 @@ def getContents(path, strTag = "@@", noBOM = False):
     #关闭文件      
     f.close()
     return list_content
+    
 #提取文件信息, 指定标识处终止
-def getContend_EndByTag(path, strTag = "@@", noBOM = False):
+def getContent_EndByTag(path, strTag = "@@", noBOM = False):
     #打开文件提取数据
     if (os.path.exists(path) == False):
         return "",[] 
@@ -174,6 +210,17 @@ def copyFile(scrPath,  targetDir, name = ""):
     if (os.path.exists(scrPath)): 
         shutil.copy(scrPath, destPath)
         print("copy %s %s" % (scrPath, destPath))
+#定义文件加内拷贝函数 2017-10-18
+def copyFiles(scrDir, targetDir, wildcard = "", iswalk = False):
+    #目标文件夹检测
+    if (os.path.exists(targetDir) == False):
+        mkdir(targetDir)
+        
+    #源文件存在则拷贝
+    if (os.path.exists(scrDir)): 
+        files = getFiles(scrDir, wildcard, iswalk)
+        for file in files:
+            copyFile(file, targetDir)
 
 #去除BOM头
 def Trans_NoBOM(strBom):

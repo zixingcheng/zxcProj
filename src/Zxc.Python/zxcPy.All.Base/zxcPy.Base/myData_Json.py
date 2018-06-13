@@ -7,7 +7,6 @@ Created on  张斌 2017-10-07 14:05:00
                http://python3-cookbook.readthedocs.io/zh_CN/latest/c06/p02_read-write_json_data.html
     
     Json操作，自定义Json对象，Json_Object 顺序输出，Json_Object2失败为乱序(暂留，但不使用便于知识积累)
-
 """ 
 import os, json
 from collections import OrderedDict
@@ -22,6 +21,8 @@ class Json_Object2:
     def ToString(self):
         strJson = json.dumps(self, default = __serialize_instance__, indent = 4) 
         return strJson
+
+
 
 #自定义Json对象 
 class Json_Object:        

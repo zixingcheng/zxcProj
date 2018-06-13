@@ -9,7 +9,7 @@ Created on  张斌 2016-10-08 10:00:00
 import sys, string, re
 import time, datetime
 from struct import pack, unpack 
-
+ 
 
 #是否为数字
 def Is_Numberic(value):
@@ -29,6 +29,7 @@ def To_Float(strData, default = 0):
         return default
     else:
         return float(strValue)
+ 
 #字符串转int
 def To_Int(strData, default = 0):
     strValue = strData.strip() 
@@ -37,7 +38,6 @@ def To_Int(strData, default = 0):
     else:
         return int(float(strValue))
 
-                      
 #字符串转Ints
 def To_Ints(strData, strSplit = ",", default = 0):
     strValue = strData.strip()
@@ -46,8 +46,8 @@ def To_Ints(strData, strSplit = ",", default = 0):
     values = []
     for i in range(0, len(strValues)):
         values.append(To_Int(strValues[i], default))
-             
     return values
+
 #字符串转floats
 def To_Floats(strData, strSplit = ",", default = 0):
     strValue = strData.strip() 
@@ -58,6 +58,7 @@ def To_Floats(strData, strSplit = ",", default = 0):
         values.append(To_Float(strValues[i], default))
              
     return values
+
 # test test test
 # 字符串转floats
 def To_timeFloats(strData, strSplit=",", default=0):
@@ -79,15 +80,15 @@ def To_retain(strData, default = 0):
     else:
         return strValue
 
-    
+                      
 #转bytes
 def To_Bytes_By_Int(value):
     return pack('i', value)
 def To_Bytes_By_Float(value):
     return pack('f', value)
 def To_Bytes_By_Str(value, encod= "utf-8"):
-    return value.encode(encoding = encod)
-      
+    return value.encode(encoding = encod) 
+
 
 #bytes转值
 def To_Int_By_Bytes(value):
@@ -96,6 +97,18 @@ def To_Float_By_Bytes(value):
     return unpack('f', value)[0]
 def To_Str_By_Bytes(value, encod= "utf-8"):
     return value.decode(encoding = encod)
+
+
+#字符串转enum
+def Tran_ToEnum(strKey, enum):
+    nIndex = 0
+    List = list(enum)
+    if(strKey in List):
+        nIndex = List.index(strKey)
+        
+    if(nIndex < 0):
+        nIndex = 0 
+    return enum[nIndex]
  
 
 # 字符串转time
@@ -103,6 +116,7 @@ def Tran_ToTime(strTime, strFormat="%Y-%m-%d %H:%M:%S"):
     # 时间转换 
     dtTime = time.strptime(strTime, strFormat)     
     return dtTime
+
 # 字符串转time
 def Tran_ToTimes(strData, strSplit = ",", strFormat="%Y-%m-%d %H:%M:%S"):
     strValue = strData.strip()
@@ -112,13 +126,13 @@ def Tran_ToTimes(strData, strSplit = ",", strFormat="%Y-%m-%d %H:%M:%S"):
     for i in range(0, len(strValues)):
         values.append(Tran_ToTime(strValues[i], strFormat))
     return values
+
 # 字符串转time
 def Tran_ToTimes(List, strFormat="%Y-%m-%d %H:%M:%S"):
     values = []
     for i in range(0, len(List)):
         values.append(Tran_ToTime(List[i], strFormat))    
     return values 
-datetime.datetime.now()
 
 # 字符串转datetime
 def Tran_ToDatetime(strTime, strFormat="%Y-%m-%d %H:%M:%S"):

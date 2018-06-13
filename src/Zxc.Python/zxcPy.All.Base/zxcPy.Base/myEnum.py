@@ -20,13 +20,3 @@ def enum_values(**kwargs):
     return namedtuple('Enum', kwargs.keys())(*kwargs.values())
 
 
-#字符串转enum
-def Tran_ToEnum(strKey, enum):
-    nIndex = 0
-    List = list(enum)
-    if(strKey in List):
-        nIndex = List.index(strKey)
-        
-    if(nIndex < 0):
-        nIndex = 0 
-    return enum[nIndex]

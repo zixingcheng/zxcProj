@@ -76,7 +76,7 @@ def loadDataSet(path, offset = 0, strSplit = "\t", filetype = []):
     for strField in lineArr:
         if(nLen > nIndex):
             #存在设置，优先设置字段类型
-            FieldType = myEnum.Tran_ToEnum(filetype[nIndex], myFiledype) #参数类型   
+            FieldType = myData_Trans.Tran_ToEnum(filetype[nIndex], myFiledype) #参数类型   
             pTypes.append(FieldType)            
         else:
             if(myData_Trans.Is_Numberic(strField)):
@@ -88,7 +88,7 @@ def loadDataSet(path, offset = 0, strSplit = "\t", filetype = []):
 
     if(len(pTypes) < len(filetype)):
         for i in range(len(pTypes), len(filetype)):
-            FieldType = myEnum.Tran_ToEnum(filetype[nIndex], myFiledype) #参数类型   
+            FieldType = myData_Trans.Tran_ToEnum(filetype[nIndex], myFiledype) #参数类型   
             pTypes.append(FieldType) 
         
     pDt.dataField = pTypes 

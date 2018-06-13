@@ -5,7 +5,7 @@ Created on  张斌 2016-10-07 16:45:00
     @email:  zhangbin@gsafety.com
 
     自定义数据类型操作
-    @依赖库：interval
+
 """
 import sys, string
 import interval 
@@ -14,6 +14,7 @@ import interval
 #三元运算
 def iif(condition, true_part, false_part):  
     return (condition and [true_part] or [false_part])[0]
+
 
 #字符串转区间对象
 def Interval(intervals = ""):
@@ -51,6 +52,16 @@ def Interval(intervals = ""):
         else:
             pInterval = interval.Interval(dLower, dUpper, closed = True)
     return pInterval
+
+
+#Trim运算
+def Trim(text):  
+    while (text[0:1] == " "):
+        text = text[1]
+
+    while (text[-1:] == " "):
+        text = text[:-1]
+    return  text
 
      
 if __name__ == '__main__':
