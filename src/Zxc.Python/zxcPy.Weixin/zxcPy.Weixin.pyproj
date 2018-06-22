@@ -35,9 +35,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />
+    <Content Include="Start.bat" />
     <Content Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\myWxDo.cpython-35.pyc" />
     <Content Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\myWxDo_Repeater.cpython-35.pyc" />
-    <Content Include="zxcPy.Weixin\Weixin_Reply\Setting.txt" />
     <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myImport.cpython-35.pyc" />
     <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myReply_Factory.cpython-35.pyc" />
     <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myReply_Text.cpython-35.pyc" />

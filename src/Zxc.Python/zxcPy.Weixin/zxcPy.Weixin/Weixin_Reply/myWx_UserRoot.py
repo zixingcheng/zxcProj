@@ -17,6 +17,7 @@ import myIO, myIO_xlsx, myImport, myEnum, myData, myData_Trans    #myDataSet #my
 import xlrd, xlwt 
 
 
+
 #功能权限对象
 class myPrj_Root():
     def __init__(self): 
@@ -31,7 +32,7 @@ class myPrj_Root():
         self.isEnable_group = False     #群有效
         self.isEnable_groupAll = False  #群同时有效
         self.isRoot = False             #根标识 
-        
+        self.goupsEnable = {}           #已启用群集
     def _Init(self, prjName, fileName, className, cmdStr, isEnable, isEnable_All, isEnable_one, isEnable_group, isEnable_groupAll): 
         self.prjName = prjName
         self.fileName = fileName
@@ -43,7 +44,6 @@ class myPrj_Root():
         self.isEnable_group = isEnable_group
         self.isEnable_groupAll = isEnable_groupAll
 
-
     #命令权限检查
     def IsEnable(self): return self.isEnable; 
     def IsEnable_All(self): return self.IsEnable() and self.isEnable_All; 
@@ -51,13 +51,25 @@ class myPrj_Root():
     def IsEnable_group(self): return self.IsEnable() and self.isEnable_group; 
     def IsEnable_groupAll(self): 
         return self.IsEnable_group() and self.isEnable_groupAll; 		 
+#功能权限用户对象
+class myPrj_Root_user():
+    def __init__(self): 
+        self.usrName = ""       #用户名
+        self.prjRoot = False    #文件名
+         
+    def _Init(self, usrName, prjRoot): 
+        self.usrName = usrName
+        self.prjRoot = prjRoot
 
+    #命令权限检查
+    def IsHasRoot(self): return self.prjRoot; 
 
 #wx功能权限对象
 class myWx_Root():
     def __init__(self, usrName): 
         self.usrName = usrName  #用户名
         self.prjRoots = {}      #功能权限集
+        self.prjRoots_user = {} #功能权限用户集
         self.prjCmds = {}       #功能命令集
         
         #初始根目录信息
@@ -65,10 +77,10 @@ class myWx_Root():
         self.Dir_Base = os.path.abspath(os.path.join(strDir, "../.."))  
         self.Dir_Setting = self.Dir_Base + "/Setting/"
         self.Dir_Data = self.Dir_Base + "/Data/"
-    
     #初始参数信息等   
     def _Init(self):            
-        dtSetting = myIO_xlsx.loadDataTable(self.Dir_Setting + "Setting.xlsx", 0, 1)    #外部参数设置 
+        dtSetting = myIO_xlsx.loadDataTable(self.Dir_Setting + "Setting.xlsx", 0, 1)            #外部参数设置 
+        dtSetting_user = myIO_xlsx.loadDataTable(self.Dir_Setting + "Setting_User.xlsx", 0, 1)  #外部参数设置-权限用户 
         
         #提取字段信息 
         lstFields = ["功能名称","文件名","类名","启动命令","统一启用","是否启用","一对一有效","群有效","群同时有效"]
@@ -89,13 +101,25 @@ class myWx_Root():
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
 
+        #用户权限设置
+        if(True): 	 
+            #提取字段信息 
+            lstFields_user = ["用户名","功能权限"]
+            lstFields_ind_user = dtSetting_user.Get_Index_Fields(lstFields_user)
+
+            #转换为功能权限对象集
+            for dtRow in dtSetting_user.dataMat:
+                prjRoot_user = myPrj_Root_user()
+                prjRoot_user.usrName = dtRow[lstFields_ind_user["用户名"]]
+                prjRoot_user.prjRoot = myData.iif(dtRow[lstFields_ind_user["功能权限"]] == True, True, False)
+                self.prjRoots_user[prjRoot_user.usrName.lower()] = prjRoot_user
+
         #增加默认隐藏功能 
         prjRoot = myPrj_Root()
         prjRoot._Init("权限提升", "myWxDo_Root", "myWxDo_Root", "zxcWeixin_Root", True, False, True, False, False)
         prjRoot.isRoot = True
         self.prjRoots[prjRoot.prjName] = prjRoot
         self.prjCmds["zxcWeixin_Root".lower()] = prjRoot.prjName
-
 
     #查找 
     def _Find(self, prjName): 
@@ -132,11 +156,10 @@ class myWx_Root():
 class myWx_UserRoot():
     def __init__(self, usrName, wxRoot):
         self.usrName = usrName  #用户名
-        self.prjRoots = wxRoot   #功能权限对象
+        self.prjRoots = wxRoot  #功能权限对象
         self.cmdsOne = {}       #登录的命令-一对一
         self.cmdsGroup = {}     #登录的命令-群
         self.cmdsGroupAll = {}  #登录的命令-全部群
-
 
     #命令权限检查
     def IsEnable(self, strCmd, isGroup = False, strId = ""):
@@ -148,7 +171,7 @@ class myWx_UserRoot():
         #按命令类型记录 
         if(isGroup):
             if(pPrj.IsEnable_group() == False): return False 
-
+            
             #全群和单群区分记录 
             if(pPrj.IsEnable_groupAll() == True):
                 return self.cmdsGroupAll.get(pPrj.prjName, False)

@@ -33,7 +33,6 @@ class myWxDo():
         
         self.maxTime = 60 * 6       #有效时常
         self.Init()
-
     def Init(self): 
         self.isValid = True         #合法性 
         self.isOpened = False         
@@ -41,7 +40,6 @@ class myWxDo():
         self.tStart = datetime.now()
         self.tNow = datetime.now()
         self.tLast = datetime.now()
-
 
     #消息处理接口
     def Done(self, Text, isGroup = False, idGroup = ""):
@@ -71,12 +69,10 @@ class myWxDo():
         
         self.tLast = self.tNow    
         return True
-
     #消息处理
     def _Done(self, Text):
         self.strText_L = Text 
         return ""
-        
     #创建返回消息
     def _Create(self, Text):
         self.msg['Text'] = Text  

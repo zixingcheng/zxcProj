@@ -26,26 +26,6 @@ class myWx_User():
         self.wxDos_sys = {}     #消息处理类集合--系统级
         self.wxDo = None		#消息处理类当前
         self.usrRoot = myWx_UserRoot.myWx_UserRoot(usrName, wxRoot)	#用户权限对象
-
-
-    #新消息处理
-    def Done(self, pWxdo, Text, isGroup = False, idGroup = ""):         
-        #增加功能 
-        self._Add_WxDo(pWxdo)
-
-        #None表示无命令，忽略 
-        if(self.wxDo == None): 
-            return None
-
-        #调用处理命令对象
-        pReturn = self.wxDo.Done(Text, isGroup, idGroup)
-
-		#命令有效性检查，失效则初始状态
-        if(self.wxDo._Check() == False): 
-            self._Close_WxDo(self.wxDo)
-            self.wxDo = None
-        return pReturn;
-
     #增加功能
     def _Add_Root(self, pWxdo): 
         pWxdo_Find = self.wxDos_sys.get(pWxdo.usrTag)
@@ -60,7 +40,6 @@ class myWx_User():
             if(key == prjName): 
                 return self.wxDos[prjName]
         return None
-    
     #增加功能
     def _Add_WxDo(self, pWxdo): 
         if(pWxdo == None): return True		#非命令，直接返回
@@ -79,7 +58,6 @@ class myWx_User():
         else: 
             self.wxDo = pWxdo_Now 
         return True
-    
     #关闭功能
     def _Close_WxDo(self, pWxdo): 
         if(pWxdo == None): return False
@@ -90,3 +68,20 @@ class myWx_User():
             self.wxDos.pop(pWxdo.usrTag)
         return True
  
+    #新消息处理
+    def Done(self, pWxdo, Text, isGroup = False, idGroup = ""):         
+        #增加功能 
+        self._Add_WxDo(pWxdo)
+
+        #None表示无命令，忽略 
+        if(self.wxDo == None): 
+            return None
+
+        #调用处理命令对象
+        pReturn = self.wxDo.Done(Text, isGroup, idGroup)
+
+		#命令有效性检查，失效则初始状态
+        if(self.wxDo._Check() == False): 
+            self._Close_WxDo(self.wxDo)
+            self.wxDo = None
+        return pReturn;

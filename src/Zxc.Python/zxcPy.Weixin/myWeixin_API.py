@@ -10,10 +10,10 @@ import os
 import mySystem 
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-mySystem.m_strFloders.append('/zxcPy.APIs')
-mySystem.m_strFloders.append('/zxcPy.Weixin')
-mySystem.m_strFloders.append('/zxcPy.Weixin/Weixin_Reply')
-mySystem.m_strFloders.append('/zxcPy.Weixin/Weixin_Reply/myWxDo')
+mySystem.Append_Us("/zxcPy.APIs", False, __file__)
+mySystem.Append_Us("/zxcPy.Weixin", False, __file__)
+mySystem.Append_Us("/zxcPy.Weixin/Weixin_Reply", False, __file__)
+mySystem.Append_Us("/zxcPy.Weixin/Weixin_Reply/myWxDo", False, __file__)
 mySystem.Append_Us("", False)    
 import myWeb, myMMap, myWeixin_Cmd
 from myGlobal import gol 

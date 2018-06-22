@@ -11,8 +11,8 @@ import itchat
 from itchat.content import *
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-mySystem.m_strFloders.append('/Weixin_Reply')
-mySystem.m_strFloders.append('/Weixin_Reply/myWxDo')
+mySystem.Append_Us("/Weixin_Reply", False, __file__)
+mySystem.Append_Us("/Weixin_Reply/myWxDo", False, __file__)
 mySystem.Append_Us("", False) 
 import myError, myData_Json, myIO, myMMap, myThread, myReply_Factory  #myDataSet, myData, myData_Trans 
 
@@ -140,6 +140,7 @@ class myWeixin_ItChat(myThread.myThread):
             userFrom = user[0]['UserName']
 
         #发送消息
+        typeMsg = typeMsg.upper()
         if(typeMsg == "TEXT"):
             itchat.send('%s: %s' % (typeMsg, msgInfo), userFrom)
         elif(typeMsg == "TEXT"):
@@ -283,7 +284,7 @@ if __name__ == "__main__":
     #运行 
     #pWeixin.Run();
     pWeixin.Run_ByThread();
-      
+
 
     exit()
 
