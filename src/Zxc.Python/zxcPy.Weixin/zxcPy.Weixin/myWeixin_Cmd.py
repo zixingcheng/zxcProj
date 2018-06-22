@@ -8,7 +8,6 @@ Created on  张斌 2017-11-19 14:58:00
 """
 import os, time  
 import mySystem 
-
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)    

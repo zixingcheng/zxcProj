@@ -1,7 +1,6 @@
 #/usr/env/bin python
-
 '''
-  this is document
+  this is document  --测试用
 '''
 class Event(object):
     '''

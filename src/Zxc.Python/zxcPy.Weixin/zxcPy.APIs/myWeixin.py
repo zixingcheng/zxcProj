@@ -4,7 +4,7 @@ Created on  张斌 2017-11-19 14:40:00
     @author: zhang bin
     @email:  zhangbin@gsafety.com
 
-    Rest API Weixin网页版接口操作() 
+    Rest API Weixin网页版接口操作() --测试用
 """
 import os  
 from flask import Flask
@@ -12,13 +12,11 @@ from flask_restful import reqparse, Api, Resource
 import myWeb
 
 
-
 #Weixin消息发送(API接口)  
 class Send_Msg(Resource):
     def get(self, usrName, msgInfo, mstType = "TEXT"): 
         return "This is myWeixin_API's Test web page..."
         return TODOS
-
     
 #测试(API方法)  
 class TestAPI2(Resource):
@@ -76,7 +74,6 @@ class TodoList(Resource):
         todo_id = 'todo%i' % todo_id
         TODOS[todo_id] = {'task': args['task']}
         return TODOS[todo_id], 201
-
 
 
 #测试API入口

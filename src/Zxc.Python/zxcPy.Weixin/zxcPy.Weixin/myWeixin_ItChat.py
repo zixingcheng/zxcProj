@@ -6,11 +6,9 @@ Created on  张斌 2017-11-17 12:16:00
 
     Python的Weixin网页版接口封装(使用itchat封装)
 """
-
 import sys, os, time, threading, mySystem 
 import itchat
 from itchat.content import *
-
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Weixin_Reply')
@@ -45,6 +43,7 @@ class myWeixin_ItChat(myThread.myThread):
             self.dirData = self.wxReply.wxRoot.Dir_Data
             self.dirPic = self.wxReply.wxRoot.Dir_Data + "Pic/"
             myIO.mkdir(self.dirPic)
+
     #创建命令内存映射 
     def Init_MMap(self, useCmdMMap = True):
         # 创建内存映射（读）
@@ -268,6 +267,7 @@ class myWeixin_CmdThread (threading.Thread):  #继承父类threading.Thread
         threading.Thread._stop(self)     
         self.exitFlag = True     
    
+
 #主启动程序
 if __name__ == "__main__":
     #声明Weixin操作对象
@@ -287,7 +287,3 @@ if __name__ == "__main__":
 
     exit()
 
-
-
-
- 
