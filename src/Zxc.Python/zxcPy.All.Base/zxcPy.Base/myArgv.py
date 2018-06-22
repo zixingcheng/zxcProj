@@ -51,6 +51,14 @@ class Usargv():
     def _GetParam(self, argv = None):
         if argv is None:
             self.baseArgv = sys.argv
+        elif(type(argv) == str):
+            self.baseArgv = self.clone_Argv_sys()
+            self.baseArgv.append(argv)
+        elif(type(argv) == list):
+            self.baseArgv = self.clone_Argv_sys()
+            for x in argv:
+                if(type(x == str)):
+                    self.baseArgv.append(x)
         #print("Usparam Test:")
         #Usage("Err")
         
@@ -166,20 +174,26 @@ class Usargv():
                 pValues.append(default_Value)
                 
         return pValues  
+    
+    #克隆系统项目
+    def clone_Argv_sys(self, bClear = True): 
+        pArgv = sys.argv.copy() 
+        if(bClear):
+            while(len(pArgv) > 1):
+                pArgv.pop() 
+        return pArgv
 
+def main(*args):
+    #pArgv = Usargv("",["help","output="])
+    pArgv = Usargv("",["prj=","prj2=","prj3="],*args)
+    print(pArgv._GetParamValue("prj"))
+    print(pArgv._GetParamValue("prj2"))
+    print(pArgv._GetParamValue("prj3"))
+    print(pArgv.basePath)
 
 if __name__ == '__main__':
-    #main()
-    #pArgv = Usargv("",["help","output="])
-    pArgv = Usargv("",["prj="])
-    print(pArgv._GetParamValue("prj"))
-    print(pArgv.basePath)
-    
-
-    #直接编译会发生错误，但通过cmd可以正确执行
-    #d = int(pArgv.b) * 10
-    #print(d)
- 
-    
-    #sys.exit(pArgv)
+    sys.argv.append("--prj=GModel_Base")
+    main("--prj2=GModel_Base2")
+    print("")
+    main(["--prj2=GModel_Base22","--prj3=GModel_Base33"])
 

@@ -90,7 +90,7 @@ def getContent(path, noBOM = False, bList = False):
             content = Trans_NoBOM(content)
     else:
         lists = f.readlines()
-        if(noBOM and len(lists[0]) > 0):
+        if(noBOM and len(lists)>0 and len(lists[0]) > 0):
             lists[0] = Trans_NoBOM(lists[0])
             
         content = []
