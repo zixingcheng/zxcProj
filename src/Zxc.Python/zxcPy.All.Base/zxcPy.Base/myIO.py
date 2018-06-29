@@ -55,18 +55,15 @@ def getFiles(path, wildcard = "", iswalk = True):
         for name in files:
             for suffix in suffixs:
                 if(name.endswith(suffix)):
-                    list_Files.append(path + "\\" + Trans_NoBOM(name))
+                    list_Files.append(Trans_NoBOM(path) + "\\" + Trans_NoBOM(name))
                     break
         return list_Files
     
     #递归子文件
     for root, subdirs, files in os.walk(path):
-        files = os.listdir(path)
-        for name in files:
-            for suffix in suffixs:
-                if(name.endswith(suffix)):
-                    list_Files.append(Trans_NoBOM(root) + "\\" + Trans_NoBOM(name))
-                    break
+        lstFile = getFiles(root, wildcard, False)
+        for x in lstFile:
+            list_Files.append(x)
     return list_Files
 def getFileName(path, isNosuffix = True):
     #提取文件后缀
@@ -101,7 +98,6 @@ def getContent(path, noBOM = False, bList = False):
     #关闭文件      
     f.close()
     return content
-
 #提取文件信息
 def getContents(path, noBOM = False):
     #提取文件Json串
@@ -122,8 +118,6 @@ def getContents(path, noBOM = False):
     #关闭文件      
     f.close()
     return list_content
-    
-
 #提取文件信息
 def getContents(path, strTag = "@@", noBOM = False):
     #提取文件Json串
@@ -155,7 +149,6 @@ def getContents(path, strTag = "@@", noBOM = False):
     #关闭文件      
     f.close()
     return list_content
-    
 #提取文件信息, 指定标识处终止
 def getContent_EndByTag(path, strTag = "@@", noBOM = False):
     #打开文件提取数据

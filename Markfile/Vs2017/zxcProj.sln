@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zxcPython", "zxcPython", "{
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "zxcPy.Quote", "..\..\src\Zxc.Python\zxcPy.Quote\zxcPy.Quote.pyproj", "{F001C86F-593E-40CB-8491-9E93C8630403}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "zxcPy.Robot", "..\..\src\Zxc.Python\zxcPy.Robot\zxcPy.Robot.pyproj", "{0E89E814-5D61-43F4-9065-03483BB5BA80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,8 @@ Global
 		{15A0A06F-3917-46FD-B1D4-F3A7530A0A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F001C86F-593E-40CB-8491-9E93C8630403}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F001C86F-593E-40CB-8491-9E93C8630403}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E89E814-5D61-43F4-9065-03483BB5BA80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E89E814-5D61-43F4-9065-03483BB5BA80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +40,7 @@ Global
 		{A0DCCAD3-0A28-4EFE-9DBA-E6D3D5FEB346} = {7C123EBC-286C-4B4E-9BA6-D9F0CCD5FD5E}
 		{15A0A06F-3917-46FD-B1D4-F3A7530A0A94} = {7C123EBC-286C-4B4E-9BA6-D9F0CCD5FD5E}
 		{F001C86F-593E-40CB-8491-9E93C8630403} = {7C123EBC-286C-4B4E-9BA6-D9F0CCD5FD5E}
+		{0E89E814-5D61-43F4-9065-03483BB5BA80} = {7C123EBC-286C-4B4E-9BA6-D9F0CCD5FD5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C9C7E36-0E45-4E37-B3DD-31393C8EBF16}

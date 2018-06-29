@@ -72,16 +72,17 @@ class myMD_node:
             ind += 1
             self.titleID_str = strTitle[0:ind]
             self.titleName = strTitle[ind:]
-    def setTitle_info(self, strTitle, level = 0):
+    def setTitle_info(self, strTitle, level = 0, titleID = 0):
         self.titleName = strTitle
         self.level = myData.iif(level < 1, 1, level)
+        self.titleID = myData.iif(titleID < 1, 1, titleID)
 
     # 新增子节点
     def addChild(self, child):
         if(child == None): return False
         self.Childs.append(child)
         child.Parent = self
-        child.upData_Level()
+        self.upData_All(self.titleID)
         return True
     # 新增内容行
     def addContent(self, strContent, bNewLine = True):
@@ -89,13 +90,13 @@ class myMD_node:
             self.contents.append(strContent + myData.iif(bNewLine, "\r\n", ""))
         else:
             self.contents.append(strContent)
+
     # 子集更新
     def upData_All(self, nId = 0):
         self.upData_Level()
 
         if(nId < 1): nId = self.level
         self.upData_ID(nId)
-
     def upData_Level(self):
         if(self.Parent == None):
             self.level = 1
@@ -132,8 +133,19 @@ class myMD_node:
         # 组装子节点信息
         if(bChild):
             for x in self.Childs:
-                strContent += x.getContent(bAll, bChild)
+                strContent += x.getContent(True, bChild)
         return strContent
+    # 提取表
+    def getTable(self, ind = 0):
+        num = -1
+        pTable = None
+        for x in self.contents:
+            if(type(x) == myMD_table):
+                num += 1
+                if(ind == num): 
+                    pTable = x
+                    break  
+        return pTable
     def getTitle(self, bSpanInd = True):
         strTitle = "#" * self.level + " "
         if(self.titleID > 0):
@@ -158,18 +170,6 @@ class myMD_node:
             parent = parent.Parent
         self.titleID_str = strID_pre + self.titleID_str
         return self.titleID_str
-    
-    # 提取表
-    def getTable(self, ind = 0):
-        num = -1
-        pTable = None
-        for x in self.contents:
-            if(type(x) == myMD_table):
-                num += 1
-                if(ind == num): 
-                    pTable = x
-                    break  
-        return pTable
 
     # 查找键值位置
     def _Find(self, key):
@@ -193,11 +193,13 @@ class myMD_node:
     
 # MD表信息
 class myMD_tableField:
-    def __init__(self, nameFiled = "", col = 0, row = 0):
+    def __init__(self, nameFiled = "", col = 0, row = 0, value = None):
         self.row = row
         self.col = col
         self.nameFiled = nameFiled
         self.values = []
+        if(value != None): self.values.append(value)
+
 class myMD_table():
     def __init__(self):
         self.type = myMD_node_Type.table
@@ -289,10 +291,13 @@ class myMD_table():
 
     # 添加字段信息
     def addField(self, field):
-        if(len(self.indFields) != self.cols):
-            self.indFields = [0] * self.cols
+        while(len(self.indFields) <= field.col + 1):
+            self.indFields.append(0)
         self.indFields[field.col] = 1
         self.fields.append(field)
+        if(self.cols < len(self.indFields)): self.cols = len(self.indFields)
+        if(self.rows <= field.row): self.rows = field.row + 1
+
         field.nameFiled = field.nameFiled.replace("<B>", "").replace("<b>", "").strip()
         for x in field.values:
             x = x.strip()
@@ -385,6 +390,7 @@ class myMD:
     def __init__(self, path=""):
         self.nodesMD = []
         self.Current = None 
+        self.Ind = 1 
         if(path != ""): self.loadMD(path)
 
     # 加载md文件 
@@ -414,7 +420,7 @@ class myMD:
                 continue
     # 保存md文件 
     def saveMD(self, path):
-        self.upData_ALl()
+        self.upData_All()
         strContent = self.getContent()
         myIO.Save_File(path, strContent, True, True)
 
@@ -455,8 +461,9 @@ class myMD:
                 parent.addChild(node)
                 self.Current = node
         return 1
-    def upData_ALl(self):
-        ind = 1
+    def upData_All(self, ind = 0):
+        if(ind < 1): ind = self.Ind
+        self.Ind = ind
         for x in self.nodesMD:  
             x.upData_All(ind);
             ind += 1
@@ -498,3 +505,37 @@ if __name__ == '__main__':
 
     pMD.saveMD("D:\\Test\\test.md")
     bb =1
+    
+    # 非顺序编号
+    pNode_C = myMD_node()
+    pNode_C.setTitle_info("接口索引")
+    pNode_C.addContent("\r\n Test")
+    pNode_C.addContent("\r\n Test2")
+
+    pNode = myMD_node()
+    pNode.setTitle_info("接口索引", 0, 5)
+    strTitle = pNode.getTitle()
+
+    pNode.addChild(pNode_C)
+    strTitle = pNode.getTitle()
+    strNode = pNode.getContent(False, True)
+    print(strTitle)
+    print(strNode)
+
+    # 复杂类型表
+    pTable = myMD_table()
+    pTable.simpleField = False
+
+    pTable.addField(myMD_tableField("接口编号", 0 , 0, "Int_5.1.1"))
+    pTable.addField(myMD_tableField("功能名称", 2 , 0, "gm_Create"))
+    	
+    pTable.addField(myMD_tableField("接口描述", 0 , 1, "创建模型对象"))
+    pTable.addField(myMD_tableField("方法定义", 0 , 2, "MYDLLAPI IModel* gm_Create(char** uid);"))
+    pTable.addField(myMD_tableField("提供方式", 0 , 3, "C++动态库"))
+    pTable.addField(myMD_tableField("配置文件说明", 0 , 4, "无"))
+
+    strTable = pTable.getContent()
+    print(strTable)
+    	
+
+    	

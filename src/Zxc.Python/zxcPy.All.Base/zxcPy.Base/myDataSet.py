@@ -21,7 +21,6 @@ class Dt:
         self.dataMat = []   #数据集
         self.dataField = [] #数据字段集
 
-
     #载入文件数据(按指定字符分隔)
     def loadDataSet_Row(self, lineArr = []):
         pTypes = self.dataField  
@@ -39,10 +38,8 @@ class Dt:
         #print(pValues)
         return pValues
 
-
     def __len__(self):
         return len(self.dataMat) 
-
     def __getitem__(self, key):
         return self.dataMat[key]
     

@@ -86,18 +86,23 @@ class DtTable:
         pWorkbook = xlwt.Workbook()  #注意Workbook的开头W要大写
         pName = myData.iif(sheet_name == "","sheet1", sheet_name)
         pSheet = pWorkbook.add_sheet(pName, cell_overwrite_ok = cell_overwrite) 
-
+        
         #循环向sheet页中写入数据
         nRows = myData.iif(row_end < 0 , len(self.dataMat), row_end)
         nCols = myData.iif(col_end < 0 , len(self.dataMat[0]), col_end)
+        
+        # 写入字段
+        for j in range(col_start, nCols):
+            pSheet.write(row_start, j - col_start, self.dataField[j])  
 
-        #print(nRows, nCols)
+        # 写入值
         for i in range(row_start, nRows):
             pValues = self.dataMat[i] 
             for j in range(col_start, nCols):
-                pSheet.write(i - row_start, j - col_start, str(pValues[j]))                
-        #    self.dataMat.append(pValues) 
-        #print(self.dataMat)
+                strVaulue = str(pValues[j])
+                if(type(pValues[j]) == bool):
+                    strVaulue = myData.iif(pValues[j], "TRUE", "FALSE")
+                pSheet.write(i - row_start + 1, j - col_start, strVaulue)                
         
         #保存该excel文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".xls"
@@ -182,9 +187,11 @@ def loadDataTable(strPath, sheet_index = 0, row_start = 1, col_start = 0, field_
 
 
 def main():
-    strPath = "F:/Working/张斌/工作文档/程序源码/模型工程化/GModel/src/GModel_Python/GModel_Py_All/GModel_Py_Prj_Department/表格/Test.xlsx"    
+    strPath = "D:\\我的工作\\学习\\MyProject\\zxcProj\\src\\Zxc.Python\\zxcPy.Robot\\Setting\\Setting.xlsx"    
     pTable = loadDataTable(strPath)
-     
+    strPath2 = "D:\\我的工作\\学习\\MyProject\\zxcProj\\src\\Zxc.Python\\zxcPy.Robot\\Setting"  
+    pTable.Save(strPath2, "Test2")
+
 if __name__ == '__main__':
      exit(main())
 

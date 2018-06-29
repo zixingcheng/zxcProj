@@ -9,15 +9,16 @@ Created on  张斌 2018-04-22 20:05:00
 
 
 #全局变量
-class gol():
-    def __init__(self):
-        self._Inited = True
-    def _Init():#初始化
-        global _global_dict
-        _global_dict = {}
+class gol():    
+    _gs_Inited = False  #加载标识
+    def _Init():        #初始化
+        if(gol._gs_Inited == False):
+            global _global_dict
+            _global_dict = {}
+            gol._gs_Inited = True
         
-        _global_dict["ms_Msgs"] = {}
-        print("初始：全局变量")
+            _global_dict["ms_Msgs"] = {}
+            print("初始：全局变量")
 
     def _Set_Value(key, value):
         """ 定义一个全局变量 """
@@ -38,3 +39,5 @@ if __name__ == '__main__':
     gol._Set_Value('CODE','UTF-8')
     gol._Set_Value('PORT',80)
     gol._Set_Value('HOST','127.0.0.1') 
+
+    print(gol._Get_Value('PORT'))
