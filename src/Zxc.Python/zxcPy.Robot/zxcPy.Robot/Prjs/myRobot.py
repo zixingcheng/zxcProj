@@ -10,32 +10,26 @@ import sys, os, time, mySystem
 from datetime import datetime, timedelta
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-mySystem.Append_Us("", True) 
+mySystem.Append_Us("../Prjs", False, __file__)
+mySystem.Append_Us("", False) 
 import myData, myEnum
 myDoType = myEnum.enum_index('Cmd')  # 命令类型枚举
 
 
-#消息处理基类
+#机器人基类
 class myRobot():
     def __init__(self):
         # 功能信息
         self.doType = myDoType.Cmd  #类型   
-        self.doTag = ""             #标识  
-        self.doTitle = ""           #说明 
-        self.strText_L = ""         #命令信息（缓存上次）  
+        self.doTitle = "Robot"      #说明 
+        self.doCmd = "@@myRobot"    #启动命令 
         self.usrName = ""           #创建用户名称
-
-        # 初始返回消息
-        self.msg = {}              
-        self.msg['FromUserName'] = "" 
-        self.msg['Type'] = "TEXT" 
-        self.msg['Text'] = ""         
-        self.maxTime = 60 * 6       #有效时常
-        self.Init()
+        self.strText_L = ""         #命令信息（缓存上次） 
+        self.Init()                 #初始基础信息
     def Init(self): 
-        self.isValid = True         #合法性 
-        self.isOpened = False         
-        
+        self.isEnable = True            #是否可用
+        self.isValid = True             #合法性 
+        self.isOpened = False           #是否启用
         self.tStart = datetime.now()
         self.tNow = datetime.now()
         self.tLast = datetime.now()
@@ -44,8 +38,14 @@ class myRobot():
         self.prjName = "消息处理功能"   #功能名
         self.fileName = "myRobot"       #文件名
         self.className = "myRobot"      #类名
-        self.cmdStr = ""                #启动命令
         self.isNoReply = True           #是否无回复操作--功能自带    
+        
+        # 初始返回消息
+        self.msg = {}              
+        self.msg['FromUserName'] = "" 
+        self.msg['Type'] = "TEXT" 
+        self.msg['Text'] = ""         
+        self.maxTime = 60 * 6       #有效时常
 
     #消息处理接口
     def Done(self, Text, isGroup = False, idGroup = ""):
@@ -54,17 +54,19 @@ class myRobot():
             return None
 
         #消息处理  
-        if(Text == self.doTag):
+        strReturn = None
+        if(Text == self.doCmd):
             strReturn = self.doTitle + "功能" + self._Title()
         else:
-            strReturn = self._Done(Text)
+            if(self.isOpened):
+                strReturn = self._Done(Text)
         
         #创建返回消息
-        return self._Create(strReturn)
+        return self._Return(strReturn)
         
     #合法性(时效)
     def _Check(self):
-        if(self.isValid == False or self.isOpened == False):
+        if(self.isEnable == False or self.isValid == False):
             return False
         
         #时效
@@ -78,9 +80,9 @@ class myRobot():
     #消息处理--继承类重写，实现处理逻辑功能
     def _Done(self, Text):
         self.strText_L = Text 
-        return ""
+        return Text
     #创建返回消息
-    def _Create(self, Text):
+    def _Return(self, Text):
         self.msg['Text'] = Text  
         return self.msg
 
@@ -104,7 +106,9 @@ if __name__ == "__main__":
     pR = myRobot();
 
     time.sleep (0)
-    pp = pR.Done("Hello")
-    print(pp)
+    print(pR.Done("Hello")["Text"])
+    print(pR.Done("@@myRobot")["Text"])
+    print(pR.Done("myRobot")["Text"])
+    print(pR.Done("@@myRobot")["Text"])
 
     

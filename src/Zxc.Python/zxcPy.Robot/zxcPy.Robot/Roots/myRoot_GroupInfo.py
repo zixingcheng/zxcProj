@@ -26,21 +26,27 @@ class myRoot_GroupsInfo():
         self.groupInfos = {}                #群组对象集
 
     # 添加群组
-    def Add_Group(self, groupName, groupID): 
+    def Add_Group(self, groupName, groupID, bUpdata = True): 
         pGroup = self.Find_Group(groupName, groupID)
-        if(pGroup != None): return False
+        if(pGroup != None): 
+            if(bUpdata):
+                pGroup.groupID = groupID
+                pGroup.groupName = groupName
+                return pGroup
+            else: return None
 
         pGroup = myRoot_GroupInfo() 
         pGroup.typeName = self.typeName
         pGroup.groupName = groupName.lower()
         pGroup.groupID = groupID.lower() 
         self.groupInfos[pGroup.groupName] = pGroup
+        return pGroup
     # 移除群组
     def Del_Group(self, groupName, groupID): 
         pGroup = self.Find_Group(groupName, groupID)
         if(pGroup == None): return False
         self.groupInfos.pop(pGroup.groupName)   # 移除字典项 
-        
+        return True
     # 查找群组
     def Find_Group(self, groupName, groupID = ""): 
         pGroup = self.groupInfos.get(groupName.lower(), None)
@@ -58,11 +64,14 @@ class myRoot_GroupsInfo():
     
 #主启动程序
 if __name__ == "__main__":
-    pGroups = myRoot_GroupsInfo("Wx")
+    pGroups = myRoot_GroupsInfo("WxGroup")
     pGroups.Add_Group("Test", "@asadafs")
-    pGroups.Add_Group("test", "@")
+    pGroups.Add_Group("test", "@001")
     pGroups.Add_Group("test2", "")
     pGroups.Del_Group("test", "@")
+    pGroups.Add_Group("Test2", "@0012")
     pGroup = pGroups.Find_Group("Test")
-
     print(pGroup)
+
+    pGroup2 = pGroups.Find_Group("Test2")
+    print(pGroup2.groupID, pGroup2.groupName, pGroup2.typeName)

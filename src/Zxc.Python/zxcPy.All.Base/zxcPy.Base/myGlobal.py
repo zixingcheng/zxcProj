@@ -5,30 +5,45 @@ Created on  张斌 2018-04-22 20:05:00
     @email:  zhangbin@gsafety.com
 
     全局变量
-"""
-
+""" 
 
 #全局变量
 class gol():    
     _gs_Inited = False  #加载标识
     def _Init():        #初始化
         if(gol._gs_Inited == False):
+            print("->>", "初始：全局变量")  
             global _global_dict
-            _global_dict = {}
             gol._gs_Inited = True
+            _global_dict = {}
         
-            _global_dict["ms_Msgs"] = {}
-            print("初始：全局变量")
+            #全局消息
+            _global_dict["golMsgs"] = {}
+
+            #全局设置
+            _ms_Setting = {}
+            _ms_Setting["CanPrint"] = True
+            _ms_Setting["CanPrint_Debug"] = True
+            _ms_Setting["CanPrint_Warnning"] = True
+            _ms_Setting["CanPrint_Error"] = True
+            _ms_Setting["Debug_Depth"] = 0
+            _ms_Setting["Return_strFormat"] = {'result': False, 'err': "", 'text': ""}
+            _global_dict["golSetting"] = _ms_Setting
+            
+            print("->>", "\t--已初始全局变量\r\n")  
 
     def _Set_Value(key, value):
         """ 定义一个全局变量 """
         _global_dict[key] = value
     def _Get_Value(key, defValue = None):
         """ 获得一个全局变量,不存在则返回默认值 """
-        try:
-            return _global_dict[key]
-        except KeyError:
-            return defValue
+        return _global_dict.get(key, defValue)
+
+    #全局设置
+    def _Set_Setting(key, value):
+        _global_dict["golSetting"][key] = value
+    def _Get_Setting(key, defValue = None):
+        return _global_dict["golSetting"].get(key, defValue)
 
 
 from myGlobal import gol   

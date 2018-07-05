@@ -6,23 +6,20 @@ Created on  张斌 2017-11-17 15:16:00
 
     Weixin网页版消息处理接口（功能库）--Root临时提升，以便有开启系统功能权限
 """
+import sys, os, time ,mySystem
 
-import sys, os, time #,mySystem
-from myWxDo import myWxDo 
-
-
-#引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-#mySystem.m_strFloders.append('/myAPIs')
-#mySystem.Append_Us("", True) 
-import myWx_UserRoot, myData   #myData_Json #myDataSet, myData, myData_Trans 
-
+#引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类 
+mySystem.Append_Us("", False) 
+import myRobot
 
     
-#消息处理--复读机(回复相同消息)
-class myWxDo_Root(myWxDo):
+#机器人类--权限提升
+class myRobot_Root(myRobot):
     def __init__(self, usrName_F, Text, usrRoot):
-        myWxDo.__init__(self)
-        self.usrType = "Cmd_@@"         #类型   
+        myRobot.__init__(self)
+        self.doTitle = "Robot_Root"     #说明 
+        self.doCmd = "@@zxcRobot_Root"  #启动命令 
+        
         self.usrTag = "zxcWeixin_Root"  #标识
         if(self.usrTag in Text):
             self.usrTag = Text 

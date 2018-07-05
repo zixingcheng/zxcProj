@@ -40,8 +40,10 @@ class myMD_node:
         self.titleID = 0        # 标题ID
         self.titleID_str = ""   # 标题ID（父级级联或设定）
         self.contents = []      # 内容
-        self.Parent = None      # 父级对象
         self.Childs = []        # 子集
+        self.Parent = None      # 父级对象
+        self.Link_str = ""      # 返回链接信息
+        self.Out_Title = True   # 允许输出标题信息
         if(strTitle != ""): self.setTitle(strTitle)
         
     # 设置标题信息
@@ -76,6 +78,10 @@ class myMD_node:
         self.titleName = strTitle
         self.level = myData.iif(level < 1, 1, level)
         self.titleID = myData.iif(titleID < 1, 1, titleID)
+    # 设置返回链接信息
+    def setLink_info(self, titleName, titleID_str):
+        strLink = "*<font color=gray size=3 face=\"宋体\">&#160;&#160;---[返回](#" + titleID_str + "):" + titleName + "</font>*"
+        self.Link_str = strLink
 
     # 新增子节点
     def addChild(self, child):
@@ -90,6 +96,7 @@ class myMD_node:
             self.contents.append(strContent + myData.iif(bNewLine, "\r\n", ""))
         else:
             self.contents.append(strContent)
+            strContent.Parent = self
 
     # 子集更新
     def upData_All(self, nId = 0):
@@ -117,8 +124,8 @@ class myMD_node:
     # 提取内容信息
     def getContent(self, bAll = False, bChild = False):
         strContent = ""
-        if(bAll):    # 组装头标题信息
-            strContent += self.getTitle() + "\r\n"
+        if(bAll and self.Out_Title):    # 组装头标题信息
+            strContent += self.getTitle() + self.Link_str + "\r\n"
         
         # 组装内容
         for x in self.contents:
@@ -191,7 +198,7 @@ class myMD_node:
         if(ind < 0): return None
         return self.Childs[ind] 
     
-# MD表信息
+# MD表字段信息
 class myMD_tableField:
     def __init__(self, nameFiled = "", col = 0, row = 0, value = None):
         self.row = row
@@ -199,13 +206,14 @@ class myMD_tableField:
         self.nameFiled = nameFiled
         self.values = []
         if(value != None): self.values.append(value)
-
+# MD表信息
 class myMD_table():
     def __init__(self):
         self.type = myMD_node_Type.table
         self.rows = 0
         self.cols = 0
         self.simpleField = True     # 简单行列结构,复杂需要记录行列数据位置
+        self.Parent = None      # 父级对象
         self.fields = []            # 字段信息
         self.indFields = []
         

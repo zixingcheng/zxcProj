@@ -68,27 +68,89 @@ def Replace_ALL(text, symbol = "  ", re = " "):
     while(text.count(symbol) > 0):
         text = text.replace(symbol, re)
     return text.strip()
+#查找指定标识字符出现的有效位置,屏蔽指定符号内标识字符
+def Find(text, sep, offset = 0, segTag_S = "\"", segTag_E = "\""):
+    #提取所有引号对
+    lstSeg = []
+    text.replace("\"", "'")                      #去除转义引号
+    ind_0 = text.find(segTag_S, offset)          #引号起始位置 
+    while(ind_0 >= 0):
+        ind_1 = text.find(segTag_E, ind_0 + 1)   #引号结束位置
+        if(ind_1 > 0):
+            lstSeg.append(ind_0)                 #记录引号对位置
+            lstSeg.append(ind_1)
+            ind_0 = text.find(segTag_S, ind_1 + 1)         
+        else: break
+
+    ind = text.find(sep, offset)                 #标识出现位置
+    numSet = len(lstSeg)
+    while(ind >= 0 and numSet > 1):
+        bInSeg = False
+        for x in range(0, numSet, 2):            #循环校检是否在指定符号内
+            if(ind > lstSeg[x] and ind < lstSeg[x + 1]):
+                offset = ind + 1
+                bInSeg = True
+                ind = -1
+                break
+        if(bInSeg == False): return ind          #不在Seg内，直接返回
+        if(offset >= len(text)):break
+        ind = text.find(sep, offset)             #标识出现位置
+    return ind
+#查找指定标识字符出现的次数,屏蔽指定符号内标识字符
+def Count(text, sep, offset = 0, end = -1, segTag_S = "\"", segTag_E = "\""):
+    #提取所有引号对
+    lstSeg = []
+    text.replace("\"", "'")                      #去除转义引号
+    ind_0 = text.find(segTag_S, offset)          #引号起始位置 
+    while(ind_0 >= 0):
+        ind_1 = text.find(segTag_E, ind_0 + 1)   #引号结束位置
+        if(ind_1 > 0):
+            lstSeg.append(ind_0)                 #记录引号对位置
+            lstSeg.append(ind_1)
+            ind_0 = text.find(segTag_S, ind_1 + 1)         
+        else: break
+
+    lstPos = []
+    if(end < 0): end = len(text)
+    ind = text.find(sep, offset, end)            #标识出现位置
+    while(ind >= 0):
+        lstPos.append(ind)
+        ind = text.find(sep, ind + 1, end)       #标识出现位置
+
+    #Count累加
+    nNum = 0
+    numSet = len(lstSeg)
+    for ind in lstPos:
+        bInSeg = False
+        for x in range(0, numSet, 2):            #循环校检是否在指定符号内
+            if(ind > lstSeg[x] and ind < lstSeg[x + 1]):
+                bInSeg = True
+                break
+        if(bInSeg == False): nNum += 1
+    return nNum
+#截取指定符号间的字符串
 def Cut_str(text = "", segTag_S = "(", segTag_E = ")", offset = 0):
     # 提取类代码段
     nNum_start = 0
     nNum_end = 0
-    ind = text.find(segTag_S, offset)
-    end = ind
-    if(ind >=0 ): nNum_start += 1
+    ind_S = Find(text, segTag_S, offset)                #查找有效起始
+    ind_E = ind_S
+    if(ind_S >=0 ): nNum_start += 1
     
     #查找，直到成对闭合则结束 
-    ind_S = ind
+    ind_S = ind_S
     while(nNum_start > nNum_end):  
-        end = text.find(segTag_E, end + 1)
-        if(end < 0): break 
+        ind_E = Find(text, segTag_E, ind_E + 1)         #查找有效结束
+        if(ind_E < 0): break 
         nNum_end += 1
 
-        #未闭合则继续
-        if(nNum_end < nNum_start or (ind >= 0 and text.find(segTag_S, ind + 1, end) > 0)):
-            ind = text.find(segTag_S, ind + 1)
-            if(ind >=0 ): nNum_start += 1
-    strCut = iif(ind_S != end, text[ind_S + len(segTag_S): end], "")
-    return ind_S, end, strCut
+        #未闭合则继续--起始符号到终止符号间是否存在有效起始符号
+        ind = Find(text, segTag_S, ind_S + 1)      
+        if(ind >= 0 and ind < ind_E):
+            ind_S = ind
+            nNum_start += 1
+    strCut = iif(ind_S != ind_E, text[ind_S + len(segTag_S): ind_E], "")
+    return ind_S, ind_E, strCut
      
 
 if __name__ == '__main__':
@@ -97,5 +159,10 @@ if __name__ == '__main__':
     print(pp)
     print(0 in pp)
 
-    ind_S, ind_E, strV = Cut_str("<<summary>>创建模型对象(返回模型uid)</summary><param name=\"111\">111</param>", "<", ">")
+    str0 = "_gT_Replace(strAppPath, string(\"//\"), string(\"/\"))";
+    ind = Find(str0, "//")
+    print(Count(str0, "//"))
+    print(Count(str0, "T", 0, 4))
+
+    ind_S, ind_E, strV = Cut_str("<<summary>>创建模型对象(返回模型uid)</summary><param name=\"1<11\">111</param>", "<", ">", 30)
     print(ind_S, ind_E, strV)

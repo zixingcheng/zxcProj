@@ -9,61 +9,58 @@ Created on  张斌 2018-06-25 10:58:00
 import sys, os, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-mySystem.Append_Us("/zxcPy.APIs", False, __file__)
-mySystem.Append_Us("", False)    
-import myRoot_GroupInfo as group
+mySystem.Append_Us("../Prjs", False, __file__) 
+mySystem.Append_Us("", False) 
+import myRoot_Prj, myRoot_Usr, myRoot_Plant
+from myGlobal import gol   
 
 
 #权限对象操作
 class myRoot():
-    def __init__(self): 
-        self.prjName = ""       #功能名
-        self.fileName = ""      #文件名
-        self.className = ""     #类名
-        self.cmdStr = ""        #启动命令
-        self.isNoReply = False  #是否无回复操作--功能自带    
-        self.isRoot = False     #是否根标识 ??
+    def __init__(self):
+        self.usrName = "zxcRobot"       #归属用户
+        self.usrID = "zxcRobot"         #归属用户ID
+        self.rootPrjs = None            #功能集 
+        self.usrInfos = None            #用户集 
+        self.usrPlants = None           #平台集
+        
+        self.Init()
+    def Init(self):  
+        self.usrName = gol._Get_Setting('usrName', "zxcRobot")  #归属用户
+        self.usrID = gol._Get_Setting('usrID', "zxcRobot")      #归属用户ID
 
-        self.isRegisted = False         #是否注册
-        self.isEnable = False           #是否启用
-        self.isEnable_All = False       #是否统一启用(登陆账户启用，否则单个用户启用)
-        self.isEnable_one = False       #一对一有效
-        self.isEnable_group = False     #群有效
-        self.isEnable_groupAll = False  #群同时有效
-        self.goupsEnable = {}           #已启用群集
+        #功能集
+        if(self.rootPrjs == None):
+            self.rootPrjs = myRoot_Prj.myRoots_Prj(self.usrName, self.usrID)   
+        else:
+            self.rootPrjs.usrName = self.usrName
+            self.rootPrjs.usrID = self.usrID
 
-    def _Init(self, prjName, fileName, className, cmdStr, isEnable, isEnable_All, isEnable_one, isEnable_group, isEnable_groupAll): 
-        self.prjName = prjName
-        self.fileName = fileName
-        self.className = className
-        self.cmdStr = cmdStr
-        self.isEnable = isEnable
-        self.isEnable_All = isEnable_All
-        self.isEnable_one = isEnable_one
-        self.isEnable_group = isEnable_group
-        self.isEnable_groupAll = isEnable_groupAll
-
-    #命令权限检查
-    def IsEnable(self): return self.isEnable; 
-    def IsEnable_All(self): return self.IsEnable() and self.isEnable_All; 
-    def IsEnable_one(self): return self.IsEnable() and self.isEnable_one; 	
-    def IsEnable_group(self): return self.IsEnable() and self.isEnable_group; 
-    def IsEnable_groupAll(self): 
-        return self.IsEnable_group() and self.isEnable_groupAll; 		 
-
-#权限对象信息(单人)
-class myRoot_Info():
-    def __init__(self, usrName, userID): 
-        self.usrName = usrName  #用户名
-        self.userID = userID    #用户名
-        self.prjRoots = {}      #功能权限集
-        self.prjCmds = {}       #功能命令集
-        # self.prjRoots_user = {} #功能权限用户集
-          
-         
+        #用户集 
+        if(self.usrInfos == None):
+            self.usrInfos = myRoot_Usr.myRoot_Usrs(self.usrName, self.usrID)   
+        else:
+            self.usrInfos.usrName = self.usrName
+            self.usrInfos.usrID = self.usrID
+        
+        #平台集   
+        if(self.usrPlants == None):
+            self.usrPlants = myRoot_Plant.myRoot_Plants(self.usrName, self.usrID)   
+        else:
+            self.usrPlants.usrName = self.usrName
+            self.usrPlants.usrID = self.usrID
+             
+#定义全局方法集并缓存
+gol._Init()         #先必须在主模块初始化（只在Main模块需要一次即可）
+gol._Set_Value('rootRobot', myRoot())
 
 
 #主启动程序
 if __name__ == "__main__":
-    pData = Data_Stock()
-    pData.Print()
+    pRoot = gol._Get_Value('rootRobot', myRoot())
+    print(pRoot.usrName)
+
+    gol._Set_Setting('usrName', "zxcRobot2")
+    gol._Set_Setting('usrID', "zxcRobot2")
+    pRoot.Init()
+    print(pRoot.usrName)
