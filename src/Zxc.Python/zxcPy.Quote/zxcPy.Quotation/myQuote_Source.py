@@ -43,12 +43,11 @@ class Quote_Source:
     def setData(self, data):
         #提取数据对象
         pDatas = self.datas.get(data.name, None)
-        if(pDatas == None):
+        if(pDatas == None):         #不存在时初始 
             pDatas = self.newDatas(data, self.interval_M)
             self.datas[data.name] = pDatas
-            
-        #设置值
-        pDatas.setData(data)
+        else:     
+            pDatas.setData(data)    #设置值
         return pDatas
      
 
@@ -86,7 +85,7 @@ def mainloop(s):
 if __name__ == "__main__":
     import mySource_Sina_Stock, myListener_Printer
 
-    stockids = 'sh601288'
+    stockids = 'sh601288,sz300523'
     s = mySource_Sina_Stock.Source_Sina_Stock(stockids)
     s.addListener(myListener_Printer.Quote_Listener_Printer())
     

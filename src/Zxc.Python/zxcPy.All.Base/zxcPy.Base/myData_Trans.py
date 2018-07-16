@@ -140,6 +140,13 @@ def Tran_ToDatetime(strTime, strFormat="%Y-%m-%d %H:%M:%S"):
     dtDatetime = datetime.datetime.strptime(strTime, strFormat)   
     return dtDatetime
 
+# datetime转字符串
+def Tran_ToDatetime_str(Datetime = None, strFormat="%Y-%m-%d %H:%M:%S"):
+    # 时间转换 
+    if(Datetime == None):
+        Datetime = datetime.datetime.now() 
+    strTime = datetime.datetime.strftime(Datetime, strFormat)   
+    return strTime
 # time转字符串
 def Tran_ToTime_str(Time = None, strFormat="%Y-%m-%d %H:%M:%S"):
     # 时间转换
@@ -187,4 +194,5 @@ if __name__ == '__main__':
     arr = To_Bytes_By_Str("Heelow!")
     value = To_Str_By_Bytes(arr)
 
-    print(dV)
+    print(Tran_ToDatetime_str())
+    print()

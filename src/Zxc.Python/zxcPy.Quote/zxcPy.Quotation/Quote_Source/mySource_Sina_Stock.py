@@ -28,7 +28,6 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
         res = res_data.read().decode(encoding = "gbk")
         
         #解析所有返回数据
-        qd = self.newData()
         lines = res.split('\n')
         for line in lines:
             if len(line) < 50 :
@@ -37,6 +36,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
             info = line[21:len(line)-2]
             vargs = info.split(',')
             
+            qd = self.newData()     
             qd.id = stkid
             qd.rawline = info
             qd.name = vargs[0]
@@ -74,6 +74,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
 
             #测试步进时间
             qd.time = myData_Trans.Tran_ToTime_str(None, "%H:%M:%S")
+            qd.date = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")
             
             #通知所有监听对象
             qd.value = myData_Trans.To_Float(qd.lastPrice)
@@ -89,7 +90,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
    
 #主启动程序
 if __name__ == "__main__":
-    stockids = 'sh601288'
+    stockids = 'sz300523'  #’,sh601288'
     s = Source_Sina_Stock(stockids)
     
     while True:

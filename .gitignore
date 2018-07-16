@@ -278,11 +278,15 @@ __pycache__/
 *.pyc
 
 
+#特殊文件夹屏蔽
+/src/Zxc.Python/zxcPy.Quote/Data
+
 /src/Zxc.Python/zxcPy.gsLog_Submits/myNotes/2017
 /src/Zxc.Python/zxcPy.gsLog_Submits/myNotes/2018
 /src/Zxc.Python/zxcPy.gsLog_Submits/myNotes/2019
 /src/Zxc.Python/zxcPy.gsLog_Submits/myNotes/2020
 /src/Zxc.Python/zxcPy.gsLog_Submits/mySetting/Note_Now.md
+
 *.dat
 /src/Zxc.Python/zxcPy.Weixin/Data
 /src/Zxc.Python/zxcPy.Quote/zxcPy.Quotation/Quote_Listener/myListener_Printer - Copy.py

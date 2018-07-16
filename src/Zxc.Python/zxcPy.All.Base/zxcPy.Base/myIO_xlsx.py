@@ -7,14 +7,14 @@ Created on  张斌 2018-01-03 18:00:00
     Excel操作 
     @依赖库： xlrd、xlwt
 """
-import sys, os, codecs
+import sys, os, datetime, codecs
 import xlrd, xlwt 
 
 #加载自定义库
 import myEnum, myData, myIO, myData_Trans
   
 #定义数据结构枚举
-myFiledype = myEnum.enum('string', 'float', 'datetime')
+myFiledype = myEnum.enum('string', 'float', 'int', 'datetime')
 
 #自定义表结构
 class DtTable:
@@ -57,7 +57,7 @@ class DtTable:
         
 
         #提取字段信息
-        self.dataField = self.loadDt_Row(field_index, col_start)
+        self.dataField = self.loadDt_Row(field_index, col_start, True)
 
         #循环提取所有行
         for i in range(row_start, pSheet.nrows):
@@ -66,22 +66,26 @@ class DtTable:
         return True
 
     #载入文件数据行
-    def loadDt_Row(self, ind_row, col_start = 0):        
+    def loadDt_Row(self, ind_row, col_start = 0, isField = False):         
         pTypes = self.dataFieldType
         nFields = len(pTypes)
         pValues = []        
         rows = self.sheet.row_values(ind_row)      # 获取整行内容,列内容: pSheet.col_values(i)
         for j in range(col_start, self.sheet.ncols): 
-            if(nFields > j and pTypes[j] == myFiledype.float): 
-                pValues.append(float(rows[j]))
-                continue
+            if(nFields > j and isField == False):
+                if(pTypes[j] == myFiledype.float): 
+                    pValues.append(float(rows[j]))
+                    continue
+                elif(pTypes[j] == myFiledype.datetime): 
+                    pValues.append(myData_Trans.Tran_ToDatetime(rows[j]))
+                    continue
             
             #其他全部为默认类型
             pValues.append(rows[j]) 
         return pValues
 
     #保存数据
-    def Save(self, strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = "", row_end = -1, col_end = -1):  
+    def Save(self, strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = "", row_end = -1, col_end = -1, bSave_AsStr = True):  
         #创建workbook和sheet对象
         pWorkbook = xlwt.Workbook()  #注意Workbook的开头W要大写
         pName = myData.iif(sheet_name == "","sheet1", sheet_name)
@@ -99,9 +103,16 @@ class DtTable:
         for i in range(row_start, nRows):
             pValues = self.dataMat[i] 
             for j in range(col_start, nCols):
-                strVaulue = str(pValues[j])
+                if(bSave_AsStr):
+                    strVaulue = str(pValues[j])
+                else:
+                    strVaulue = pValues[j]
+
+                #特殊类型转换
                 if(type(pValues[j]) == bool):
                     strVaulue = myData.iif(pValues[j], "TRUE", "FALSE")
+                elif(type(pValues[j]) == datetime.datetime):
+                    strVaulue = myData_Trans.Tran_ToDatetime_str(pValues[j])
                 pSheet.write(i - row_start + 1, j - col_start, strVaulue)                
         
         #保存该excel文件,有同名文件时直接覆盖
