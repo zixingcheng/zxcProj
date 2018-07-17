@@ -92,8 +92,10 @@ class DtTable:
         pSheet = pWorkbook.add_sheet(pName, cell_overwrite_ok = cell_overwrite) 
         
         #循环向sheet页中写入数据
+        nCols = len(self.dataField)
         nRows = myData.iif(row_end < 0 , len(self.dataMat), row_end)
-        nCols = myData.iif(col_end < 0 , len(self.dataMat[0]), col_end)
+        if(nRows > 0):
+            nCols = myData.iif(col_end < 0 , len(self.dataMat[0]), col_end)
         
         # 写入字段
         for j in range(col_start, nCols):
