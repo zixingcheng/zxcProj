@@ -73,13 +73,12 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
             qd.time = vargs[31]
 
             #测试步进时间
-            qd.time = myData_Trans.Tran_ToTime_str(None, "%H:%M:%S")
-            qd.date = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")
+            #qd.time = myData_Trans.Tran_ToTime_str(None, "%H:%M:%S")
+            #qd.date = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")
             
-            #通知所有监听对象
+            #设置数据
             qd.value = myData_Trans.To_Float(qd.lastPrice)
             pDatas = self.setData(qd)
-            self.notifyListeners(pDatas)
             
     #生成数据对象
     def newData(self):
@@ -90,7 +89,9 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
    
 #主启动程序
 if __name__ == "__main__":
-    stockids = 'sz300523'  #’,sh601288'
+    # sh000001,sh601939,sh601288,sh600919,sh600718
+    # sz399001,sz399006,sz300523,sz300512,sz300144,sz300036,sz002410,sz002024
+    stockids = 'sh601288'
     s = Source_Sina_Stock(stockids)
     
     while True:

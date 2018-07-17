@@ -21,12 +21,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="myQuote_API.py" />
-    <Compile Include="zxcPy.Quotation\myQuotation.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Data.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Listener.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Source.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\myData_Stock.py" />
-    <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Printer - Copy.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Printer.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Qtimg_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Sina_Stock.py" />
@@ -41,6 +40,7 @@
     <Folder Include="Setting\" />
     <Folder Include="zxcPy.Quotation\" />
     <Folder Include="zxcPy.Quotation\Quote_Data\" />
+    <Folder Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\" />
     <Folder Include="zxcPy.Quotation\Quote_Listener\" />
     <Folder Include="zxcPy.Quotation\Quote_Source\" />
     <Folder Include="zxcPy.Test\" />

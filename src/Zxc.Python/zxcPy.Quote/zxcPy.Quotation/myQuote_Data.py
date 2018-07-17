@@ -6,7 +6,7 @@ Created on  张斌 2018-05-03 14:58:00
 
     监听-数据对象 
 """
-import sys, os, time, copy, mySystem 
+import sys, os, time, datetime, copy, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Data')
@@ -51,10 +51,11 @@ class Quote_Data:
         if(not bMinute):
             if(self.datetime == None):
                 self.datetime = myData_Trans.Tran_ToDatetime(self.date + " " + self.time)
-                print(self.datetime)
+                #print(self.datetime)
             return self.datetime
         else:
-            datetime = myData_Trans.Tran_ToDatetime(self.date + " " + self.time[0: 5], "%Y-%m-%d %H:%M")
+            times = self.time.split(":")
+            datetime = myData_Trans.Tran_ToDatetime(self.date + " " + times[0] + ":" + times[1], "%Y-%m-%d %H:%M")
             print(datetime , "-- New Minutes")
             return datetime
     def getTime_str(self, bMinute = False):
@@ -115,7 +116,7 @@ class Quote_Data_CKD():
         return True
         
     #其他统计接口
-    def setData_Statics(self, pData):
+    def setData_Statics(self, pData,):
         pass
 
 #数据对象--统计集 
@@ -156,13 +157,12 @@ class Quote_Datas:
         self.datas = {}                                 #原始数据
         self.datas_CKDs_M = self.newData_CKDs(pData)    #统计数据--分钟级
         self.data = pData                               #当前数据
-        self.datas[pData.getTime()] = pData         #记录细分数据
+        self.datas[pData.getTime()] = pData             #记录细分数据
         self.autoSave = True
         self.autoSave_interval_M = 2
-        self.timeM = 0
+        self.timeM = -1
         if(self.loadData()):                            #加载已存数据
             self.setData(pData)
-            
         
     #设置值 
     def setData(self, pData):
@@ -182,10 +182,11 @@ class Quote_Datas:
         #自动保存数据
         if(self.autoSave):
             nMin = self.datas_CKDs_M.CKD.tag.minute
-            if(self.timeM != nMin):
+            if(self.timeM < nMin):
                 if(nMin % self.autoSave_interval_M == 0): 
-                    self.saveData("")
-                    self.timeM = nMin
+                    self.saveData_seg("", pData.getTime())
+                    self.timeM = nMin + 1
+                    if(self.timeM > 60): self.timeM = -1
         
     #初始统计对象 
     def newData_CKDs(self, pData):
@@ -193,6 +194,9 @@ class Quote_Datas:
 
     #装载excel数据
     def loadData(self, strDir = ""):
+        #合并缓存数据
+        self.saveData_segMerg(strDir)
+
         #组装路径
         if(strDir == ""): strDir = "./Data/"
         strDir += self.name + "/"
@@ -221,14 +225,14 @@ class Quote_Datas:
         return bInite
 
     #保存为excel数据
-    def saveData(self, strDir = ""):
-        pDt = myIO_xlsx.DtTable()
-
+    #保存数据
+    def saveData(self, strDir = "", bClearBuffer = False):
         #字典排序
         keys = list(self.datas.keys())
         keys.sort(key = None, reverse = True)
 
         #组装数据
+        pDt = myIO_xlsx.DtTable()
         pDt.dataField = self.data.csvHead().split(',')
         pDt.dataMat = []
         for x in keys:
@@ -239,8 +243,83 @@ class Quote_Datas:
         strDir += self.name + "/"
         myIO.mkdir(strDir)
         fileName = self.data.date
+        pDt.Save(strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False) 
+        if(bClearBuffer): myIO.mkdir(strDir + "/bufferData/", False, True)
+    #保存数据(分段)--减少重复存贮导致的耗时累增
+    def saveData_seg(self, strDir = "", tNow = None):
+        #计算输出时间段
+        if(tNow == None):
+            tNow = datetime.datetime.now()
+        nMinute = int(tNow.minute % self.autoSave_interval_M)
+        if(nMinute == 0): nMinute = self.autoSave_interval_M         #整分修正为前间隔分钟
+        dtEnd = tNow - datetime.timedelta(seconds = tNow.second)
+        dtStart = dtEnd - datetime.timedelta(minutes = nMinute ) 
+        pDt = myIO_xlsx.DtTable()
+
+        #字典排序
+        keys = list(self.datas.keys())
+        keys.sort(key = None, reverse = True)
+
+        #组装数据
+        pDt.dataField = self.data.csvHead().split(',')
+        pDt.dataMat = []
+        for x in keys:
+            if(dtStart < x and x < dtEnd):
+                pDt.dataMat.append(self.datas[x].toValueList())
+
+        #保存基础数据
+        if(strDir == ""): strDir = "./Data/"
+        strDir += self.name + "/bufferData/"
+        myIO.mkdir(strDir) 
+        fileName = myData_Trans.Tran_ToDatetime_str(dtStart, "%Y-%m-%d-%H-%M")
         pDt.Save(strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False)  
-    
+    #保存数据(分段-合并)
+    def saveData_segMerg(self, strDir = ""):
+        #提取所有分段数据 
+        if(strDir == ""): strDir = "./Data/"
+        strDir += self.name + "/"
+        list_Files = myIO.getFiles(strDir + "/bufferData/")
+        print("... load data(" + self.name + ")...")
+
+        #循环提取所有数据
+        dictDatas = {}
+        strDay_Now = myData_Trans.Tran_ToDatetime_str(self.data.getTime(), "%Y-%m-%d")  #当前天
+        for x in list_Files:
+            #屏蔽非当天数据
+            dtDay = myData_Trans.Tran_ToDatetime(myIO.getFileName(x), "%Y-%m-%d-%H-%M")
+            strDay = myData_Trans.Tran_ToDatetime_str(dtDay, "%Y-%m-%d")
+            if(strDay != strDay_Now): continue
+
+            #载入分段表数据
+            pDt = myIO_xlsx.DtTable()
+            pDt.dataFieldType = ['datetime', 'float', 'float', 'float']             #数据字段类型集
+            pDt.Load(x)
+
+            #组装数据
+            nRows = len(pDt.dataMat)
+            for x in range(nRows - 1, -1, -1):
+                pData = copy.deepcopy(self.data)
+                pData.datetime = None                               #清空时间(必须)
+                pData.fromValueList(pDt.dataMat[x])                 #由表数据还原
+                dictDatas[pData.getTime()] = pData
+
+        #字典排序
+        keys = list(dictDatas.keys())
+        keys.sort(key = None, reverse = True)
+        
+        #组装数据
+        pDt = myIO_xlsx.DtTable()
+        pDt.dataField = self.data.csvHead().split(',')
+        pDt.dataMat = []
+        for x in keys:
+            pDt.dataMat.append(dictDatas[x].toValueList())
+
+        #保存基础数据
+        myIO.mkdir(strDir)
+        fileName = self.data.date
+        pDt.Save(strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False) 
+
+
         
 #主启动程序
 if __name__ == "__main__":

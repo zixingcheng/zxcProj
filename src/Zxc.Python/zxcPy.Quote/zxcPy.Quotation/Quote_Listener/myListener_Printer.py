@@ -21,5 +21,11 @@ class Quote_Listener_Printer(myQuote_Listener.Quote_Listener):
 
     #处理接收信息
     def OnRecvQuote(self, quoteDatas): 
-        quoteDatas.data.Print()
+        #输出统计信息
+        pData = quoteDatas.datas_CKDs_M.data
+        pCKD = quoteDatas.datas_CKDs_M.CKD
+        print(pData.name, "Price: ",pData.lastPrice, "Price_A: ", round(pCKD.Price,4),  "Valume: ", pCKD.Valume)
+
+        #输出数据信息
+        pData.Print()
 

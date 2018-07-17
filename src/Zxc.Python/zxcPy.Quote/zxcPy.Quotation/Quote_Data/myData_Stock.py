@@ -97,7 +97,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
         
     #序列化--csv行信息
     def toCSVString(self):
-        return '\n' + self.date + " " + self.time  \
+        return '\r\n' + self.date + " " + self.time  \
             + ',' + self.lastPrice  \
             + ',' + self.highPrice  \
             + ',' + self.lowPrice  \
@@ -221,7 +221,7 @@ class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
             self.Valume_pre = lastCKD.Valume_pre + lastCKD.Valume        #前一统计成交量_S
             self.Turnover_pre = lastCKD.Turnover_pre + lastCKD.Turnover  #前一统计成交额_S
             self.Price = lastCKD.Price
-        self.setData(data)      #设置数据
+        self.setData(data)                     #设置数据
 
     #其他统计接口
     def setData_Statics(self, pData):
@@ -232,7 +232,6 @@ class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
             self.Price = self.Turnover / self.Valume
         elif(self.Valume < 0):
             a =0
-        print(pData.name, "Price: ",pData.lastPrice, "Price_A: ", round(self.Price,4),  "Valume: ", self.Valume)
        
 #数据对象--统计集 
 class Data_CKDs_Stock(myQuote_Data.Quote_Data_CKDs):
