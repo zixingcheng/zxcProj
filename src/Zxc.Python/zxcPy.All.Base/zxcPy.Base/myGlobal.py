@@ -9,10 +9,11 @@ Created on  张斌 2018-04-22 20:05:00
 
 #全局变量
 class gol():    
-    _gs_Inited = False  #加载标识
-    def _Init():        #初始化
+    _gs_Inited = False              #加载标识
+    def _Init(bPrint = False):      #初始化
         if(gol._gs_Inited == False):
-            print("->>", "初始：全局变量")  
+            if(bPrint):
+                print("->>", "初始：全局变量")  
             global _global_dict
             gol._gs_Inited = True
             _global_dict = {}
@@ -30,7 +31,8 @@ class gol():
             _ms_Setting["Return_strFormat"] = {'result': False, 'err': "", 'text': ""}
             _global_dict["golSetting"] = _ms_Setting
             
-            print("->>", "\t--已初始全局变量\r\n")  
+            if(bPrint):
+                print("->>", "\t--已初始全局变量\r\n")  
 
     def _Set_Value(key, value):
         """ 定义一个全局变量 """

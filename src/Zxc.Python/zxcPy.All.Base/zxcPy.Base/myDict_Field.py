@@ -318,6 +318,8 @@ class Dict_Field:
     def Find(self, ID): 
         nID = 0
         try:
+            if(type(ID) == str):
+                ID = ID.replace('_@@', '')
             nID = int(ID)
             nIndex = self.pDicts_Index.index(nID)
         except :

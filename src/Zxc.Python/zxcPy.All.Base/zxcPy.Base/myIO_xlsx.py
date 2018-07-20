@@ -65,9 +65,9 @@ class DtTable:
             self.dataMat.append(pValues)
         return True
     #载入文件数据
-    def Load_csv(self, strPath, row_start = 1, col_start = 0, all_row = True, row_field = 0, strsplit = ','):
+    def Load_csv(self, strPath, row_start = 1, col_start = 0, all_row = True, row_field = 0, strsplit = ',', isUtf = False):
         #打开文件 
-        lstLines = myIO.getContents(strPath, True, False)
+        lstLines = myIO.getContents(strPath, True, isUtf)
         if(len(lstLines) < 2): return False 
 
         #提取字段信息   
@@ -144,7 +144,7 @@ class DtTable:
         pWorkbook.save(strPath)
         return True 
     #保存数据
-    def Save_csv(self, strDir, fileName, row_start = 0, col_start = 0, sheet_name = "", symbol = ",", row_end = -1, col_end = -1):  
+    def Save_csv(self, strDir, fileName, isUtf = False, row_start = 0, col_start = 0, sheet_name = "", symbol = ",", row_end = -1, col_end = -1):  
         nRows = myData.iif(row_end < 0 , len(self.dataMat), row_end)
         nCols = myData.iif(col_end < 0 , len(self.dataMat[0]), col_end)
         
@@ -164,8 +164,7 @@ class DtTable:
 
         #保存该csv文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".csv"
-        myIO.Save_File(strPath, strLines, False)
-
+        myIO.Save_File(strPath, strLines, isUtf)
         return True 
     #保存数据测试
     def Save_Test(self, strPath, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = "", row_end = -1, col_end = -1):  
