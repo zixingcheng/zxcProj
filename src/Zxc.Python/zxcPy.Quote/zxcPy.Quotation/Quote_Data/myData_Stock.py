@@ -6,7 +6,7 @@ Created on  张斌 2018-05-03 14:58:00
 
     监听-数据对象 
 """
-import sys, os, mySystem 
+import sys, os, datetime, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/zxcPy.Quotation')
@@ -94,10 +94,9 @@ class Data_Stock(myQuote_Data.Quote_Data):
     def csvHead():
         head = '时间,当前价,最高价,最低价,买价,卖价,成交量,成交额,买一量,买二量,买三量,买四量,买五量,买一价,买二价,买三价,买四价,买五价,卖一量,卖二量,卖三量,卖四量,卖五量,卖一价,卖二价,卖三价,卖四价,卖五价'
         return head
-        
     #序列化--csv行信息
     def toCSVString(self):
-        return '\r\n' + self.date + " " + self.time  \
+        return '\n' + self.date + " " + self.time  \
             + ',' + self.lastPrice  \
             + ',' + self.highPrice  \
             + ',' + self.lowPrice  \
@@ -167,6 +166,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
     def fromValueList(self, lstValue):
         self.dateList = lstValue
         dtNow = lstValue[0]
+        if(type(dtNow) == str): dtNow = myData_Trans.Tran_ToDatetime(dtNow)
 
         self.date = str(dtNow.year) + "-" + str(dtNow.month) + "-" + str(dtNow.day)
         self.time = str(dtNow.hour) + ":" + str(dtNow.minute) + ":" + str(dtNow.second)
@@ -253,6 +253,34 @@ class Datas_Stock(myQuote_Data.Quote_Datas):
     #初始统计对象 
     def newData_CKDs(self, pData):
         return Data_CKDs_Stock(pData, self.interval_M)
+    
+    #其他统计接口
+    def dataStatics(self, minute = 5):
+        #统计指定时间内数据
+        dNow = self.datas_CKDs_M.data.lastPrice
+        dMin = dNow
+        dMax = dNow
+        dtEnd = self.datas_CKDs_M.CKD.tag
+        dtStart = self.datas_CKDs_M.CKD.tag
+        nSeconds = 0
+        if(len(self.datas_CKDs_M.CKDs) > minute * 10000):
+            for x in range(0, minute):
+                dtTime = dtEnd - datetime.timedelta(minutes = x)
+                pCKD = self.datas_CKDs_M.CKDs.get(dtTime, None)
+                if(pCKD != None):
+                    if(dMin > pCKD.low): dMin = pCKD.low
+                    if(dMax < pCKD.high): dMax = pCKD.high
+
+                    #起始时间
+                    dtStart = pCKD.tag
+
+        #计算方向
+        pData = myQuote_Data.Quote_Data_Static()
+        #pData.high = dMax
+        #pData.low = dMin
+        #pData.last = dNow
+        #pData.seconds = (dtEnd - dtStart).seconds
+        return pData
 
 
 #主启动程序

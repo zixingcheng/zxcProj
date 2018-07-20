@@ -29,6 +29,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
         
         #解析所有返回数据
         lines = res.split('\n')
+        nResult = 0
         for line in lines:
             if len(line) < 50 :
                 continue
@@ -79,6 +80,8 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
             #设置数据
             qd.value = myData_Trans.To_Float(qd.lastPrice)
             pDatas = self.setData(qd)
+            if(pDatas != None): nResult += 1
+        if(nResult > 0): print("")
             
     #生成数据对象
     def newData(self):

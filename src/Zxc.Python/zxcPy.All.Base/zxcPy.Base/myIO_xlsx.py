@@ -64,6 +64,26 @@ class DtTable:
             pValues = self.loadDt_Row(i, col_start)
             self.dataMat.append(pValues)
         return True
+    #载入文件数据
+    def Load_csv(self, strPath, row_start = 1, col_start = 0, all_row = True, row_field = 0, strsplit = ','):
+        #打开文件 
+        lstLines = myIO.getContents(strPath, True, False)
+        if(len(lstLines) < 2): return False 
+
+        #提取字段信息   
+        if(True):
+            self.dataField  = lstLines[row_field].split(strsplit)
+            nFields = len(self.dataField )
+
+        #提取内容
+        self.dataMat = []
+        if(all_row == False): return False
+        
+        #循环提取所有行
+        for i in range(row_start, len(lstLines)):
+            pValues = lstLines[i].split(strsplit)
+            self.dataMat.append(pValues)
+        return True
 
     #载入文件数据行
     def loadDt_Row(self, ind_row, col_start = 0, isField = False):         
@@ -144,7 +164,7 @@ class DtTable:
 
         #保存该csv文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".csv"
-        myIO.Save_File(strPath, strLines)
+        myIO.Save_File(strPath, strLines, False)
 
         return True 
     #保存数据测试
@@ -200,6 +220,9 @@ def loadDataTable(strPath, sheet_index = 0, row_start = 1, col_start = 0, field_
 
 
 def main():
+    pTable2 = DtTable()
+    pTable2.Load_csv("D:\\myGit\\zxcProj\\src\\Zxc.Python\\zxcPy.Quote\\Data\\农业银行\\2018-07-20.csv")
+
     strPath = "D:\\我的工作\\学习\\MyProject\\zxcProj\\src\\Zxc.Python\\zxcPy.Robot\\Setting\\Setting.xlsx"    
     pTable = loadDataTable(strPath)
     strPath2 = "D:\\我的工作\\学习\\MyProject\\zxcProj\\src\\Zxc.Python\\zxcPy.Robot\\Setting"  

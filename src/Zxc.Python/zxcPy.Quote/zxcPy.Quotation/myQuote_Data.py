@@ -24,6 +24,7 @@ class Quote_Data:
         self.time = ''
         self.value = 0
         self.datetime = None
+        self.datetime_queryed = datetime.datetime.now()
     
     #序列化
     def toString(self):
@@ -65,6 +66,15 @@ class Quote_Data:
     #输出
     def Print(self):
         print(self.toString())
+        
+#数据对象--统计 
+class Quote_Data_Static():
+    def __init__(self): 
+        self.seconds = 0                #时间间隔       
+        self.last = 0                   #结束     
+        self.high = 0                   #最高       
+        self.low = 0                    #最低     
+        self.average = 0                #均值  
 
 #数据对象--统计 
 class Quote_Data_CKD():
@@ -86,7 +96,7 @@ class Quote_Data_CKD():
     def setValues(self, key, values = []):
         self.values[key] = values
         return True
-        
+    
     #检查统计时段(起始+间隔) 
     def checkTimeRange(self, tagTime, pData):
         if(self.interval_M < 0): return True
@@ -113,10 +123,9 @@ class Quote_Data_CKD():
 
         #其他统计接口
         self.setData_Statics(pData)
-        return True
-        
+        return True        
     #其他统计接口
-    def setData_Statics(self, pData,):
+    def setData_Statics(self, pData):
         pass
 
 #数据对象--统计集 
@@ -127,8 +136,7 @@ class Quote_Data_CKDs():
         self.startTime = data.getTime(True)   
         self.interval_M = interval_M    #分钟级间隔
         self.CKDs = {}                  #统计集
-        self.CKD = None
-        self.CKD = self.newDataCKD(self.startTime, data) 
+        self.CKD = None 
         self.data = data
         
     #初始统计对象 
@@ -141,13 +149,16 @@ class Quote_Data_CKDs():
     def setData(self, pData):
         #分钟级数据处理
         time = pData.getTime()
-        if(not self.CKD.checkTimeRange(time, pData)): 
+        if(self.CKD == None or self.CKD.checkTimeRange(time, pData) == False):
             #过时间段，重新生成统计对象
             self.CKD = self.newDataCKD(pData.getTime(True), pData)
 
         #更新统计信息
         self.CKD.setData(pData)
         self.data = pData
+    #其他统计接口
+    def dataStatics(self, minute = 5):
+        pass
 
 #数据对象集
 class Quote_Datas:
@@ -156,17 +167,21 @@ class Quote_Datas:
         self.interval_M = interval                      #分钟级间隔
         self.datas = {}                                 #原始数据
         self.datas_CKDs_M = self.newData_CKDs(pData)    #统计数据--分钟级
-        self.data = pData                               #当前数据
-        self.datas[pData.getTime()] = pData             #记录细分数据
+        self.data = pData                               #当前数据对象
         self.autoSave = True
         self.autoSave_interval_M = 2
         self.timeM = -1
-        if(self.loadData()):                            #加载已存数据
+
+        #保存基础数据
+        self.dir = "./Data/" + self.name + "/"
+        self.fileName = myData_Trans.Tran_ToDatetime_str(pData.getTime(), "%Y-%m-%d")
+        myIO.mkdir(self.dir) 
+        if(self.loadData()):                           #加载已存数据
             self.setData(pData)
         
     #设置值 
     def setData(self, pData):
-        if(self.data.date == pData.date and self.data.time == pData.time):
+        if(len(self.datas) > 0 and self.data.date == pData.date and self.data.time == pData.time):
             return 
 
         #记录原始数据,更新最新
@@ -175,18 +190,13 @@ class Quote_Datas:
         
         #统计
         self.setData_CKDs(pData)
-    #设置统计信息 
-    def setData_CKDs(self, pData):
-        self.datas_CKDs_M.setData(pData)
-
+        
         #自动保存数据
         if(self.autoSave):
-            nMin = self.datas_CKDs_M.CKD.tag.minute
-            if(self.timeM < nMin):
-                if(nMin % self.autoSave_interval_M == 0): 
-                    self.saveData_seg("", pData.getTime())
-                    self.timeM = nMin + 1
-                    if(self.timeM > 60): self.timeM = -1
+            self.saveData_stream("", pData)
+    #设置统计信息 
+    def setData_CKDs(self, pData):
+        self.datas_CKDs_M.setData(pData) 
         
     #初始统计对象 
     def newData_CKDs(self, pData):
@@ -195,12 +205,11 @@ class Quote_Datas:
     #装载excel数据
     def loadData(self, strDir = ""):
         #合并缓存数据
-        self.saveData_segMerg(strDir)
+        self.saveData_stream_Trans(strDir)
 
         #组装路径
-        if(strDir == ""): strDir = "./Data/"
-        strDir += self.name + "/"
-        strPath = strDir + self.data.date + ".xls"
+        if(strDir == ""): strDir = self.dir 
+        strPath = strDir + self.fileName + ".xls"
 
         #装载表数据
         pDt = myIO_xlsx.DtTable()
@@ -208,21 +217,20 @@ class Quote_Datas:
         pDt.Load(strPath)
 
         #创建数据
-        bCanSave = self.autoSave                                #屏蔽自动保存（必须）
+        bCanSave = self.autoSave                                        #屏蔽自动保存（必须）
         self.autoSave = False
-        bInite = False
+        bInited = True
         nRows = len(pDt.dataMat)
 
         for x in range(nRows - 1, -1, -1):
             pData = copy.deepcopy(self.data)
-            pData.datetime = None                               #清空时间(必须)
-            pData.fromValueList(pDt.dataMat[x])                 #由表数据还原
-            if(bInite == False):
-                self.datas_CKDs_M = self.newData_CKDs(pData)    #统计数据--分钟级
-                bInite = True
-            self.setData(pData)                                 #设置数据(不允许保存)
-        self.autoSave = bCanSave                                #恢复自动保存
-        return bInite
+            pData.datetime = None                                       #清空时间(必须)
+            bInited = bInited and pData.fromValueList(pDt.dataMat[x])   #由表数据还原
+            if(bInited == False):
+                self.datas_CKDs_M = self.newData_CKDs(pData)            #统计数据--分钟级
+            self.setData(pData)                                         #设置数据(不允许保存)
+        self.autoSave = bCanSave                                        #恢复自动保存
+        return bInited
 
     #保存为excel数据
     #保存数据
@@ -239,68 +247,39 @@ class Quote_Datas:
             pDt.dataMat.append(self.datas[x].toValueList())
 
         #保存基础数据
-        if(strDir == ""): strDir = "./Data/"
-        strDir += self.name + "/"
-        myIO.mkdir(strDir)
-        fileName = self.data.date
-        pDt.Save(strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False) 
-        if(bClearBuffer): myIO.mkdir(strDir + "/bufferData/", False, True)
-    #保存数据(分段)--减少重复存贮导致的耗时累增
-    def saveData_seg(self, strDir = "", tNow = None):
-        #计算输出时间段
-        if(tNow == None):
-            tNow = datetime.datetime.now()
-        nMinute = int(tNow.minute % self.autoSave_interval_M)
-        if(nMinute == 0): nMinute = self.autoSave_interval_M         #整分修正为前间隔分钟
-        dtEnd = tNow - datetime.timedelta(seconds = tNow.second)
-        dtStart = dtEnd - datetime.timedelta(minutes = nMinute ) 
-        pDt = myIO_xlsx.DtTable()
+        if(strDir == ""): strDir = self.dir
+        pDt.Save(strDir, self.fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False) 
+        if(bClearBuffer): 
+            os.remove(strDir + self.fileName + ".csv")
+    #保存数据(分段)--单个数据追加
+    def saveData_stream(self, file = "", pData = None):
+        #文件头写入 
+        if(file == ""): file = self.dir + self.fileName + ".csv"
+        if(len(self.datas) <= 1):
+            myIO.Save_File(file, pData.csvHead(), False, True) 
 
-        #字典排序
-        keys = list(self.datas.keys())
-        keys.sort(key = None, reverse = True)
-
-        #组装数据
-        pDt.dataField = self.data.csvHead().split(',')
-        pDt.dataMat = []
-        for x in keys:
-            if(dtStart < x and x < dtEnd):
-                pDt.dataMat.append(self.datas[x].toValueList())
-
-        #保存基础数据
-        if(strDir == ""): strDir = "./Data/"
-        strDir += self.name + "/bufferData/"
-        myIO.mkdir(strDir) 
-        fileName = myData_Trans.Tran_ToDatetime_str(dtStart, "%Y-%m-%d-%H-%M")
-        pDt.Save(strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False)  
+        #文件追加数据内容
+        if(pData == None): pData = self.data
+        with open(file, 'a+') as f:
+            f.write(pData.toCSVString())    
     #保存数据(分段-合并)
-    def saveData_segMerg(self, strDir = ""):
-        #提取所有分段数据 
-        if(strDir == ""): strDir = "./Data/"
-        strDir += self.name + "/"
-        list_Files = myIO.getFiles(strDir + "/bufferData/")
-        print("... load data(" + self.name + ")...")
-
-        #循环提取所有数据
+    def saveData_stream_Trans(self, strDir = ""):
+        #提取当前数据
+        if(strDir == ""): strDir = self.dir
         dictDatas = {}
-        strDay_Now = myData_Trans.Tran_ToDatetime_str(self.data.getTime(), "%Y-%m-%d")  #当前天
-        for x in list_Files:
-            #屏蔽非当天数据
-            dtDay = myData_Trans.Tran_ToDatetime(myIO.getFileName(x), "%Y-%m-%d-%H-%M")
-            strDay = myData_Trans.Tran_ToDatetime_str(dtDay, "%Y-%m-%d")
-            if(strDay != strDay_Now): continue
-
-            #载入分段表数据
-            pDt = myIO_xlsx.DtTable()
-            pDt.dataFieldType = ['datetime', 'float', 'float', 'float']             #数据字段类型集
-            pDt.Load(x)
-
+        if(True):
+            print("... load data(" + self.name + ")...")
+            path = strDir + self.fileName + ".csv"
+            pDt_csv = myIO_xlsx.DtTable()
+            pDt_csv.dataFieldType = ['datetime', 'float', 'float', 'float']             #数据字段类型集
+            pDt_csv.Load_csv(path)
+        
             #组装数据
-            nRows = len(pDt.dataMat)
+            nRows = len(pDt_csv.dataMat)
             for x in range(nRows - 1, -1, -1):
                 pData = copy.deepcopy(self.data)
-                pData.datetime = None                               #清空时间(必须)
-                pData.fromValueList(pDt.dataMat[x])                 #由表数据还原
+                pData.datetime = None                           #清空时间(必须)
+                pData.fromValueList(pDt_csv.dataMat[x])         #由表数据还原
                 dictDatas[pData.getTime()] = pData
 
         #字典排序
@@ -316,8 +295,7 @@ class Quote_Datas:
 
         #保存基础数据
         myIO.mkdir(strDir)
-        fileName = self.data.date
-        pDt.Save(strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False) 
+        pDt.Save(strDir, self.fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False) 
 
 
         

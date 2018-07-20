@@ -75,12 +75,15 @@ def getFileName(path, isNosuffix = True):
 
 
 #提取文件信息
-def getContent(path, noBOM = False, bList = False):
+def getContent(path, noBOM = False, bList = False, isUtf = True):
     #提取文件Json串
     if (os.path.exists(path) == False):
         if(bList): return None
         else: return ""
-    f = codecs.open(path, 'r', 'utf-8')   
+    if(isUtf):
+        f = codecs.open(path, 'r', 'utf-8')  
+    else:
+        f = codecs.open(path, 'r') 
     if(bList == False):
         content = f.read() 
         if(noBOM):
@@ -99,11 +102,14 @@ def getContent(path, noBOM = False, bList = False):
     f.close()
     return content
 #提取文件信息
-def getContents(path, noBOM = False):
+def getContents(path, noBOM = False, isUtf = True):
     #提取文件Json串
     if (os.path.exists(path) == False):
         return ""
-    f = codecs.open(path, 'r', 'utf-8')    
+    if(isUtf):
+        f = codecs.open(path, 'r', 'utf-8')  
+    else:
+        f = codecs.open(path, 'r')  
     lists = f.readlines()
     if(noBOM and len(lists[0]) > 0):
         lists[0] = Trans_NoBOM(lists[0])
@@ -117,44 +123,16 @@ def getContents(path, noBOM = False):
                 
     #关闭文件      
     f.close()
-    return list_content
-#提取文件信息
-def getContents(path, strTag = "@@", noBOM = False):
-    #提取文件Json串
-    if (os.path.exists(path) == False):
-        return ""
-    f = codecs.open(path, 'r', 'utf-8')    
-    lists = f.readlines()
-    if(noBOM and len(lists[0]) > 0):
-        lists[0] = Trans_NoBOM(lists[0])
-        
-    bEnd = False;
-    list_content = []
-    content = ""
-    for strLine in lists:
-        #print(strLine)
-        strTemp = strLine.strip() 
-        if len(strTemp) > 2:
-            nIndex = strTemp.find(strTag)  
-            if nIndex == 0:
-                bEnd = True
-             
-        if(bEnd == False ):
-            strLine = Trans_NoBOM(strLine)
-            strLine = strLine.replace("\r\n", "")
-            strLine = strLine.replace("\n", "")
-            strLine = strLine.replace("\t", "")
-            list_content.append(strLine)
-                
-    #关闭文件      
-    f.close()
-    return list_content
+    return list_content 
 #提取文件信息, 指定标识处终止
-def getContent_EndByTag(path, strTag = "@@", noBOM = False):
+def getContent_EndByTag(path, strTag = "@@", noBOM = False, isUtf = True):
     #打开文件提取数据
     if (os.path.exists(path) == False):
         return "",[] 
-    f = codecs.open(path, 'r', 'utf-8')   
+    if(isUtf):
+        f = codecs.open(path, 'r', 'utf-8')  
+    else:
+        f = codecs.open(path, 'r')    
     lists = f.readlines()
     if(noBOM and len(lists[0]) > 0):
         lists[0] = Trans_NoBOM(lists[0])

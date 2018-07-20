@@ -6,13 +6,13 @@ Created on  张斌 2018-05-03 14:58:00
 
     监听--源基类 
 """
-import sys, os, time, mySystem 
+import sys, os, time,  mySystem 
 import threading
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Source')
 mySystem.Append_Us("", False)    
-import myQuote_Data, myQuote_Listener, myData_Trans
+import myQuote_Data, myData_Trans, myQuote_Listener, myListener_StaticsM5
  
 
 #行情来源
@@ -45,7 +45,8 @@ class Quote_Source:
     def setData(self, data, bNotify = True):
         #有效验证     
         if(data == None): return None
-        if(self.checkTime(data.getTime()) == False): return None  
+        if(self.checkTime(data.datetime_queryed) == False): 
+            if(len(self.datas) > 0): return None  
 
         #提取数据对象
         pDatas = self.datas.get(data.name, None)
@@ -61,26 +62,26 @@ class Quote_Source:
         self.datasNow = pDatas
         return pDatas
     #合法性(时效)
-    def checkTime(self, tNow):
+    def checkTime(self, tNow): 
         if(self.startTime < tNow and tNow < self.endTime):
             if(self.timeIntervals > 0):
                 self.timeIntervals += 1
             return True
-        elif(self.timeIntervals == 0):
+        elif(self.timeIntervals == 0 and self.endTime < tNow):
             self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 13:00:00")      #起始时间
-            self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 15:05:00")        #结束时间
+            self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 15:02:00")        #结束时间
             self.timeIntervals += 1
             if(self.datasNow != None): 
-                self.datasNow.saveData_seg("", self.datasNow)       #保存数据 
+                self.datasNow.saveData()        #保存数据（第一时段结束）  
             return self.checkTime(tNow)
         if(self.timeIntervals > 1):
-            self.datasNow.saveData()                                #保存数据（第二时段结束） 
+            self.datasNow.saveData()            #保存数据（第二时段结束） 
         return False
     #设置(时效)
     def setTime(self):
         self.dtDay = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")                 #当前天
         self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 9:28:00")      #起始时间
-        self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:35:00")       #结束时间
+        self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:00")       #结束时间
         self.timeIntervals = 0
      
 
@@ -97,7 +98,6 @@ class Quote_Thread(threading.Thread):
         self.threadRunning = True;
         while self.threadRunning:
             self.source.query()
-            print("")
             time.sleep(self.interval)
 
     def stop(self):
@@ -124,7 +124,9 @@ if __name__ == "__main__":
     stockids = 'sh601288'
     s = mySource_Sina_Stock.Source_Sina_Stock(stockids)
     s.addListener(myListener_Printer.Quote_Listener_Printer())
-    
+    s.addListener(myListener_StaticsM5.Quote_Listener_StaticsM5())
+
+    myListener_StaticsM5
     #线程验证    
     thread = Quote_Thread(s)
     thread.setDaemon(True)
