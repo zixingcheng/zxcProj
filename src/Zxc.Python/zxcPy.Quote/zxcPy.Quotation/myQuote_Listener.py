@@ -11,20 +11,50 @@ import sys, os, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Listener')
 mySystem.Append_Us("", False) 
-import myQuote_Data
+import myManager_Msg, myQuote_Data
+
+#初始全局消息管理器
+from myGlobal import gol 
+gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
         
 #行情监听
 class Quote_Listener:
     def __init__(self, name):
         self.name = name
+        self.pMMsg = gol._Get_Setting('manageMsgs')
     def getName(self):
         return self.name  
     def OnRecvQuote(self, quoteDatas):pass 
-    
+    #消息处理
+    def OnHandleMsg(self, quoteDatas, strMsg):
+        #通知处理
+        pSet = quoteDatas.setting
+        for x in pSet.msgUsers_wx:
+            #生成用户消息
+            msg = self.OnCreatMsgInfo(x, strMsg)
+            if(self.pMMsg != None):
+                self.pMMsg.OnHandleMsg(msg)
+    #创建新消息
+    def OnCreatMsgInfo(self, to_user, text, type = "TEXT", plat = 'weixin'):
+        if(self.pMMsg != None):
+            msg = self.pMMsg.OnCreatMsg()
+        else: msg ={}
+
+        #更新
+        msg["user"] = to_user
+        msg["text"] = text
+        msg["type"] = type
+        msg["plat"] = plat
+        return msg
+    #创建消息内容
+    def OnCreatMsgstr(self, quoteDatas):
+        pass
+
 
 #主启动程序
 if __name__ == "__main__":
+    pMMsg = gol._Get_Setting('manageMsgs')
     import myListener_Printer
     pListener = myListener_Printer.Quote_Listener_Printer()
 
