@@ -54,6 +54,8 @@ class Data_Stock(myQuote_Data.Quote_Data):
         self.date = ''
         self.time = ''
         self.dateList = []
+        self.priceOpen = 0      #开盘价格
+        self.priceBase = 0      #前一收盘价格
 
     #序列化
     def toString(self):
@@ -161,6 +163,9 @@ class Data_Stock(myQuote_Data.Quote_Data):
         self.dateList.append(myData_Trans.To_Float(self.sell3Price))   
         self.dateList.append(myData_Trans.To_Float(self.sell4Price))   
         self.dateList.append(myData_Trans.To_Float(self.sell5Price))   
+
+        self.priceOpen = myData_Trans.To_Float(self.openPrice)           #开盘价格
+        self.priceBase = myData_Trans.To_Float(self.preClose)            #前一收盘价格
         return self.dateList
     #由值组转换
     def fromValueList(self, lstValue):
@@ -199,6 +204,9 @@ class Data_Stock(myQuote_Data.Quote_Data):
         self.sell3Price = str(lstValue[25])
         self.sell4Price = str(lstValue[26])
         self.sell5Price = str(lstValue[27])
+
+        self.priceOpen = myData_Trans.To_Float(self.openPrice)  #开盘价格
+        self.priceBase = myData_Trans.To_Float(self.preClose)   #前一收盘价格
         return True
          
     #输出
@@ -212,6 +220,7 @@ class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
         self.Valume = 0         #当前成交量
         self.Turnover = 0       #当前成交额   
         self.Price = 0          #成交均价  
+        self.Rise_Fall = 0      #当前涨跌幅
 
         if(lastCKD == None):
             datas = data.toValueList()
@@ -228,6 +237,7 @@ class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
         datas = pData.toValueList()
         self.Valume = datas[6] - self.Valume_pre
         self.Turnover = datas[7] - self.Turnover_pre
+        self.Rise_Fall = datas[1] / pData.priceBase     #涨跌幅
         if(self.Valume > 0):
             self.Price = self.Turnover / self.Valume
         elif(self.Valume < 0):

@@ -278,7 +278,7 @@ if __name__ == "__main__":
     pWeixin.Logion();
  
     #消息测试
-    pWeixin.Send_Msg("茶叶一主号","登陆")
+    #pWeixin.Send_Msg("茶叶一主号","登陆")
     #pWeixin.run()
 
     #运行 
