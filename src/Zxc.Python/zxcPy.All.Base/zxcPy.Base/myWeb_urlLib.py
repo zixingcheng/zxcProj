@@ -7,15 +7,14 @@ Created on  张斌 2016-09-02 16:30:00
     Web操作模拟类
     @依赖库： urllib
 """
-
+from requests import get, put, post, delete
 import urllib,urllib.request
 import http.cookiejar
-
 import myDebug;
 
 class myWeb:
     #初始构造 
-    def __init__(self, Host = "127.0.0.1",Path = '',bPrint = True):
+    def __init__(self, Host = "http://127.0.0.1",Path = '',bPrint = True):
         self.Host = Host
         self.Path = Path
         self.Referer = Host + "/" + Path
@@ -33,13 +32,11 @@ class myWeb:
     def __set_param__(self , Path): 
         self.Path = Path
         self.Referer =self.Host + "/" + Path
-
     #定义cookies
     def __set_cookies__(self , Path): 
         self.Path = Path
         self.Referer =self.Host + "/" + Path
         
-    
     #定义Post方法
     def Do_Post(self, Path , strPostData, strTag = "", bUseHeaders = True, bInitCookie = False):
         self.__set_param__(Path)    #更新属性
@@ -87,20 +84,27 @@ class myWeb:
         #更新相关记录信息，并返回相应
         page = response.read()
         self.status = response.status
-        self.reason = response.reason
-        #print(self.status, self.reason)  
-        #print(response.headers) 
-        #print(response)
-        #print(response.read().decode("UTF8"))
-        
+        self.reason = response.reason 
         if(self.status == 200 or self.reason.tolower() == "ok"):
             myDebug.Debug("    请求完毕。")
         else:
             myDebug.Debug("    请求出错。")
         print("") 
         return page
+    
+    #定义rest API方法Get方法
+    def Do_API_get(self, Path , strTag = ""):
+        self.__set_param__(Path)    #更新属性
 
-
+        #测试get
+        try:
+            myDebug.Debug("请求" + strTag + "页面：" + self.Referer, "Debug" )
+            request = get(self.Referer)
+            return request.text
+        except:
+            pass
+        return ""
+        
     #定义web页面元素获取方法
     def Get_EleStr(self, strSource, strFliter_S, strFliter_E):
         strInfo = strSource
@@ -122,7 +126,7 @@ class myWeb:
     #    'username':'zhangbin', 
     #    'pwd':'zxc123' 
     #    }
-
+    #
     #r = Do_Post ("http://192.168.29.31:7003/ams//util/sys/login.do",strLoginInfo,True)
     #print(r.read().decode("UTF8"))
  
@@ -133,3 +137,7 @@ if __name__ == "__main__":
     aa = pWeb.Do_Post("list=sh600006,sh510050", "",)
     bb = aa.decode(encoding = "gbk")
     print(bb)
+    
+    pWeb = myWeb("http://127.0.0.1:8668")
+    aa = pWeb.Do_API_get("weixin/茶叶一主号/网页测试py-0/TEXT", "",)
+    print(aa)

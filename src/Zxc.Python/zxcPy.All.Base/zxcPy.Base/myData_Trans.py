@@ -156,6 +156,14 @@ def Tran_ToTime_str(Time = None, strFormat="%Y-%m-%d %H:%M:%S"):
     return strTime
 
 
+#转换为字符串
+def Tran_ToStr(lstV = [], symbol = ','):
+    strV = ""
+    for x in lstV:
+        strV += symbol + str(x)
+    if(len(strV) > 0): strV = strV[1:]
+    return strV
+    
 #字符串变为转义字符（"转为\"）
 def To_Escape_str(strData, bOneLine = False):
     strValue = strData.strip() 
