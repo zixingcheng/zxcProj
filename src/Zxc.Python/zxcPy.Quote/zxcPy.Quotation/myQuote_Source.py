@@ -12,18 +12,31 @@ import threading
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Source')
 mySystem.Append_Us("", False)    
-import myQuote_Data, myData_Trans, myQuote_Listener, myListener_StaticsM5
- 
+import myQuote_Data, myData_Trans, myQuote_Listener
+from myGlobal import gol 
 
 #行情来源
 class Quote_Source:
-    def __init__(self, params):
+    def __init__(self, params = "", type = ''):
+        self.type = type
+        if(params == ""): params = self._getDefault_Param()
         self.params = params
         self.datas = {}
         self.datasNow = None
         self.listeners = []
         self.interval_M = 1       #分钟级间隔
         self.setTime()            #设置(时效)
+    def _getDefault_Param(self):  #默认配置
+        pSets = gol._Get_Value('setsQuote')
+        if(pSets != None):
+            keys = pSets.setList.keys()
+            lstParam = []
+            for x in keys:
+                pSet = pSets._Find(x)
+                if(pSet != None and pSet.isEnable and self.type == pSet.setType):
+                    lstParam.append(pSet.setTag)
+            strParams = myData_Trans.Tran_ToStr(lstParam)
+            return strParams
      
     #添加监听
     def addListener(self, listener):
@@ -83,7 +96,6 @@ class Quote_Source:
         self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 9:28:00")      #起始时间
         self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:00")       #结束时间
         self.timeIntervals = 0
-     
 
 #行情监听线程
 class Quote_Thread(threading.Thread):
@@ -106,32 +118,30 @@ class Quote_Thread(threading.Thread):
 
           
 is_exit = False
-def mainloop(s):
+def mainloop(pQuote):
     global is_exit
     try:
         while True:
             time.sleep(1)
     except:
-        s.stop()
+        pQuote.stop()
 
 #主启动程序
 if __name__ == "__main__":
-    import mySource_Sina_Stock, myListener_Printer
-    
-    # sh000001,sh601939,sh601288,sh600919,sh600718
-    # sz399001,sz399006,sz300523,sz300512,sz300144,sz300036,sz002410,sz002024
-    stockids = 'sh000001,sh601939,sh601288,sh600919,sh600718,sz399001,sz399006,sz300523,sz300512,sz300144,sz300036,sz002410,sz002024'
-    stockids = 'sh601288'
-    s = mySource_Sina_Stock.Source_Sina_Stock(stockids)
-    s.addListener(myListener_Printer.Quote_Listener_Printer())
-    s.addListener(myListener_StaticsM5.Quote_Listener_StaticsM5())
+    import mySource_Sina_Stock
+    import myListener_Printer, myListener_Rise_Fall_asInt
 
-    myListener_StaticsM5
-    #线程验证    
-    thread = Quote_Thread(s)
+    #示例数据监控(暂只支持单源，多源需要调整完善)
+    pQuote = mySource_Sina_Stock.Source_Sina_Stock()
+    pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
+    pQuote.addListener(myListener_Rise_Fall_asInt.Quote_Listener_Rise_Fall_asInt())
+
+    #线程执行   
+    thread = Quote_Thread(pQuote)
     thread.setDaemon(True)
     thread.start()
     mainloop(thread)
+    print("Quote thread exited...")
 
 
 

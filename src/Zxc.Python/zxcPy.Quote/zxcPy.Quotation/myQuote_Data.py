@@ -11,7 +11,7 @@ import sys, os, time, datetime, copy, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Data')
 mySystem.Append_Us("", False) 
-import myData_Trans, myIO, myIO_xlsx
+import myData_Trans, myIO, myIO_xlsx, myQuote_Setting
 
 
 #数据对象
@@ -168,6 +168,7 @@ class Quote_Datas:
         self.datas = {}                                 #原始数据
         self.datas_CKDs_M = self.newData_CKDs(pData)    #统计数据--分钟级
         self.data = pData                               #当前数据对象
+        self.setting = myQuote_Setting._Find(pData.name)#配置项
         self.autoSave = True
         self.autoSave_interval_M = 2
         self.timeM = -1
@@ -176,7 +177,7 @@ class Quote_Datas:
         self.dir = "./Data/" + self.name + "/"
         self.fileName = myData_Trans.Tran_ToDatetime_str(pData.getTime(), "%Y-%m-%d")
         myIO.mkdir(self.dir) 
-        if(self.loadData()):                           #加载已存数据
+        if(self.loadData()):                            #加载已存数据
             self.setData(pData)
         
     #设置值 

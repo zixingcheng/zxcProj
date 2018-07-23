@@ -19,6 +19,8 @@ import myQuote_Data, myData_Stock, myQuote_Listener, myQuote_Source
 
 #行情源--新浪--Stock
 class Source_Sina_Stock(myQuote_Source.Quote_Source):
+    def __init__(self, params = ""):
+        myQuote_Source.Quote_Source.__init__(self, params, 'Stock')     #设置类型
     def query(self):    
         #新浪Stock接口查询
         host="http://hq.sinajs.cn/list="
