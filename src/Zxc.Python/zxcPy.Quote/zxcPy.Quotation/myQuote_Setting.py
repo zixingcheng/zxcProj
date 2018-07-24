@@ -47,6 +47,7 @@ class myQuote_Settings():
 
         #转换为功能权限对象集
         for dtRow in dtSetting.dataMat:
+            if(len(dtRow) < len(self.lstFields)): continue
             pSet = myQuote_Setting("", "")
             pSet.setTag = dtRow[lstFields_ind["代码"]]
             pSet.setName = dtRow[lstFields_ind["名称"]]
@@ -56,9 +57,9 @@ class myQuote_Settings():
             pSet.mark = dtRow[lstFields_ind["备注"]] 
 
             pSet.msgUsers_wx = str(dtRow[lstFields_ind["消息发送用户_wx"]]).split(',')
-            self._Index(pSet)           #索引设置信息
+            self._Index(pSet)               #索引设置信息
     def _Save(self):            
-        dtSetting = myIO_xlsx.DtTable()    #监听设置信息表
+        dtSetting = myIO_xlsx.DtTable()     #监听设置信息表
         dtSetting.dataName = "dataName"
         dtSetting.dataField = self.lstFields
         dtSetting.dataFieldType = ['string', 'string', 'string', 'string', 'bool', 'string', 'string']
