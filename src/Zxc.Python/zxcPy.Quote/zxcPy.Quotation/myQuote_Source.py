@@ -58,8 +58,7 @@ class Quote_Source:
     def setData(self, data, bNotify = True):
         #有效验证     
         if(data == None): return None
-        if(self.checkTime(data.datetime_queryed) == False): 
-            if(len(self.datas) > 0): return None  
+        if(self.checkTime(data.datetime_queryed) == False): return None 
 
         #提取数据对象
         pDatas = self.datas.get(data.name, None)
@@ -87,6 +86,9 @@ class Quote_Source:
             if(self.datasNow != None): 
                 self.datasNow.saveData()        #保存数据（第一时段结束）  
             return self.checkTime(tNow)
+        elif(self.endTime < tNow):
+            if(len(self.datas) == 0):           #初始数据(当天结束时段后，只有一条数据)
+               return True
         if(self.timeIntervals > 1):
             self.datasNow.saveData()            #保存数据（第二时段结束） 
         return False
