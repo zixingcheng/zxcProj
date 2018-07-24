@@ -37,10 +37,10 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             strTag = ""
             strTag_suffix = ""
             if(dValue_N >= 1):                      #涨
-                strTag = "涨 "
+                strTag = "涨"
                 if(dDelta < 0): strTag_suffix = ",涨幅收窄"
             else:                                   #跌
-                strTag = "跌 "
+                strTag = "跌"
                 if(dDelta < 0): strTag_suffix = ",跌幅收窄"
             strMsg = key + ": " + strTag + str(round(dRF,2)) + "% " + strTag_suffix + "."
             

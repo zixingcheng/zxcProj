@@ -91,6 +91,7 @@ class Quote_Source:
                return True
         if(self.timeIntervals > 1):
             self.datasNow.saveData()            #保存数据（第二时段结束） 
+            self.timeIntervals = 0
         return False
     #设置(时效)
     def setTime(self):

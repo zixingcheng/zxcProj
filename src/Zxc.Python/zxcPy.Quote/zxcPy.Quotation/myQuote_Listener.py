@@ -45,7 +45,7 @@ class Quote_Listener:
 
         #更新
         msg["user"] = to_user
-        msg["text"] = text + "\r\n\t   --zxcRobot(Stock) " + time
+        msg["text"] = text + "\r\n\t   --zxcRobot(Stock)   " + time
         msg["type"] = type
         msg["plat"] = plat
         return msg
