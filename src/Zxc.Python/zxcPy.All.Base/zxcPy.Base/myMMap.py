@@ -230,7 +230,6 @@ class myMMap_Manager():
             nOffet = self.mmap.Write(self.offsets, nOffet)
             self._offset = nOffet
             self.offset = nOffet
-
     def __del__(self):
         self.mmap.Close()
         
@@ -247,6 +246,8 @@ class myMMap_Manager():
         self.offsets[ind] = self.offset             #记录索引
         self.Write_Ind(self.offset, ind)            #索引对应偏移
         self.offset = self.mmap.Write_Data(value)   #数据写入偏移位置
+        if(self.offset == value.offset):            #写入失败
+            return ind
         self.ind += 1                               #索引步进(循环)
         if(self.ind >= self.indNum):
             self.offset = self._offset              #偏移恢复到起始位置
@@ -269,12 +270,12 @@ class myMMap_Manager():
         if(bDelete):                                #检查是否过界
             if(self.Check_Ind(ind) == False):       #过界则忽略    
                 return None, ind
-        self.offset = self.Read_Ind(ind)            #记录的索引偏移
-        if(self.offset <= 0):
+        offset = self.Read_Ind(ind)                 #记录的索引偏移
+        if(offset <= 0):
             return None, ind
 
         #读取内存数据
-        pData = myMMap_Data(0, self.offset)
+        pData = myMMap_Data(0, offset)
         self.mmap.Read_Data(pData)
         pData.Get_Value()
 
@@ -344,7 +345,11 @@ def main():
             #myMMap_Manager
             lst.append("ind--" + str(i))
             pMMdata = myMMap_Data(lst, 0)
-            pMMap_Manager.Write(pMMdata)
+            ind2 = pMMap_Manager.Write(pMMdata)
+            pMMdata_M2, ind3 = pMMap_Manager.Read(ind2)
+            if(pMMdata_M2 != None):
+                print(str(ind2) + ":", pMMdata_M2.value)  
+            pMMap_Manager.Read
             time.sleep(1)
     else:
         pMMdata = myMMap_Data(0, 0)

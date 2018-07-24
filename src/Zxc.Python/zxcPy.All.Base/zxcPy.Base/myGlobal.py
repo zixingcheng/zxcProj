@@ -34,16 +34,25 @@ class gol():
             if(bPrint):
                 print("->>", "\t--已初始全局变量\r\n")  
 
-    def _Set_Value(key, value):
+    def _Set_Value(key, value, cover = False):
         """ 定义一个全局变量 """
-        _global_dict[key] = value
+        if(cover):
+            if(_global_dict.get(key, None) == None):
+                _global_dict[key] = value
+        else:
+            _global_dict[key] = value
     def _Get_Value(key, defValue = None):
         """ 获得一个全局变量,不存在则返回默认值 """
         return _global_dict.get(key, defValue)
 
     #全局设置
-    def _Set_Setting(key, value):
-        _global_dict["golSetting"][key] = value
+    def _Set_Setting(key, value, cover = False):
+        dictSet = _global_dict["golSetting"]
+        if(cover):
+            if(dictSet.get(key, None) == None):
+                dictSet[key] = value
+        else:
+            dictSet[key] = value
     def _Get_Setting(key, defValue = None):
         return _global_dict["golSetting"].get(key, defValue)
 
