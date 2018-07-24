@@ -28,24 +28,24 @@ class Quote_Listener:
     def OnRecvQuote(self, quoteDatas):pass 
     #消息处理
     def OnHandleMsg(self, quoteDatas, strMsg):
-        if(self.autoSave ): return False    #屏蔽旧数据处理
+        if(quoteDatas.autoSave == False): return False    #屏蔽旧数据处理
         #通知处理
         pSet = quoteDatas.setting
         for x in pSet.msgUsers_wx:
             #生成用户消息
-            msg = self.OnCreatMsgInfo(x, strMsg)
+            msg = self.OnCreatMsgInfo(x, strMsg, quoteDatas.data.time)
             if(self.pMMsg != None):
                 self.pMMsg.OnHandleMsg(msg)
         return True
     #创建新消息
-    def OnCreatMsgInfo(self, to_user, text, type = "TEXT", plat = 'weixin'):
+    def OnCreatMsgInfo(self, to_user, text, time = '', type = "TEXT", plat = 'weixin'):
         if(self.pMMsg != None):
             msg = self.pMMsg.OnCreatMsg()
         else: msg ={}
 
         #更新
         msg["user"] = to_user
-        msg["text"] = text
+        msg["text"] = text + "\r\n\t   --zxcRobot(Stock) " + time
         msg["type"] = type
         msg["plat"] = plat
         return msg
@@ -57,7 +57,16 @@ class Quote_Listener:
 #主启动程序
 if __name__ == "__main__":
     pMMsg = gol._Get_Setting('manageMsgs')
+
     import myListener_Printer
     pListener = myListener_Printer.Quote_Listener_Printer()
+    #pListener.OnRecvQuote(myQuote_Data.Quote_Data())
 
-    pListener.OnRecvQuote(myQuote_Data.Quote_Data())
+    users = ['茶叶一主号', '老婆']
+    for i in range(0, 15):
+        for x in users:
+            strMsg = "Hello " + x 
+            msg = pListener.OnCreatMsgInfo(x, strMsg, str(i))
+            if(pMMsg != None):
+                pMMsg.OnHandleMsg(msg)
+    print()
