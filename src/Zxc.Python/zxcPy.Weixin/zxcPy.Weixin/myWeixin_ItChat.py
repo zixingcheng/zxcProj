@@ -142,8 +142,8 @@ class myWeixin_ItChat(myThread.myThread):
         #发送消息
         typeMsg = typeMsg.upper()
         if(typeMsg == "TEXT"):
-            itchat.send('%s: %s' % (typeMsg, msgInfo), userFrom)
-        elif(typeMsg == "TEXT"):
+            itchat.send('%s' % (msgInfo), userFrom)
+        elif(typeMsg == "IMage"):   #未实现
             itchat.send_image('%s: %s' % (typeMsg, msgInfo), userFrom)
         else:
             print("No this type.")
@@ -228,17 +228,15 @@ class myWeixin_ItChat(myThread.myThread):
         pMMdata_M, self.ind = self.managerMMap.Read(self.ind, True)
         while(pMMdata_M != None):
             #调用发送消息
+            nNum += 1
             msg = pMMdata_M.value
             if(msg != None and msg != 0):
                 self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
                 print(msg)
-                
-                #再次提取命令
-                pMMdata_M, self.ind = self.managerMMap.Read(self.ind, True)
 
-            nNum += 1
-            if(nNum >= self.max):
-                return 
+                #再次提取命令
+                if(nNum >= self.max): return 
+                pMMdata_M, self.ind = self.managerMMap.Read(self.ind, True)
             
 #webWeixin接口--命令封装类--未使用
 #线程

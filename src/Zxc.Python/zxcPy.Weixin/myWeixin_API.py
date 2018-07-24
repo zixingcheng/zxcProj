@@ -6,7 +6,7 @@ Created on  张斌 2017-11-19 14:58:00
 
     Rest API --Weixin API操作 
 """
-import os  
+import os, time  
 import mySystem 
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
@@ -27,7 +27,17 @@ if __name__ == '__main__':
     # 创建内存映射（写）
     try:
         pMMap_Manager = myMMap.myMMap_Manager("Data/zxcMMap.dat")
-        gol._Set_Value('manageMMap', pMMap_Manager)
+        gol._Set_Value('manageMMap', pMMap_Manager, True)
+
+        #测试
+        #users = ['茶叶一主号', '老婆']
+        #pAPI = myWeixin_Cmd.myAPI_Weixin_Cmd()
+        #for i in range(0, 15):
+        #    for x in users:
+        #        strMsg = "Hello " + x 
+        #        pAPI.get(x, strMsg)
+        #    time.sleep(1)
+        #print()
     except:
         print("创建内存映射失败.")
         exit()

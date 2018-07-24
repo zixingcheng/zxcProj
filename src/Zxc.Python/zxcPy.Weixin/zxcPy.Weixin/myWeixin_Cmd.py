@@ -13,6 +13,7 @@ import mySystem
 mySystem.Append_Us("", False)    
 import myWeb, myMMap
 from myGlobal import gol   
+gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
 
 #API-命令--共享内存
@@ -30,11 +31,15 @@ class myAPI_Weixin_Cmd(myWeb.myAPI):
         
         #读取测试
         pMMdata_M2, ind2 = pMMap_Manager.Read(ind)  
-        print(pMMdata_M2.value)
+        print(str(ind) + ":", pMMdata_M2.value)
+        #if(ind>1):
+        #    pMMdata_M3, ind3 = pMMap_Manager.Read(ind - 1)  
+        #    if(pMMdata_M3 != None):
+        #        print("Last::" + str(ind - 1) + ":", pMMdata_M3.value)
         return ind
 
 
-#主程序启动
+#主程序启动 
 if __name__ == '__main__': 
     # 创建内存映射
     try:
