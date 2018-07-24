@@ -28,6 +28,7 @@ class Quote_Listener:
     def OnRecvQuote(self, quoteDatas):pass 
     #消息处理
     def OnHandleMsg(self, quoteDatas, strMsg):
+        if(self.autoSave ): return False    #屏蔽旧数据处理
         #通知处理
         pSet = quoteDatas.setting
         for x in pSet.msgUsers_wx:
@@ -35,6 +36,7 @@ class Quote_Listener:
             msg = self.OnCreatMsgInfo(x, strMsg)
             if(self.pMMsg != None):
                 self.pMMsg.OnHandleMsg(msg)
+        return True
     #创建新消息
     def OnCreatMsgInfo(self, to_user, text, type = "TEXT", plat = 'weixin'):
         if(self.pMMsg != None):
