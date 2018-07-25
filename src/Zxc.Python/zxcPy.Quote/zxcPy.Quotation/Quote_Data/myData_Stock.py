@@ -53,7 +53,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
         self.sell5Price = ''
         self.date = ''
         self.time = ''
-        self.dateList = []
+        self.dataList = []
         self.priceOpen = 0      #开盘价格
         self.priceBase = 0      #前一收盘价格
 
@@ -130,46 +130,46 @@ class Data_Stock(myQuote_Data.Quote_Data):
     #转换为值组
     def toValueList(self):
         dtNow = self.getTime(False)
-        if(len(self.dateList) > 1 and self.dateList[0] == dtNow):
-           return self.dateList
-        self.dateList = [] 
-        self.dateList.append(dtNow)                                      #时间
-        self.dateList.append(myData_Trans.To_Float(self.lastPrice))      #最后价格
-        self.dateList.append(myData_Trans.To_Float(self.highPrice))      #最高价格
-        self.dateList.append(myData_Trans.To_Float(self.lowPrice))       #最低价格 
-        self.dateList.append(myData_Trans.To_Float(self.buyPrice))       #买价
-        self.dateList.append(myData_Trans.To_Float(self.sellPrice))      #卖价
-        self.dateList.append(myData_Trans.To_Float(self.tradeValume))    #成交量
-        self.dateList.append(myData_Trans.To_Float(self.tradeTurnover))  #成交额
+        if(len(self.dataList) > 1 and self.dataList[0] == dtNow):
+           return self.dataList
+        self.dataList = [] 
+        self.dataList.append(dtNow)                                      #时间
+        self.dataList.append(myData_Trans.To_Float(self.lastPrice))      #最后价格
+        self.dataList.append(myData_Trans.To_Float(self.highPrice))      #最高价格
+        self.dataList.append(myData_Trans.To_Float(self.lowPrice))       #最低价格 
+        self.dataList.append(myData_Trans.To_Float(self.buyPrice))       #买价
+        self.dataList.append(myData_Trans.To_Float(self.sellPrice))      #卖价
+        self.dataList.append(myData_Trans.To_Float(self.tradeValume))    #成交量
+        self.dataList.append(myData_Trans.To_Float(self.tradeTurnover))  #成交额
         
-        self.dateList.append(myData_Trans.To_Float(self.buy1Volume))     #买1-5量
-        self.dateList.append(myData_Trans.To_Float(self.buy2Volume))   
-        self.dateList.append(myData_Trans.To_Float(self.buy3Volume))   
-        self.dateList.append(myData_Trans.To_Float(self.buy4Volume))   
-        self.dateList.append(myData_Trans.To_Float(self.buy5Volume))  
-        self.dateList.append(myData_Trans.To_Float(self.buy1Price))      #买1-5价格
-        self.dateList.append(myData_Trans.To_Float(self.buy2Price))   
-        self.dateList.append(myData_Trans.To_Float(self.buy3Price))   
-        self.dateList.append(myData_Trans.To_Float(self.buy4Price))   
-        self.dateList.append(myData_Trans.To_Float(self.buy5Price))   
+        self.dataList.append(myData_Trans.To_Float(self.buy1Volume))     #买1-5量
+        self.dataList.append(myData_Trans.To_Float(self.buy2Volume))   
+        self.dataList.append(myData_Trans.To_Float(self.buy3Volume))   
+        self.dataList.append(myData_Trans.To_Float(self.buy4Volume))   
+        self.dataList.append(myData_Trans.To_Float(self.buy5Volume))  
+        self.dataList.append(myData_Trans.To_Float(self.buy1Price))      #买1-5价格
+        self.dataList.append(myData_Trans.To_Float(self.buy2Price))   
+        self.dataList.append(myData_Trans.To_Float(self.buy3Price))   
+        self.dataList.append(myData_Trans.To_Float(self.buy4Price))   
+        self.dataList.append(myData_Trans.To_Float(self.buy5Price))   
         
-        self.dateList.append(myData_Trans.To_Float(self.sell1Volume))    #卖1-5量
-        self.dateList.append(myData_Trans.To_Float(self.sell2Volume))   
-        self.dateList.append(myData_Trans.To_Float(self.sell3Volume))   
-        self.dateList.append(myData_Trans.To_Float(self.sell4Volume))   
-        self.dateList.append(myData_Trans.To_Float(self.sell5Volume))  
-        self.dateList.append(myData_Trans.To_Float(self.sell1Price))     #卖1-5价格
-        self.dateList.append(myData_Trans.To_Float(self.sell2Price))   
-        self.dateList.append(myData_Trans.To_Float(self.sell3Price))   
-        self.dateList.append(myData_Trans.To_Float(self.sell4Price))   
-        self.dateList.append(myData_Trans.To_Float(self.sell5Price))   
+        self.dataList.append(myData_Trans.To_Float(self.sell1Volume))    #卖1-5量
+        self.dataList.append(myData_Trans.To_Float(self.sell2Volume))   
+        self.dataList.append(myData_Trans.To_Float(self.sell3Volume))   
+        self.dataList.append(myData_Trans.To_Float(self.sell4Volume))   
+        self.dataList.append(myData_Trans.To_Float(self.sell5Volume))  
+        self.dataList.append(myData_Trans.To_Float(self.sell1Price))     #卖1-5价格
+        self.dataList.append(myData_Trans.To_Float(self.sell2Price))   
+        self.dataList.append(myData_Trans.To_Float(self.sell3Price))   
+        self.dataList.append(myData_Trans.To_Float(self.sell4Price))   
+        self.dataList.append(myData_Trans.To_Float(self.sell5Price))   
 
         self.priceOpen = myData_Trans.To_Float(self.openPrice)           #开盘价格
         self.priceBase = myData_Trans.To_Float(self.preClose)            #前一收盘价格
-        return self.dateList
+        return self.dataList
     #由值组转换
     def fromValueList(self, lstValue):
-        self.dateList = lstValue
+        self.dataList = lstValue
         dtNow = lstValue[0]
         if(type(dtNow) == str): dtNow = myData_Trans.Tran_ToDatetime(dtNow)
 

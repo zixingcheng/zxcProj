@@ -172,6 +172,7 @@ class Quote_Datas:
         self.autoSave = True
         self.autoSave_interval_M = 2
         self.timeM = -1
+        self.stoped = False
 
         #保存基础数据
         self.dir = "./Data/" + self.name + "/"

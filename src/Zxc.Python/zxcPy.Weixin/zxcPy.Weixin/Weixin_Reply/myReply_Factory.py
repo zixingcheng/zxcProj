@@ -49,12 +49,12 @@ class myWx_Reply():
         idGroup = ""
         pWxdo = None 
         if(isGroup):
-            idGroup = msg['User']['UserName']
-            nickName = msg['ActualNickName']
-            usrName = msg['ActualUserName']
+            idGroup = msg['User'].get('UserName',"")
+            nickName = msg.get('ActualNickName',"")
+            usrName = msg.get('ActualUserName',"")
         else:
-            nickName = msg['User']['NickName']
-            usrName = msg['FromUserName']
+            nickName = msg['User'].get('NickName',"")
+            usrName = msg.get('FromUserName',"")
 
         #调用 
         return self.Done(usrName, nickName, strText, isGroup, idGroup)

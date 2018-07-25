@@ -6,7 +6,7 @@ Created on  张斌 2018-05-03 14:58:00
 
     监听--源基类 
 """
-import sys, os, time,  mySystem 
+import sys, os, time, datetime,  mySystem 
 import threading
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
@@ -25,7 +25,7 @@ class Quote_Source:
         self.datasNow = None
         self.listeners = []
         self.interval_M = 1       #分钟级间隔
-        self.setTime()            #设置(时效)
+        self.setTime()            #设置(时效) 
     def _getDefault_Param(self):  #默认配置
         pSets = gol._Get_Value('setsQuote')
         if(pSets != None):
@@ -37,6 +37,15 @@ class Quote_Source:
                     lstParam.append(pSet.setTag)
             strParams = myData_Trans.Tran_ToStr(lstParam)
             return strParams
+    def _Stoped(self):
+        keys = self.datas.keys()
+        isStoped = False
+        for x in keys:
+            if(self.datas[x].stoped):
+                isStoped = True
+                break
+        return isStoped
+    
      
     #添加监听
     def addListener(self, listener):
@@ -58,7 +67,7 @@ class Quote_Source:
     def setData(self, data, bNotify = True):
         #有效验证     
         if(data == None): return None
-        if(self.checkTime(data.datetime_queryed) == False): return None 
+        if(self.checkTime(data) == False): return None 
 
         #提取数据对象
         pDatas = self.datas.get(data.name, None)
@@ -66,6 +75,7 @@ class Quote_Source:
             pDatas = self.newDatas(data, self.interval_M)
             self.datas[data.name] = pDatas
         else:     
+            if(pData.stoped): return None       #终止接收
             pDatas.setData(data)                #设置值
         
         #通知所有监听对象
@@ -74,24 +84,31 @@ class Quote_Source:
         self.datasNow = pDatas
         return pDatas
     #合法性(时效)
-    def checkTime(self, tNow): 
+    def checkTime(self, data):
+        tNow = data.datetime_queryed
         if(self.startTime < tNow and tNow < self.endTime):
             if(self.timeIntervals > 0):
                 self.timeIntervals += 1
             return True
         elif(self.timeIntervals == 0 and self.endTime < tNow):
             self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 13:00:00")      #起始时间
-            self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 15:02:00")        #结束时间
+            self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 15:06:00")        #结束时间
             self.timeIntervals += 1
             if(self.datasNow != None): 
-                self.datasNow.saveData()        #保存数据（第一时段结束）  
-            return self.checkTime(tNow)
+                self.datasNow.saveData()                    #保存数据（第一时段结束）  
+            return self.checkTime(data)
         elif(self.endTime < tNow):
-            if(len(self.datas) == 0):           #初始数据(当天结束时段后，只有一条数据)
-               return True
-        if(self.timeIntervals > 1):
-            self.datasNow.saveData()            #保存数据（第二时段结束） 
-            self.timeIntervals = 0
+            if(self.datas.get(data.name,None) == None): #初始数据(当天结束时段后，只有一条数据)
+                self.timeIntervals += 1
+                return True
+            elif(self.timeIntervals > 1):
+                #设置数据监听停止
+                if(self.datasNow.name != data.name):
+                    self.datasNow = self.datas.get(data.name,None)
+                if(self.datasNow.stoped == False):
+                    self.datasNow.saveData()                #保存数据（第二时段结束） 
+                    self.datasNow.stoped = True
+                    print("... stoped data(" + data.name + ")...") 
         return False
     #设置(时效)
     def setTime(self):
@@ -112,8 +129,17 @@ class Quote_Thread(threading.Thread):
         print ('StockQuote run')
         self.threadRunning = True;
         while self.threadRunning:
-            self.source.query()
-            time.sleep(self.interval)
+            try:
+                #发生错误时继续
+                self.source.query()
+
+                #判断结束
+                if(self.source._Stoped()):
+                    break
+                time.sleep(self.interval)   
+            except :
+                pass
+        self.stop()
 
     def stop(self):
         print ('StockQuote stop')
@@ -121,13 +147,13 @@ class Quote_Thread(threading.Thread):
 
           
 is_exit = False
-def mainloop(pQuote):
+def mainloop(thread):
     global is_exit
     try:
         while True:
             time.sleep(1)
     except:
-        pQuote.stop()
+        thread.stop()
 
 #主启动程序
 if __name__ == "__main__":
