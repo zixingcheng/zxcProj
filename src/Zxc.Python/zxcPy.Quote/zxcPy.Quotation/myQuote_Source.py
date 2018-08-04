@@ -75,7 +75,7 @@ class Quote_Source:
             pDatas = self.newDatas(data, self.interval_M)
             self.datas[data.name] = pDatas
         else:     
-            if(pDatas.stoped): return None       #终止接收
+            if(pDatas.stoped): return None      #终止接收
             pDatas.setData(data)                #设置值
         
         #通知所有监听对象
@@ -114,7 +114,7 @@ class Quote_Source:
     def setTime(self):
         self.dtDay = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")                 #当前天
         self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 9:29:30")      #起始时间
-        self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:30")       #结束时间
+        self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:3:30")        #结束时间
         self.timeIntervals = 0
 
 #行情监听线程
@@ -129,16 +129,16 @@ class Quote_Thread(threading.Thread):
         print ('StockQuote run')
         self.threadRunning = True;
         while self.threadRunning:
-            #try:
-            #发生错误时继续
-            self.source.query()
+            try:
+                #发生错误时继续
+                self.source.query()
 
-            #判断结束
-            if(self.source._Stoped()):
-                break
-            time.sleep(self.interval)   
-            #except :
-            #    pass
+                #判断结束
+                if(self.source._Stoped()):
+                    break
+                time.sleep(self.interval)   
+            except :
+                pass
         self.stop()
 
     def stop(self):

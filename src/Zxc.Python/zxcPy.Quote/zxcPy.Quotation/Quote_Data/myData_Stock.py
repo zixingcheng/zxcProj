@@ -237,7 +237,7 @@ class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
         datas = pData.toValueList()
         self.Valume = datas[6] - self.Valume_pre
         self.Turnover = datas[7] - self.Turnover_pre
-        self.Rise_Fall = datas[1] / pData.priceBase     #涨跌幅
+        self.Rise_Fall = datas[1] / pData.priceBase - 1     #涨跌幅
         if(self.Valume > 0):
             self.Price = self.Turnover / self.Valume
         elif(self.Valume < 0):

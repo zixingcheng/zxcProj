@@ -4,14 +4,14 @@ Created on  张斌 2018-05-03 14:58:00
     @author: zhang bin
     @email:  zhangbin@gsafety.com
 
-    监听--类 涨跌幅整数位
+    监听--类 涨跌幅整数倍
 """
-import sys, os, math, mySystem 
+import sys, os, math, copy, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/zxcPy.Quotation')
 mySystem.Append_Us("", False)    
-import myData, myQuote_Data, myQuote_Listener  
+import myQuote_Data, myQuote_Listener  
     
 
 #行情监听--涨跌幅整数位
@@ -19,36 +19,100 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
     def __init__(self):
         myQuote_Listener.Quote_Listener.__init__(self, 'Rise_Fall_asInt')
         self.values = {}
+        self.data = {'max':-0.1, 'min':0.1, 'now':0}        #值结构
+        self.deltaV = 0.5 / 100;
 
     #处理接收信息
     def OnRecvQuote(self, quoteDatas): 
+        #设置有效检查
+        if(self.IsEnable()== False): return
+        
         #提取值
+        dValue_N = quoteDatas.datas_CKDs_M.CKD.Rise_Fall    #当前值
         key = quoteDatas.name
-        dValue = self.values.get(key, 0)
-        dValue_N = quoteDatas.datas_CKDs_M.CKD.Rise_Fall
-        dDelta = dValue_N - dValue -1               #当前-历史
-        if(abs(dDelta) > 0.01):
-            #涨跌幅达到整数位, 1%
-            dRF = (dValue_N -1) * 100
-            nRF = int(math.modf(dRF)[1])
-            self.values[key] = nRF / 100            #更新记录值
+
+        #通知处理
+        strMsg = self.OnRecvQuote(dValue_N, key)
+        if(strMsg != ""):
+            self.OnHandleMsg(quoteDatas, strMsg)
+    def OnRecvQuote(self, dValue_N, key): 
+        strTag_suffix = ""
+        value = self.values.get(key, None)
+        if(value == None):
+            #实例值对象
+            value = copy.deepcopy(self.data)
+            value['max'] = dValue_N
+            value['min'] = dValue_N
+            self.values[key] = value
+            strTag_suffix = "."
+        
+        #判断涨跌幅
+        dValue = value['now']                               #前一个记录值
+        dDelta = dValue_N - dValue                          #当前-历史的差值
+        
+        #涨跌超限值
+        if(abs(dDelta) >= self.deltaV):
+            #涨跌幅达到间隔值整数倍, 计算记录新值
+            nTimes = int(dDelta / self.deltaV)
+            value['now'] = dValue + nTimes * self.deltaV    #更新记录值
+            
+            #涨跌幅突破标识
+            if(value['max'] < dValue_N):
+                value['max'] = dValue_N
+                if(dValue_N > 0): strTag_suffix = ",涨幅新高."
+            if(value['min'] > dValue_N):
+                value['min'] = dValue_N
+                if(dValue_N < 0): strTag_suffix = ",跌幅加深."
 
             #计算涨跌返回对应说明标识
-            strTag = ""
-            strTag_suffix = ""
-            if(dValue_N >= 1):                      #涨
-                strTag = "涨"
-                if(dDelta < 0): strTag_suffix = ",涨幅收窄"
-            else:                                   #跌
-                strTag = "跌"
-                if(dDelta < 0): strTag_suffix = ",跌幅收窄"
-            strMsg = key + ": " + strTag + str(round(dRF,2)) + "% " + strTag_suffix + "."
-            
-            #通知处理
-            self.OnHandleMsg(quoteDatas, strMsg)
-            
-    #创建消息内容
-    def OnCreatMsgstr(self, quoteDatas):
-        strMsg = self.getName()
+            strTag = ""  
+            strDelta = str(round(nTimes * self.deltaV * 100, 2)) + "%"
+            if(dDelta > 0):
+                #涨
+                strTag = "区间涨超:" + strDelta
+            else:
+                strTag = "区间跌逾:" + strDelta
 
-        return strMsg
+            #涨跌反转标识
+            if(dValue_N >= 0 and dValue >= 0):
+                nTimes2 = int(value['max'] / self.deltaV)
+                if(strTag_suffix == "" and abs(nTimes2) > 1): 
+                    strTag_suffix = ",涨幅回落."
+            else:
+                nTimes2 = int(value['min'] / self.deltaV)
+                if(strTag_suffix == "" and abs(nTimes2) > 1): 
+                    strTag_suffix = ",跌幅收窄."
+            
+            #组装返回结果
+            dRF = dValue_N * 100
+            strMsg = key + ": " + str(round(dRF,2)) + "%," + strTag + strTag_suffix
+            return strMsg
+        return ""
+
+    #功能是否可用
+    def IsEnable(self, quoteDatas):
+        return quoteDatas.setting.isEnable_RFasInt
+    
+
+
+#主启动程序--测试
+if __name__ == "__main__":
+    pListener = Quote_Listener_Rise_Fall_asInt()
+    #pListener.deltaV = 0.01
+
+    #测试
+    key = '建设银行'
+    pListener.OnRecvQuote(0.032, key)
+    pListener.OnRecvQuote(0.041, key)
+    pListener.OnRecvQuote(0.0453, key)
+    pListener.OnRecvQuote(0.0152, key)
+    pListener.OnRecvQuote(0.01, key)
+    pListener.OnRecvQuote(0.0, key)
+    pListener.OnRecvQuote(-0.0051, key)
+    pListener.OnRecvQuote(-0.0152, key)
+    pListener.OnRecvQuote(-0.0453, key)
+    pListener.OnRecvQuote(-0.012, key)
+    pListener.OnRecvQuote(0.0, key)
+    pListener.OnRecvQuote(0.051, key)
+
+    print()

@@ -23,7 +23,9 @@ class myQuote_Setting():
         self.mark = ''              #备注说明
         self.msgUsers_wx = []       #消息发送用户-微信
 
-        self.isEnable = False       #是否设置有效
+        self.isEnable = False           #是否设置有效
+        self.isEnable_RFasInt = False   #是否设置有效--涨跌幅监测
+        self.isEnable_Hourly = False    #是否设置有效--整点播报
 
 #监听--设置对象集
 class myQuote_Settings():
@@ -36,7 +38,7 @@ class myQuote_Settings():
         self.Dir_Base = os.path.abspath(os.path.join(strDir, ".."))  
         self.Dir_Setting = self.Dir_Base + "/Setting"
         self.Path_SetQuote = self.Dir_Setting + "/Setting_Quote.xls"
-        self.lstFields = ["代码","名称","类型","国家","有效性","消息发送用户_wx","备注"]
+        self.lstFields = ["代码","名称","类型","国家","有效性","消息发送用户_wx","涨跌监测","整点播报","备注"]
         self._Init()
     #初始参数信息等   
     def _Init(self):            
@@ -54,8 +56,10 @@ class myQuote_Settings():
             pSet.setType = dtRow[lstFields_ind["类型"]]
             pSet.setArea = dtRow[lstFields_ind["国家"]]
             pSet.isEnable = myData.iif(dtRow[lstFields_ind["有效性"]] == True, True, False)
-            pSet.mark = dtRow[lstFields_ind["备注"]] 
+            pSet.isEnable_RFasInt = myData.iif(dtRow[lstFields_ind["涨跌监测"]] == True, True, False)
+            pSet.isEnable_Hourly = myData.iif(dtRow[lstFields_ind["整点播报"]] == True, True, False)
 
+            pSet.mark = dtRow[lstFields_ind["备注"]] 
             pSet.msgUsers_wx = str(dtRow[lstFields_ind["消息发送用户_wx"]]).split(',')
             self._Index(pSet)               #索引设置信息
     def _Save(self):            

@@ -52,6 +52,9 @@ class Quote_Listener:
     #创建消息内容
     def OnCreatMsgstr(self, quoteDatas):
         pass
+    #功能是否可用
+    def IsEnable(self, quoteDatas):
+        return True
 
 
 #主启动程序
