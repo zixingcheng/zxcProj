@@ -19,15 +19,16 @@ from myGlobal import gol
 class myRoot():
     def __init__(self):
         self.usrName = "zxcRobot"       #归属用户
+        self.usrNameNick = "zxcRobot"   #归属用户昵称
         self.usrID = "zxcRobot"         #归属用户ID
         self.rootPrjs = None            #功能集 
         self.usrInfos = None            #用户集 
         self.usrPlants = None           #平台集
-        
-        self.Init()
+        self.Init()                     #信息初始
     def Init(self):  
-        self.usrName = gol._Get_Setting('usrName', "zxcRobot")  #归属用户
-        self.usrID = gol._Get_Setting('usrID', "zxcRobot")      #归属用户ID
+        self.usrName = gol._Get_Setting('usrName', "zxcRobot")          #归属用户
+        self.usrNameNick = gol._Get_Setting('usrNameNick', "zxc机器人") #归属用户昵称
+        self.usrID = gol._Get_Setting('usrID', "zxcRobotID")            #归属用户ID
 
         #功能集
         if(self.rootPrjs == None):
@@ -49,6 +50,14 @@ class myRoot():
         else:
             self.usrPlants.usrName = self.usrName
             self.usrPlants.usrID = self.usrID
+        self.Init_Plants()  #初始平台             
+    def Init_Plants(self, plant = "wx"):  
+        self.usrPlants.Regist(self.usrName, self.usrID, plant)
+    def Init_UserInfo(self, usrName, usrNameNick, usrID):  
+        gol._Set_Setting('usrName', usrName)
+        gol._Set_Setting('usrNameNick', usrNameNick)
+        gol._Set_Setting('usrID', usrID)
+        self.Init();
              
 #定义全局方法集并缓存
 gol._Init()         #先必须在主模块初始化（只在Main模块需要一次即可）
@@ -61,6 +70,7 @@ if __name__ == "__main__":
     print(pRoot.usrName)
 
     gol._Set_Setting('usrName', "zxcRobot2")
-    gol._Set_Setting('usrID', "zxcRobot2")
+    gol._Set_Setting('usrNameNick', "zxc机器人2")
+    gol._Set_Setting('usrID', "zxcRobotID2")
     pRoot.Init()
     print(pRoot.usrName)
