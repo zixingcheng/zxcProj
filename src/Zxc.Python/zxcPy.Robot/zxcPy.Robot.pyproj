@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0e89e814-5d61-43f4-9065-03483bb5ba80}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>zxcPy.Robot\Roots\myRoot_Plant.py</StartupFile>
+    <StartupFile>zxcPy.Robot\Roots\myRoot.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -21,6 +21,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="zxcPy.APIs\myAPI_Robot.py" />
+    <Compile Include="zxcPy.Robot\Reply\myRobot_Reply.py" />
     <Compile Include="zxcPy.Robot\myRobot_API.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Repeater.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Root.py" />
@@ -39,6 +40,7 @@
     <Folder Include="Setting\" />
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Robot\" />
+    <Folder Include="zxcPy.Robot\Reply\" />
     <Folder Include="zxcPy.Robot\Roots\" />
     <Folder Include="zxcPy.Robot\Prjs\" />
   </ItemGroup>
