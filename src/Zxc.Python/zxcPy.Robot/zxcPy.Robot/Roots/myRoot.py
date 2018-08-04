@@ -11,7 +11,7 @@ import sys, os, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__) 
 mySystem.Append_Us("", False) 
-import myRoot_Prj, myRoot_Usr, myRoot_Plant
+import myRoot_Prj, myRoot_Usr, myRoot_GroupInfo, myRoot_Plant
 from myGlobal import gol   
 
 
@@ -23,7 +23,9 @@ class myRoot():
         self.usrID = "zxcRobot"         #归属用户ID
         self.rootPrjs = None            #功能集 
         self.usrInfos = None            #用户集 
+        self.usrGroups = None           #用户群组集
         self.usrPlants = None           #平台集
+
         self.Init()                     #信息初始
     def Init(self):  
         self.usrName = gol._Get_Setting('usrName', "zxcRobot")          #归属用户
@@ -37,6 +39,14 @@ class myRoot():
         else:
             self.usrInfos.usrName = self.usrName
             self.usrInfos.usrID = self.usrID
+
+        #群组集
+        if(self.usrGroups == None):
+            self.usrGroups = myRoot_GroupInfo.myRoot_GroupsInfo(self.usrName, self.usrID)   
+            gol._Set_Value('rootRobot_usrGroups', self.usrGroups)
+        else:
+            self.usrGroups.usrName = self.usrName
+            self.usrGroups.usrID = self.usrID
 
         #功能集
         if(self.rootPrjs == None):

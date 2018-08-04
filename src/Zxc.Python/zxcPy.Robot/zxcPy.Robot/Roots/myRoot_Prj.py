@@ -10,7 +10,7 @@ import sys, os, datetime, mySystem
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)    
-import myIO, myIO_xlsx, myData, myRoot_Usr
+import myIO, myIO_xlsx, myData, myRoot_Usr, myRoot_GroupInfo
 import myRoot_GroupInfo as group
 from myGlobal import gol 
 
@@ -23,15 +23,16 @@ class myRoot_Prj():
         self.className = ""     #类名
         self.cmdStr = ""        #启动命令
         self.isRoot = False     #是否根标识 ??
-
+        
+        self.isRunning = False          #是否运行中
         self.isEnable = False           #是否启用
         self.isEnable_All = False       #是否统一启用(登陆账户启用，否则单个用户启用)
         self.isEnable_one = False       #一对一有效
         self.isEnable_group = False     #群有效
         self.isEnable_groupAll = False  #群同时有效
-        self.rootUsers = myRoot_Usr.myRoot_Usrs("", "")       #根权限用户集
-        self.rootUsers_up = myRoot_Usr.myRoot_Usrs("", "")    #提升权限用户集
-        self.goupsEnable = []           #已启用群集
+        self.rootUsers = myRoot_Usr.myRoot_Usrs("", "")                 #根权限用户集
+        self.rootUsers_up = myRoot_Usr.myRoot_Usrs("", "")              #提升权限用户集
+        self.rootGroups = myRoot_GroupInfo.myRoot_GroupsInfo("", "")    #已启用群集
         self.plantsEnable = []          #平台列表
         self.registedUsr = None         #当前授权功能开启用户
         self.infoLogs = {}              #日志消息
@@ -49,14 +50,19 @@ class myRoot_Prj():
         self.infoLogs[datetime.datetime.now] = usrName + "::" + usrInfo
 
     #命令权限检查
-    def IsRoot_user(self, usrName):  
-        isRoot = self.rootUsers._Find(usrName, usrName, usrName, usrName) != None
-        isRoot_up = self.rootUsers_up._Find(usrName, usrName, usrName, usrName) != None
-        return isRoot == True or isRoot_up == True
+    def IsRoot_user(self, usr):  
+        if(self.rootUsers._Find(usr.usrName, usr.usrName, usr.usrName, usr.usrName) != None):
+            return True
+        return (self.rootUsers_up._Find(usr.usrName, usr.usrName, usr.usrName, usr.usrName) != None)
+    def IsRunning(self): return self.isRunning; 
     def IsEnable(self): return self.isEnable; 
     def IsEnable_All(self): return self.IsEnable() and self.isEnable_All; 
     def IsEnable_one(self): return self.IsEnable() and self.isEnable_one; 	 
-    def IsEnable_group(self): return self.IsEnable() and self.isEnable_group; 
+    def IsEnable_group(self, pGroup): 
+        if(self.IsEnable_groupAll()): return True
+        if(self.IsEnable() and self.IsEnable_group()):
+            return self.rootGroups._Find_Group(pGroup)
+        return False
     def IsEnable_groupAll(self): return self.IsEnable() and self.IsEnable_group() and self.isEnable_groupAll;
     def IsEnable_plant(self, plantName): 
         if(plantName == ""):
@@ -88,6 +94,7 @@ class myRoots_Prj():
         lstFields_ind = dtSetting.Get_Index_Fields(lstFields)
 
         #转换为功能权限对象集
+        pGroups = gol._Get_Value('rootRobot_usrGroups', None)     #群组信息
         for dtRow in dtSetting.dataMat:
             prjRoot = myRoot_Prj()
             prjRoot.prjName = dtRow[lstFields_ind["功能名称"]]
@@ -99,7 +106,13 @@ class myRoots_Prj():
             prjRoot.isEnable_one = myData.iif(dtRow[lstFields_ind["一对一有效"]] == True, True, False)
             prjRoot.isEnable_group = myData.iif(dtRow[lstFields_ind["群有效"]] == True, True, False)
             prjRoot.isEnable_groupAll = myData.iif(dtRow[lstFields_ind["群同时有效"]] == True, True, False)
-            prjRoot.goupsEnable = list(dtRow[lstFields_ind["群列表"]])
+
+            #平台集合
+            lstGroup = list(dtRow[lstFields_ind["群列表"]])
+            for x in lstGroup:
+                pGroup = pGroups.Find_Group(x, x, "", True)
+                prjRoot.rootGroups.groupInfos[x] = pGroup
+
             prjRoot.plantsEnable = list(dtRow[lstFields_ind["平台列表"]])
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName

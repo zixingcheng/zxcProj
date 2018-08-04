@@ -14,18 +14,19 @@ mySystem.Append_Us("", False)
  
 #功能权限 群组信息对象
 class myRoot_GroupInfo():
-    def __init__(self): 
-        self.typeName = ""      #群组类型
-        self.groupName = ""     #群组名
-        self.groupID = ""       #群组ID  
+    def __init__(self, groupName, groupID = "", typeName = ""): 
+        self.typeName = typeName    #群组类型
+        self.groupName = groupName  #群组名
+        self.groupID = groupID      #群组ID  
 #功能权限 群组信息对象
 class myRoot_GroupsInfo():
-    def __init__(self, typeName): 
-        self.typeName = typeName.lower()    #群组类型
-        self.groupInfos = {}                #群组对象集
+    def __init__(self, usrName, userID): 
+        self.usrName = usrName      #归属用户
+        self.usrID_sys = userID     #归属用户ID
+        self.groupInfos = {}        #群组对象集
 
     # 添加群组
-    def Add_Group(self, groupName, groupID, bUpdata = True): 
+    def Add_Group(self, groupName, groupID, typeName = "", bUpdata = True): 
         pGroup = self.Find_Group(groupName, groupID)
         if(pGroup != None): 
             if(bUpdata):
@@ -34,10 +35,7 @@ class myRoot_GroupsInfo():
                 return pGroup
             else: return None
 
-        pGroup = myRoot_GroupInfo() 
-        pGroup.typeName = self.typeName
-        pGroup.groupName = groupName.lower()
-        pGroup.groupID = groupID.lower() 
+        pGroup = myRoot_GroupInfo(groupName, groupID, typeName) 
         self.groupInfos[pGroup.groupName] = pGroup
         return pGroup
     # 移除群组
@@ -47,10 +45,11 @@ class myRoot_GroupsInfo():
         self.groupInfos.pop(pGroup.groupName)   # 移除字典项 
         return True
     # 查找群组
-    def Find_Group(self, groupName, groupID = ""): 
-        pGroup = self.groupInfos.get(groupName.lower(), None)
+    def _Find_Group(self, pGroup):
+        return Find_Group(pGroup.groupName, pGroup.groupID, pGroup.typeName)
+    def Find_Group(self, groupName, groupID = "", typeName = "", bCreate_Auto = False): 
+        pGroup = self.groupInfos.get(groupName, None)
         if(pGroup != None): return pGroup
-        groupID = groupID.strip().lower()
         if(groupID == ""): return pGroup
 
         #查找ID
@@ -58,6 +57,11 @@ class myRoot_GroupsInfo():
         for x in keys:
             if(self.groupInfos[x].groupID == groupID):
                 return self.groupInfos[x]
+            
+        # 不存在
+        if(bCreate_Auto):
+            pGroup = myRoot_GroupInfo(groupName, groupID, typeName)
+            self.groupInfos[pGroup.groupName] = pGroup
         return pGroup
 
     

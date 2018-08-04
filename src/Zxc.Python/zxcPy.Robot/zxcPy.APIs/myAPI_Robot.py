@@ -15,6 +15,7 @@ import myWeb
 from myGlobal import gol   
 
 
+
 #API-平台注册
 class myAPI_Robot_RegistPlant(myWeb.myAPI): 
     def get(self, usrName, usrID, plantName):
@@ -32,11 +33,13 @@ class myAPI_Robot_RegistPlant(myWeb.myAPI):
         pMsg['toke'] = pPlant.usrToken
         return pMsg
 
+
 #集中添加所有API
 def add_APIs(pWeb):     
     # 创建Web 
     pWeb.add_API(myAPI_Robot_RegistPlant, '/regist/plant/<usrName>/<usrID>/<plantName>')
     
+
 
 #主程序启动
 if __name__ == '__main__': 

@@ -61,7 +61,7 @@ class myRobot_Reply():
         #命令识别
         pWxdo = None 
         if(strText[0:2] == "@@"):
-            pWxdo, pPrj, pUser = self._Create_Cmd(usrName, nickName, strText[2:], isGroup, idGroup)
+            pWxdo, pPrj, pUser = self._Create_Cmd(usrID, usrName, nickName, strText[2:], isGroup, idGroup)
             if(pWxdo != None):
                 print( "--Create WxDo: %s " % pPrj.prjName)
                 return pUser.Done(pWxdo, pPrj.cmdStr, isGroup, idGroup)    #直接消息处理方法调用
@@ -78,7 +78,7 @@ class myRobot_Reply():
     #查找用户（不存在则自动创建）
     def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlant = ""): 
         #按消息生成对应对象 
-        pUser = self.usrReplys._Find(nickName, usrName, usrID,)
+        pUser = self.root.usrInfos._Find(nickName, usrName, usrID, usrID_sys, usrPlant, False)
         if(pUser == None):      #非参与用户，于全局用户集信息提取，不存在的自动生成
             pUser = self.root.usrInfos._Find(nickName, usrName, usrID, usrID_sys, usrPlant, True)
             self.usrReplys._Add(pUser)
@@ -90,11 +90,28 @@ class myRobot_Reply():
         if pRoot.prjRoot == False : return False
         return True
     #是否可启动命令用户
-    def _IsEnable_Usr(self, pUser, pPrj, isGroup, idGroup):
+    def _IsEnable_Usr(self, pUser, pPrj, isGroup, pGroup = None):
         # 查找用户权限 
-        bEnable = pUser.usrRoot.IsEnable(pPrj.prjName, isGroup, idGroup)
-        if(bEnable == False): bEnable = self._IsRoot_Usr(pUser.usrName) or self._IsRoot_Usr(pUser.nickName)      
+        bEnable = pPrj.IsRoot_user(pUser)
         if(bEnable == True): return True
+
+        # 非功能root用户, 只有在程序运行过程中才是权限用户
+        if(pPrj.IsRunning()):
+            if(pPrj.IsEnable_All() == False):    #非统一启动时，需要个人启动
+                if(isGroup):                     #群有效，且为设置群
+                    return pPrj.IsEnable_group(pGroup)
+                else:
+                    return pPrj.IsEnable_one()   #单人有效
+
+
+
+            else:           #单一启动 
+                if(isGroup):
+                    if pPrj.IsEnable_group() and pPrj.goupsEnable.get(idGroup, None) != None : return True
+                else:
+                    if(pPrj.IsEnable_one()): return True 
+            return False
+
         
         # 提取集合权限
         pWxdo = self.wxDos.get(pPrj.cmdStr, None)
@@ -110,7 +127,7 @@ class myRobot_Reply():
         return False
             
     #命令处理（@@命令，一次开启，再次关闭）
-    def _Create_Cmd(self, usrName, nickName, prjCmd, isGroup, idGroup):    
+    def _Create_Cmd(self, usrID, usrName, nickName, prjCmd, isGroup, idGroup):    
         #查找功能权限对象
         pPrj = self.root.rootPrjs._Find(prjCmd)
         if(pPrj == None):
@@ -119,7 +136,7 @@ class myRobot_Reply():
         if(pPrj.IsEnable() == False): return None, None, None     #必须启用
 
         #查找用户（功能开启全部可用则当前用户）  
-        pUser = self._Find_Usr(usrName, nickName)   
+        pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlant)   
         if(pUser == None): return None, None, None
 
         #功能权限验证 
@@ -160,12 +177,18 @@ if __name__ == "__main__":
     #机器人消息处理
     pWxReply = myRobot_Reply()
     pWxReply._Init()
+    
+    #用户信息
+    usrID = "zxc_0"
+    usrName = "墨紫_0"
+    nickName = "墨紫"
+    usrPlant = "wx"
+
 
     #权限初始
-    print(pWxReply.Done('zxc_0',"墨紫",'@@Repeater'))
+    print(pWxReply.Done(usrID, usrName, nickName, usrPlant, '@@Repeater'))
 
-
-    print(pWxReply.Done('zxc_0',"墨紫_0",'@@zxcRobot_Root'))
+    print(pWxReply.Done(usrID, usrName, nickName, usrPlant, '@@zxcRobot_Root'))
     print(pWxReply.Done('zxc_0',"墨紫_0",'Repeater'))
 
     #功能开关
