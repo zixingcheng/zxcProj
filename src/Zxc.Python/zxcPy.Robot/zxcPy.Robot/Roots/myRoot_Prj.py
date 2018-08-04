@@ -12,6 +12,7 @@ import sys, os, datetime, mySystem
 mySystem.Append_Us("", False)    
 import myIO, myIO_xlsx, myData, myRoot_Usr
 import myRoot_GroupInfo as group
+from myGlobal import gol 
 
 
 #功能权限对象
@@ -28,8 +29,8 @@ class myRoot_Prj():
         self.isEnable_one = False       #一对一有效
         self.isEnable_group = False     #群有效
         self.isEnable_groupAll = False  #群同时有效
-        self.rootUsers = {}             #根权限用户集
-        self.rootUsers_up = {}          #提升权限用户集
+        self.rootUsers = myRoot_Usr.myRoot_Usrs("", "")       #根权限用户集
+        self.rootUsers_up = myRoot_Usr.myRoot_Usrs("", "")    #提升权限用户集
         self.goupsEnable = []           #已启用群集
         self.plantsEnable = []          #平台列表
         self.registedUsr = None         #当前授权功能开启用户
@@ -49,23 +50,14 @@ class myRoot_Prj():
 
     #命令权限检查
     def IsRoot_user(self, usrName):  
-        isRoot = usrName in self.rootUsers or usrName in self.rootUsers_up 
-        return isRoot
+        isRoot = self.rootUsers._Find(usrName, usrName, usrName, usrName) != None
+        isRoot_up = self.rootUsers_up._Find(usrName, usrName, usrName, usrName) != None
+        return isRoot == True or isRoot_up == True
     def IsEnable(self): return self.isEnable; 
     def IsEnable_All(self): return self.IsEnable() and self.isEnable_All; 
-    def IsEnable_one(self, usrName = ""):  
-        if(usrName == ""):
-            return self.IsEnable() and self.isEnable_one; 	
-        else:
-            return self.IsEnable() and self.isEnable_one and (usrName in self.rootUsers or self.IsEnable_All()); 	
-    def IsEnable_group(self, groupName = ""): 
-        if(self.IsEnable_groupAll()): return True
-        if(groupName == ""):
-            return self.IsEnable() and self.isEnable_group; 	
-        else:
-            return self.IsEnable() and self.isEnable_group and (groupName in self.goupsEnable or self.IsEnable_All()); 
-    def IsEnable_groupAll(self): 
-        return self.IsEnable_group() and self.isEnable_groupAll; 	
+    def IsEnable_one(self): return self.IsEnable() and self.isEnable_one; 	 
+    def IsEnable_group(self): return self.IsEnable() and self.isEnable_group; 
+    def IsEnable_groupAll(self): return self.IsEnable() and self.IsEnable_group() and self.isEnable_groupAll;
     def IsEnable_plant(self, plantName): 
         if(plantName == ""):
             return self.IsEnable(); 	
@@ -120,28 +112,30 @@ class myRoots_Prj():
         self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
         
         #用户权限设置
-        rootUsers = []
         if(True): 	 
             #提取字段信息 
             lstFields_user = ["用户名","功能权限","功能列表"]
             lstFields_ind_user = dtSetting_user.Get_Index_Fields(lstFields_user)
 
             #转换为功能权限对象集
+            pUsers = gol._Get_Value('rootRobot_usrInfos', None)     #权限信息
             for dtRow in dtSetting_user.dataMat:
+                #提取用户对象
                 #prjRoot_user = myRoot_Usr.myRoot_Usr(usrName, usrName, "", "", self)
                 usrName = dtRow[lstFields_ind_user["用户名"]] 
+                pUser = pUsers._Find(usrName, usrName, usrName, "", "", True)
+
+                #添加系统级权限用户 
                 bRoot = myData.iif(dtRow[lstFields_ind_user["功能权限"]] == True, True, False)
                 lstPrj = list(dtRow[lstFields_ind_user["功能列表"]])
-                
-                #同步root用户信息
                 if(bRoot):
                     if(len(lstPrj) < 1):    #所有有效
                         for x in self.prjRoots.keys():
-                            self.prjRoots[x].rootUsers[usrName] = "sys"
+                            self.prjRoots[x].rootUsers._Add(pUser)
                     else:
                         for x in self.prjRoots.keys():
                             if(x.prjName in lstPrj):
-                                self.prjRoots[x].rootUsers[usrName] = "sys"
+                                self.prjRoots[x].rootUsers._Add(pUser) 
     #查找 
     def _Find(self, prjName): 
         prjName = prjName.lower()

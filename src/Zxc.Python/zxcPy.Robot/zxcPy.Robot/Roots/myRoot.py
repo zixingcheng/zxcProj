@@ -29,6 +29,14 @@ class myRoot():
         self.usrName = gol._Get_Setting('usrName', "zxcRobot")          #归属用户
         self.usrNameNick = gol._Get_Setting('usrNameNick', "zxc机器人") #归属用户昵称
         self.usrID = gol._Get_Setting('usrID', "zxcRobotID")            #归属用户ID
+        
+        #用户集 
+        if(self.usrInfos == None):
+            self.usrInfos = myRoot_Usr.myRoot_Usrs(self.usrName, self.usrID)   
+            gol._Set_Value('rootRobot_usrInfos', self.usrInfos)
+        else:
+            self.usrInfos.usrName = self.usrName
+            self.usrInfos.usrID = self.usrID
 
         #功能集
         if(self.rootPrjs == None):
@@ -36,13 +44,6 @@ class myRoot():
         else:
             self.rootPrjs.usrName = self.usrName
             self.rootPrjs.usrID = self.usrID
-
-        #用户集 
-        if(self.usrInfos == None):
-            self.usrInfos = myRoot_Usr.myRoot_Usrs(self.usrName, self.usrID)   
-        else:
-            self.usrInfos.usrName = self.usrName
-            self.usrInfos.usrID = self.usrID
         
         #平台集   
         if(self.usrPlants == None):
