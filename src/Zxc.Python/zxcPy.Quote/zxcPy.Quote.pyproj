@@ -27,6 +27,7 @@
     <Compile Include="zxcPy.Quotation\myQuote_Setting.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\myData_Stock.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Hourly.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Rise_Fall_asInt.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_StaticsM5.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Printer.py" />
@@ -50,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />
-    <Content Include="Setting\Setting.xlsx" />
+    <Content Include="Setting\Setting_Quote.xls" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
