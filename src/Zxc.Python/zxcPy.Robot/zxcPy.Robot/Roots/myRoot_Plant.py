@@ -21,7 +21,6 @@ class myRoot_Plant():
         self.usrTime_Regist = datetime.datetime.now()          #注册时间
         self.usrTime_Logined_Last = datetime.datetime.now()    #最后登录时间（请求）
         self.usrToken = str(uuid.uuid1())                      #用于验证，暂时为请求获取
-        
 #平台对象集
 class myRoot_Plants():
     def __init__(self, usrName, userID): 

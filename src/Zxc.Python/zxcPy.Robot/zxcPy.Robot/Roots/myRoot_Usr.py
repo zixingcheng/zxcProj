@@ -4,7 +4,7 @@ Created on  张斌 2018-06-25 10:58:00
     @author: zhang bin
     @email:  zhangbin@gsafety.com
 
-    机器人-用户对象 
+    机器人-用户对象 真实用户对象，可能来自多个平台
 """
 import sys, os, datetime, uuid, mySystem 
 
@@ -20,7 +20,7 @@ class myRoot_Usr():
         self.usrID = ""         #用户ID
         self.usrName = usrName  #用户名
         self.usrName_Nick = ""  #用户名--昵称
-        self.usrType = ""       #用户类型(来源)
+        self.usrTypes = []      #用户类型(来源平台集)
         self.usrTag = ""        #标签
         self.usrRamak = ""      #备注
         self.usrPhone = ""      #电话号码
@@ -34,7 +34,9 @@ class myRoot_Usr():
     def _Init(self, usrName_Nick = "", usrID = "", fromID = ""): 
         if(usrName_Nick != ""): self.usrName_Nick = usrName_Nick
         if(usrID != ""): self.usrID = usrID
-        if(fromID != ""): self.usrType = fromID
+        if(fromID != ""): 
+            if(fromID in self.usrTypes == False):
+                self.usrTypes.append(fromID)
         return True
 #用户对象集
 class myRoot_Usrs():
@@ -67,7 +69,7 @@ class myRoot_Usrs():
             pUser.usrID_sys = dtRow[lstFields_ind["ID"]]
             pUser.usrName_Nick = dtRow[lstFields_ind["用户昵称"]]
             pUser.usrID = dtRow[lstFields_ind["用户ID"]]
-            pUser.usrType = dtRow[lstFields_ind["来源平台"]]
+            pUser.usrTypes = dtRow[lstFields_ind["来源平台"]].split(',')
             pUser.usrPhone = dtRow[lstFields_ind["电话"]]
             pUser.usrTag = dtRow[lstFields_ind["标签"]]
             pUser.usrRamak = dtRow[lstFields_ind["备注"]]
@@ -91,7 +93,7 @@ class myRoot_Usrs():
             pValues.append(pUser.usrName)
             pValues.append(pUser.usrName_Nick)
             pValues.append(pUser.usrID)
-            pValues.append(pUser.usrType)
+            pValues.append(myData_Trans.Tran_ToStr(pUser.usrTypes))
             pValues.append(pUser.usrPhone)
             pValues.append(pUser.usrTag)
             pValues.append(pUser.usrRamak)
@@ -101,10 +103,10 @@ class myRoot_Usrs():
             dtUser.dataMat.append(pValues)
 
         # 保存
-        dtUser.Save(self.Dir_Setting,  "UserInfo", 0, 0, True, "用户信息表")
+        dtUser.Save(self.Dir_Setting, "UserInfo", 0, 0, True, "用户信息表")
 
     #查找 
-    def _Find(self, usrName, usrName_Nick, usrID, usrID_sys, usrType = "", bCreate_Auto = False): 
+    def _Find(self, usrName, usrName_Nick, usrID, usrID_sys = "", usrType = "", bCreate_Auto = False): 
         pUser = None
 
         #按名称查找
@@ -199,7 +201,10 @@ class myRoot_Usrs():
         pUser.usrPhone = msgInfo.get("usrPhone", "")  
         pUser.usrTag = msgInfo.get("usrTag", "")  
         pUser.usrRamak = msgInfo.get("usrRamak", "")  
-        pUser.usrNotes = msgInfo.get("usrNotes", "")  
+        pUser.usrNotes = msgInfo.get("usrNotes", "") 
+        if(usrType != ""):
+            if(not usrType in pUser.usrTypes):
+                pUser.usrTypes.append(usrType)
         return True
     # 添加用户
     def Del(self, usrName): 
@@ -217,7 +222,7 @@ class myRoot_Usrs():
 #主启动程序
 if __name__ == "__main__":
     pUsers = myRoot_Usrs("zxcPy", "@@zxcPy")
-    pUser = pUsers.Add({'usrName': "Test",'usrName_Nick': "测试",'usrID': "@@1" ,'usrType': "wx"})
+    pUser = pUsers.Add({'usrName': "Test",'usrName_Nick': "测试",'usrID': "@@1" ,'usrType': "wx"}, True)
     pUser = pUsers.Add({'usrName': "Test3",'usrName_Nick': "测试3",'usrID': "@@3" })
     pUsers.Del("测试3")
 

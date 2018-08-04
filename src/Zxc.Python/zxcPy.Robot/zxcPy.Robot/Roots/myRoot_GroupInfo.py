@@ -18,7 +18,6 @@ class myRoot_GroupInfo():
         self.typeName = ""      #群组类型
         self.groupName = ""     #群组名
         self.groupID = ""       #群组ID  
-
 #功能权限 群组信息对象
 class myRoot_GroupsInfo():
     def __init__(self, typeName): 
