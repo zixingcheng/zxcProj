@@ -20,7 +20,7 @@ class myRoot_Usr():
         self.usrID = ""         #用户ID
         self.usrName = usrName  #用户名
         self.usrName_Nick = ""  #用户名--昵称
-        self.usrTypes = []      #用户类型(来源平台集)
+        self.usrPlants = []     #用户类型(来源平台集)
         self.usrTag = ""        #标签
         self.usrRamak = ""      #备注
         self.usrPhone = ""      #电话号码
@@ -35,8 +35,8 @@ class myRoot_Usr():
         if(usrName_Nick != ""): self.usrName_Nick = usrName_Nick
         if(usrID != ""): self.usrID = usrID
         if(fromID != ""): 
-            if(fromID in self.usrTypes == False):
-                self.usrTypes.append(fromID)
+            if(fromID in self.usrPlants == False):
+                self.usrPlants.append(fromID)
         return True
 #用户对象集
 class myRoot_Usrs():
@@ -69,7 +69,7 @@ class myRoot_Usrs():
             pUser.usrID_sys = dtRow[lstFields_ind["ID"]]
             pUser.usrName_Nick = dtRow[lstFields_ind["用户昵称"]]
             pUser.usrID = dtRow[lstFields_ind["用户ID"]]
-            pUser.usrTypes = dtRow[lstFields_ind["来源平台"]].split(',')
+            pUser.usrPlants = dtRow[lstFields_ind["来源平台"]].split(',')
             pUser.usrPhone = dtRow[lstFields_ind["电话"]]
             pUser.usrTag = dtRow[lstFields_ind["标签"]]
             pUser.usrRamak = dtRow[lstFields_ind["备注"]]
@@ -93,7 +93,7 @@ class myRoot_Usrs():
             pValues.append(pUser.usrName)
             pValues.append(pUser.usrName_Nick)
             pValues.append(pUser.usrID)
-            pValues.append(myData_Trans.Tran_ToStr(pUser.usrTypes))
+            pValues.append(myData_Trans.Tran_ToStr(pUser.usrPlants))
             pValues.append(pUser.usrPhone)
             pValues.append(pUser.usrTag)
             pValues.append(pUser.usrRamak)
@@ -203,8 +203,8 @@ class myRoot_Usrs():
         pUser.usrRamak = msgInfo.get("usrRamak", "")  
         pUser.usrNotes = msgInfo.get("usrNotes", "") 
         if(usrType != ""):
-            if(not usrType in pUser.usrTypes):
-                pUser.usrTypes.append(usrType)
+            if(not usrType in pUser.usrPlants):
+                pUser.usrPlants.append(usrType)
         return True
     # 添加用户
     def Del(self, usrName): 

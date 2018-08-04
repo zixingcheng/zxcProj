@@ -30,6 +30,7 @@ class myRobot():
         self.isEnable = True            #是否可用
         self.isValid = True             #合法性 
         self.isOpened = False           #是否启用
+        self.isSingleUse = False        #是否为单例使用(单例时每个用户专属) 
         self.tStart = datetime.now()
         self.tNow = datetime.now()
         self.tLast = datetime.now()
