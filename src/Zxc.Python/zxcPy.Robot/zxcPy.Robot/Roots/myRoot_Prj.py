@@ -6,7 +6,7 @@ Created on  张斌 2018-06-25 10:58:00
 
     机器人-功能权限对象 
 """
-import sys, os, mySystem 
+import sys, os, datetime, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)    
@@ -23,15 +23,17 @@ class myRoot_Prj():
         self.cmdStr = ""        #启动命令
         self.isRoot = False     #是否根标识 ??
 
-        self.isRegisted = False         #是否注册
         self.isEnable = False           #是否启用
         self.isEnable_All = False       #是否统一启用(登陆账户启用，否则单个用户启用)
         self.isEnable_one = False       #一对一有效
         self.isEnable_group = False     #群有效
         self.isEnable_groupAll = False  #群同时有效
-        self.rootUsers = {}             #根权限用户
+        self.rootUsers = {}             #根权限用户集
+        self.rootUsers_up = {}          #提升权限用户集
         self.goupsEnable = []           #已启用群集
         self.plantsEnable = []          #平台列表
+        self.registedUsr = None         #当前授权功能开启用户
+        self.infoLogs = {}              #日志消息
     def _Init(self, prjName, fileName, className, cmdStr, isEnable, isEnable_All, isEnable_one, isEnable_group, isEnable_groupAll): 
         self.prjName = prjName
         self.fileName = fileName
@@ -42,8 +44,13 @@ class myRoot_Prj():
         self.isEnable_one = isEnable_one
         self.isEnable_group = isEnable_group
         self.isEnable_groupAll = isEnable_groupAll
+    def Log(self, usrName, usrInfo):  
+        self.infoLogs[datetime.datetime.now] = usrName + "::" + usrInfo
 
     #命令权限检查
+    def IsRoot_user(self, usrName):  
+        isRoot = usrName in self.rootUsers or usrName in self.rootUsers_up 
+        return isRoot
     def IsEnable(self): return self.isEnable; 
     def IsEnable_All(self): return self.IsEnable() and self.isEnable_All; 
     def IsEnable_one(self, usrName = ""):  
@@ -64,7 +71,6 @@ class myRoot_Prj():
             return self.IsEnable(); 	
         else:
             return self.IsEnable() and (plantName in self.plantsEnable); 	 
-
 #功能权限集对象
 class myRoots_Prj():
     def __init__(self, usrName, usrID): 
@@ -113,7 +119,6 @@ class myRoots_Prj():
         self.prjRoots[prjRoot.prjName] = prjRoot
         self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
         
-
         #用户权限设置
         rootUsers = []
         if(True): 	 
