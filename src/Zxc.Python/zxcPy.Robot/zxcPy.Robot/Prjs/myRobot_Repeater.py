@@ -15,11 +15,11 @@ import myRobot
     
 #机器人类--复读机(回复相同消息)
 class myRobot_Repeater(myRobot.myRobot):
-    def __init__(self, usrName_F):
-        super().__init__()
+    def __init__(self, usrName, usrID):
+        super().__init__(usrName, usrID)
         self.doTitle = "复读机"     #说明 
         self.doCmd = "@@Repeater"   #启动命令 
-        self.msg['FromUserName'] = usrName_F 
+        self.msg['FromUserName'] = self.usrName 
 
     #消息处理接口
     def _Done(self, Text, isGroup = False, idGroup = ""):        
@@ -31,7 +31,7 @@ class myRobot_Repeater(myRobot.myRobot):
 
 #主启动程序
 if __name__ == "__main__":
-    pR = myRobot_Repeater("zxc");
+    pR = myRobot_Repeater("zxc", "zxcID");
     print(pR.Done("@@Repeater")["Text"])
     print(pR.Done("Hello")["Text"])
     print(pR.Done("@@Repeater")["Text"])
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     time.sleep (2)
     print(pR.Done("Hello"))
 
-    pR = myRobot_Repeater("zxc");
+    pR = myRobot_Repeater("zxc", "zxcID");
     print(pR.Done("@@zxcWeixin")["Text"])
     print(pR.Done("Hello")["Text"])
     print(pR.Done("@@zxcWeixin")["Text"])

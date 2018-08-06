@@ -18,12 +18,13 @@ myDoType = myEnum.enum_index('Cmd')  # 命令类型枚举
 
 #机器人基类
 class myRobot():
-    def __init__(self):
+    def __init__(self, usrName = "", usrID = ""):
         # 功能信息
         self.doType = myDoType.Cmd  #类型   
         self.doTitle = "Robot"      #说明 
         self.doCmd = "@@myRobot"    #启动命令 
-        self.usrName = ""           #创建用户名称
+        self.usrName = usrName      #功能所属用户名称
+        self.usrID = usrID          #功能所属用户ID
         self.strText_L = ""         #命令信息（缓存上次） 
         self.Init()                 #初始基础信息
     def Init(self): 
