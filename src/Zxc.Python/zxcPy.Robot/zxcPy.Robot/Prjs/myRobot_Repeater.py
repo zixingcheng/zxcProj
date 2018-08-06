@@ -18,6 +18,7 @@ class myRobot_Repeater(myRobot.myRobot):
     def __init__(self, usrName, usrID):
         super().__init__(usrName, usrID)
         self.doTitle = "复读机"     #说明 
+        self.prjName = "复读机"     #功能名
         self.doCmd = "@@Repeater"   #启动命令 
         self.msg['FromUserName'] = self.usrName 
 

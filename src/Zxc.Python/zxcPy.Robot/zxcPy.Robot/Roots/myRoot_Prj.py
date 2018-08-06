@@ -26,6 +26,7 @@ class myRoot_Prj():
         self.cmdStr = ""        #启动命令
         self.isRoot = False     #是否根标识 ??
         
+        self.isRunSingle = False        #是否为单例使用(单例时每个用户专属) 
         self.isRunning = False          #是否运行中（允许中非统一启用，全员有权限）
         self.isEnable = False           #是否可启用
         self.isEnable_All = False       #是否统一启用(登陆账户启用，否则单个用户启用)
@@ -51,9 +52,8 @@ class myRoot_Prj():
     def Log(self, usrName, usrInfo):  
         self.infoLogs[datetime.datetime.now] = usrName + "::" + usrInfo
     #实例功能对象
-    def creatIntance(self, usrName, usrInfo):      
-        self.prjClass = myImport.Import_Class(self.fileName, self.className)(usrName, usrID)
-        return self.prjClass
+    def creatIntance(self, usrName, usrID):      
+        return myImport.Import_Class(self.fileName, self.className)(usrName, usrID)
 
     #命令权限检查
     def IsRoot_user(self, usr):  
@@ -61,6 +61,7 @@ class myRoot_Prj():
             return True
         return (self.rootUsers_up._Find(usr.usrName, usr.usrName, usr.usrName, usr.usrName) != None)
     def IsRunning(self): return self.isRunning; 
+    def IsRunSingle(self): return self.isRunSingle; 
     def IsEnable(self): return self.isEnable; 
     def IsEnable_All(self): return self.IsEnable() and self.isEnable_All; 
     def IsEnable_one(self): return self.IsEnable() and self.isEnable_one; 	 
@@ -125,7 +126,8 @@ class myRoots_Prj():
             prjRoot.plantsEnable = list(dtRow[lstFields_ind["平台列表"]])
 
             #实例功能对象并缓存索引
-            prjRoot.creatIntance(self.usrName, self.usrID)
+            prjRoot.prjClass = prjRoot.creatIntance(self.usrName, self.usrID)
+            prjRoot.isRunSingle = prjRoot.prjClass.isSingleUse  #是否为单例使用(单例时每个用户专属) 
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
 

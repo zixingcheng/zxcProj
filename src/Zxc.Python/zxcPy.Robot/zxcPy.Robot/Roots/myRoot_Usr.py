@@ -55,7 +55,7 @@ class myRoot_Usr():
         for x in self.usrPrj.prjDos:
             pass 
         return pReturn
-#消息回复用户类
+#消息回复用户功能管理类
 class myRoot_UsrPrj():
     def __init__(self, usrName, nickName = "", usrID = ""):
         self.usrName = usrName
