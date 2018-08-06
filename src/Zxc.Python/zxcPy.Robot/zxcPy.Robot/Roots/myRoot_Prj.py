@@ -9,8 +9,9 @@ Created on  张斌 2018-06-25 10:58:00
 import sys, os, datetime, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
+mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("", False)    
-import myIO, myIO_xlsx, myData, myRoot_Usr, myRoot_GroupInfo
+import myIO, myIO_xlsx, myData, myImport, myRoot_Usr, myRoot_GroupInfo
 import myRoot_GroupInfo as group
 from myGlobal import gol 
 
@@ -19,13 +20,14 @@ from myGlobal import gol
 class myRoot_Prj():
     def __init__(self): 
         self.prjName = ""       #功能名
+        self.prjClass = None    #功能对象实例
         self.fileName = ""      #文件名
         self.className = ""     #类名
         self.cmdStr = ""        #启动命令
         self.isRoot = False     #是否根标识 ??
         
-        self.isRunning = False          #是否运行中
-        self.isEnable = False           #是否启用
+        self.isRunning = False          #是否运行中（允许中非统一启用，全员有权限）
+        self.isEnable = False           #是否可启用
         self.isEnable_All = False       #是否统一启用(登陆账户启用，否则单个用户启用)
         self.isEnable_one = False       #一对一有效
         self.isEnable_group = False     #群有效
@@ -48,6 +50,10 @@ class myRoot_Prj():
         self.isEnable_groupAll = isEnable_groupAll
     def Log(self, usrName, usrInfo):  
         self.infoLogs[datetime.datetime.now] = usrName + "::" + usrInfo
+    #实例功能对象
+    def creatIntance(self, usrName, usrInfo):      
+        self.prjClass = myImport.Import_Class(self.fileName, self.className)(usrName, usrID)
+        return self.prjClass
 
     #命令权限检查
     def IsRoot_user(self, usr):  
@@ -61,6 +67,7 @@ class myRoot_Prj():
     def IsEnable_group(self, pGroup): 
         if(self.IsEnable_groupAll()): return True
         if(self.IsEnable() and self.IsEnable_group()):
+            if(len(self.rootGroups) < 1): return True   #未设置群则全部有效
             return self.rootGroups._Find_Group(pGroup)
         return False
     def IsEnable_groupAll(self): return self.IsEnable() and self.IsEnable_group() and self.isEnable_groupAll;
@@ -71,11 +78,12 @@ class myRoot_Prj():
             return self.IsEnable() and (plantName in self.plantsEnable); 	 
 #功能权限集对象
 class myRoots_Prj():
-    def __init__(self, usrName, usrID): 
+    def __init__(self, usrName, usrID, bgetGol = True): 
         self.usrName = usrName  #用户名
         self.usrID = usrID      #用户名
         self.prjRoots = {}      #功能权限集
         self.prjCmds = {}       #功能命令集
+        self.hasGol = bgetGol   #由全局提取
         # self.prjRoots_user = {} #功能权限用户集
         
         #初始根目录信息
@@ -94,7 +102,8 @@ class myRoots_Prj():
         lstFields_ind = dtSetting.Get_Index_Fields(lstFields)
 
         #转换为功能权限对象集
-        pGroups = gol._Get_Value('rootRobot_usrGroups', None)     #群组信息
+        if(self.hasGol):
+            pGroups = gol._Get_Value('rootRobot_usrGroups', None)     #群组信息
         for dtRow in dtSetting.dataMat:
             prjRoot = myRoot_Prj()
             prjRoot.prjName = dtRow[lstFields_ind["功能名称"]]
@@ -109,11 +118,14 @@ class myRoots_Prj():
 
             #平台集合
             lstGroup = list(dtRow[lstFields_ind["群列表"]])
-            for x in lstGroup:
-                pGroup = pGroups.Find_Group(x, x, "", True)
-                prjRoot.rootGroups.groupInfos[x] = pGroup
-
+            if(self.hasGol):
+                for x in lstGroup:
+                    pGroup = pGroups.Find_Group(x, x, "", True)
+                    prjRoot.rootGroups.groupInfos[x] = pGroup
             prjRoot.plantsEnable = list(dtRow[lstFields_ind["平台列表"]])
+
+            #实例功能对象并缓存索引
+            prjRoot.creatIntance(self.usrName, self.usrID)
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
 
@@ -131,24 +143,25 @@ class myRoots_Prj():
             lstFields_ind_user = dtSetting_user.Get_Index_Fields(lstFields_user)
 
             #转换为功能权限对象集
-            pUsers = gol._Get_Value('rootRobot_usrInfos', None)     #权限信息
-            for dtRow in dtSetting_user.dataMat:
-                #提取用户对象
-                #prjRoot_user = myRoot_Usr.myRoot_Usr(usrName, usrName, "", "", self)
-                usrName = dtRow[lstFields_ind_user["用户名"]] 
-                pUser = pUsers._Find(usrName, usrName, usrName, "", "", True)
+            if(self.hasGol):
+                pUsers = gol._Get_Value('rootRobot_usrInfos', None)     #权限信息
+                for dtRow in dtSetting_user.dataMat:
+                    #提取用户对象
+                    #prjRoot_user = myRoot_Usr.myRoot_Usr(usrName, usrName, "", "", self)
+                    usrName = dtRow[lstFields_ind_user["用户名"]] 
+                    pUser = pUsers._Find(usrName, usrName, usrName, "", "", True)
 
-                #添加系统级权限用户 
-                bRoot = myData.iif(dtRow[lstFields_ind_user["功能权限"]] == True, True, False)
-                lstPrj = list(dtRow[lstFields_ind_user["功能列表"]])
-                if(bRoot):
-                    if(len(lstPrj) < 1):    #所有有效
-                        for x in self.prjRoots.keys():
-                            self.prjRoots[x].rootUsers._Add(pUser)
-                    else:
-                        for x in self.prjRoots.keys():
-                            if(x.prjName in lstPrj):
-                                self.prjRoots[x].rootUsers._Add(pUser) 
+                    #添加系统级权限用户 
+                    bRoot = myData.iif(dtRow[lstFields_ind_user["功能权限"]] == True, True, False)
+                    lstPrj = list(dtRow[lstFields_ind_user["功能列表"]])
+                    if(bRoot):
+                        if(len(lstPrj) < 1):    #所有有效
+                            for x in self.prjRoots.keys():
+                                self.prjRoots[x].rootUsers._Add(pUser)
+                        else:
+                            for x in self.prjRoots.keys():
+                                if(x.prjName in lstPrj):
+                                    self.prjRoots[x].rootUsers._Add(pUser) 
     #查找 
     def _Find(self, prjName): 
         prjName = prjName.lower()
@@ -182,5 +195,5 @@ class myRoots_Prj():
 
 #主启动程序
 if __name__ == "__main__":
-    pRoots = myRoots_Prj("zxcTest", "@Test")
+    pRoots = myRoots_Prj("zxcTest", "@Test", False)
     print(pRoots.prjRoots)
