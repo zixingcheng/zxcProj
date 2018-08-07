@@ -30,6 +30,7 @@ class Quote_Listener:
     def OnHandleMsg(self, quoteDatas, strMsg):
         if(quoteDatas.autoSave == False): return False    #屏蔽旧数据处理
         if(strMsg == ""): return False
+
         #通知处理
         pSet = quoteDatas.setting
         for x in pSet.msgUsers_wx:

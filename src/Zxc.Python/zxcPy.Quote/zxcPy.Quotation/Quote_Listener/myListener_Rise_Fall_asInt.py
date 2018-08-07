@@ -33,8 +33,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
 
         #通知处理
         strMsg = self.DoRecvQuote(dValue_N, key, quoteDatas.datas_CKDs_M.data, quoteDatas.setting.isIndex)
-        if(strMsg != ""):
-            self.OnHandleMsg(quoteDatas, strMsg)
+        self.OnHandleMsg(quoteDatas, strMsg)
     def DoRecvQuote(self, dValue_N, key, data, bIndex): 
         strTag_suffix = ""
         value = self.values.get(key, None)

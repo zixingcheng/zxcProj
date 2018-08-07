@@ -46,7 +46,8 @@ class myListener_Hourly(myQuote_Listener.Quote_Listener):
                 #组装返回结果
                 strMsg = quoteDatas.data.getMsg_str(quoteDatas.setting.isIndex)
                 strMsg += "\n整点播报: " + strTime + "."
-            return strMsg 
+        #通知处理
+        self.OnHandleMsg(quoteDatas, strMsg)
 
     #功能是否可用
     def IsEnable(self, quoteDatas):
