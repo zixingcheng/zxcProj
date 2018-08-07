@@ -56,7 +56,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
         dDelta = dValue_N - dValue                          #当前-历史的差值
          
         #涨跌超限值
-        if(True or abs(dDelta) >= self.deltaV):
+        if(abs(dDelta) >= self.deltaV):
             #涨跌幅达到间隔值整数倍, 计算记录新值
             nTimes = int(dDelta / self.deltaV)
             value['now'] = dValue + nTimes * self.deltaV    #更新记录值
@@ -72,7 +72,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
                 
             #时间标识
             strTag_M = ""  
-            if(nTim_M >= 0 and nTim_M <99): strTag_M = "1" + str(nTim_M) + "分钟"
+            if(nTim_M >= 0 and nTim_M <99): strTag_M = str(nTim_M) + "分钟"
             if(strTag_M == ""): strTag_M = "区间"
 
             #计算涨跌返回对应说明标识
@@ -100,10 +100,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             
             #组装返回结果
             #strMsg = "创业板指: 10000.34, 涨+10.01%;\n99分钟涨幅: 10.5%, 涨幅新高."
-            strMsg = data.getMsg_str(bIndex) + ", " 
-            dRF = dValue_N * 100
-            strMsg += strTag0 + str(round(dRF,2)) + "%;" 
-            
+            strMsg = data.getMsg_str(bIndex) 
             if(len(strMsg) < 24):       #定长度格式修正
                 strMsg += " " * (24 - len(strMsg))
             print(len(strMsg))

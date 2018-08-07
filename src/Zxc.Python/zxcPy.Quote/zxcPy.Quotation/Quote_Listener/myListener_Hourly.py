@@ -26,6 +26,7 @@ class myListener_Hourly(myQuote_Listener.Quote_Listener):
         if(self.IsEnable(quoteDatas)== False): return
         
         #提取值--时间
+        strMsg = ""
         dtNow = quoteDatas.data.getTime()
         if(dtNow.minute == 0 or dtNow.minute == 30):
             #提取值
@@ -42,20 +43,10 @@ class myListener_Hourly(myQuote_Listener.Quote_Listener):
             if(lstValue.get(strTime, None) == None):
                 lstValue[strTime] = dValue_N                    #记录值
 
-                #生成返回信息
-                if(dValue_N > 0):
-                    strTag = "涨"
-                elif(dValue_N > 0):
-                    strTag = "跌"
-                else:
-                    strTag = "平"
-            
                 #组装返回结果
-                dRF = dValue_N * 100
-                strMsg = key + ": " + strTag + str(round(dRF,2)) + "%,  at " + strTime + "."
-
-                #通知处理
-                self.OnHandleMsg(quoteDatas, strMsg) 
+                strMsg = quoteDatas.data.getMsg_str(quoteDatas.setting.isIndex)
+                strMsg += "\n整点播报: " + strTime + "."
+            return strMsg 
 
     #功能是否可用
     def IsEnable(self, quoteDatas):

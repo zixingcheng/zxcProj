@@ -56,6 +56,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
         self.dataList = []
         self.priceOpen = 0      #开盘价格
         self.priceBase = 0      #前一收盘价格
+        self.priceRiseFall = 0  #涨跌幅
 
     #序列化
     def toString(self):
@@ -166,6 +167,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
 
         self.priceOpen = myData_Trans.To_Float(self.openPrice)           #开盘价格
         self.priceBase = myData_Trans.To_Float(self.preClose)            #前一收盘价格
+        self.priceRiseFall = self.dataList[1] / self.priceBase - 1       #涨跌幅 
         return self.dataList
     #由值组转换
     def fromValueList(self, lstValue):
@@ -217,6 +219,14 @@ class Data_Stock(myQuote_Data.Quote_Data):
         strMsg = self.name + ": " + str(round(lstValue[1], 2))  
         if(bIndex == False):
             strMsg += "元"
+            
+        #涨跌标识    
+        dValue_N = self.priceRiseFall
+        strTag0 = myData.iif(dValue_N >=0, "涨", "跌")
+        strTag0 = myData.iif(dValue_N ==0, "平", strTag0) 
+             
+        dRF = dValue_N * 100
+        strMsg += ", " + strTag0 + str(round(dRF,2)) + "%;"  
         return strMsg
 
     #输出
@@ -248,7 +258,7 @@ class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
         self.last = datas[1]
         self.Valume = datas[6] - self.Valume_pre
         self.Turnover = datas[7] - self.Turnover_pre
-        self.Rise_Fall = datas[1] / pData.priceBase - 1     #涨跌幅
+        self.Rise_Fall = pData.priceRiseFall  #涨跌幅
         if(self.Valume > 0):
             self.Price = self.Turnover / self.Valume
         elif(self.Valume < 0):
