@@ -10,6 +10,17 @@ import os, time, codecs
 import shutil
 
  
+#删除文件夹
+def deldir(path): 
+    # 去除首位空格
+    path = path.strip()
+    
+    # 去除尾部 \ 符号
+    path = path.rstrip("\\")
+
+    #删除已存在文件
+    if(os.path.exists(path)):
+        shutil.rmtree(path)
 #创建文件夹，存在则忽略
 def mkdir(path, bTitle = True, bNew = False): 
     # 去除首位空格
@@ -182,7 +193,7 @@ def copyFile(scrPath,  targetDir, name = ""):
         shutil.copy(scrPath, destPath)
         print("copy %s %s" % (scrPath, destPath))
 #定义文件加内拷贝函数 2017-10-18
-def copyFiles(scrDir, targetDir, wildcard = "", iswalk = False):
+def copyFiles(scrDir, targetDir, wildcard = "", iswalk = False, bSameFloder = False):
     #目标文件夹检测
     if (os.path.exists(targetDir) == False):
         mkdir(targetDir)
@@ -191,7 +202,12 @@ def copyFiles(scrDir, targetDir, wildcard = "", iswalk = False):
     if (os.path.exists(scrDir)): 
         files = getFiles(scrDir, wildcard, iswalk)
         for file in files:
-            copyFile(file, targetDir)
+            if(not os.path.isdir(file)):
+                #文件夹深度处理
+                dirTarget = targetDir
+                if(bSameFloder):
+                    dirTarget = os.path.dirname(file).replace(scrDir, targetDir)
+                copyFile(file, dirTarget)
 
 #去除BOM头
 def Trans_NoBOM(strBom):
