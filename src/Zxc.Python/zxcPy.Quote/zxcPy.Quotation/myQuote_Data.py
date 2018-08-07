@@ -62,6 +62,9 @@ class Quote_Data:
     def getTime_str(self, bMinute = False):
         datetime = self.getTime(bMinute)
         return myData_Trans.Tran_ToDatetime_str(datetime)
+    #获取播报消息 
+    def getMsg_str(self, bIndex = False):
+        pass 
 
     #输出
     def Print(self):

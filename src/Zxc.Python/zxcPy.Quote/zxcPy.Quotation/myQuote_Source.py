@@ -114,7 +114,7 @@ class Quote_Source:
     def setTime(self):
         self.dtDay = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")                 #当前天
         self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 9:29:30")      #起始时间
-        self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:3:30")        #结束时间
+        self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:30")        #结束时间
         self.timeIntervals = 0
 
 #行情监听线程

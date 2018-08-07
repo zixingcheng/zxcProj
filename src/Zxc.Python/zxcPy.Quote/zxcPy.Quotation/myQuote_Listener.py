@@ -43,9 +43,14 @@ class Quote_Listener:
             msg = self.pMMsg.OnCreatMsg()
         else: msg ={}
 
+        #尾部标签
+        strTag = "  --zxcRobot(Stock)  " + time
+        if(len(strTag) < 32):
+            strTag = (32 - len(strTag)) * " " + strTag
+
         #更新
         msg["user"] = to_user
-        msg["text"] = text + "\r\n\t   --zxcRobot(Stock)   " + time
+        msg["text"] = text + "\n" + strTag
         msg["type"] = type
         msg["plat"] = plat
         return msg
