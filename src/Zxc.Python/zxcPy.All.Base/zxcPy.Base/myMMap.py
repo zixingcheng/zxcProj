@@ -14,7 +14,7 @@ myMMap_DataType = myEnum.enum_index('str', 'int', 'float', 'list', 'dict', 'obje
 #共享内存类
 class myMMap_Data(): 
     def __init__(self, value, nOffset = -1):             
-        self.type = myMMap_DataType.object
+        self.type = myMMap_DataType.str
         self.value = value
         self.offset = nOffset
         self.length = 0
@@ -83,8 +83,9 @@ class myMMap_Data():
             strValue = myData_Trans.To_Str_By_Bytes(self.arrValue)
             self.value = ast.literal_eval(strValue)
         else:
-            self.type = myMMap_DataType.object
-            self.value = myData_Trans.To_Bytes_By_Str(value.ToString())
+            #self.type = myMMap_DataType.object
+            #self.value = myData_Trans.To_Str_By_Bytes(self.arrValue)
+            return None
         return self.value
 
 #共享内存类
