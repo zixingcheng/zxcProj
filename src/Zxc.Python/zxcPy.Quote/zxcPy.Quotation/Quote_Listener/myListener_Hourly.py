@@ -23,7 +23,7 @@ class myListener_Hourly(myQuote_Listener.Quote_Listener):
     #处理接收信息
     def OnRecvQuote(self, quoteDatas): 
         #设置有效检查
-        if(self.IsEnable()== False): return
+        if(self.IsEnable(quoteDatas)== False): return
         
         #提取值--时间
         dtNow = quoteDatas.data.getTime()

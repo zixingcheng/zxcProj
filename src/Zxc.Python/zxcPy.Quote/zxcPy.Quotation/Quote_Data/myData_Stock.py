@@ -11,7 +11,7 @@ import sys, os, datetime, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/zxcPy.Quotation')
 mySystem.Append_Us("", False)    
-import myQuote_Data, myData_Trans
+import myQuote_Data, myData, myData_Trans
 
 
 #行情数据对象
@@ -209,6 +209,16 @@ class Data_Stock(myQuote_Data.Quote_Data):
         self.priceBase = myData_Trans.To_Float(self.preClose)   #前一收盘价格
         return True
          
+    #获取播报消息 
+    def getMsg_str(self, bIndex = False):
+        lstValue = self.toValueList()
+        strValue = str(round(lstValue[1], 2))
+        
+        strMsg = self.name + ": " + str(round(lstValue[1], 2))  
+        if(bIndex == False):
+            strMsg += "元"
+        return strMsg
+
     #输出
     def Print(self):
         print(self.toString())
@@ -235,6 +245,7 @@ class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
     #其他统计接口
     def setData_Statics(self, pData):
         datas = pData.toValueList()
+        self.last = datas[1]
         self.Valume = datas[6] - self.Valume_pre
         self.Turnover = datas[7] - self.Turnover_pre
         self.Rise_Fall = datas[1] / pData.priceBase - 1     #涨跌幅
