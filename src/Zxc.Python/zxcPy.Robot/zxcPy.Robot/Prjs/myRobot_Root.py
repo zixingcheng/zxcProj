@@ -19,6 +19,7 @@ class myRobot_Root(myRobot.myRobot):
     def __init__(self, usrName, usrID):
         super().__init__(usrName, usrID)
         self.doTitle = "Robot_Root"     #说明 
+        self.prjName = "Robot_Root"     #功能名
         self.doCmd = "@@zxcRobot_Root"  #启动命令 
         self.rootPrjs = None            #功能集
         
