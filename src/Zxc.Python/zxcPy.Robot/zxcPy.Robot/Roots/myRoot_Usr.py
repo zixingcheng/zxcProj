@@ -53,7 +53,9 @@ class myRoot_Usr():
         #调用消息处理，及其他处理 
         pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup)
         for x in self.usrPrj.prjDos:
-            pass 
+            prjDo = self.usrPrj.prjDos[x]
+            if(prjDo.isBackUse):
+                prjDo.Done(Text, msgID, isGroup, pGroup)
         return pReturn
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
@@ -96,6 +98,8 @@ class myRoot_UsrPrj():
         for x in lstDos:
             prj = rootPrjs.prjRoots[x]
             if(prj.isRoot == False and prj.IsRunSingle()):    #非root功能，且非单例
+                self._Add_prjDo(prj.prjClass) 
+            elif(prj.isRunBack == True):    #后台运行
                 self._Add_prjDo(prj.prjClass) 
     #增加功能
     def _Change_prjDo(self, prjDo, pPrj): 

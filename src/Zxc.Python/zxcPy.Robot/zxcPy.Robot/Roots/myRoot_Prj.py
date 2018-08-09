@@ -11,7 +11,8 @@ import sys, os, datetime, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("", False)    
-import myIO, myIO_xlsx, myData, myImport, myRoot_Usr, myRoot_GroupInfo
+import myIO, myIO_xlsx, myData, myImport
+import myRoot_Usr, myRoot_GroupInfo, myRobot_Log
 import myRoot_GroupInfo as group
 from myGlobal import gol 
 
@@ -24,9 +25,10 @@ class myRoot_Prj():
         self.fileName = ""      #文件名
         self.className = ""     #类名
         self.cmdStr = ""        #启动命令
-        self.isRoot = False     #是否根标识 ??
+        self.isRoot = False     #是否系统权限
         
         self.isRunSingle = False        #是否为单例使用(单例时每个用户专属) 
+        self.isRunBack = False          #是否为后台运行(后台可运行多个，一般为系统级功能，如日志)  
         self.isRunning = False          #是否运行中（允许中非统一启用，全员有权限）
         self.isEnable = False           #是否可启用
         self.isEnable_All = False       #是否统一启用(登陆账户启用，否则单个用户启用)
@@ -53,7 +55,11 @@ class myRoot_Prj():
         self.infoLogs[datetime.datetime.now] = usrName + "::" + usrInfo
     #实例功能对象
     def creatIntance(self, usrName, usrID):      
-        return myImport.Import_Class(self.fileName, self.className)(usrName, usrID)
+        self.prjClass = myImport.Import_Class(self.fileName, self.className)(usrName, usrID)
+        self.isRoot = self.prjClass.isRootUse           #是否为系统级使用(系统内置功能) 
+        self.isRunSingle = self.prjClass.isSingleUse    #是否为单例使用(单例时每个用户专属) 
+        self.isRunBack = self.prjClass.isBackUse        #是否为后台使用(后台可运行多个，一般为系统级功能，如日志) 
+        return self.prjClass
 
     #命令权限检查
     def IsRoot_user(self, usr):  
@@ -126,17 +132,24 @@ class myRoots_Prj():
             prjRoot.plantsEnable = list(dtRow[lstFields_ind["平台列表"]])
 
             #实例功能对象并缓存索引
-            prjRoot.prjClass = prjRoot.creatIntance(self.usrName, self.usrID)
-            prjRoot.isRunSingle = prjRoot.prjClass.isSingleUse  #是否为单例使用(单例时每个用户专属) 
+            prjRoot.creatIntance(self.usrName, self.usrID)
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
 
         #增加默认隐藏功能 
-        prjRoot = myRoot_Prj()
-        prjRoot._Init("权限提升", "myRobot_Root", "myRobot_Root", "zxcRobot_Root", True, False, True, False, False)
-        prjRoot.isRoot = True
-        self.prjRoots[prjRoot.prjName] = prjRoot
-        self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
+        if(True): 	 
+            prjRoot = myRoot_Prj()
+            prjRoot._Init("权限提升", "myRobot_Root", "myRobot_Root", "zxcRobot_Root", True, False, True, False, False)
+            prjRoot.creatIntance(self.usrName, self.usrID)
+            self.prjRoots[prjRoot.prjName] = prjRoot
+            self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
+
+            prjLog = myRoot_Prj()
+            prjLog._Init("消息日志", "myRobot_Log", "myRobot_Log", "zxcRobot_Log", True, False, True, False, False)
+            prjLog.creatIntance(self.usrName, self.usrID)
+            prjLog.prjClass.Done("@@zxcRobot_Log", "")       #自启动
+            self.prjRoots[prjLog.prjName] = prjLog
+            self.prjCmds[prjLog.cmdStr.lower()] = prjLog.prjName
         
         #用户权限设置
         if(True): 	 
