@@ -10,17 +10,19 @@ import sys, os, time ,mySystem
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类 
 mySystem.Append_Us("", False) 
-import myRobot, myManager_Msg
+import myDebug, myRobot, myManager_Msg
 from myGlobal import gol   
 
     
-#机器人类--聊天机器人
-class myRobot_Robot(myRobot.myRobot):
+#机器人类--日志
+class myRobot_Log(myRobot.myRobot):
     def __init__(self, usrName, usrID):
         super().__init__(usrName, usrID)
         self.doTitle = "Robot_Log"     #说明 
         self.prjName = "Robot_Log"     #功能名
         self.doCmd = "@@zxcRobot_Log"  #启动命令 
+
+        self.isOpened
         self.msgLogs = gol._Get_Setting('manageMsgs')   #全局消息日志管理器
         
     #消息处理接口
@@ -31,12 +33,14 @@ class myRobot_Robot(myRobot.myRobot):
         return "" 
 
     def _Title_User_Opened(self): 
-        return "开启Robot Log..." 
+        strMsg = "开启 Robot Log..." 
+        myDebug.Print(strMsg)
+        return strMsg  
         
 
 #主启动程序
 if __name__ == "__main__":
-    pR = myRobot_Robot("zxc", "zxcID");
+    pR = myRobot_Log("zxc", "zxcID");
     pp = pR.Done("@@zxcRobot_Log")
     print(pp)
     print(pR.Done("Hello"))

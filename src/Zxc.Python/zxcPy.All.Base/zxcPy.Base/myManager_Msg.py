@@ -55,7 +55,7 @@ class myManager_Msg():
         self.usePrint = True
         self.useVoice = False
         self.useLineMsg = True
-        self.msgExramp = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "plat":'weixin'} #消息样例
+        self.msgExramp = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "groupID":'', "plat":''} #消息样例
         self.msgLogs = {}
         self.msgInd_Name = {}
         self.msgInd_Nick = {}
