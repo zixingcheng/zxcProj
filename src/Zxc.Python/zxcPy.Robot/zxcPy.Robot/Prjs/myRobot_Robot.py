@@ -23,7 +23,7 @@ class myRobot_Robot(myRobot.myRobot):
         self.doCmd = "@@ChatRobot"      #启动命令 
         
     #消息处理接口
-    def _Done(self, Text, isGroup = False, idGroup = ""): 
+    def _Done(self, Text, msgID = "", isGroup = False, idGroup = ""):  
         #聊天机器人(接入第三方接口进行处理)
         strText = Text + "--by zxcChatRobot"
         return strText 

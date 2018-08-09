@@ -23,7 +23,7 @@ class myRobot_Repeater(myRobot.myRobot):
         self.msg['FromUserName'] = self.usrName 
 
     #消息处理接口
-    def _Done(self, Text, isGroup = False, idGroup = ""):        
+    def _Done(self, Text, msgID = "", isGroup = False, idGroup = ""): 
         #复读机(回复相同消息)
         return "@" + self.msg['FromUserName'] + " "+ Text 
     def _Title_User_Opened(self): 

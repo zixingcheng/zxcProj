@@ -31,7 +31,7 @@ class myRobot():
         self.isEnable = True            #是否可用
         self.isValid = True             #合法性 
         self.isOpened = False           #是否启用
-        self.isSingleUse = True        #是否为单例使用(非单例时每个用户专属) 
+        self.isSingleUse = True         #是否为单例使用(非单例时每个用户专属) 
         self.tStart = datetime.now()
         self.tNow = datetime.now()
         self.tLast = datetime.now()
@@ -50,7 +50,7 @@ class myRobot():
         self.maxTime = 60 * 6       #有效时常
 
     #消息处理接口
-    def Done(self, Text, isGroup = False, idGroup = ""):
+    def Done(self, Text, msgID = "", isGroup = False, idGroup = ""):
         #检查
         if(self._Check() == False): 
             return None
@@ -61,7 +61,7 @@ class myRobot():
             strReturn = self.doTitle + "功能" + self._Title()
         else:
             if(self.isOpened):
-                strReturn = self._Done(Text)
+                strReturn = self._Done(Text, msgID, isGroup, idGroup)
         
         #创建返回消息
         return self._Return(strReturn)
@@ -80,7 +80,7 @@ class myRobot():
         self.tLast = self.tNow    
         return True
     #消息处理--继承类重写，实现处理逻辑功能
-    def _Done(self, Text):
+    def _Done(self, Text, msgID = "", isGroup = False, idGroup = ""):
         self.strText_L = Text 
         return Text
     #创建返回消息

@@ -257,7 +257,8 @@ class myMD_table():
                 # 值表
                 for i in range(2, self.rows + 1):
                     pField.values.append(lstTable[i][j].strip())
-                addField(pField)
+                self.addField(pField)
+            self.cols = len(lstTable[0])    #修正字段数 
         else:
             # 提取字段信息 
             for j in range(0, self.cols):
@@ -397,7 +398,8 @@ class myMD_table():
 class myMD:
     def __init__(self, path=""):
         self.nodesMD = []
-        self.Current = None 
+        self.nodeDef = myMD_node()  #添加默认项避免无节点报错 
+        self.Current = self.nodeDef 
         self.Ind = 1 
         if(path != ""): self.loadMD(path)
 
@@ -407,7 +409,17 @@ class myMD:
         if (os.path.exists(path) == False): return False
 
         # 提取所有行数据、解析所有
-        lstLines = myIO.getContent(path, True, True)
+        lstLines = myIO.getContent(path, True, True) 
+        return self._loadMD_strs(lstLines)
+    # 加载md字符串 
+    def loadMD_str(self, strLine):
+        # 字符串必须有效  
+        if(strLine == ""): return False
+        lstLines = strLine.split('\n') 
+        return self._loadMD_strs(lstLines)
+    # 加载md字符串行集 
+    def _loadMD_strs(self, lstLines):
+        # 提取所有行数据、解析所有
         ind = 0
         for i in range(0, len(lstLines)):
             if i < ind: continue
@@ -435,7 +447,7 @@ class myMD:
     # 提取内容信息
     def getContent(self): 
         # 组装字符串
-        strLines = ""
+        strLines = self.nodeDef.getContent(False, False)
         for md in self.nodesMD: 
             strLines += md.getContent(True, True)
         return strLines
@@ -493,7 +505,8 @@ class myMD:
     # 提取子对象
     def __getitem__(self, key):
         ind = self._Find(key)
-        if(ind < 0): return None
+        if(ind == -1): return self.nodeDef
+        if(ind < -1): return None
         return self.nodesMD[ind] 
 
 

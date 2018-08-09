@@ -13,7 +13,8 @@ import mySystem
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("../Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myImport, myRoot, myRoot_Usr
+import myWeb, myImport, myManager_Msg, myData
+import myRoot, myRoot_Usr
 from myGlobal import gol 
 
 
@@ -38,26 +39,31 @@ class myRobot_Reply():
             self.usrReplys = myRoot_Usr.myRoot_Usrs(self.usrName, self.usrTag)   #消息用户集
         
     #处理封装返回消息(按标识内容处理)
-    def Done_ByMsg(self, msg, isGroup = False):
+    def Done_ByMsg(self, msg):
         if(msg == None): return None
 
-        #提取消息内容（可能随wx版本变更）
-        usrName_To = msg['ToUserName']
-        strText = msg['Text'] 
-        idGroup = ""
-        pWxdo = None 
-        if(isGroup):
-            idGroup = msg['User'].get('UserName',"")
-            nickName = msg.get('ActualNickName',"")
-            usrName = msg.get('ActualUserName',"")
+        #提取消息内容（自定义格式类型 myManager_Msg.OnCreatMsg）
+        usrID = msg.get('usrID', "")
+        usrName = msg.get('usrName', "")
+        usrNameNick = msg.get('usrNameNick', "")
+
+        msg = msg.get('msg', "")
+        msgID = msg.get('msgID', "")
+        msgType = msg.get('msgType', "")
+        plat = msg.get('plat', "")
+        groupID = msg.get('groupID', "")
+        isGroup = myData.iif(groupID == "", False, True)
+
+        #按消息类型进一步处理('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
+        if(msgType == myMsgType.TEXT):
+            msgText = msg
         else:
-            nickName = msg['User'].get('NickName',"")
-            usrName = msg.get('FromUserName',"")
+            return False 
 
         #调用 
-        return self.Done(usrName, nickName, strText, isGroup, idGroup)
+        return self.Done(usrID, usrName, nickName, msgText, msgID, plat, isGroup, groupID)
     #按命令处理返回消息(按标识内容处理)
-    def Done(self, usrID, usrName, nickName, usrPlant, strText, isGroup = False, idGroup = ""):
+    def Done(self, usrID, usrName, nickName, strText, msgID = "", usrPlant = "", isGroup = False, idGroup = ""):
         #命令识别
         pPrj = None 
         pUser = None 
@@ -69,7 +75,7 @@ class myRobot_Reply():
       
         #查找用户, 调用消息处理方法调用
         if(pUser != None):
-            return pUser.Done(pPrj, strText, isGroup, idGroup)
+            return pUser.Done(pPrj, strText, msgID, isGroup, idGroup)
         return None
 
     #查找用户（不存在则自动创建）
@@ -151,13 +157,15 @@ if __name__ == "__main__":
     usrName = "墨紫_0"
     nickName = "墨紫"
     usrPlant = "wx"
+    msgID = ""
 
 
     #权限初始
-    print(pWxReply.Done(usrID, usrName, nickName, usrPlant, '@@Repeater'))
-    print(pWxReply.Done(usrID, usrName, nickName, usrPlant, 'Hello Rep'))
-    print(pWxReply.Done(usrID, usrName, nickName, usrPlant, 'Bye Repeater'))
-    print(pWxReply.Done(usrID, usrName, nickName, usrPlant, '@@Repeater'))
+    print(pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant))
+    print(pWxReply.Done(usrID, usrName, nickName, 'Hello Rep', msgID, usrPlant))
+    print(pWxReply.Done(usrID, usrName, nickName, 'zxczxc', "@zxcvbnm", usrPlant))
+    print(pWxReply.Done(usrID, usrName, nickName, 'Bye Repeater', msgID, usrPlant))
+    print(pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant))
 
 
     exit()
