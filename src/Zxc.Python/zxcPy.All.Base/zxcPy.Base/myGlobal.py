@@ -28,7 +28,7 @@ class gol():
             _ms_Setting["CanPrint_Warnning"] = True
             _ms_Setting["CanPrint_Error"] = True
             _ms_Setting["Debug_Depth"] = 0
-            _ms_Setting["Return_strFormat"] = {'result': False, 'err': "", 'text': ""}
+            _ms_Setting["Return_strFormat"] = {'result': False, 'code': 0,'err': "", 'text': ""}
             _global_dict["golSetting"] = _ms_Setting
             
             if(bPrint):

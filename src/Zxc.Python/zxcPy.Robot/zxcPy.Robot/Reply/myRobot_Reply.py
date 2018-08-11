@@ -47,7 +47,7 @@ class myRobot_Reply():
         usrName = msg.get('usrName', "")
         usrNameNick = msg.get('usrNameNick', "")
 
-        msg = msg.get('msg', "")
+        msgText = msg.get('msg', "")
         msgID = msg.get('msgID', "")
         msgType = msg.get('msgType', "")
         plat = msg.get('plat', "")
@@ -55,13 +55,13 @@ class myRobot_Reply():
         isGroup = myData.iif(groupID == "", False, True)
 
         #按消息类型进一步处理('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
-        if(msgType == myMsgType.TEXT):
-            msgText = msg
+        if(msgType == myManager_Msg.myMsgType.TEXT):
+            msgText = msgText
         else:
             return False 
 
         #调用 
-        return self.Done(usrID, usrName, nickName, msgText, msgID, plat, isGroup, groupID)
+        return self.Done(usrID, usrName, usrNameNick, msgText, msgID, plat, isGroup, groupID)
     #按命令处理返回消息(按标识内容处理)
     def Done(self, usrID, usrName, nickName, strText, msgID = "", usrPlant = "", isGroup = False, idGroup = ""):
         #命令识别
@@ -81,9 +81,9 @@ class myRobot_Reply():
     #查找用户（不存在则自动创建）
     def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlant = ""): 
         #按消息生成对应对象 
-        pUser = self.root.usrInfos._Find(nickName, usrName, usrID, usrID_sys, usrPlant, False)
+        pUser = self.root.usrInfos._Find(usrName_Nick, usrName, usrID, usrID_sys, usrPlant, False)
         if(pUser == None):      #非参与用户，于全局用户集信息提取，不存在的自动生成
-            pUser = self.root.usrInfos._Find(nickName, usrName, usrID, usrID_sys, usrPlant, True)
+            pUser = self.root.usrInfos._Find(usrName_Nick, usrName, usrID, usrID_sys, usrPlant, True)
             pUser.usrPrj._Add_prjDos(self.root.rootPrjs)
             self.usrReplys._Add(pUser)
         return pUser
