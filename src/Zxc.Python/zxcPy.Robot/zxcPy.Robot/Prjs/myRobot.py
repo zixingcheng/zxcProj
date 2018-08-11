@@ -91,6 +91,10 @@ class myRobot():
     def _Return(self, Text):
         self.msg['Text'] = Text  
         return self.msg
+    #关闭功能
+    def _Close(self):
+        if(self._Check()):
+            self.Done(self.doCmd)       #启动关闭命令
 
     #开关提示信息
     def _Title(self):

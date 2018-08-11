@@ -159,14 +159,48 @@ if __name__ == "__main__":
     usrPlant = "wx"
     msgID = ""
 
-
-    #权限初始
-    print(pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant))
+    
+    #复读机功能测试
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant)
     print(pWxReply.Done(usrID, usrName, nickName, 'Hello Rep', msgID, usrPlant))
     print(pWxReply.Done(usrID, usrName, nickName, 'zxczxc', "@zxcvbnm", usrPlant))
     print(pWxReply.Done(usrID, usrName, nickName, 'Bye Repeater', msgID, usrPlant))
-    print(pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant))
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant) 
+    print()
 
+    #复读功能再次开启与关闭
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant) 
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant)  
+    print()
+
+
+    #聊天机器人测试
+    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
+    print(pWxReply.Done(usrID, usrName, nickName, 'Hello Robot', msgID, usrPlant))
+    print(pWxReply.Done(usrID, usrName, nickName, 'God Job...', msgID, usrPlant))
+    print(pWxReply.Done(usrID, usrName, nickName, 'Bye Robot', msgID, usrPlant))
+    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
+    print()
+
+
+    #交互启动测试 
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant) 
+    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
+    print(pWxReply.Done(usrID, usrName, nickName, 'Hello ChatRobot...', msgID, usrPlant))
+    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
+    print()
+
+
+
+    #消息提取测试
+    #pMsg = pR.msgLogs._Find_Log("zxcID").Find("@zxcvbnm")
+
+
+    exit()
+    
+    #提取消息测试
+    #pMsg = pR.msgLogs._Find_Log("zxcID").Find("@zxcvbnm")
+    #print("msgID: " , pMsg.msgID, "msg: ", pMsg.msg)
 
     exit()
 

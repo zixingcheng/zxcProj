@@ -45,10 +45,15 @@ class myRoot_Usr():
     def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None):    
         #提取功能设置信息
         if(pPrj == None): pPrj = self.usrPrj.prjInfo
+        if(self.usrPrj.prjInfo != None):
+            if(pPrj.prjName != self.usrPrj.prjInfo.prjName):        #命令切换
+                prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
+                self.usrPrj._Change_prjDo(prjClass, pPrj)
 
         #提取当前功能对象
         prjClass = self.usrPrj.prjDo
-        if(prjClass == None): prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
+        if(prjClass == None): 
+            prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
 
         #调用消息处理，及其他处理 
         pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup)
@@ -77,7 +82,7 @@ class myRoot_UsrPrj():
         prjDo = self.prjDo
         if(prjDo == None): prjDo = self.prjDos.get(pPrj.prjName, None) 
         if(prjDo != None):
-            pPrj.isRunning = prjDo.isOpened
+            pPrj.isRunning = prjDo.isRunning
 
     #查找功能
     def _Find_prjDo(self, prjDo):
@@ -117,11 +122,14 @@ class myRoot_UsrPrj():
     #关闭功能
     def _Close_prjDo(self, prjDo): 
         if(prjDo == None): return False
+        prjDo._Close()                #启动关闭命令
 
         #查找功能并关闭
         pFind = self._Find_prjDo(prjDo)
-        if(pFind != None): 
-            self.prjDos.pop(prjDo.prjName)
+        if(pFind != None):      
+            pFind.isRunning = prjDo.isRunning       #更新当前功能状态
+            if(self.prjDo.isSingleUse == False):    #非单例运行功能移除   
+                self.prjDos.pop(prjDo.prjName)
         return True
  
     #新消息处理
