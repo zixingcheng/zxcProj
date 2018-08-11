@@ -13,7 +13,7 @@ import mySystem
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("../Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myImport, myManager_Msg, myData
+import myWeb, myImport, myManager_Msg, myData, myDebug
 import myRoot, myRoot_Usr
 from myGlobal import gol 
 
@@ -28,7 +28,7 @@ class myRobot_Reply():
         #self.wxDos = {}         #消息处理类
         #self.wxUser_Root = None #当前授权用户对象(避免频繁查找)
         self._Init()    #按全局权限初始
-        print(">>实例消息处理工厂(%s::%s--%s)" % (self.usrName, self.usrNameNick, self.usrTag))
+        myDebug.Print("消息处理工厂--已初始 (%s::%s--%s)" % (self.usrName, self.usrNameNick, self.usrTag))
     def _Init(self,): 
         #初始用户全局功能权限对象 
         self.root = gol._Get_Value('rootRobot')     #权限信息
