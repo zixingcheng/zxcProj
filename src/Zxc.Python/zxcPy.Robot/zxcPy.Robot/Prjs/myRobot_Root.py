@@ -24,7 +24,7 @@ class myRobot_Root(myRobot.myRobot):
         self.rootPrjs = None            #功能集
         
     #消息处理接口
-    def _Done(self, Text, msgID = "", isGroup = False, idGroup = ""): 
+    def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
         #命令权限提升()
         #print(Text)
         #bResult, pPrj = self.usrRoot.Add_Cmd(Text, isGroup, idGroup)

@@ -19,38 +19,37 @@ class myRobot_Log(myRobot.myRobot):
     def __init__(self, usrName, usrID):
         super().__init__(usrName, usrID)
         self.doTitle = "Robot_Log"     #说明 
-        self.prjName = "Robot_Log"     #功能名
+        self.prjName = "消息日志"      #功能名
         self.doCmd = "@@zxcRobot_Log"  #启动命令 
-
-        self.isOpened
         self.msgLogs = gol._Get_Setting('manageMsgs')   #全局消息日志管理器
         
     #消息处理接口
-    def _Done(self, Text, msgID = "", isGroup = False, idGroup = ""): 
+    def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
         #日志记录
         #strText = Text + "--by zxcLog"
         self.msgLogs.Log(self.usrID, self.usrName, "", Text, msgID) 
         return "" 
 
     def _Title_User_Opened(self): 
-        strMsg = "开启 Robot Log..." 
-        myDebug.Print(strMsg)
-        return strMsg  
+        return "自动缓存所有消息..."
         
 
 #主启动程序
 if __name__ == "__main__":
     pR = myRobot_Log("zxc", "zxcID");
     pp = pR.Done("@@zxcRobot_Log")
-    print(pp)
     print(pR.Done("Hello"))
     print(pR.Done("Test", "@zxcvbnm"))
     print(pR.Done("Bye"))
-
     pp = pR.Done("@@zxcRobot_Log")
-    print(pp)
-    time.sleep (2)
+    print()
+    time.sleep (1)
     
     #提取消息测试
     pMsg = pR.msgLogs._Find_Log("zxcID").Find("@zxcvbnm")
-    print("msgID: " , pMsg.msgID, "msg: ", pMsg.msg)
+    print("历史消息： msgID: " , pMsg.msgID, "msg: ", pMsg.msg)
+    print()
+    
+    pp = pR.Done("@@zxcRobot_Log")
+    pp = pR.Done("@@zxcRobot_Log")
+    print()

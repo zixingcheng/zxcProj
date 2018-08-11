@@ -20,12 +20,11 @@ class myRobot_Repeater(myRobot.myRobot):
         self.doTitle = "复读机"     #说明 
         self.prjName = "复读机"     #功能名
         self.doCmd = "@@Repeater"   #启动命令 
-        self.msg['FromUserName'] = self.usrName 
 
     #消息处理接口
-    def _Done(self, Text, msgID = "", isGroup = False, idGroup = ""): 
+    def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
         #复读机(回复相同消息)
-        return "@" + self.msg['FromUserName'] + " "+ Text 
+        return "@" + usrName + " "+ Text 
     def _Title_User_Opened(self): 
         return "发送任何消息均同声回复..."
         
@@ -33,16 +32,22 @@ class myRobot_Repeater(myRobot.myRobot):
 #主启动程序
 if __name__ == "__main__":
     pR = myRobot_Repeater("zxc", "zxcID");
-    print(pR.Done("@@Repeater")["Text"])
+    pR.Done("@@Repeater")["Text"]
     print(pR.Done("Hello")["Text"])
-    print(pR.Done("@@Repeater")["Text"])
+    pR.Done("@@Repeater")["Text"]
+    print()
+    
+    time.sleep (1)
+    pR.Done("@@Repeater")["Text"]
+    pR.Done("@@Repeater")["Text"]
+    print()
 
     time.sleep (2)
     print(pR.Done("Hello"))
 
     pR = myRobot_Repeater("zxc", "zxcID");
-    print(pR.Done("@@zxcWeixin")["Text"])
-    print(pR.Done("Hello")["Text"])
-    print(pR.Done("@@zxcWeixin")["Text"])
+    print(pR.Done("@@zxcWeixin"))
+    print(pR.Done("Hello"))
+    print(pR.Done("@@zxcWeixin"))
 
     

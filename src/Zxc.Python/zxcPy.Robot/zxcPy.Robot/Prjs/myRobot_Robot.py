@@ -23,25 +23,28 @@ class myRobot_Robot(myRobot.myRobot):
         self.doCmd = "@@ChatRobot"      #启动命令 
         
     #消息处理接口
-    def _Done(self, Text, msgID = "", isGroup = False, idGroup = ""):  
+    def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
         #聊天机器人(接入第三方接口进行处理)
         strText = Text + "--by zxcChatRobot"
         return strText 
 
     def _Title_User_Opened(self): 
-        return "开启聊天Robot..." 
+        return "消息机器人自动回复..."
         
 
 #主启动程序
 if __name__ == "__main__":
     pR = myRobot_Robot("zxc", "zxcID");
     pp = pR.Done("@@ChatRobot")
-    print(pp)
     print(pR.Done("Hello"))
-    print(pR.Done("@@ChatRobot"))
+    pR.Done("@@ChatRobot")
+    print()
 
     time.sleep (2)
     pp = pR.Done("Hello")
     print(pp)
-
+    
+    pR.Done("@@ChatRobot")
+    pR.Done("@@ChatRobot")
+    print()
     
