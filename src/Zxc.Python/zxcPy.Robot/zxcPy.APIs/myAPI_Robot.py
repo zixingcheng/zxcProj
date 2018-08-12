@@ -16,7 +16,7 @@ mySystem.Append_Us("../zxcPy.Robot/Prjs", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Reply", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb,  myRobot_Reply, myManager_Msg
+import myWeb, myDebug, myRobot_Reply, myManager_Msg
 from myGlobal import gol   
 
 
@@ -49,9 +49,9 @@ class myAPI_Robot_Reply(myWeb.myAPI):
         
         #消息处理(应为异步处理)
         msg = ast.literal_eval(msgInfo) 
+        pReutrn = ms_Reply.Done_ByMsg(msg) 
+        myDebug.Debug("API-->>", pReutrn)
         try:
-            pReutrn = ms_Reply.Done_ByMsg(msg) 
-            print("API-->>", pReutrn)
             return pReutrn
         except :
             return None
@@ -106,6 +106,9 @@ if __name__ == '__main__':
     pReply.get(str(msg))
     print()
     
+    msg["msg"] = "@@Repeater"
+    print(pReply.get(str(msg)))
+
     msg["msg"] = "Hi Repeater"
     print(pReply.get(str(msg)))
     print()

@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{a0dccad3-0a28-4efe-9dba-e6d3d5feb346}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>myWeixin_API.py</StartupFile>
+    <StartupFile>zxcPy.Weixin\myWeixin_ItChat.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -24,33 +24,18 @@
     <Compile Include="zxcPy.Test\myTest_Chat.py" />
     <Compile Include="myWeixin_API.py" />
     <Compile Include="zxcPy.Test\myTest_Event.py" />
+    <Compile Include="zxcPy.Weixin\myReply_Factory.py" />
     <Compile Include="zxcPy.Weixin\myWeixin_Cmd.py" />
     <Compile Include="zxcPy.Weixin\myWeixin_ItChat.py" />
-    <Compile Include="zxcPy.Weixin\Weixin_Reply\myReply_Factory.py" />
-    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWxDo\myWxDo.py" />
-    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWxDo\myWxDo_Root.py" />
-    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWxDo\myWxDo_Repeater.py" />
-    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWx_UserRoot.py" />
-    <Compile Include="zxcPy.Weixin\Weixin_Reply\myWx_User.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />
     <Content Include="Start.bat" />
-    <Content Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\myWxDo.cpython-35.pyc" />
-    <Content Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\myWxDo_Repeater.cpython-35.pyc" />
-    <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myImport.cpython-35.pyc" />
-    <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myReply_Factory.cpython-35.pyc" />
-    <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myReply_Text.cpython-35.pyc" />
-    <Content Include="zxcPy.Weixin\Weixin_Reply\__pycache__\myWx_User.cpython-35.pyc" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Test\" />
     <Folder Include="zxcPy.Weixin\" />
-    <Folder Include="zxcPy.Weixin\Weixin_Reply\" />
-    <Folder Include="zxcPy.Weixin\Weixin_Reply\myWxDo\" />
-    <Folder Include="zxcPy.Weixin\Weixin_Reply\myWxDo\__pycache__\" />
-    <Folder Include="zxcPy.Weixin\Weixin_Reply\__pycache__\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.5" />
