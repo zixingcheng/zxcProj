@@ -44,7 +44,9 @@ class myRoot_Usr():
     #新消息处理
     def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None):    
         #提取功能设置信息
-        if(pPrj == None): pPrj = self.usrPrj.prjInfo
+        if(pPrj == None): 
+            pPrj = self.usrPrj.prjInfo
+            if(pPrj == None): return None                           #当前无功能启用
         if(self.usrPrj.prjInfo != None):
             if(pPrj.prjName != self.usrPrj.prjInfo.prjName):        #命令切换
                 prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 

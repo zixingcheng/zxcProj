@@ -20,7 +20,7 @@ from myGlobal import gol
 #主程序启动
 if __name__ == '__main__': 
     gol._Init()             #先必须在主模块初始化（只在Main模块需要一次即可）
-    gol._Set_Setting("CanPrint", False)
+    #gol._Set_Setting("CanPrint", False)
     import myAPI_Robot      #回重启导致多次输出信息，调整为不输出打印信息
     
     # 创建新线程

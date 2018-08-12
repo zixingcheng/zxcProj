@@ -49,7 +49,12 @@ class myAPI_Robot_Reply(myWeb.myAPI):
         
         #消息处理(应为异步处理)
         msg = ast.literal_eval(msgInfo) 
-        return ms_Reply.Done_ByMsg(msg) 
+        try:
+            pReutrn = ms_Reply.Done_ByMsg(msg) 
+            print("API-->>", pReutrn)
+            return pReutrn
+        except :
+            return None
 
 
 #初始消息处理对象
@@ -67,7 +72,7 @@ def add_APIs(pWeb):
 
     # 创建Web API
     pWeb.add_API(myAPI_Robot_RegistPlant, '/zxcAPI/robot/regist/plant/<usrName>/<usrID>/<plantName>')
-    pWeb.add_API(myAPI_Robot_Reply, '/zxcAPI/robot//reply/<msgInfo>')
+    pWeb.add_API(myAPI_Robot_Reply, '/zxcAPI/robot/reply/<msgInfo>')
 
 
 #主程序启动
@@ -92,10 +97,11 @@ if __name__ == '__main__':
     msg["usrID"] = "zxc_0"
     msg["usrName"] = "墨紫_0"
     msg["usrNameNick"] = "墨紫"
-    msg["msg"] = "@@Repeater"
+    msg["msg"] = "Repeater"
     msg["plat"] = "wx"
     print(msg)
-
+    
+    #http://127.0.0.1:8668/zxcAPI/robot/reply/{'msgType': 'TEXT', 'groupID': '', 'usrName': '信阳毛尖--杨帆桥', 'msg': '你好', 'usrNameNick': '信阳毛尖--杨帆桥', 'usrID': '@04a97e8ab667ac550d0c3da8e2c3a67f2fa4c2fc8a3b1abe61d7bd1fb0e9a790', 'msgID': '', 'plat': 'wx'}
     pReply = myAPI_Robot_Reply()
     pReply.get(str(msg))
     print()

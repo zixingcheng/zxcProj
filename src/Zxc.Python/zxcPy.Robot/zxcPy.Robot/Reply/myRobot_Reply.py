@@ -40,6 +40,7 @@ class myRobot_Reply():
         
     #处理封装返回消息(按标识内容处理)
     def Done_ByMsg(self, msg):
+        print("请求消息:: ", msg)
         if(msg == None): return None
 
         #提取消息内容（自定义格式类型 myManager_Msg.OnCreatMsg）
@@ -58,7 +59,7 @@ class myRobot_Reply():
         if(msgType == myManager_Msg.myMsgType.TEXT):
             msgText = msgText
         else:
-            return False 
+            return None 
 
         #调用 
         return self.Done(usrID, usrName, usrNameNick, msgText, msgID, plat, isGroup, groupID)
