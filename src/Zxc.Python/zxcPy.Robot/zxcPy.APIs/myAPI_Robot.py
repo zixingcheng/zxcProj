@@ -6,7 +6,7 @@ Created on  张斌 2018-07-04 15:58:00
 
     Rest API --平台注册
 """
-import os, copy , ast 
+import os, copy, ast 
 import mySystem 
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类

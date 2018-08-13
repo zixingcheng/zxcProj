@@ -58,6 +58,7 @@ class myWx_Reply():
             else:
                 nickName = msg['User'].get('NickName',"")
                 usrName = nickName
+        return None
 
         #消息测试 
         msgR = {}
