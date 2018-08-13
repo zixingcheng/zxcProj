@@ -11,32 +11,48 @@ import mySystem
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)    
-import myWeb, myMMap
+import myWeb, myMMap, myMQ_Rabbit, myDebug
 from myGlobal import gol   
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
 
 #API-命令--共享内存
-class myAPI_Weixin_Cmd(myWeb.myAPI): 
+class myAPI_Weixin_Cmd_ByMMP(myWeb.myAPI): 
     def get(self, user, text, type = "Text"):
         pMMap_Manager = gol._Get_Value('manageMMap')
         if(pMMap_Manager == None):
             return False
-        print(user, text, type)
+        #myDebug.Debug(user, text, type)
 
         #生成并写入命令
-        dict0 = {'FromUserName': user, 'Text': text, 'Type': type}        
-        pMMdata = myMMap.myMMap_Data(dict0, 0)      #生成命令--共享内存数据对象
+        msg = {'FromUserName': user, 'Text': text, 'Type': type}        
+        pMMdata = myMMap.myMMap_Data(msg, 0)      #生成命令--共享内存数据对象
         ind = pMMap_Manager.Write(pMMdata)          #写入命令--共享内存
         
         #读取测试
         pMMdata_M2, ind2 = pMMap_Manager.Read(ind)  
-        print(str(ind) + ":", pMMdata_M2.value)
+        #myDebug.Debug(str(ind) + ":", pMMdata_M2.value)
         #if(ind>1):
         #    pMMdata_M3, ind3 = pMMap_Manager.Read(ind - 1)  
         #    if(pMMdata_M3 != None):
         #        print("Last::" + str(ind - 1) + ":", pMMdata_M3.value)
         return ind
+    
+#API-命令--消息队列
+class myAPI_Weixin_Cmd_ByMQ(myWeb.myAPI): 
+    def get(self, user, text, type = "Text"):
+        pMQ_Sender = gol._Get_Value('zxcMQ_Wx_Sender')
+        if(pMQ_Sender == None):
+            return False 
+
+        #生成命令并推送消息队列
+        msg = {'FromUserName': user, 'Text': text, 'Type': type}     
+        try:
+            pMQ_Sender.Send_Msg(pMQ_Sender.nameQueue, str(msg))
+            myDebug.Debug(pMQ_Sender.nameQueue, msg)
+            return True
+        except :
+            return False
 
 
 #主程序启动 

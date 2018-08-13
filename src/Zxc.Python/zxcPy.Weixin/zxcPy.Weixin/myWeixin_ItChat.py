@@ -6,15 +6,16 @@ Created on  张斌 2017-11-17 12:16:00
 
     Python的Weixin网页版接口封装(使用itchat封装)
 """
-import sys, os, time, re, threading, mySystem 
+import sys, os, time, re, ast, threading, mySystem 
 import itchat
 from itchat.content import *
+from atexit import register
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 #mySystem.Append_Us("/Weixin_Reply", False, __file__)
 #mySystem.Append_Us("/Weixin_Reply/myWxDo", False, __file__)
 mySystem.Append_Us("", False) 
-import myError, myIO, myDebug, myMMap, myThread, myDebug, myReply_Factory    
+import myError, myIO, myDebug, myMMap, myThread, myDebug, myMQ_Rabbit, myReply_Factory    
 from myGlobal import gol 
 
 
@@ -36,7 +37,7 @@ class myWeixin_ItChat(myThread.myThread):
         self.funStatus_RText = False    #状态自动回复--文本
         self.funStatus_RText_G = False  #状态自动回复--文本-群
         self.managerMMap = None
-        self.Init_MMap(useCmdMMap)      #创建命令内存映射
+        self.Init_MsgCache(useCmdMMap)  #创建消息通讯缓存
     def Init(self, dir = "", pathPicDir = ""):
         if (dir == ""):
             strDir, strName = myIO.getPath_ByFile(__file__)
@@ -51,6 +52,11 @@ class myWeixin_ItChat(myThread.myThread):
         self.dirPic = pathPicDir + "Pic/"
         myIO.mkdir(self.dirPic, False)
 
+    #初始消息通讯缓存    
+    def Init_MsgCache(self, useCmdMMap = True):
+        self.useCmdMMap = useCmdMMap
+        if(useCmdMMap): return self.Init_MMap()
+        return self.Init_MQ()
     #创建命令内存映射 
     def Init_MMap(self, useCmdMMap = True):
         # 创建内存映射（读）
@@ -63,6 +69,21 @@ class myWeixin_ItChat(myThread.myThread):
         except:
             myDebug.Print("创建内存映射失败.")
             return False
+    #创建消息队列 
+    def Init_MQ(self, useCmdMMap = True):
+        #初始消息接收队列
+        self.mqName = 'zxcMQ_Wx'
+        self.mqRecv = myMQ_Rabbit.myMQ_Rabbit(False)
+        self.mqRecv.Init_Queue(self.mqName, False)
+        self.mqRecv.Init_callback_RecvMsg(self.callback_RecvMsg)    #消息接收回调
+            
+        #接收消息--x线程方式
+        self.thrd_MQ = threading.Thread(target = self.mqRecv.Start)
+        self.thrd_MQ.setDaemon(False)
+        self.thrd_MQ.start()
+        #self.mqRecv.Start()
+        myDebug.Print("消息队列创建成功...")
+
     #运行
     def run(self): 
         self.Run_ByThread();
@@ -160,11 +181,15 @@ class myWeixin_ItChat(myThread.myThread):
             myDebug.Print("No this type.")
     #提取格式化返回信息 
     def Get_Msg_Back(self, msg):
-        myDebug.Print("结果::", msg)
+        myDebug.Debug("结果::", msg)
         if(msg == None): return None
         if(msg.get('isSelf', False) == True):   #自己时，主动发送个对方处理信息(无法自动回复给自己)
             self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
-        return msg.get("Text", None)
+        return msg.get("Text", None) 
+    #定义消息接收方法，外部可重写@register
+    def callback_RecvMsg(self, body):
+        self.Run_Monitor_Cmd_ByMQ(body)
+
             
     #二维码信息下载完回调函数
     def _DownloadQRed(self, uuid, status, qrcode): 
@@ -209,7 +234,8 @@ class myWeixin_ItChat(myThread.myThread):
                     self.Run_Monitor()  
             
                     #命令监测--共享内存方式 
-                    self.Run_Monitor_Cmd()
+                    if(self.useCmdMMap):
+                        self.Run_Monitor_Cmd_ByMMP()
                     time.sleep(nSleep)
                 except :
                     myDebug.Error("Err:: Run_Monitor... ")
@@ -275,7 +301,7 @@ class myWeixin_ItChat(myThread.myThread):
                     # 删除字典旧消息
                     msg_dict.pop(old_msg_id)
     #命令监测--共享内存方式 
-    def Run_Monitor_Cmd(self):     
+    def Run_Monitor_Cmd_ByMMP(self):     
         if(self.managerMMap == None): 
             return False
         nNum = 0
@@ -291,6 +317,15 @@ class myWeixin_ItChat(myThread.myThread):
                 #再次提取命令
                 if(nNum >= self.max): return 
                 pMMdata_M, self.ind = self.managerMMap.Read(self.ind, True)
+    #命令监测--消息队列方式 
+    def Run_Monitor_Cmd_ByMQ(self, strMsg):  
+        try:
+            myDebug.Debug("接收队列消息::", strMsg)  
+            msg = ast.literal_eval(strMsg) 
+            self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
+        except :
+            pass
+
             
 #webWeixin接口--命令封装类--未使用
 #线程
@@ -324,7 +359,7 @@ class myWeixin_CmdThread (threading.Thread):  #继承父类threading.Thread
 #主启动程序
 if __name__ == "__main__":
     #声明Weixin操作对象
-    pWeixin = myWeixin_ItChat()
+    pWeixin = myWeixin_ItChat('zxcWx', False)
     
     #登录微信网页版(二维码扫码)
     pWeixin.Logion();
