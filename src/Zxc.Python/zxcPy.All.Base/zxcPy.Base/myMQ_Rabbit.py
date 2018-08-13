@@ -6,7 +6,7 @@ Created on  张斌 2018-08-13 18:30:00
 
     MQ 消息队列操作 
 """
-import sys, time, pika
+import sys, time, pika, threading
 from atexit import register
 
 
@@ -17,6 +17,7 @@ class myMQ_Rabbit:
         self.Host = Host            #指定远程RabbitMQ的地址
         self.usrName = usrName      #远程RabbitMQ的用户名
         self.usrPwd = usrPwd        #远程RabbitMQ的用户密码
+        self.callback_RecvMsg = None#消息接收回调函数
         self.Init()                 #初始MQ
     #初始RabbitMQ认证及连接信息
     def Init(self):
@@ -24,6 +25,9 @@ class myMQ_Rabbit:
         self.usrCredentials = pika.PlainCredentials(self.usrName, self.usrPwd)       
         #创建连接
         self.usrConn = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1', credentials=self.usrCredentials))    
+    #初始消息接收回调    
+    def Init_callback_RecvMsg(self, callback_RecvMsg):
+        self.callback_RecvMsg = callback_RecvMsg
     #初始消息队列    
     def Init_Queue(self, nameQueue, isNo_ack = True):
         #在连接上创建一个频道
@@ -39,12 +43,13 @@ class myMQ_Rabbit:
         #区分生产者(发送)/消费者(接收)
         if(self.isSender == False):
             #调用回调函数，从队列里取消息
-            self.usrChannel.basic_consume(self.callback_RecvMsg,    #调用回调函数，从队列里取消息
+            self.usrChannel.basic_consume(self.callback_Consumer,    #调用回调函数，从队列里取消息
                             queue=nameQueue,                #指定取消息的队列名
                             no_ack=isNo_ack                 #取完一条消息后，不给生产者发送确认消息，默认是False的，即  默认给rabbitmq发送一个收到消息的确认，一般默认即可
                             #,properties=pika.BasicProperties(delivery_mode=2,)#设置消息持久化，将要发送的消息的属性标记为2，表示该消息要持久化
                             )
-        else: pass
+        else: 
+            self.nameQueue = nameQueue
     #发送消息    
     def Send_Msg(self, nameQueue, msg):
         #区分生产者(发送)/消费者(接收)
@@ -56,23 +61,27 @@ class myMQ_Rabbit:
 
     #消息队列开始    
     def Start(self):
-        self.usrChannel.start_consuming()#开始循环取消息    #消息队列开始    
+        self.usrChannel.start_consuming()           #开始循环取消息    #消息队列开始    
     #消息队列关闭
     def Close(self,):
         self.usrConn.close()    #关闭连接
 
     #定义一个回调函数，用来接收生产者发送的消息
-    def callback_RecvMsg(self, ch, method, properties, body): 
+    def callback_Consumer(self, ch, method, properties, body): 
         #print("[消费者] recv %s" % body
         ch.basic_ack(delivery_tag=method.delivery_tag)  #接收到消息后会给rabbitmq发送一个确认
-        Recv_Msg(body)      #接收消息处理
+        #Recv_Msg(body)      #接收消息处理
+
+        #回调，通知处理消息
+        if(self.callback_RecvMsg != None):
+            self.callback_RecvMsg(body)
 
     #定义消息接收方法，外部可重写@register
     def Recv_Msg(self, body):
-        print("[消费者] recv %s" % body)
-    register(Recv_Msg, 'body')
+        print("[消费者] Recv_Msg %s" % body)
+        pass
+    #register(Recv_Msg, 'body')     #装饰器方法未研究透，有问题，暂时放弃
 
-         
 
 if __name__ == '__main__':
     #实例生产者、消费者
@@ -84,25 +93,27 @@ if __name__ == '__main__':
     
     pMQ_Recv = myMQ_Rabbit(False)
     pMQ_Recv.Init_Queue(nameMQ, False)
+    pMQ_Recv.Init_callback_RecvMsg(pMQ_Recv.Recv_Msg)
+    
+    #接收消息线程
+    thrdMQ = threading.Thread(target = pMQ_Recv.Start)
+    thrdMQ.setDaemon(False)
+    #thrdMQ.start() 
 
     #循环测试
-    nTimes = 10
+    nTimes = 100
     for x in range(1, nTimes):
         #发送消息
         msg = "hello world " + str(x)
         print("[生产者] send '", msg)
         pMQ_Send.Send_Msg(nameMQ, msg)
+        time.sleep(0.00001)
         pMQ_Send2.Send_Msg(nameMQ, msg + "--Sender2")
         time.sleep(0.1)
-        
+
     #注册普通文本消息回复                 
-    @register
-    def Recv_Msg(body):
-        print("[消费者] recv override %s" % body)
-
-    #接收消息
-    print('[消费者] waiting for msg .')
-    pMQ_Recv.Start()
-
+    #@register  #装饰器方法未研究透，有问题，暂时放弃
+    #def Recv_Msg(body):
+    #    print("[消费者] recv override %s" % body)
 
     print()
