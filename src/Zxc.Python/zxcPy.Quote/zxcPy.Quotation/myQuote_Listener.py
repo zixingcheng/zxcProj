@@ -40,7 +40,7 @@ class Quote_Listener:
                 self.pMMsg.OnHandleMsg(msg)
         return True
     #创建新消息
-    def OnCreatMsgInfo(self, to_user, text, time = '', type = "TEXT", plat = 'weixin'):
+    def OnCreatMsgInfo(self, to_user, text, time = '', type = "TEXT", plat = myManager_Msg.myMsgPlat.wx):
         if(self.pMMsg != None):
             msg = self.pMMsg.OnCreatMsg()
         else: msg ={}
@@ -50,10 +50,10 @@ class Quote_Listener:
         if(len(strTag) < 32):
             strTag = (32 - len(strTag)) * " " + strTag
 
-        #更新
-        msg["user"] = to_user
-        msg["text"] = text + "\n" + strTag
-        msg["type"] = type
+        #更新 
+        msg["usrName"] = to_user
+        msg["msg"] = text + "\n" + strTag
+        msg["msgType"] = type
         msg["plat"] = plat
         return msg
     #创建消息内容

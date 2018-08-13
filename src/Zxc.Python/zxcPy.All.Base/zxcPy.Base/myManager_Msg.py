@@ -12,6 +12,7 @@ import myEnum, myWeb_urlLib #, myVoice
 
 #定义消息类型枚举
 myMsgType = myEnum.enum('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
+myMsgPlat = myEnum.enum('wx')
 
 #自定义消息对象
 class myMsg():
@@ -51,7 +52,7 @@ class myMsgs():
 
 #消息处理器--通用消息处理器
 class myManager_Msg():
-    def __init__(self, msgUrls ={"weixin": "http://127.0.0.1:8668"}):
+    def __init__(self, msgUrls ={myMsgPlat.wx: "http://127.0.0.1:8666"}):
         self.usePrint = True
         self.useVoice = False
         self.useLineMsg = True
@@ -109,13 +110,13 @@ class myManager_Msg():
         #    myVoice.Say_thrd(msg["text"])
 
         #在线消息输出
-        typePlatform = msg.get("plat", "weixin")
+        typePlatform = msg.get("plat", myMsgPlat.wx)
         if(typePlatform != ""):
             pWeb = self.usrWebs.get(typePlatform, None)     #提取对应平台的web对象
             if(pWeb != None):   
                 #微信输出
-                if(typePlatform == "weixin"):    
-                    wxPath = "weixin/" + msg["usrID"] + "/" + strMsg + "/" + msg["msgType"]
+                if(typePlatform == myMsgPlat.wx):    
+                    wxPath = "zxcAPI/weixin/" + msg["usrName"] + "/" + strMsg + "/" + msg["msgType"]
                     pWeb.Do_API_get(wxPath, "微信API-py")
                 else:
                     pass
