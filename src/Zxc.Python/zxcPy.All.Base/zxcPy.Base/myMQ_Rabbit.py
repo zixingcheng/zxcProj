@@ -74,7 +74,7 @@ class myMQ_Rabbit:
 
         #回调，通知处理消息
         if(self.callback_RecvMsg != None):
-            self.callback_RecvMsg(body)
+            self.callback_RecvMsg(body.decode('utf-8'))
 
     #定义消息接收方法，外部可重写@register
     def Recv_Msg(self, body):
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     #接收消息线程
     thrdMQ = threading.Thread(target = pMQ_Recv.Start)
     thrdMQ.setDaemon(False)
-    #thrdMQ.start() 
+    thrdMQ.start() 
 
     #循环测试
     nTimes = 100
@@ -107,8 +107,10 @@ if __name__ == '__main__':
         msg = "hello world " + str(x)
         print("[生产者] send '", msg)
         pMQ_Send.Send_Msg(nameMQ, msg)
-        time.sleep(0.00001)
-        pMQ_Send2.Send_Msg(nameMQ, msg + "--Sender2")
+        time.sleep(0.00001) 
+        
+        msgDict = {'FromUserName': '茶叶一主号', 'Text': 'h2i 你好', 'Type': 'TEXT'}
+        pMQ_Send2.Send_Msg(nameMQ, msg + "--Sender2" + str(msgDict))
         time.sleep(0.1)
 
     #注册普通文本消息回复                 
