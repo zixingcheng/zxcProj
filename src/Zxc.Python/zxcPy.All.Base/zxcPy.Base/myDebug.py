@@ -36,14 +36,14 @@ def Debug_byTag(tag, msg = "", bRecord = False, bTitle = True):
 #打印调试信息并记录时间
 def Error(*args):
     if(gol._Get_Setting('CanPrint_Error')):
-        Print(*args, type="E")
+        Print(*args, type="#")
 def Warnning(*args):
     if(gol._Get_Setting('CanPrint_Warnning')):
-        Print(*args, type="W")
+        Print(*args, type="!")
 def Debug(*args):
     if(gol._Get_Setting('CanPrint_Debug')):
-        Print(*args, type="D")
-def Print(*args, type = "T"):
+        Print(*args, type="  >>")
+def Print(*args, type = "*"):
     if(gol._Get_Setting('CanPrint')):
         strText = ""
         for x in args:
@@ -51,13 +51,15 @@ def Print(*args, type = "T"):
     
         strDepth = _Depth_str()
         if(strDepth == ""):
-            print(type + "->>", strText) 
+            #print(type + "->>", strText) 
+            print("", type, strText) 
         else:
-            print(type + "->>", strDepth, strText) 
+            #print(type + "->>", strDepth, strText) 
+            print("", type, strDepth, strText) 
 
 
 #提取depth字符串
-def _Depth_str(strSeg = "->>", nSeg = 1):
+def _Depth_str(strSeg = "  ", nSeg = 1):
     nDeepth = gol._Get_Setting('Debug_Depth') 
     strDepth = ""
     while(nDeepth > 0):
@@ -68,6 +70,11 @@ def _Depth_str(strSeg = "->>", nSeg = 1):
 
 def main(): 
     Print("a", "b", 1)
+    Print("常规输出")
+    Debug("调试信息输出")
+    Warnning("警告信息输出")
+    Error("错误信息输出")
+
     Debug_byTag("Test", "测试", True, False)
     time.sleep(1)
     Debug("Test0", "测试结束")
