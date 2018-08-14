@@ -18,9 +18,9 @@ class myMQ_Rabbit_Recv:
 
 if __name__ == '__main__':
     #实例生产者、消费者
-    nameMQ = 'Test'
+    nameMQ = 'zxcTest'
     pMQ_Recv = myMQ_Rabbit(False)
-    pMQ_Recv.Init_Queue(nameMQ, False)
+    pMQ_Recv.Init_Queue(nameMQ, True, False)
 
     p = myMQ_Rabbit_Recv()
     pMQ_Recv.Init_callback_RecvMsg(p.Recv_Msg)
