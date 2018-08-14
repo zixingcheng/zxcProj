@@ -11,7 +11,7 @@ import mySystem
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)    
-import myWeb, myMMap, myMQ_Rabbit, myDebug
+import myWeb, myMMap, myDebug
 from myGlobal import gol   
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
@@ -46,10 +46,10 @@ class myAPI_Weixin_Cmd_ByMQ(myWeb.myAPI):
             return False 
 
         #生成命令并推送消息队列
-        msg = {'FromUserName': user, 'Text': text, 'Type': type}     
+        msg = {'FromUserName': user, 'Text': text, 'Type': type}    
+        pMQ_Sender.Send_Msg(pMQ_Sender.nameQueue, str(msg))
+        myDebug.Debug(pMQ_Sender.nameQueue, msg) 
         try:
-            pMQ_Sender.Send_Msg(pMQ_Sender.nameQueue, str(msg))
-            myDebug.Debug(pMQ_Sender.nameQueue, msg)
             return True
         except :
             return False

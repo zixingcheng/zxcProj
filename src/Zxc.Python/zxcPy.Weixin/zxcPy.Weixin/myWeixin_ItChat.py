@@ -74,7 +74,7 @@ class myWeixin_ItChat(myThread.myThread):
         #初始消息接收队列
         self.mqName = 'zxcMQ_Wx'
         self.mqRecv = myMQ_Rabbit.myMQ_Rabbit(False)
-        self.mqRecv.Init_Queue(self.mqName, False)
+        self.mqRecv.Init_Queue(self.mqName, True, False)
         self.mqRecv.Init_callback_RecvMsg(self.callback_RecvMsg)    #消息接收回调
             
         #接收消息--x线程方式
@@ -181,12 +181,12 @@ class myWeixin_ItChat(myThread.myThread):
             myDebug.Print("No this type.")
     #提取格式化返回信息 
     def Get_Msg_Back(self, msg):
-        myDebug.Debug("结果::", msg)
+        myDebug.Debug("消息回复::", msg)
         if(msg == None): return None
         if(msg.get('isSelf', False) == True):   #自己时，主动发送个对方处理信息(无法自动回复给自己)
             self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
         return msg.get("Text", None) 
-    #定义消息接收方法，外部可重写@register
+    #定义消息接收方法回调
     def callback_RecvMsg(self, body):
         self.Run_Monitor_Cmd_ByMQ(body)
 

@@ -36,7 +36,7 @@ if __name__ == '__main__':
             # 创建消息队列
             nameMQ = 'zxcMQ_Wx'
             pMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True)
-            pMQ_Sender.Init_Queue(nameMQ)
+            pMQ_Sender.Init_Queue(nameMQ, True, True)
             gol._Set_Value('zxcMQ_Wx_Sender', pMQ_Sender, True)
             errStr = "创建消息队列失败."
 

@@ -6,30 +6,33 @@ Created on  张斌 2017-11-17 12:16:00
 
     Python的Robot消息处理接口(文本消息)
 """
-import os, threading  
+import os, ast, time, threading  
 import mySystem 
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("../Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myImport, myManager_Msg, myData, myDebug
+import myWeb, myImport, myData, myDebug, myManager_Msg, myMQ_Rabbit
 import myRoot, myRoot_Usr
 from myGlobal import gol 
 
 
 #机器人消息处理工厂类（所有消息从此处走）
 class myRobot_Reply():
-    def __init__(self): 
+    def __init__(self, useMQ = True): 
         self.usrTag = ""
         self.usrName = ""
         self.usrNameNick = ""
         self.usrReplys = myRoot_Usr.myRoot_Usrs("", "")   #消息用户集
+        self.usrMQ_Recv = None   #消息队列队形       
+        self.isUseMQ = useMQ     #是否允许使用消息队列
+        self._Init()             #按全局权限初始
+        self._Init_MQ()          #初始消息队列
         #self.wxDos = {}         #消息处理类
         #self.wxUser_Root = None #当前授权用户对象(避免频繁查找)
-        self._Init()    #按全局权限初始
         myDebug.Print("消息处理工厂--已初始 (%s::%s--%s)" % (self.usrName, self.usrNameNick, self.usrTag))
-    def _Init(self,): 
+    def _Init(self): 
         #初始用户全局功能权限对象 
         self.root = gol._Get_Value('rootRobot')     #权限信息
         if(self.root != None):
@@ -37,6 +40,21 @@ class myRobot_Reply():
             self.usrNameNick =self.root.usrNameNick
             self.usrTag =self.root.usrID
             self.usrReplys = myRoot_Usr.myRoot_Usrs(self.usrName, self.usrTag)   #消息用户集
+    def _Init_MQ(self): 
+        if(self.isUseMQ == False): return
+
+        #初始消息接收队列
+        self.usrMQ_Name = 'zxcMQ_Robot'
+        self.usrMQ_Recv = myMQ_Rabbit.myMQ_Rabbit(False)
+        self.usrMQ_Recv.Init_Queue(self.usrMQ_Name, True, False)
+        self.usrMQ_Recv.Init_callback_RecvMsg(self.callback_RecvMsg)    #消息接收回调
+            
+        #接收消息--x线程方式
+        self.thrd_MQ = threading.Thread(target = self.usrMQ_Recv.Start)
+        self.thrd_MQ.setDaemon(False)
+        self.thrd_MQ.start()
+        #self.usrMQ_Recv.Start()
+        myDebug.Print("消息队列创建成功...")
         
     #处理封装返回消息(按标识内容处理)
     def Done_ByMsg(self, msg):
@@ -78,6 +96,11 @@ class myRobot_Reply():
         if(pUser != None):
             return pUser.Done(pPrj, strText, msgID, isGroup, idGroup)
         return None
+    #定义消息接收方法回调
+    def callback_RecvMsg(self, body):
+        msg = ast.literal_eval(body) 
+        #myDebug.Debug("接收队列消息::", msg['msg'])  
+        myDebug.Debug("处理消息::", self.Done_ByMsg(msg)['Text'])
 
     #查找用户（不存在则自动创建）
     def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlant = ""): 
@@ -152,6 +175,7 @@ if __name__ == "__main__":
     #机器人消息处理
     pWxReply = myRobot_Reply()
     pWxReply._Init()
+    pWxReply._Init_MQ
     
     #用户信息
     usrID = "zxc_0"
@@ -188,6 +212,41 @@ if __name__ == "__main__":
     pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant) 
     pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
     print(pWxReply.Done(usrID, usrName, nickName, 'Hello ChatRobot...', msgID, usrPlant))
+    
+   #队列消息测试
+    if(True):
+        nameMQ = 'zxcMQ_Robot'
+        pMQ_Send = myMQ_Rabbit.myMQ_Rabbit(True)
+        pMQ_Send.Init_Queue(nameMQ, True)
+         
+        pMQ_Recv = myMQ_Rabbit.myMQ_Rabbit(False)
+        pMQ_Recv.Init_Queue(nameMQ, True, False)
+        pMQ_Recv.Init_callback_RecvMsg(pWxReply.callback_RecvMsg)
+        #pMQ_Recv.Init_callback_RecvMsg(pMQ_Recv.Recv_Msg)
+    
+        #接收消息线程
+        thrdMQ = threading.Thread(target = pMQ_Recv.Start)
+        thrdMQ.setDaemon(False)
+        #thrdMQ.start()  
+
+        #循环测试
+        nTimes = 5
+        pMMsg = myManager_Msg.myManager_Msg()
+        msg = pMMsg.OnCreatMsg()
+        msg["usrID"] = usrID
+        msg["usrName"] = usrName
+        msg["usrNameNick"] = nickName
+        msg["plat"] = usrPlant
+    
+        for x in range(0, nTimes):
+            #发送消息
+            msg["msg"] = "hello world " + str(x)
+            pMQ_Send.Send_Msg(nameMQ, str(msg))
+            print("[生产者] send '", msg)
+
+            #myDebug.Debug(pWxReply.Done_ByMsg(msg))
+            time.sleep(0.01) 
+
     pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
     print()
 
@@ -196,29 +255,7 @@ if __name__ == "__main__":
     #消息提取测试
     #pMsg = pR.msgLogs._Find_Log("zxcID").Find("@zxcvbnm")
 
-
     exit()
-    
-    #提取消息测试
-    #pMsg = pR.msgLogs._Find_Log("zxcID").Find("@zxcvbnm")
-    #print("msgID: " , pMsg.msgID, "msg: ", pMsg.msg)
-
-    exit()
-
-    print(pWxReply.Done(usrID, usrName, nickName, usrPlant, '@@zxcRobot_Root'))
-    print(pWxReply.Done('zxc_0',"墨紫_0",'Repeater'))
-
-    #功能开关
-    print(pWxReply.Done('zxc_0',"墨紫_0",'@@Repeater'))
-    print(pWxReply.Done('zxc_0',"",'@@Repeater'))
-
-
-    print(pWxReply.Done('zxc', "墨紫",'@@Repeater'))
-    print(pWxReply.Done('zxc', "",'Hello'))
-    print(pWxReply.Done('zxc', "",'@@Repeater'))
-
-    time.sleep(2)
-    print(pWxReply.Done('zxc', "",'@@Repeater'))
 
  
  
