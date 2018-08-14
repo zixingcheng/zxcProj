@@ -158,7 +158,7 @@ class myWeixin_ItChat(myThread.myThread):
         #增加记录日志 
 
         #调用 
-        return self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
+        return self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
     #发送消息接口
     def Send_Msg(self, userFrom = "", msgInfo = "" , typeMsg = "TEXT"):
         #用户检测(@开头为用户名，filehelper，其他需要检索实际用户名)
@@ -184,7 +184,7 @@ class myWeixin_ItChat(myThread.myThread):
         myDebug.Debug("消息回复::", msg)
         if(msg == None): return None
         if(msg.get('isSelf', False) == True):   #自己时，主动发送个对方处理信息(无法自动回复给自己)
-            self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
+            self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
         return msg.get("Text", None) 
     #定义消息接收方法回调
     def callback_RecvMsg(self, body):
@@ -322,7 +322,7 @@ class myWeixin_ItChat(myThread.myThread):
         try:
             myDebug.Debug("接收队列消息::", strMsg)  
             msg = ast.literal_eval(strMsg) 
-            self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
+            self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
         except :
             pass
 

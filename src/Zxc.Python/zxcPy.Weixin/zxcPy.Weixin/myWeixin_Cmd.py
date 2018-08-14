@@ -11,7 +11,7 @@ import mySystem
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)    
-import myWeb, myMMap, myDebug
+import myWeb, myMMap, myDebug, myMQ_Rabbit
 from myGlobal import gol   
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
@@ -46,7 +46,7 @@ class myAPI_Weixin_Cmd_ByMQ(myWeb.myAPI):
             return False 
 
         #生成命令并推送消息队列
-        msg = {'FromUserName': user, 'Text': text, 'Type': type}    
+        msg = {'usrName': user, 'msg': text, 'msgType': type}    
         pMQ_Sender.Send_Msg(pMQ_Sender.nameQueue, str(msg))
         myDebug.Debug(pMQ_Sender.nameQueue, msg) 
         try:
@@ -57,6 +57,18 @@ class myAPI_Weixin_Cmd_ByMQ(myWeb.myAPI):
 
 #主程序启动 
 if __name__ == '__main__': 
+    # 创建消息队列
+    gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
+    nameMQ = 'zxcMQ_Wx'
+    pMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True)
+    pMQ_Sender.Init_Queue(nameMQ, True, True)
+    gol._Set_Value('zxcMQ_Wx_Sender', pMQ_Sender, True)
+    errStr = "创建消息队列失败."
+
+    pMQ = myAPI_Weixin_Cmd_ByMQ()
+    pMQ.get('茶叶一主号','text--登陆')
+
+
     # 创建内存映射
     try:
         pMMap_Manager = myMMap.myMMap_Manager("D:\myGit\zxcProj\src\Zxc.Python\zxcPy.Weixin\Data/zxcMMap.dat")
