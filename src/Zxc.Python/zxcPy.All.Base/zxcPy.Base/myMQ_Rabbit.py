@@ -24,7 +24,7 @@ class myMQ_Rabbit:
         #认证信息
         self.usrCredentials = pika.PlainCredentials(self.usrName, self.usrPwd)       
         #创建连接
-        self.usrConn = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1', credentials=self.usrCredentials))    
+        self.usrConn = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1', credentials=self.usrCredentials, heartbeat_interval=0))    
     #初始消息接收回调    
     def Init_callback_RecvMsg(self, callback_RecvMsg):
         self.callback_RecvMsg = callback_RecvMsg
@@ -34,7 +34,7 @@ class myMQ_Rabbit:
         self.usrChannel = self.usrConn.channel() 
 
         #声明一个队列，生产者和消费者都要声明一个相同的队列，用来防止万一某一方挂了，另一方能正常运行
-        self.usrChannel.queue_declare(queue = nameQueue)
+        self.usrChannel.queue_declare(queue=nameQueue)
 
         #接收到消息后会给rabbitmq发送一个确认
         if(isNo_ack == False):
@@ -50,10 +50,28 @@ class myMQ_Rabbit:
                             )
         else: 
             self.nameQueue = nameQueue
+
+    #检查连接         
+    def _Check_Connection(self):
+        #TCP是否关闭或正在关闭，则重连
+        isReConnect = False
+        if(self.usrConn.is_closed or self.usrConn.is_closing):
+            self.Init()
+            isReConnect = True
+
+        #重建频道
+        if(isReConnect or self.usrChannel.is_closed):
+            #在连接上创建一个频道
+            self.usrChannel = self.usrConn.channel() 
+
+            #声明一个队列，生产者和消费者都要声明一个相同的队列，用来防止万一某一方挂了，另一方能正常运行
+            self.usrChannel.queue_declare(queue=self.nameQueue)
+
     #发送消息    
     def Send_Msg(self, nameQueue, msg):
         #区分生产者(发送)/消费者(接收)
         if(self.isSender):
+            self._Check_Connection()    
             self.usrChannel.basic_publish(exchange='',      #交换机
                             routing_key=nameQueue,          #路由键，写明将消息发往哪个队列，本例是将消息发往队列hello
                             body=msg)                       #生产者要发送的消息

@@ -78,6 +78,7 @@ def add_APIs(pWeb):
 #主程序启动
 if __name__ == '__main__': 
     gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
+    #gol._Set_Setting("CanPrint_Debug", False)
     init_Reply()
     print()
 
@@ -88,7 +89,7 @@ if __name__ == '__main__':
     #注册平台, 取token
     pReg = myAPI_Robot_RegistPlant()
     token = pReg.get("myTest", "@zxcv", "wx")
-    print(token)
+    print("token::", token)
 
     #消息处理借接口
     # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
@@ -99,7 +100,8 @@ if __name__ == '__main__':
     msg["usrNameNick"] = "墨紫"
     msg["msg"] = "Repeater"
     msg["plat"] = "wx"
-    print(msg)
+    myDebug.Debug(msg)
+    print()
     
     #http://127.0.0.1:8668/zxcAPI/robot/reply/{'msgType': 'TEXT', 'groupID': '', 'usrName': '信阳毛尖--杨帆桥', 'msg': '你好', 'usrNameNick': '信阳毛尖--杨帆桥', 'usrID': '@04a97e8ab667ac550d0c3da8e2c3a67f2fa4c2fc8a3b1abe61d7bd1fb0e9a790', 'msgID': '', 'plat': 'wx'}
     pReply = myAPI_Robot_Reply()
