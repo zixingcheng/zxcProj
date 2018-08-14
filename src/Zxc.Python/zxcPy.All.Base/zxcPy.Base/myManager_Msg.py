@@ -7,7 +7,7 @@ Created on  张斌 2018-07-23 11:00:00
     消息处理器--通用消息处理器
 """
 import sys, os, copy, datetime
-import myEnum, myWeb_urlLib #, myVoice 
+import myEnum, myDebug, myWeb_urlLib, myMQ_Rabbit #, myVoice 
 
 
 #定义消息类型枚举
@@ -52,21 +52,33 @@ class myMsgs():
 
 #消息处理器--通用消息处理器
 class myManager_Msg():
-    def __init__(self, msgUrls ={myMsgPlat.wx: "http://127.0.0.1:8666"}):
+    def __init__(self, msgUrls ={myMsgPlat.wx: "http://127.0.0.1:8666/zxcAPI/weixin"}):
         self.usePrint = True
         self.useVoice = False
         self.useLineMsg = True
+        self.useMqMsg = True
         self.msgExramp = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "groupID":'', "plat":''} #消息样例
         self.msgLogs = {}
         self.msgInd_Name = {}
         self.msgInd_Nick = {}
-
-        self.usrWebs = {}           #在线消息集       
+        
+        self.usrWebs = {}           #在线消息集    
         if(self.useLineMsg):
             keys = msgUrls.keys()
             for x in keys:          #按消息分类标识初始对应web对象并存入dict
                 pWeb = myWeb_urlLib.myWeb(msgUrls[x])
                 self.usrWebs[x] = pWeb
+                
+        self.usrMQs = {}            #消息队列     
+        if(self.useMqMsg):
+            keys = msgUrls.keys()
+            for x in keys:          #按消息分类标识初始对应web对象并存入dict
+                #初始消息发送队列
+                usrMQ_Name = str(myMsgPlat.wx)
+                usrMQ_Name = 'zxcMQ_' + usrMQ_Name[0:1].upper() + usrMQ_Name[1:]
+                usrMQ = myMQ_Rabbit.myMQ_Rabbit(True)
+                usrMQ.Init_Queue(usrMQ_Name, True, True)
+                self.usrMQs[x] = usrMQ
         
     #添加消息
     def Log(self, usrID, usrName, usrNameNick, msg, msgID, msgType = myMsgType.TEXT):
@@ -103,7 +115,7 @@ class myManager_Msg():
         strMsg = msg.get('msg')
 
         #文字输出
-        if(self.usePrint): print(strMsg)
+        if(self.usePrint): myDebug.Print("消息管理器::", strMsg)
 
         #声音输出
         #if(self.useVoice):
@@ -114,12 +126,14 @@ class myManager_Msg():
         if(typePlatform != ""):
             pWeb = self.usrWebs.get(typePlatform, None)     #提取对应平台的web对象
             if(pWeb != None):   
-                #微信输出
-                if(typePlatform == myMsgPlat.wx):    
-                    wxPath = "zxcAPI/weixin/" + msg["usrName"] + "/" + strMsg + "/" + msg["msgType"]
-                    pWeb.Do_API_get(wxPath, "微信API-py")
-                else:
-                    pass
+                #格式化接口输出
+                wxPath = msg["usrName"] + "/" + strMsg + "/" + msg["msgType"]
+                pWeb.Do_API_get(wxPath, typePlatform + "API-py")
+
+            usrMQ = self.usrMQs.get(typePlatform, None)
+            if(usrMQ != None):
+                usrMQ.Send_Msg(usrMQ.nameQueue, msg)
+
     #创建新消息
     def OnCreatMsg(self):
         return copy.deepcopy(self.msgExramp)
