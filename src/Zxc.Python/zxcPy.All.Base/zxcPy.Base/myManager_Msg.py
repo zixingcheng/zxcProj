@@ -52,11 +52,11 @@ class myMsgs():
 
 #消息处理器--通用消息处理器
 class myManager_Msg():
-    def __init__(self, msgUrls ={myMsgPlat.wx: "http://127.0.0.1:8666/zxcAPI/weixin"}):
+    def __init__(self, useMqMsg = True, msgUrls ={myMsgPlat.wx: "http://127.0.0.1:8666/zxcAPI/weixin"}):
         self.usePrint = True
         self.useVoice = False
-        self.useLineMsg = True
-        self.useMqMsg = True
+        self.useLineMsg = (not useMqMsg)
+        self.useMqMsg = useMqMsg
         self.msgExramp = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "groupID":'', "plat":''} #消息样例
         self.msgLogs = {}
         self.msgInd_Name = {}
@@ -132,7 +132,7 @@ class myManager_Msg():
 
             usrMQ = self.usrMQs.get(typePlatform, None)
             if(usrMQ != None):
-                usrMQ.Send_Msg(usrMQ.nameQueue, msg)
+                usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
 
     #创建新消息
     def OnCreatMsg(self):
@@ -154,7 +154,7 @@ if __name__ == '__main__':
    msg["msg"] = "测试消息py"
    msg["msgID"] = "msgID-***"
    msg["msgType"] = "TEXT"
-   msg["plat"] = "weixin"
+   msg["plat"] = "wx"
    pMMsg.OnHandleMsg(msg)
 
 
