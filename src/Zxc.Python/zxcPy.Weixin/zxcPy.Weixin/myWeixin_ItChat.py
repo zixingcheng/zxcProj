@@ -320,7 +320,7 @@ class myWeixin_ItChat(myThread.myThread):
     #命令监测--消息队列方式 
     def Run_Monitor_Cmd_ByMQ(self, strMsg):  
         try:
-            myDebug.Debug("接收队列消息::", strMsg)  
+            myDebug.Debug("接收队列消息wx::", strMsg)  
             msg = ast.literal_eval(strMsg) 
             self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
         except :

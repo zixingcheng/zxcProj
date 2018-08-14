@@ -29,7 +29,7 @@ class myRoot_Usr():
         self.usrTime_Regist = datetime.datetime.now()          #注册时间
         self.usrTime_Logined_Last = datetime.datetime.now()    #最后登录时间（请求）
         self.usrLoaded = False  
-        self.usrPrj = myRoot_UsrPrj(usrName, "", "")           #当前功能管理对象 
+        self.usrPrj = myRoot_UsrPrj(usrName, usrName_Nick, usrID)   #当前功能管理对象 
         self._Init(usrName_Nick, usrID, fromID)
     # 初始用户信息
     def _Init(self, usrName_Nick = "", usrID = "", fromID = ""): 
@@ -45,8 +45,9 @@ class myRoot_Usr():
     def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None, pPlat = ""):    
         #提取功能设置信息
         if(pPrj == None): 
+            self.usrPrj._Updata_DoInfo()        #更新当前项目    
             pPrj = self.usrPrj.prjInfo
-            if(pPrj == None): return None                           #当前无功能启用
+            if(pPrj == None): return None       #当前无功能启用
         if(self.usrPrj.prjInfo != None):
             if(pPrj.prjName != self.usrPrj.prjInfo.prjName):        #命令切换
                 prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
@@ -59,10 +60,6 @@ class myRoot_Usr():
 
         #调用消息处理，及其他处理 
         pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup, pPlat)
-        for x in self.usrPrj.prjDos:
-            prjDo = self.usrPrj.prjDos[x]
-            if(prjDo.isBackUse):
-                prjDo.Done(Text, msgID, isGroup, pGroup, self.usrID, self.usrName)
         return pReturn
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
@@ -70,6 +67,7 @@ class myRoot_UsrPrj():
         self.usrName = usrName
         self.nickName = nickName
         self.usrID = usrID
+        self.prjInfos = {}          #消息功能信息集合
         self.prjDos = {}            #消息处理类集合
         self.prjDo = None		    #消息处理类当前 
         self.prjInfo = None		    #功能信息
@@ -104,9 +102,10 @@ class myRoot_UsrPrj():
         lstDos = rootPrjs.prjRoots.keys()
         for x in lstDos:
             prj = rootPrjs.prjRoots[x]
+            self.prjInfos[prj.prjName] = prj    #记录功能信息
             if(prj.isRoot == False and prj.IsRunSingle()):    #非root功能，且非单例
                 self._Add_prjDo(prj.prjClass) 
-            elif(prj.isRunBack == True):    #后台运行
+            elif(prj.isRunBack == True):        #后台运行
                 self._Add_prjDo(prj.prjClass) 
     #增加功能
     def _Change_prjDo(self, prjDo, pPrj): 
@@ -133,6 +132,25 @@ class myRoot_UsrPrj():
             if(self.prjDo.isSingleUse == False):    #非单例运行功能移除   
                 self.prjDos.pop(prjDo.prjName)
         return True
+    #同步功能信息
+    def _Updata_prjInfo(self, prjDo): 
+        if(prjDo == None): return False 
+        if(self.prjInfo == None): return False 
+        if(self.prjInfo.prjName != prjDo.prjName): return False 
+        
+        #同步信息
+        self.prjInfo.isRunning = prjDo.isRunning       #更新当前功能状态 
+        return True
+    #更新当前功能
+    def _Updata_DoInfo(self): 
+        if(self.prjInfo == None):
+            for x in self.prjDos:
+                prjDo = self.prjDos[x]
+                if(prjDo.isBackUse): continue
+                if(prjDo._Check()):
+                    self.prjInfo = self.prjInfos.get(x, None)
+                    self.prjDo = self.prjDos.get(x, None)
+        return True 
  
     #新消息处理
     def Done(self, pPrj, prjDo, Text, msgID = "", isGroup = False, pGroup = None, pPlat = ""):         
@@ -142,6 +160,13 @@ class myRoot_UsrPrj():
             
         #调用处理命令对象
         pReturn = self.prjDo.Done(Text, msgID, isGroup, pGroup, self.usrID, self.usrName)
+        self._Updata_prjInfo(prjDo)     #功能信息同步
+
+        #处理后台功能 
+        for x in self.prjDos:
+            prjClass = self.prjDos[x]
+            if(prjClass.isBackUse):
+                prjClass.Done(Text, msgID, isGroup, pGroup, self.usrID, self.usrName)
 
         #补全返回信息
         if(pReturn != None):
