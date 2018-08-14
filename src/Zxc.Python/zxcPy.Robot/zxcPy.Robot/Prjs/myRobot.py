@@ -41,10 +41,8 @@ class myRobot():
         self.isNoReply = True           #是否无回复操作--功能自带    
         
         # 初始返回消息
-        self.msg = {}              
-        self.msg['usrID'] = ""    
-        self.msg['msgType'] = "TEXT" 
-        self.msg['Text'] = ""         
+        # self.msg = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "groupID":'', "plat":''} #同消息样例
+        self.msg = {"usrID":'', "usrName":'', "msg":'', "msgType":'TEXT', "plat":''} #同消息样例
         self.maxTime = 60 * 6       #有效时常 
     def Init(self): 
         self.isRunning = False          #是否启用中
@@ -67,8 +65,7 @@ class myRobot():
                 return None
         
         #创建返回消息
-        self.msg['usrID'] = usrID
-        return self._Return(strReturn)
+        return self._Return(usrID, usrName, strReturn, idGroup)
         
     #合法性(时效)
     def _Check(self):
@@ -88,8 +85,12 @@ class myRobot():
         self.strText_L = Text 
         return Text
     #创建返回消息
-    def _Return(self, Text):
-        self.msg['Text'] = Text  
+    def _Return(self, usrID, usrName, Text, idGroup):
+        self.msg['usrID'] = usrID
+        self.msg['usrName'] = usrName
+        self.msg['msg'] = Text  
+        if(idGroup != ""):
+            self.msg['groupID'] = idGroup  
         return self.msg
     #关闭功能
     def _Close(self):
@@ -120,14 +121,14 @@ if __name__ == "__main__":
 
     time.sleep (0)
     print(pR.Done("Hello"))
-    pR.Done("@@myRobot")["Text"]
-    print(pR.Done("Test....")["Text"])
+    pR.Done("@@myRobot")["msg"]
+    print(pR.Done("Test....")["msg"])
     print(pR.Done("Test2...."))
-    pR.Done("@@myRobot")["Text"]
+    pR.Done("@@myRobot")["msg"]
     print()
 
-    pR.Done("@@myRobot")["Text"]
-    pR.Done("@@myRobot")["Text"]
+    pR.Done("@@myRobot")["msg"]
+    pR.Done("@@myRobot")["msg"]
     print()
 
     

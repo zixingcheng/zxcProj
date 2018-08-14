@@ -42,7 +42,7 @@ class myRoot_Usr():
         return True 
         
     #新消息处理
-    def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None):    
+    def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None, pPlat = ""):    
         #提取功能设置信息
         if(pPrj == None): 
             pPrj = self.usrPrj.prjInfo
@@ -58,11 +58,11 @@ class myRoot_Usr():
             prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
 
         #调用消息处理，及其他处理 
-        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup)
+        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup, pPlat)
         for x in self.usrPrj.prjDos:
             prjDo = self.usrPrj.prjDos[x]
             if(prjDo.isBackUse):
-                prjDo.Done(Text, msgID, isGroup, pGroup)
+                prjDo.Done(Text, msgID, isGroup, pGroup, self.usrID, self.usrName)
         return pReturn
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
@@ -135,14 +135,18 @@ class myRoot_UsrPrj():
         return True
  
     #新消息处理
-    def Done(self, pPrj, prjDo, Text, msgID = "", isGroup = False, pGroup = None):         
+    def Done(self, pPrj, prjDo, Text, msgID = "", isGroup = False, pGroup = None, pPlat = ""):         
         #切换功能 
         self._Change_prjDo(prjDo, pPrj)
         if(self.prjDo == None): return None    #None表示无命令，忽略 
             
         #调用处理命令对象
-        pReturn = self.prjDo.Done(Text, msgID, isGroup, pGroup)
+        pReturn = self.prjDo.Done(Text, msgID, isGroup, pGroup, self.usrID, self.usrName)
 
+        #补全返回信息
+        if(pReturn != None):
+            if(pPlat != ""): pReturn['plat'] = pPlat
+            
 		#命令有效性检查，失效则初始状态
         if(self.prjDo._Check() == False): 
             self._Close_prjDo(self.prjDo)
