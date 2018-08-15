@@ -1,26 +1,4 @@
-# 模型项目vs下的脚本工具项目文件夹
-
-具体参见文件夹的Readme.md文件，全部为中文，文件列表说明省略
-
-
-## 文件夹列表
-	Base_Setting： 基础参数设置文件夹，通过相关脚本将参数直接写入相关代码文件
-		Base：
-			Air_SpreadRatio.txt：   大气扩散参数配置文件
-			Raster_TifDE.txt：		tif文件属性标识配置文件
-			Wind_Ratio.txt：		风廓线幂指数配置文件
-
-			Chemicals：
-				Chemical_Safety_Level.txt：	化学品根据物性、泄漏量衡量后果严重程度参数设置
-	
-	参数字典归集：见文件夹下Readme.md
-	模型参数归集：见文件夹下Readme.md
-	项目文件归集_C++：见文件夹下Readme.md
-	项目文件归集_Python：见文件夹下Readme.md
-	坐标系参数归集：见文件夹下Readme.md
-
-	
-# 关联库
+# 依赖库
 
 ## Flask (0.12.2)
 	itsdangerous (0.24)
@@ -41,3 +19,13 @@
 	MarkupSafe (1.0)
 	python-dateutil (2.6.0)
 	
+	
+#通讯说明
+
+使用API（myRobot_API.py），或直接使用消息队列方式（myRobot_Reply_MQ.py）
+
+···
+API： 使用myRobot_Reply来作处理，并将处理消息发送给消息管理器
+队列： 使用myRobot_Reply_MQ，通过MQ队列（zxcMQ_robot）监听需处理消息
+消息管理器： 使用myManager_Msg，自动转发消息(需注册平台转发api或消息队列)
+···

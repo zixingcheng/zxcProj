@@ -30,7 +30,8 @@ class myRobot_Reply():
         self.usrNameNick = ""
         self.usrReplys = myRoot_Usr.myRoot_Usrs("", "")   #消息用户集
         self.usrMMsg = gol._Get_Setting('manageMsgs')     #消息管理器
-        self.usrMQ_Recv = None   #消息队列队形       
+        self.usrMQ_Recv = None   #消息队列队形      
+        self.isRunning = False   #是否运行中
         self._Init()             #按全局权限初始
         #self.wxDos = {}         #消息处理类
         #self.wxUser_Root = None #当前授权用户对象(避免频繁查找)
@@ -88,18 +89,19 @@ class myRobot_Reply():
         if(pUser != None):
             return pUser.Done(pPrj, strText, msgID, isGroup, idGroup, usrPlant)
         return None
-
-    #定义消息接收方法回调
-    def callback_RecvMsg(self, body):
-        msg = ast.literal_eval(body) 
-        myDebug.Debug("接收队列消息::", msg['msg'])  
-        self.Done_ByMsg(msg, True)
+     
     #消息处理
     def OnHandleMsg(self, msg):
         if(msg == None): return False
 
         #消息管理器处理消息
         self.usrMMsg.OnHandleMsg(msg)
+    #运行-开始
+    def Start(self):
+        self.isRuning = True
+    #运行-停止
+    def Stop(self):
+        self.isRuning = False
 
     #查找用户（不存在则自动创建）
     def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlant = ""): 
