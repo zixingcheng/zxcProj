@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0e89e814-5d61-43f4-9065-03483bb5ba80}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>zxcPy.Robot\Reply\myRobot_Reply.py</StartupFile>
+    <StartupFile>myRobot_API.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -20,11 +20,14 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="myRobot_API.py" />
     <Compile Include="zxcPy.APIs\myAPI_Robot.py" />
+    <Compile Include="zxcPy.Robot\myRobot_Main.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Log.py" />
+    <Compile Include="zxcPy.Robot\Prjs\myRobot_Gift.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Robot.py" />
+    <Compile Include="zxcPy.Robot\Reply\myRobot_Reply_MQ.py" />
     <Compile Include="zxcPy.Robot\Reply\myRobot_Reply.py" />
-    <Compile Include="zxcPy.Robot\myRobot_API.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Repeater.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Root.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_Plant.py" />
