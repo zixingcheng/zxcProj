@@ -13,9 +13,11 @@ from atexit import register
 
 class myMQ_Rabbit:
     #初始构造 
-    def __init__(self, isSender = False, Host = "http://127.0.0.1", usrName = 'guest', usrPwd = 'guest'):
+    def __init__(self, isSender = False, nameQueue = 'zxcTest', Host = "127.0.0.1", Port = 5672, usrName = 'guest', usrPwd = 'guest'):
         self.isSender = isSender    #是否为生产者
         self.Host = Host            #指定远程RabbitMQ的地址
+        self.Port = Port            #指定远程RabbitMQ的端口
+        self.nameQueue = nameQueue  #队列名
         self.usrName = usrName      #远程RabbitMQ的用户名
         self.usrPwd = usrPwd        #远程RabbitMQ的用户密码
         self.callback_RecvMsg = None#消息接收回调函数
@@ -26,7 +28,7 @@ class myMQ_Rabbit:
         #认证信息
         self.usrCredentials = pika.PlainCredentials(self.usrName, self.usrPwd)       
         #创建连接
-        self.usrConn = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1', credentials=self.usrCredentials, heartbeat_interval=0))    
+        self.usrConn = pika.BlockingConnection(pika.ConnectionParameters(self.Host, port=self.Port, credentials=self.usrCredentials, heartbeat_interval=0))    
     #初始消息接收回调    
     def Init_callback_RecvMsg(self, callback_RecvMsg):
         self.callback_RecvMsg = callback_RecvMsg
