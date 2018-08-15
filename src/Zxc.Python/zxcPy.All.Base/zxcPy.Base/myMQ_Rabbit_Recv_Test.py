@@ -14,7 +14,7 @@ class myMQ_Rabbit_Recv:
     #定义消息接收方法，外部可重写@register
     def Recv_Msg(self, body):
         print("[消费者] Recv_Msg %s" % body)
-        pass
+        return True
 
 if __name__ == '__main__':
     #实例生产者、消费者

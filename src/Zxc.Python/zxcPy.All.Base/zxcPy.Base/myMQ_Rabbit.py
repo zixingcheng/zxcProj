@@ -99,16 +99,15 @@ class myMQ_Rabbit:
 
         #回调，通知处理消息
         if(self.callback_RecvMsg != None):
-            self.callback_RecvMsg(body.decode('utf-8'))
-
-            #回复确认消息已处理
-            if(self.isNoAck == False):
-                ch.basic_ack(delivery_tag=method.delivery_tag)  #接收到消息后会给rabbitmq发送一个确认
+            if(self.callback_RecvMsg(body.decode('utf-8'))):
+                #回复确认消息已处理
+                if(self.isNoAck == False):
+                    ch.basic_ack(delivery_tag=method.delivery_tag)  #接收到消息后会给rabbitmq发送一个确认
 
     #定义消息接收方法，外部可重写@register
     def Recv_Msg(self, body):
         print("[消费者] Recv_Msg %s" % body)
-        pass
+        return True
     #register(Recv_Msg, 'body')     #装饰器方法未研究透，有问题，暂时放弃
 
 
