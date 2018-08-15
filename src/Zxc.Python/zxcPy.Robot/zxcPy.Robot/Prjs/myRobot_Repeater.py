@@ -24,7 +24,10 @@ class myRobot_Repeater(myRobot.myRobot):
     #消息处理接口
     def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
         #复读机(回复相同消息)
-        return "@" + usrName + " "+ Text 
+        if(isGroup):
+            return "@" + usrName + " " + Text 
+        else:
+            return Text 
     def _Title_User_Opened(self): 
         return "发送任何消息均同声回复..."
         
@@ -32,14 +35,14 @@ class myRobot_Repeater(myRobot.myRobot):
 #主启动程序
 if __name__ == "__main__":
     pR = myRobot_Repeater("zxc", "zxcID");
-    pR.Done("@@Repeater")["Text"]
-    print(pR.Done("Hello")["Text"])
-    pR.Done("@@Repeater")["Text"]
+    pR.Done("@@Repeater")["msg"]
+    print(pR.Done("Hello")["msg"])
+    pR.Done("@@Repeater")["msg"]
     print()
     
     time.sleep (1)
-    pR.Done("@@Repeater")["Text"]
-    pR.Done("@@Repeater")["Text"]
+    pR.Done("@@Repeater")["msg"]
+    pR.Done("@@Repeater")["msg"]
     print()
 
     time.sleep (2)
