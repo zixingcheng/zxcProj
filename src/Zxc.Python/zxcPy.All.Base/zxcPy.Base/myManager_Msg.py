@@ -7,12 +7,12 @@ Created on  张斌 2018-07-23 11:00:00
     消息处理器--通用消息处理器
 """
 import sys, os, copy, datetime
-import myEnum, myDebug, myWeb_urlLib, myMQ_Rabbit #, myVoice 
+import myEnum, myData, myDebug, myWeb_urlLib, myMQ_Rabbit #, myVoice 
 
 
 #定义消息类型枚举
 myMsgType = myEnum.enum('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
-myMsgPlat = myEnum.enum('wx')
+myMsgPlat = myEnum.enum('robot', 'wx')
 
 #自定义消息对象
 class myMsg():
@@ -105,20 +105,21 @@ class myManager_Msg():
             if(usrNameNick != ""): self.msgInd_Nick[usrNameNick] = usrID
         return pMsgs
 
-    #消息处理
-    def OnHandleMsg(self, msg):
+    #消息处理（可指定plat）
+    def OnHandleMsg(self, msg, plat = ""):
+        if(msg == None): return
         strMsg = msg.get('msg')
 
         #文字输出
+        typePlatform = myData.iif(plat == "", msg.get("plat", myMsgPlat.wx), plat)
         if(self.usePrint):
-            myDebug.Print("消息管理器::", strMsg)
+            myDebug.Print("消息管理器::", typePlatform + ">> ",strMsg)
 
         #声音输出
         #if(self.useVoice):
         #    myVoice.Say_thrd(msg["text"])
 
         #在线消息输出
-        typePlatform = msg.get("plat", myMsgPlat.wx)
         if(typePlatform != ""):
             pWeb = self.usrWebs.get(typePlatform, None)     #提取对应平台的web对象
             if(pWeb != None):   
@@ -129,7 +130,7 @@ class myManager_Msg():
             usrMQ = self.usrMQs.get(typePlatform, None)
             if(usrMQ != None):
                 usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
-            myDebug.Print("消息管理器转发::", usrMQ.nameQueue, strMsg)
+                myDebug.Print("消息管理器转发::", usrMQ.nameQueue + ">> ",strMsg)
 
     #创建新消息
     def OnCreatMsg(self):
@@ -139,6 +140,7 @@ class myManager_Msg():
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Setting('manageMsgs', myManager_Msg())    #实例 消息管理器并初始消息api及消息队列 
+gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "") #不使用api回调
 gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "") #不使用api回调
 
 
