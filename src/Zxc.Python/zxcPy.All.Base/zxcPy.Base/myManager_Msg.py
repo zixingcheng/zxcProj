@@ -62,7 +62,7 @@ class myManager_Msg():
         self.usrWebs = {}           #在线消息集    
         self.usrMQs = {}            #消息队列  
     #初始API、消息队列    
-    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_Wx')):
+    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx')):
         if(plat == None or plat == ""): return 
 
         #消息队列
@@ -128,7 +128,7 @@ class myManager_Msg():
 
             usrMQ = self.usrMQs.get(typePlatform, None)
             if(usrMQ != None):
-                usrMQ.Send_Msg(usrMQ.nameQueue, strMsg)
+                usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
             myDebug.Print("消息管理器转发::", usrMQ.nameQueue, strMsg)
 
     #创建新消息
@@ -139,7 +139,7 @@ class myManager_Msg():
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Setting('manageMsgs', myManager_Msg())    #实例 消息管理器并初始消息api及消息队列 
-gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_Wx'), msgUrl_API = "") #不使用api回调
+gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "") #不使用api回调
 
 
 if __name__ == '__main__':
