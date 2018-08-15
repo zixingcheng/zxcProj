@@ -22,7 +22,6 @@
   <ItemGroup>
     <Compile Include="myRobot_API.py" />
     <Compile Include="zxcPy.APIs\myAPI_Robot.py" />
-    <Compile Include="zxcPy.Robot\myRobot_Main.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Log.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Gift.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Robot.py" />

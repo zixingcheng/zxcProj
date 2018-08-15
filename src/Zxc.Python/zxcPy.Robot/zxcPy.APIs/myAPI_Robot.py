@@ -16,7 +16,7 @@ mySystem.Append_Us("../zxcPy.Robot/Prjs", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Reply", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myDebug, myRobot_Reply, myManager_Msg
+import myWeb, myDebug, myRobot_Reply, myRobot_Reply_MQ, myManager_Msg
 from myGlobal import gol   
 
 
@@ -62,7 +62,7 @@ def init_Reply():
     #全局对象提取
     ms_Reply = gol._Get_Value('rootReply', None)
     if(ms_Reply == None):
-        ms_Reply = myRobot_Reply.myRobot_Reply()
+        ms_Reply = myRobot_Reply_MQ.myRobot_Reply_MQ()
         gol._Set_Value('rootReply', ms_Reply)
     return ms_Reply
 #集中添加所有API
