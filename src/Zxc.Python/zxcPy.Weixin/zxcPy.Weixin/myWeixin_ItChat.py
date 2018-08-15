@@ -79,12 +79,12 @@ class myWeixin_ItChat(myThread.myThread):
             self.mqRecv = myMQ_Rabbit.myMQ_Rabbit(False)
             self.mqRecv.Init_Queue(self.mqName, True, False)
             self.mqRecv.Init_callback_RecvMsg(self.callback_RecvMsg)    #消息接收回调
+            myDebug.Print("消息队列(" + self.mqName + ")创建成功...")
             
         #接收消息--x线程方式
         self.thrd_MQ = threading.Thread(target = self.mqRecv.Start)
         self.thrd_MQ.setDaemon(False)
         if(bStart): self.thrd_MQ.start()
-        myDebug.Print("消息队列创建成功...")
 
     #运行
     def run(self): 

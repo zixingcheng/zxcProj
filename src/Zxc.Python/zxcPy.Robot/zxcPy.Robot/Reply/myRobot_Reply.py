@@ -98,17 +98,17 @@ class myRobot_Reply():
         self.usrMMsg.OnHandleMsg(msg)
     #运行-开始
     def Start(self):
-        self.isRuning = True
+        self.isRunning = True
     #运行-停止
     def Stop(self):
-        self.isRuning = False
+        self.isRunning = False
 
     #查找用户（不存在则自动创建）
     def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlant = ""): 
         #按消息生成对应对象 
-        pUser = self.root.usrInfos._Find(usrName_Nick, usrName, usrID, usrID_sys, usrPlant, False)
+        pUser = self.root.usrInfos._Find(usrName, usrName_Nick, usrID, usrID_sys, usrPlant, False)
         if(pUser == None or len(pUser.usrPrj.prjDos) < 1):      #非参与用户，于全局用户集信息提取，不存在的自动生成
-            pUser = self.root.usrInfos._Find(usrName_Nick, usrName, usrID, usrID_sys, usrPlant, True)
+            pUser = self.root.usrInfos._Find(usrName, usrName_Nick, usrID, usrID_sys, usrPlant, True)
             pUser.usrPrj._Add_prjDos(self.root.rootPrjs)
             self.usrReplys._Add(pUser)
         return pUser
@@ -142,7 +142,7 @@ class myRobot_Reply():
         pPrj = self.root.rootPrjs._Find(prjCmd)
         if(pPrj == None):
             print(">>Create Prj(%s) Faield" % (prjCmd))
-            return None, None, None
+            return None, None
         if(pPrj.IsEnable() == False): return None, None     #必须启用
 
         #查找用户（功能开启全部可用则当前用户）  
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     #用户信息
     usrID = "zxc_0"
     usrName = "墨紫"
-    nickName = "墨紫_0"
+    nickName = ""
     usrPlant = "wx"
     msgID = ""
 
@@ -224,7 +224,7 @@ if __name__ == "__main__":
         msg = pMMsg.OnCreatMsg()
         msg["usrID"] = usrID
         msg["usrName"] = "茶叶一主号"     
-        msg["usrNameNick"] = "茶叶一主号"     
+        msg["usrNameNick"] = ""     
         msg["plat"] = usrPlant
         msg["msg"] = "@@ChatRobot" 
 
