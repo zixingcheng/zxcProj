@@ -24,7 +24,8 @@ class myRobot_Robot(myRobot.myRobot):
 
         #创建机器人api  
         self.apiRobot = myWeb_urlLib.myWeb("http://openapi.tuling123.com", "", False)    #图灵机器人
-        self.data = myData_Json.Json_Object()
+        self.apiKeys = ["de79dec1dc6b41f59ed3e4c743b1f089", "de79dec1dc6b41f59ed3e4c743b1f089", "45722107eece483baae1d36a82e33fc1"]
+        self.apiKey_ind = 0
         self.data = {
 	                    "reqType":0,
                         "perception": {
@@ -38,7 +39,7 @@ class myRobot_Robot(myRobot.myRobot):
                         }
                     }
         self.data = {
-                        "key": "de79dec1dc6b41f59ed3e4c743b1f089",
+                        "key": self.apiKeys[self.apiKey_ind],
 	                    "info": "",
 	                    "loc": "",
 	                    "userid": "zxcRobot"
@@ -64,6 +65,13 @@ class myRobot_Robot(myRobot.myRobot):
         data = self.apiRobot.Do_Post("openapi/api", self.data, "myRobot_Robot")
         body = data.decode(encoding = "utf-8")
         msg = ast.literal_eval(body) 
+
+        #key超过次数
+        if(msg['code'] == 40004):
+            self.apiKey_ind += 1
+            if(self.apiKey_ind >= len(self.apiKey_ind)):
+                return "累了，不想说话。。。"
+            self.data["key"] = self.apiKeys[self.apiKey_ind]
         return msg['text']
          
 
