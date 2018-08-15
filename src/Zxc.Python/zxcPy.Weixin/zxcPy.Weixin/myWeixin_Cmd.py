@@ -59,7 +59,7 @@ class myAPI_Weixin_Cmd_ByMQ(myWeb.myAPI):
 if __name__ == '__main__': 
     # 创建消息队列
     gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
-    nameMQ = 'zxcMQ_Wx'
+    nameMQ = 'zxcMQ_wx'
     pMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True)
     pMQ_Sender.Init_Queue(nameMQ, True, True)
     gol._Set_Value('zxcMQ_Wx_Sender', pMQ_Sender, True)

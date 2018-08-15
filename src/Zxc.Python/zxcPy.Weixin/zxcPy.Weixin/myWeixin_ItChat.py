@@ -31,12 +31,13 @@ class myWeixin_ItChat(myThread.myThread):
         self.max = 5
         #self.cmdWeixin = None
         
-        self.Runing = False             #是否运行中
+        self.isRuning = False           #是否运行中
         self.Auto_RreplyText = True     #是否开启自动回复--文本
         self.Auto_RreplyText_G = True   #是否开启自动回复--文本-群
         self.funStatus_RText = False    #状态自动回复--文本
         self.funStatus_RText_G = False  #状态自动回复--文本-群
-        self.managerMMap = None
+        self.managerMMap = None         #接收共享内存
+        self.mqRecv = None              #接收消息队列     
         self.Init_MsgCache(useCmdMMap)  #创建消息通讯缓存
     def Init(self, dir = "", pathPicDir = ""):
         if (dir == ""):
@@ -56,7 +57,7 @@ class myWeixin_ItChat(myThread.myThread):
     def Init_MsgCache(self, useCmdMMap = True):
         self.useCmdMMap = useCmdMMap
         if(useCmdMMap): return self.Init_MMap()
-        return self.Init_MQ()
+        return True
     #创建命令内存映射 
     def Init_MMap(self, useCmdMMap = True):
         # 创建内存映射（读）
@@ -67,21 +68,22 @@ class myWeixin_ItChat(myThread.myThread):
                 myDebug.Print(pMMdata_M2.value, ind2)
             return True
         except:
+            print()
             myDebug.Print("创建内存映射失败.")
             return False
     #创建消息队列 
-    def Init_MQ(self, useCmdMMap = True):
+    def Init_MQ(self, bStart = False):
         #初始消息接收队列
-        self.mqName = 'zxcMQ_Wx'
-        self.mqRecv = myMQ_Rabbit.myMQ_Rabbit(False)
-        self.mqRecv.Init_Queue(self.mqName, True, False)
-        self.mqRecv.Init_callback_RecvMsg(self.callback_RecvMsg)    #消息接收回调
+        self.mqName = 'zxcMQ_wx'
+        if(self.mqRecv == None):
+            self.mqRecv = myMQ_Rabbit.myMQ_Rabbit(False)
+            self.mqRecv.Init_Queue(self.mqName, True, False)
+            self.mqRecv.Init_callback_RecvMsg(self.callback_RecvMsg)    #消息接收回调
             
         #接收消息--x线程方式
         self.thrd_MQ = threading.Thread(target = self.mqRecv.Start)
         self.thrd_MQ.setDaemon(False)
-        self.thrd_MQ.start()
-        #self.mqRecv.Start()
+        if(bStart): self.thrd_MQ.start()
         myDebug.Print("消息队列创建成功...")
 
     #运行
@@ -188,7 +190,9 @@ class myWeixin_ItChat(myThread.myThread):
         return msg.get("Text", None) 
     #定义消息接收方法回调
     def callback_RecvMsg(self, body):
-        self.Run_Monitor_Cmd_ByMQ(body)
+        if(self.isRuning):   
+            return self.Run_Monitor_Cmd_ByMQ(body)
+        return False
 
             
     #二维码信息下载完回调函数
@@ -216,7 +220,7 @@ class myWeixin_ItChat(myThread.myThread):
         itchat.run() 
     #运行-停止
     def Stop(self):
-        self.Runing = False
+        self.isRuning = False
             
     #运行（线程检测）
     def Run_ByThread(self, nSleep = 0.1):
@@ -225,10 +229,14 @@ class myWeixin_ItChat(myThread.myThread):
             self.thrd_Replay = threading.Thread(target = itchat.run)
             self.thrd_Replay.setDaemon(False)
             self.thrd_Replay.start()
+            
+            #创建消息队列 
+            self.Init_MQ(bStart = True)
+
                     
             #线程循环
-            self.Runing = True
-            while self.Runing:
+            self.isRuning = True
+            while self.isRuning:
                 try:
                     #运行（监测, 用于线程内部） 
                     self.Run_Monitor()  
@@ -324,8 +332,9 @@ class myWeixin_ItChat(myThread.myThread):
             myDebug.Debug("接收队列消息wx::", strMsg)  
             msg = ast.literal_eval(strMsg) 
             self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
+            return True
         except :
-            pass
+            return False
 
             
 #webWeixin接口--命令封装类--未使用

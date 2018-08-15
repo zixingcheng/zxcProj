@@ -62,9 +62,9 @@ class myWx_Reply():
 
         #消息测试 
         msgR = {}
-        msgR["Text"] = "msg:" + strText
-        msgR["FromUserName"] = usrID
-        msgR["Type"] = "TEXT"
+        msgR["msgType"] = "TEXT"
+        msgR["msg"] = "msg:" + strText
+        msgR["usrName"] = usrID
         msgR["isSelf"] = isFromSelf
         return msgR
 
