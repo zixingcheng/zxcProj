@@ -166,10 +166,10 @@ if __name__ == "__main__":
 
     #动态实例测试
     pWxdo2 = myImport.Import_Class("myRobot_Repeater","myRobot_Repeater")('zxc', 'zxcID');
-    print( pWxdo2.Done("@@Repeater"))
-    print( pWxdo2.Done("Hello"))
-    print( pWxdo2.Done("Bye"))
-    print( pWxdo2.Done("@@Repeater"))
+    myDebug.Debug( pWxdo2.Done("@@Repeater"))
+    myDebug.Debug( pWxdo2.Done("Hello"))
+    myDebug.Debug( pWxdo2.Done("Bye"))
+    myDebug.Debug( pWxdo2.Done("@@Repeater"))
     print("\n\n")
 
     #机器人消息处理
@@ -186,9 +186,9 @@ if __name__ == "__main__":
     
     #复读机功能测试
     pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant)
-    print(pWxReply.Done(usrID, usrName, nickName, 'Hello Rep', msgID, usrPlant))
-    print(pWxReply.Done(usrID, usrName, nickName, 'zxczxc', "@zxcvbnm", usrPlant))
-    print(pWxReply.Done(usrID, usrName, nickName, 'Bye Repeater', msgID, usrPlant))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello Rep', msgID, usrPlant))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'zxczxc', "@zxcvbnm", usrPlant))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Bye Repeater', msgID, usrPlant))
     pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant) 
     print()
 
@@ -200,9 +200,9 @@ if __name__ == "__main__":
 
     #聊天机器人测试
     pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
-    print(pWxReply.Done(usrID, usrName, nickName, 'Hello Robot', msgID, usrPlant))
-    print(pWxReply.Done(usrID, usrName, nickName, 'God Job...', msgID, usrPlant))
-    print(pWxReply.Done(usrID, usrName, nickName, 'Bye Robot', msgID, usrPlant))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello Robot', msgID, usrPlant))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'God Job...', msgID, usrPlant))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Bye Robot', msgID, usrPlant))
     pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
     print()
 
@@ -210,8 +210,9 @@ if __name__ == "__main__":
     #交互启动测试 
     pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, usrPlant) 
     pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, usrPlant) 
-    print(pWxReply.Done(usrID, usrName, nickName, 'Hello ChatRobot...', msgID, usrPlant))
-    print("Change user")
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello ChatRobot...', msgID, usrPlant))
+    print()
+    myDebug.Print("Change user")
     
    #队列消息测试
     if(True == True):  
@@ -230,7 +231,7 @@ if __name__ == "__main__":
         for x in range(0, nTimes):
             #发送消息
             msg["msg"] = "hello world " + str(x)
-            myDebug.Debug(pWxReply.Done_ByMsg(msg, True))
+            pWxReply.Done_ByMsg(msg, True)
             time.sleep(0.01) 
 
     time.sleep(2) 

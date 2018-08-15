@@ -49,7 +49,7 @@ class myAPI_Robot_Reply(myWeb.myAPI):
         
         #消息处理(应为异步处理)
         msg = ast.literal_eval(msgInfo) 
-        pReutrn = ms_Reply.Done_ByMsg(msg) 
+        pReutrn = ms_Reply.Done_ByMsg(msg, True) 
         myDebug.Debug("API-->>", pReutrn)
         try:
             return pReutrn
@@ -90,29 +90,33 @@ if __name__ == '__main__':
     pReg = myAPI_Robot_RegistPlant()
     token = pReg.get("myTest", "@zxcv", "wx")
     print("token::", token)
+    print()
+
 
     #消息处理借接口
     # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
     pMMsg = myManager_Msg.myManager_Msg()
     msg = pMMsg.OnCreatMsg()
     msg["usrID"] = "zxc_0"
-    msg["usrName"] = "墨紫_0"
-    msg["usrNameNick"] = "墨紫"
+    msg["usrName"] = "墨紫"
+    msg["usrNameNick"] = ""
     msg["msg"] = "Repeater"
     msg["plat"] = "wx"
-    myDebug.Debug(msg)
+    myDebug.Debug("消息结构：", msg)
     print()
     
-    #http://127.0.0.1:8668/zxcAPI/robot/reply/{'msgType': 'TEXT', 'groupID': '', 'usrName': '信阳毛尖--杨帆桥', 'msg': '你好', 'usrNameNick': '信阳毛尖--杨帆桥', 'usrID': '@04a97e8ab667ac550d0c3da8e2c3a67f2fa4c2fc8a3b1abe61d7bd1fb0e9a790', 'msgID': '', 'plat': 'wx'}
+
+    #API测试
     pReply = myAPI_Robot_Reply()
     pReply.get(str(msg))
     print()
     
+    #测试功能 
     msg["msg"] = "@@Repeater"
-    print(pReply.get(str(msg)))
+    myDebug.Debug(pReply.get(str(msg)))
 
     msg["msg"] = "Hi Repeater"
-    print(pReply.get(str(msg)))
+    myDebug.Debug(pReply.get(str(msg)))
     print()
     
     msg["msg"] = "@@Repeater"
