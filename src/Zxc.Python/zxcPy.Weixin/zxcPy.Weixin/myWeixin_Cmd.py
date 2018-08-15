@@ -25,8 +25,8 @@ class myAPI_Weixin_Cmd_ByMMP(myWeb.myAPI):
         #myDebug.Debug(user, text, type)
 
         #生成并写入命令
-        msg = {'FromUserName': user, 'Text': text, 'Type': type}        
-        pMMdata = myMMap.myMMap_Data(msg, 0)      #生成命令--共享内存数据对象
+        msg = {'usrName': user, 'msg': text, 'msgType': type}        
+        pMMdata = myMMap.myMMap_Data(msg, 0)        #生成命令--共享内存数据对象
         ind = pMMap_Manager.Write(pMMdata)          #写入命令--共享内存
         
         #读取测试
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         
         ind = 0
         while(True):
-            dict0 = {'FromUserName': '茶叶一主号', 'Text': 'text--登陆', 'Type': 'Text'}        
+            dict0 = {'usrName': '茶叶一主号', 'msg': 'text--登陆', 'msgType': 'Text'}        
             pMMdata = myMMap.myMMap_Data(dict0, 0)
             #ind = pMMap_Manager.Write(pMMdata)
             

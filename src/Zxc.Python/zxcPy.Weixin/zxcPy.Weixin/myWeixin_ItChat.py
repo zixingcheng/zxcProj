@@ -183,7 +183,7 @@ class myWeixin_ItChat(myThread.myThread):
     def Get_Msg_Back(self, msg):
         myDebug.Debug("消息回复::", msg)
         if(msg == None): return None
-        if(msg.get('isSelf', False) == True):   #自己时，主动发送个对方处理信息(无法自动回复给自己)
+        if(msg.get('isSelf', False) == True):       #自己时，主动发送个对方处理信息(无法自动回复给自己)
             self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
         return msg.get("Text", None) 
     #定义消息接收方法回调
@@ -251,6 +251,7 @@ class myWeixin_ItChat(myThread.myThread):
             def Reply_Text_(msg): 
                 if self.Auto_RreplyText: 
                     #提取回复消息内容
+                    myDebug.Debug("消息接收::", msg['Content'])
                     pReply = self.Get_Msg_Back(self.wxReply.Done_ByMsg(msg))
                     if(pReply != None): 
                         return pReply       #返回消息
@@ -311,7 +312,7 @@ class myWeixin_ItChat(myThread.myThread):
             nNum += 1
             msg = pMMdata_M.value
             if(msg != None and msg != 0):
-                self.Send_Msg(msg['FromUserName'], msg['Text'], msg['Type'])
+                self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
                 myDebug.Print(msg)
 
                 #再次提取命令
