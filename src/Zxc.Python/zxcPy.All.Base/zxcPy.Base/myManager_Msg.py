@@ -50,35 +50,30 @@ class myMsgs():
                 return pMsg
         return None
 
-#消息处理器--通用消息处理器
+#消息处理器--通用消息处理器(转发需要主动初始平台对应消息队列及API)
 class myManager_Msg():
-    def __init__(self, useMqMsg = True, msgUrls ={myMsgPlat.wx: "http://127.0.0.1:8666/zxcAPI/weixin"}):
+    def __init__(self):
         self.usePrint = True
-        self.useVoice = False
-        self.useLineMsg = (not useMqMsg)
-        self.useMqMsg = useMqMsg
+        self.useVoice = False  
         self.msgExramp = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "groupID":'', "plat":''} #消息样例
         self.msgLogs = {}
         self.msgInd_Name = {}
         self.msgInd_Nick = {}
-        
         self.usrWebs = {}           #在线消息集    
-        if(self.useLineMsg):
-            keys = msgUrls.keys()
-            for x in keys:          #按消息分类标识初始对应web对象并存入dict
-                pWeb = myWeb_urlLib.myWeb(msgUrls[x])
-                self.usrWebs[x] = pWeb
-                
-        self.usrMQs = {}            #消息队列     
-        if(self.useMqMsg):
-            keys = msgUrls.keys()
-            for x in keys:          #按消息分类标识初始对应web对象并存入dict
-                #初始消息发送队列
-                usrMQ_Name = str(myMsgPlat.wx)
-                usrMQ_Name = 'zxcMQ_' + usrMQ_Name[0:1].upper() + usrMQ_Name[1:]
-                usrMQ = myMQ_Rabbit.myMQ_Rabbit(True)
-                usrMQ.Init_Queue(usrMQ_Name, True, True)
-                self.usrMQs[x] = usrMQ
+        self.usrMQs = {}            #消息队列  
+    #初始API、消息队列    
+    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_Wx')):
+        if(plat == None or plat == ""): return 
+
+        #消息队列
+        if(msgMQ_Sender != None): 
+            msgMQ_Sender.Init_Queue(msgMQ_Sender.nameQueue, True, True)     #消息持久化设置
+            self.usrMQs[plat] = msgMQ_Sender
+            
+        #消息回调API
+        if(msgUrl_API != ""):                 
+            pWeb = myWeb_urlLib.myWeb(msgUrl_API)       #按消息分类标识初始对应web对象并存入dict
+            self.usrWebs[plat] = pWeb
         
     #添加消息
     def Log(self, usrID, usrName, usrNameNick, msg, msgID, msgType = myMsgType.TEXT):
@@ -115,7 +110,8 @@ class myManager_Msg():
         strMsg = msg.get('msg')
 
         #文字输出
-        if(self.usePrint): myDebug.Print("消息管理器::", strMsg)
+        if(self.usePrint):
+            myDebug.Print("消息管理器::", strMsg)
 
         #声音输出
         #if(self.useVoice):
@@ -132,7 +128,8 @@ class myManager_Msg():
 
             usrMQ = self.usrMQs.get(typePlatform, None)
             if(usrMQ != None):
-                usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
+                usrMQ.Send_Msg(usrMQ.nameQueue, strMsg)
+            myDebug.Print("消息管理器转发::", usrMQ.nameQueue, strMsg)
 
     #创建新消息
     def OnCreatMsg(self):
@@ -141,7 +138,8 @@ class myManager_Msg():
 #初始全局消息管理器
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
-gol._Set_Setting('manageMsgs', myManager_Msg())
+gol._Set_Setting('manageMsgs', myManager_Msg())    #实例 消息管理器并初始消息api及消息队列 
+gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_Wx'), msgUrl_API = "") #不使用api回调
 
 
 if __name__ == '__main__':
@@ -156,6 +154,7 @@ if __name__ == '__main__':
    msg["msgType"] = "TEXT"
    msg["plat"] = "wx"
    pMMsg.OnHandleMsg(msg)
+   print()
 
 
    #消息日志
