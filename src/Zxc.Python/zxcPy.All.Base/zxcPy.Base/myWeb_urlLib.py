@@ -18,6 +18,7 @@ class myWeb:
         self.Host = Host
         self.Path = Path
         self.Referer = Host + "/" + Path
+        self.canPrint = bPrint
         
         #声明一个CookieJar对象实例来保存cookie
         self.cookie = http.cookiejar.CookieJar()
@@ -42,7 +43,8 @@ class myWeb:
         self.__set_param__(Path)    #更新属性
         
         #urlencode转换，并强制为UTF8
-        myDebug.Debug("请求" + strTag + "页面：" + self.Referer, "Debug" )
+        if(self.canPrint):
+            myDebug.Debug("请求" + strTag + "页面：" + self.Referer)
         postdata = urllib.parse.urlencode(strPostData) 
         postdata = postdata.encode(encoding='UTF8')
 
@@ -61,7 +63,8 @@ class myWeb:
             myDebug.Debug("    页面Cookie重建") 
         else:     
             self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cookie))    # 利用urllib2的build_opener方法创建一个opener
-            myDebug.Debug("    页面Cookie重置ok") 
+            if(self.canPrint):
+                myDebug.Debug("    页面Cookie重置ok") 
             
         #构造Requset
         request= urllib.request.Request( 
@@ -71,7 +74,8 @@ class myWeb:
             
         #请求响应 
         #response = urllib.request.urlopen(request) 
-        myDebug.Debug("    页面请求中。。。") 
+        if(self.canPrint):
+            myDebug.Debug("    页面请求中。。。") 
         response = self.opener.open(request)         
 
              
@@ -86,9 +90,11 @@ class myWeb:
         self.status = response.status
         self.reason = response.reason 
         if(self.status == 200 or self.reason.tolower() == "ok"):
-            myDebug.Debug("    请求完毕。")
+            if(self.canPrint):
+                myDebug.Debug("    请求完毕。")
         else:
-            myDebug.Debug("    请求出错。")
+            if(self.canPrint):
+                myDebug.Debug("    请求出错。")
         print("") 
         return page
     
@@ -98,7 +104,8 @@ class myWeb:
 
         #测试get
         try:
-            myDebug.Debug("请求" + strTag + "页面：" + self.Referer, "Debug" )
+            if(self.canPrint):
+                myDebug.Debug("请求" + strTag + "页面：" + self.Referer)
             request = get(self.Referer)
             return request.text
         except:

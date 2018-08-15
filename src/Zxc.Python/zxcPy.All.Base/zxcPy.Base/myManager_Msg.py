@@ -72,7 +72,7 @@ class myManager_Msg():
             
         #消息回调API
         if(msgUrl_API != ""):                 
-            pWeb = myWeb_urlLib.myWeb(msgUrl_API)       #按消息分类标识初始对应web对象并存入dict
+            pWeb = myWeb_urlLib.myWeb(msgUrl_API, "", False)                #按消息分类标识初始对应web对象并存入dict
             self.usrWebs[plat] = pWeb
         
     #添加消息
