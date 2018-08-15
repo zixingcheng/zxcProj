@@ -13,13 +13,12 @@ import mySystem
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("../Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myImport, myData, myDebug, myManager_Msg
+import myWeb, myImport, myData, myData_Trans, myDebug, myManager_Msg
 import myRoot, myRoot_Usr
 
 #初始全局消息管理器
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
-
 
 
 #机器人消息处理工厂类（所有消息从此处走）
@@ -93,9 +92,18 @@ class myRobot_Reply():
     #消息处理
     def OnHandleMsg(self, msg):
         if(msg == None): return False
+        
+        #必须有处理消息存在
+        strMsg = msg.get('msg', "")
+        if(strMsg != ""):
+            #尾部标签
+            strTag = "  --zxcRobot  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
+            strTag = (32 - len(strTag)) * " " + strTag
+            msg["msg"] = strMsg + "\n" + strTag
 
-        #消息管理器处理消息
-        self.usrMMsg.OnHandleMsg(msg)
+            #消息管理器处理消息
+            self.usrMMsg.OnHandleMsg(msg)
+        
     #运行-开始
     def Start(self):
         self.isRunning = True
@@ -160,7 +168,6 @@ class myRobot_Reply():
             pUser.usrPrj._Change_prjDo(prjClass)    #切换功能 
         return pPrj, pUser  
      
-
 
 #主启动程序
 if __name__ == "__main__":
