@@ -16,7 +16,7 @@ from myGlobal import gol
 
 #消息处理工厂类
 class myWx_Reply():
-    def __init__(self, tag, robot_API = "http://127.0.0.1:8668/zxcAPI/robot"):
+    def __init__(self, tag, bUseMQ = True, robot_API = "http://127.0.0.1:8668/zxcAPI/robot"):
         self.usrTag = tag
         self.usrID = "zxcID"
         self.usrName = "墨紫"
@@ -24,10 +24,12 @@ class myWx_Reply():
         self.robotAPI = myWeb_urlLib.myWeb(robot_API)   #WebAPI
         self.routeReply = "reply/"                      #消息处理接口路由名
         self.MMsg = gol._Get_Setting('manageMsgs')      #消息管理对象
+        self.useMQ = bUseMQ
     def _Init(self, usrID, usrName, nickName = ""): 
         self.usrID = usrID
         self.usrName = usrName
         self.nickName = myData.iif(nickName == "", usrName, nickName)
+        self.usrMMsg = gol._Get_Setting('manageMsgs')
         myDebug.Print("    --消息工厂(%s)初始: %s--%s" % (self.usrTag, nickName, usrID))
                  
     #处理封装返回消息(按标识内容处理)
@@ -48,30 +50,28 @@ class myWx_Reply():
         else:
             #区分自己发送
             usrID = msg.get('FromUserName',"")
+            nickName = msg['User'].get('NickName',"")
             msgID = msg.get('msgID',"")
             if(self.usrID == usrID):
                 usrID = msg.get('ToUserName',"")    #调整为目标用户
-                nickName = self.nickName            #调整为自己
-                usrName = nickName
+                usrName = self.usrName              #调整为自己
                 isFromSelf = True
-                print(nickName, msgID, strText, usrID)
+                myDebug.Debug(nickName, msgID, strText, usrID)
             else:
-                nickName = msg['User'].get('NickName',"")
-                usrName = nickName
-        return None
+                usrName = msg['User'].get('RemarkName',"")
 
         #消息测试 
-        msgR = {}
-        msgR["msgType"] = "TEXT"
-        msgR["msg"] = "msg:" + strText
-        msgR["usrName"] = usrID
-        msgR["isSelf"] = isFromSelf
-        return msgR
-
+        #msgR = {}
+        #msgR["msgType"] = "TEXT"
+        #msgR["msg"] = "msg:" + strText
+        #msgR["usrName"] = usrID
+        #msgR["isSelf"] = isFromSelf
+        #return msgR
+        
         #调用 
-        return self.Done(usrID, usrName, nickName, strText, msgID, isGroup, idGroup)
+        return self.Done(usrID, usrName, nickName, strText, msgID, isGroup, idGroup, isFromSelf)         
     #按命令处理返回消息(按标识内容处理)
-    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", isGroup = False, idGroup = ""):
+    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", isGroup = False, idGroup = "", isFromSelf = False):
         #组装请求参数字典
         # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
         msg = self.MMsg.OnCreatMsg()
@@ -80,25 +80,25 @@ class myWx_Reply():
         msg["usrNameNick"] = usrNameNick
         msg["msg"] = strText
         msg["plat"] = "wx"
+        msg["isSelf"] = isFromSelf
         print("请求消息:: ", msg)
 
         #请求robotAPI
         robotPath = self.routeReply + str(msg) 
         strReturn = ""
         try:
-            strReturn = self.robotAPI.Do_API_get(robotPath, "zxcAPI-py") 
+            if(self.useMQ):
+                self.usrMMsg.OnHandleMsg(msg, 'robot')     #消息处理--推送至消息处理器
+                return None
+            else:
+                strReturn = self.robotAPI.Do_API_get(robotPath, "zxcAPI-py") 
+                #处理返回结果 
+                if(strReturn == "null" or strReturn == ""): return None
+                if(strReturn != None):
+                    msgRe = ast.literal_eval(strReturn) 
+                    return msgRe
         except :
             pass
-        print("adfdf:::", strReturn)
-
-        #处理返回结果 
-        if(strReturn == "null" or strReturn == ""): return None
-        if(strReturn != None):
-            try:
-                msgRe = ast.literal_eval(strReturn) 
-                return msgRe
-            except :
-                pass
         return None
 
     
