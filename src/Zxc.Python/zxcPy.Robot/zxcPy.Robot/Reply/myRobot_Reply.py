@@ -91,7 +91,7 @@ class myRobot_Reply():
         #查找用户, 调用消息处理方法调用
         if(pUser != None):
             msgR = pUser.Done(pPrj, strText, msgID, isGroup, idGroup, usrPlant)
-            if(isSelf):         #自己所发消息，需要调整usrName为对方(去除以使用nickName)，否则无法发送
+            if(msgR != None and isSelf):         #自己所发消息，需要调整usrName为对方(去除以使用nickName)，否则无法发送
                 msgR['usrName'] = nickName   
             return msgR
         return None
