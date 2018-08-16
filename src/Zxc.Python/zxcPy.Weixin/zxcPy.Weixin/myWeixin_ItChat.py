@@ -27,6 +27,7 @@ class myWeixin_ItChat(myThread.myThread):
         self.usrTag = Tag       #类实例标识
         self.usrName = ""       #类实例用户名
         self.wxReply = myReply_Factory.myWx_Reply(Tag)     #回复消息处理工厂对象类
+        self.usrDefault = {'UserName' : ""}
         self.Init()             #文件初始
         self.ind = 0
         self.max = 5
@@ -121,6 +122,10 @@ class myWeixin_ItChat(myThread.myThread):
         self.wxReply._Init(self.usrName, self.usrName_Alias)
         
 
+        #消息发送测试
+        #self.Send_Msg("", "茶叶一主号", "测试消息", "TEXT", 0)
+        #self.Send_Msg("", "测试", "测试消息", "TEXT", 1)
+ 
         #将friends列表存下来，看看内容
         if(bSave):
             #创建文件夹用于装载所有好友头像
@@ -149,7 +154,39 @@ class myWeixin_ItChat(myThread.myThread):
             pics = os.listdir(self.dirPic_Head)    
             numPic = len(pics)
             myDebug.Print("    --微信好友图像数：" + str(numPic) + "\n")  
-            
+    #查找用户       
+    def Get_User(self, usrID = "", usrName = ""):
+        if(usrID[0:1] == "@"):
+            pUsers = itchat.search_friends(userName = usrID)
+            if(len(pUsers) == 1): return pUsers[0]
+
+        #统配查询所有
+        if(usrID != ""):
+            pUsers = itchat.search_friends(name = usrID)
+            if(len(pUsers) == 1): return pUsers[0]
+        if(usrName != ""):
+            pUsers = itchat.search_friends(name = usrName)
+            if(len(pUsers) == 1): return pUsers[0]
+
+        myDebug.Error("用户未找到::", usrID, usrName)
+        return self.usrDefault  
+    #查找群       
+    def Get_User_group(self, roupID = "测试", groupName = ""):
+        if(roupID[0:2] == "@@"):
+            pUsers = itchat.search_chatrooms(userName = roupID)
+            if(len(pUsers) == 1): return pUsers[0]
+
+        #统配查询所有
+        if(roupID != ""):
+            pUsers = itchat.search_chatrooms(name = roupID)
+            if(len(pUsers) == 1): return pUsers[0]
+        if(groupName != ""):
+            pUsers = itchat.search_chatrooms(name = groupName)
+            if(len(pUsers) == 1): return pUsers[0]
+
+        myDebug.Error("用户群未找到::", roupID, groupName)
+        return self.usrDefault    
+
     #发送消息接口(Json的msg)
     def _Send_Msg(self, msgInfo): 
         if(type(msgInfo)== str):
@@ -164,25 +201,23 @@ class myWeixin_ItChat(myThread.myThread):
         #增加记录日志--消息管理器实现 
 
         #调用 
-        return self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
-    #发送消息接口
-    def Send_Msg(self, userFrom = "", msgInfo = "" , typeMsg = "TEXT"):
+        return self.Send_Msg(msg.get('usrID', ""), msg['usrName'], msg['msg'], msg['msgType'])
+    #发送消息接口(typeUser, 0: 好友 1：群 2：公众号)
+    def Send_Msg(self, usrID, usrName = "", msgInfo = "" , typeMsg = "TEXT", typeUser = 0):
         #用户检测(@开头为用户名，filehelper，其他需要检索实际用户名)
-        if(userFrom == ""): return
-        if(userFrom[0:1] != "@" and userFrom != "filehelper"):      
-            #查找用户
-            user = itchat.search_friends(name = userFrom)
-            if(len(user) != 1):
-                myError.Error("用户(" + userFrom + ")未找到.")
-                return
-            userFrom = user[0]['UserName']
+        if(typeUser == 0):
+            pUser = self.Get_User(usrID, usrName)
+        else:
+            pUser = self.Get_User_group(usrID, usrName)
+        userName = pUser['UserName']
+        if(userName == ""): return 
 
         #发送消息
         typeMsg = typeMsg.upper()
         if(typeMsg == "TEXT"):
-            itchat.send('%s' % (msgInfo), userFrom)
+            itchat.send('%s' % (msgInfo), userName)
         elif(typeMsg == "IMage"):   #未实现
-            itchat.send_image('%s: %s' % (typeMsg, msgInfo), userFrom)
+            itchat.send_image('%s: %s' % (typeMsg, msgInfo), userName)
         else:
             myDebug.Print("No this type.")
     #提取格式化返回信息 
@@ -194,9 +229,9 @@ class myWeixin_ItChat(myThread.myThread):
         #回复自己判断(调整为目标用户)
         myDebug.Debug("消息回复::", msgR)
         if(msgR.get('isSelf', False) == True):          #自己时，主动发送个对方处理信息(无法自动回复给自己)
-            self.Send_Msg(msgR['usrName'], msgR['msg'], msgR['msgType'])
+            self.Send_Msg(msgR['usrID'], msgR['usrName'], msgR['msg'], msgR['msgType'])
         else:
-            self.Send_Msg(msgR['usrName'], msgR['msg'], msgR['msgType'])
+            self.Send_Msg(msgR['usrID'], msgR['usrName'], msgR['msg'], msgR['msgType'])
         return None
     #定义消息接收方法回调
     def callback_RecvMsg(self, body):
@@ -326,7 +361,7 @@ class myWeixin_ItChat(myThread.myThread):
             nNum += 1
             msg = pMMdata_M.value
             if(msg != None and msg != 0):
-                self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
+                self.Send_Msg(msg['usrID'], msg['usrName'], msg['msg'], msg['msgType'])
                 myDebug.Print(msg)
 
                 #再次提取命令
@@ -345,7 +380,7 @@ class myWeixin_ItChat(myThread.myThread):
                 return True
 
             #消息发送
-            self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
+            self.Send_Msg(msg['usrID'], msg['usrName'], msg['msg'], msg['msgType'])
             return True
         except :
             return False
@@ -389,7 +424,7 @@ if __name__ == "__main__":
     pWeixin.Logion();
  
     #消息测试
-    #pWeixin.Send_Msg("茶叶一主号","登陆")
+    #pWeixin.Send_Msg("", "茶叶一主号","登陆")
 
     #运行 
     #pWeixin.Run();
