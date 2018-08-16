@@ -60,6 +60,7 @@ class myRobot_Reply():
         plat = msg.get('plat', "")
         groupID = msg.get('groupID', "")
         isGroup = myData.iif(groupID == "", False, True)
+        isSelf = msg.get('isSelf', False)
 
         #按消息类型进一步处理('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
         if(msgType == myManager_Msg.myMsgType.TEXT):
@@ -67,14 +68,17 @@ class myRobot_Reply():
         else:
             return None 
 
+
         #调用 
-        msgR = self.Done(usrID, usrName, usrNameNick, msgText, msgID, plat, isGroup, groupID)
+        msgR = self.Done(usrID, usrName, usrNameNick, msgText, msgID, plat, isGroup, groupID, isSelf)
         myDebug.Debug("处理消息::", msgR)  
+
+        #推送结果至消息管理器 
         if(bOnHandleMsg):   
             self.OnHandleMsg(msgR)      #消息处理
         return msgR
     #按命令处理返回消息(按标识内容处理)
-    def Done(self, usrID, usrName, nickName, strText, msgID = "", usrPlant = "", isGroup = False, idGroup = ""):
+    def Done(self, usrID, usrName, nickName, strText, msgID = "", usrPlant = "", isGroup = False, idGroup = "", isSelf = False):
         #命令识别
         pPrj = None 
         pUser = None 
@@ -86,12 +90,15 @@ class myRobot_Reply():
       
         #查找用户, 调用消息处理方法调用
         if(pUser != None):
-            return pUser.Done(pPrj, strText, msgID, isGroup, idGroup, usrPlant)
+            msgR = pUser.Done(pPrj, strText, msgID, isGroup, idGroup, usrPlant)
+            if(isSelf):         #自己所发消息，需要调整usrName为对方(去除以使用nickName)，否则无法发送
+                msgR['usrName'] = nickName   
+            return msgR
         return None
      
     #消息处理
-    def OnHandleMsg(self, msg):
-        if(msg == None): return False
+    def OnHandleMsg(self, msg):  
+        if(msg == None): return None
         
         #必须有处理消息存在
         strMsg = msg.get('msg', "")

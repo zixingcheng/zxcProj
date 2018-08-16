@@ -48,8 +48,9 @@ class myRobot_Reply_MQ(myRobot_Reply):
                 #调用消息处理(并推送消息管理器)
                 self.Done_ByMsg(msg, True)
                 return True
-            except :
-                return False
+            except (Usage):
+                myDebug.Error(Usage.msg)
+                return True
         return False
     
     #运行-开始
