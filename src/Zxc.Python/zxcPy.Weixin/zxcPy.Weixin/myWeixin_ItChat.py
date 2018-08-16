@@ -161,7 +161,7 @@ class myWeixin_ItChat(myThread.myThread):
         else:
             return False
 
-        #增加记录日志 
+        #增加记录日志--消息管理器实现 
 
         #调用 
         return self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
@@ -186,12 +186,18 @@ class myWeixin_ItChat(myThread.myThread):
         else:
             myDebug.Print("No this type.")
     #提取格式化返回信息 
-    def Get_Msg_Back(self, msg):
-        myDebug.Debug("消息回复::", msg)
-        if(msg == None): return None
-        if(msg.get('isSelf', False) == True):       #自己时，主动发送个对方处理信息(无法自动回复给自己)
-            self.Send_Msg(msg['usrName'], msg['msg'], msg['msgType'])
-        return msg.get("msg", None) 
+    def Get_Msg_Back(self, msg, isGroup = False):
+        #回复操作调用 
+        msgR = self.wxReply.Done_ByMsg(msg, isGroup)    #兼容API方式，消息队列无返回        
+        if(msgR == None): return None
+        
+        #回复自己判断(调整为目标用户)
+        myDebug.Debug("消息回复::", msgR)
+        if(msgR.get('isSelf', False) == True):          #自己时，主动发送个对方处理信息(无法自动回复给自己)
+            self.Send_Msg(msgR['usrName'], msgR['msg'], msgR['msgType'])
+        else:
+            self.Send_Msg(msgR['usrName'], msgR['msg'], msgR['msgType'])
+        return None
     #定义消息接收方法回调
     def callback_RecvMsg(self, body):
         if(self.isRuning):   
@@ -264,9 +270,7 @@ class myWeixin_ItChat(myThread.myThread):
                 if self.Auto_RreplyText: 
                     #提取回复消息内容
                     myDebug.Debug("消息接收::", msg['Content'])
-                    pReply = self.Get_Msg_Back(self.wxReply.Done_ByMsg(msg))
-                    if(pReply != None): 
-                        return pReply       #返回消息
+                    return self.Get_Msg_Back(msg)             #格式化提取(兼容API方式，消息队列无返回)
             self.funStatus_RText = self.Auto_RreplyText
 
         #注册普通文本消息回复(群消息)    
@@ -276,9 +280,7 @@ class myWeixin_ItChat(myThread.myThread):
             def Reply_Text_Group(msg): 
                 if self.Auto_RreplyText_G: 
                     #提取回复消息内容
-                    pReply = self.Get_Msg_Back(self.wxReply.Done_ByMsg(msg, True))
-                    if(pReply != None): 
-                        return pReply       #返回消息
+                    return self.Get_Msg_Back(msg, True)     #格式化提取(兼容API方式，消息队列无返回)
             self.funStatus_RText_G = self.Auto_RreplyText_G
        
         # 收到note通知类消息，判断是不是撤回并进行相应操作

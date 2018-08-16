@@ -92,6 +92,7 @@ class myWx_Reply():
                 return None
             else:
                 strReturn = self.robotAPI.Do_API_get(robotPath, "zxcAPI-py") 
+
                 #处理返回结果 
                 if(strReturn == "null" or strReturn == ""): return None
                 if(strReturn != None):
