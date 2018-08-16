@@ -7,7 +7,7 @@ Created on  张斌 2018-07-23 11:00:00
     消息处理器--通用消息处理器
 """
 import sys, os, copy, datetime
-import myEnum, myData, myDebug, myWeb_urlLib, myMQ_Rabbit #, myVoice 
+import myEnum, myData, myData_Trans, myDebug, myWeb_urlLib, myMQ_Rabbit #, myVoice 
 
 
 #定义消息类型枚举
@@ -133,8 +133,11 @@ class myManager_Msg():
                 myDebug.Print("消息管理器转发::", usrMQ.nameQueue + ">> ",strMsg)
 
     #创建新消息
-    def OnCreatMsg(self):
-        return copy.deepcopy(self.msgExramp)
+    def OnCreatMsg(self, bCreatTime = True):
+        msg = copy.deepcopy(self.msgExramp)
+        if(bCreatTime):
+            msg['time'] = myData_Trans.Tran_ToTime_int()
+        return msg
               
 #初始全局消息管理器
 from myGlobal import gol 
@@ -148,7 +151,7 @@ if __name__ == '__main__':
    pMMsg = gol._Get_Setting('manageMsgs')
 
    #组装消息 
-   msg = {}
+   msg = pMMsg.OnCreatMsg()
    msg["usrName"] = "茶叶一主号"
    msg["usrID"] = "zxcID"
    msg["msg"] = "测试消息py"
