@@ -33,32 +33,38 @@ class myWx_Reply():
         myDebug.Print("    --消息工厂(%s)初始: %s--%s" % (self.usrTag, nickName, usrID))
                  
     #处理封装返回消息(按标识内容处理)
-    def Done_ByMsg(self, msg, isGroup = False):
+    def Done_ByMsg(self, msg, isGroup = False, isNote = False):
         if(msg == None): return None
 
-        #提取消息内容（可能随wx版本变更）
+        #提取消息内容（可能随wx版本变更） 参见 https://blog.csdn.net/zhizunyu2009/article/details/79000190
         usrName_To = msg['ToUserName']
-        strText = msg['Text'] 
+        msgID = msg.get('NewMsgId',"")              #消息ID
+        msgTime = msg.get('CreateTime', 0)          #消息时间
+        strText = msg['Text']                       #消息内容
+
+        #区分群与个人
         idGroup = "" 
         isFromSelf = False
         if(isGroup):
-            idGroup = msg['User'].get('UserName',"")
-            nickName = msg.get('ActualNickName',"")
-            usrName = msg.get('ActualNickName',"")
-            usrID = msg.get('ActualUserName',"")
-            msgID = msg.get('NewMsgId',"")
+            usrID = msg.get('FromUserName',"")          #发消息人ID
+            usrName = msg.get('ActualNickName',"")      #发消息人昵称
+            idGroup = msg['User'].get('NickName',"")    #应优先群名称
+            if(self.usrID == usrID):
+                usrID = msg.get('ToUserName',"")        #发消息ID，调整为目标用户(群ID)
+                usrName = self.usrName                  #发消息人名称，调整为自己
+                isFromSelf = True                       #标识来源自己
+            nickName = ""                               #不使用
         else:
             #区分自己发送
-            usrID = msg.get('FromUserName',"")
-            nickName = msg['User'].get('NickName',"")
-            msgID = msg.get('msgID',"")
+            usrID = msg.get('FromUserName',"")          #发消息人ID
+            nickName = msg['User'].get('NickName',"")   #发消息人昵称
             if(self.usrID == usrID):
-                usrID = msg.get('ToUserName',"")    #调整为目标用户
-                usrName = self.usrName              #调整为自己
-                isFromSelf = True
+                usrID = msg.get('ToUserName',"")        #发消息ID，调整为目标用户
+                usrName = self.usrName                  #发消息人名称，调整为自己
+                isFromSelf = True                       #标识来源自己
                 myDebug.Debug(nickName, msgID, strText, usrID)
             else:
-                usrName = msg['User'].get('RemarkName',"")
+                usrName = msg['User'].get('RemarkName',"")  #发消息人备注名称
 
         #消息测试 
         #msgR = {}
@@ -69,16 +75,18 @@ class myWx_Reply():
         #return msgR
         
         #调用 
-        return self.Done(usrID, usrName, nickName, strText, msgID, isGroup, idGroup, isFromSelf)         
+        return self.Done(usrID, usrName, nickName, strText, msgID, msgTime, idGroup, isFromSelf)         
     #按命令处理返回消息(按标识内容处理)
-    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", isGroup = False, idGroup = "", isFromSelf = False):
+    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgTime = 0, idGroup = "", isFromSelf = False):
         #组装请求参数字典
         # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
         msg = self.MMsg.OnCreatMsg()
         msg["usrID"] = usrID
         msg["usrName"] = usrName
         msg["usrNameNick"] = usrNameNick
+        msg["groupID"] = idGroup
         msg["msg"] = strText
+        if(msgTime > 0): msg['time'] = msgTime
         msg["plat"] = "wx"
         msg["isSelf"] = isFromSelf
         print("请求消息:: ", msg)
