@@ -300,27 +300,32 @@ class myWeixin_ItChat(myThread.myThread):
         #注册普通文本消息回复(一对一)
         if self.Auto_RreplyText != self.funStatus_RText:
             #注册普通文本消息回复                 
-            @itchat.msg_register(TEXT, isGroupChat = False)
-            def Reply_Text_(msg): 
+            @itchat.msg_register([NOTE, TEXT], isFriendChat=True)
+            def Reply_Text(msg): 
                 if self.Auto_RreplyText: 
                     #提取回复消息内容
                     myDebug.Debug("消息接收::", msg['Content'])
-                    return self.Get_Msg_Back(msg)             #格式化提取(兼容API方式，消息队列无返回)
+                    return self.Get_Msg_Back(msg)               #格式化提取(兼容API方式，消息队列无返回)
             self.funStatus_RText = self.Auto_RreplyText
 
         #注册普通文本消息回复(群消息)    
         if self.Auto_RreplyText_G != self.funStatus_RText_G:
             #注册普通文本消息回复                 
-            @itchat.msg_register(TEXT, isGroupChat = True)
+            @itchat.msg_register([NOTE, TEXT], isGroupChat=True)
             def Reply_Text_Group(msg): 
                 if self.Auto_RreplyText_G: 
                     #提取回复消息内容
-                    return self.Get_Msg_Back(msg, True)     #格式化提取(兼容API方式，消息队列无返回)
+                    return self.Get_Msg_Back(msg, True)         #格式化提取(兼容API方式，消息队列无返回)
             self.funStatus_RText_G = self.Auto_RreplyText_G
        
         # 收到note通知类消息，判断是不是撤回并进行相应操作
-        @itchat.msg_register([NOTE])
+        @itchat.msg_register([NOTE], isMpChat=True)
         def send_msg_helper(msg):
+            def Reply_Text_Group(msg): 
+                if self.Auto_RreplyText_G: 
+                    #提取回复消息内容
+                    return self.Get_Msg_Back(msg, True, True)   #格式化提取(兼容API方式，消息队列无返回)
+
             global face_bug
             if re.search(r"\<\!\[CDATA\[.*撤回了一条消息\]\]\>", msg['Content']) is not None:
                 # 获取消息的id

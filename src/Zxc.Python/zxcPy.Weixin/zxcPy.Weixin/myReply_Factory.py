@@ -6,7 +6,7 @@ Created on  张斌 2018-08-12 19:16:00
 
     Python的Weixin网页版消息处理接口(文本消息)--调整为调用Robot消息接口方法 
 """
-import sys, ast, mySystem   
+import sys, ast, re, mySystem   
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类  
 mySystem.Append_Us("", False) 
@@ -33,12 +33,13 @@ class myWx_Reply():
         myDebug.Print("    --消息工厂(%s)初始: %s--%s" % (self.usrTag, nickName, usrID))
                  
     #处理封装返回消息(按标识内容处理)
-    def Done_ByMsg(self, msg, isGroup = False, isNote = False):
+    def Done_ByMsg(self, msg, isGroup = False):
         if(msg == None): return None
 
         #提取消息内容（可能随wx版本变更） 参见 https://blog.csdn.net/zhizunyu2009/article/details/79000190
         usrName_To = msg['ToUserName']
         msgID = msg.get('NewMsgId',"")              #消息ID
+        msgType = msg['Type'].upper()               #消息类型
         msgTime = msg.get('CreateTime', 0)          #消息时间
         strText = msg['Text']                       #消息内容
 
@@ -66,6 +67,10 @@ class myWx_Reply():
             else:
                 usrName = msg['User'].get('RemarkName',"")  #发消息人备注名称
 
+        #Note信息(增加Note标识及提取信息)
+        noteMsg = self.get_NoteTag(msgType, msg)
+
+
         #消息测试 
         #msgR = {}
         #msgR["msgType"] = "TEXT"
@@ -75,9 +80,9 @@ class myWx_Reply():
         #return msgR
         
         #调用 
-        return self.Done(usrID, usrName, nickName, strText, msgID, msgTime, idGroup, isFromSelf)         
+        return self.Done(usrID, usrName, nickName, strText, msgID, msgType, msgTime, idGroup, isFromSelf, noteMsg)         
     #按命令处理返回消息(按标识内容处理)
-    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgTime = 0, idGroup = "", isFromSelf = False):
+    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgType = "TEXT", msgTime = 0, idGroup = "", isFromSelf = False, noteMsg = None):
         #组装请求参数字典
         # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
         msg = self.MMsg.OnCreatMsg()
@@ -86,9 +91,11 @@ class myWx_Reply():
         msg["usrNameNick"] = usrNameNick
         msg["groupID"] = idGroup
         msg["msg"] = strText
-        if(msgTime > 0): msg['time'] = msgTime
+        msg["msgType"] = msgType
+        if(msgTime > 0): msg['time'] = msgTime 
         msg["plat"] = "wx"
         msg["isSelf"] = isFromSelf
+        if(noteMsg != None): msg['noteInfo'] = noteMsg      #加入通知信息 noteMsg  
         print("请求消息:: ", msg)
 
         #请求robotAPI
@@ -109,8 +116,20 @@ class myWx_Reply():
         except :
             pass
         return None
-
     
+    #处理封装返回消息(按标识内容处理)
+    def get_NoteTag(self, msgType, msg):
+        if(msgType != "NOTE"): return None
+        strText = msg['Text']   #消息内容
+
+        noteMsg = {}
+        if(strText.count("撤回了一条消息") == 1):
+            noteMsg['noteTag'] = "REVOKE"
+            noteMsg['old_msg_id'] = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)     # 获取消息的id
+        return noteMsg
+
+
+
 #主启动程序
 if __name__ == "__main__":
     gol._Init()             #先必须在主模块初始化（只在Main模块需要一次即可）
