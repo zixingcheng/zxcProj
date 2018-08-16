@@ -116,6 +116,10 @@ def Tran_ToTime(strTime, strFormat="%Y-%m-%d %H:%M:%S"):
     # 时间转换 
     dtTime = time.strptime(strTime, strFormat)     
     return dtTime
+def Tran_ToTime_byInt(nTime = 0):
+    #转换成localtime
+    time_local = time.localtime(nTime) 
+    return time_local
 
 # 字符串转time
 def Tran_ToTimes(strData, strSplit = ",", strFormat="%Y-%m-%d %H:%M:%S"):
@@ -126,7 +130,6 @@ def Tran_ToTimes(strData, strSplit = ",", strFormat="%Y-%m-%d %H:%M:%S"):
     for i in range(0, len(strValues)):
         values.append(Tran_ToTime(strValues[i], strFormat))
     return values
-
 # 字符串转time
 def Tran_ToTimes(List, strFormat="%Y-%m-%d %H:%M:%S"):
     values = []
@@ -154,7 +157,15 @@ def Tran_ToTime_str(Time = None, strFormat="%Y-%m-%d %H:%M:%S"):
         Time = time.localtime() 
     strTime = time.strftime(strFormat, Time)
     return strTime
+# time转字时间戳
+def Tran_ToTime_int(Time = None):
+    # 时间转换
+    if(Time == None):
+        Time = time.localtime()  
 
+    #转换成时间戳
+    timestamp = time.mktime(Time)
+    return int(timestamp)
 
 #转换为字符串
 def Tran_ToStr(lstV = [], symbol = ','):
@@ -204,3 +215,16 @@ if __name__ == '__main__':
 
     print(Tran_ToDatetime_str())
     print()
+
+
+    #转换成时间数组
+    dt = "2016-05-05 20:28:54"
+    print(dt)
+    timeArray = Tran_ToTime(dt) 
+    timestamp = Tran_ToTime_int(timeArray)
+    print(timestamp)
+     
+    #转换成localtime
+    dt = Tran_ToTime_byInt(timestamp)
+    print (Tran_ToTime_str(dt))
+    
