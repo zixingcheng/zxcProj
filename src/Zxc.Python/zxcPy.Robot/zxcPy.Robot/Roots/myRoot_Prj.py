@@ -73,11 +73,12 @@ class myRoot_Prj():
     def IsEnable_one(self): return self.IsEnable() and self.isEnable_one; 	 
     def IsEnable_group(self, pGroup): 
         if(self.IsEnable_groupAll()): return True
-        if(self.IsEnable() and self.IsEnable_group()):
-            if(len(self.rootGroups) < 1): return True   #未设置群则全部有效
-            return self.rootGroups._Find_Group(pGroup)
+        if(self.IsEnable() and self.isEnable_group):
+            if(len(self.rootGroups.groupInfos) < 1): return True   #未设置群则全部有效
+            pGroup = self.rootGroups._Find_Group(pGroup)
+            if(pGroup != None): return True
         return False
-    def IsEnable_groupAll(self): return self.IsEnable() and self.IsEnable_group() and self.isEnable_groupAll;
+    def IsEnable_groupAll(self): return self.IsEnable() and self.isEnable_group and self.isEnable_groupAll;
     def IsEnable_plant(self, plantName): 
         if(plantName == ""):
             return self.IsEnable(); 	

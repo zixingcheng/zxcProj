@@ -68,7 +68,6 @@ class myRobot_Reply():
         else:
             return None 
 
-
         #调用 
         msgR = self.Done(usrID, usrName, usrNameNick, msgText, msgID, plat, isGroup, groupID, isSelf)
         myDebug.Debug("处理消息::", msgR)  
