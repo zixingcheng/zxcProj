@@ -40,7 +40,7 @@ class myWeixin_ItChat(myThread.myThread):
         self.funStatus_RText_G = False  #状态自动回复--文本-群
         self.managerMMap = None         #接收共享内存
         self.mqRecv = None              #接收消息队列     
-        self.mqTimeStart = 0            #接收开始时间 
+        self.mqTimeNow = 0              #接收时间--当前
         self.Init_MsgCache(useCmdMMap)  #创建消息通讯缓存
     def Init(self, dir = "", pathPicDir = ""):
         if (dir == ""):
@@ -89,7 +89,7 @@ class myWeixin_ItChat(myThread.myThread):
         self.thrd_MQ.setDaemon(False)
         if(bStart): 
             self.thrd_MQ.start()
-            self.mqTimeStart = myData_Trans.Tran_ToTime_int()   #接收开始时间
+            self.mqTimeNow = myData_Trans.Tran_ToTime_int()   #接收开始时间
 
     #运行
     def run(self): 
@@ -379,8 +379,7 @@ class myWeixin_ItChat(myThread.myThread):
             msg = ast.literal_eval(strMsg) 
             
             #时间校检, 十分钟内缓存数据有效(过早时间数据忽略)
-            msgTime = msg.get('time', -1)
-            if(abs(msgTime - self.mqTimeStart) >= 600):    
+            if(self.wxReply.Check_TimeOut(msg)):
                 myDebug.Debug("--队列消息已超时wx::", strMsg)  
                 return True
 

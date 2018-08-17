@@ -127,7 +127,10 @@ class myWx_Reply():
             noteMsg['noteTag'] = "REVOKE"
             noteMsg['old_msg_id'] = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)     # 获取消息的id
         return noteMsg
-
+    
+    #消息超时校检
+    def Check_TimeOut(self, msg, nTimeOut = 600): 
+        return self.Check_TimeOut(msg, nTimeOut)
 
 
 #主启动程序
