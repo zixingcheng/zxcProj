@@ -11,7 +11,7 @@ import sys, os, datetime, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/zxcPy.Quotation')
 mySystem.Append_Us("", False)    
-import myQuote_Data, myData, myData_Trans
+import myQuote_Data, myData, myData_Trans, myDebug
 
 
 #行情数据对象
@@ -231,7 +231,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
 
     #输出
     def Print(self):
-        print(self.toString())
+        myDebug.Debug(self.toString())
 
 #行情数据对象--统计 
 class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):

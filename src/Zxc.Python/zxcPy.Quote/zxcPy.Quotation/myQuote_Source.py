@@ -12,7 +12,7 @@ import threading
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Source')
 mySystem.Append_Us("", False)    
-import myQuote_Data, myData_Trans, myQuote_Listener
+import myQuote_Data, myData_Trans, myDebug, myQuote_Listener
 from myGlobal import gol 
 
 #行情来源
@@ -108,7 +108,7 @@ class Quote_Source:
                 if(self.datasNow.stoped == False):
                     self.datasNow.saveData()                #保存数据（第二时段结束） 
                     self.datasNow.stoped = True
-                    print("... stoped data(" + data.name + ")...") 
+                    myDebug.Print("... stoped data(" + data.name + ")...") 
         return False
     #设置(时效)
     def setTime(self):
@@ -126,7 +126,7 @@ class Quote_Thread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        print ('StockQuote run')
+        myDebug.Print('StockQuote run')
         self.threadRunning = True;
         while self.threadRunning:
             try:
@@ -142,7 +142,7 @@ class Quote_Thread(threading.Thread):
         self.stop()
 
     def stop(self):
-        print ('StockQuote stop')
+        myDebug.Print('StockQuote stop')
         self.threadRunning = False;
 
           
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     thread.setDaemon(True)
     thread.start()
     mainloop(thread)
-    print("Quote thread exited...")
+    myDebug.Print("Quote thread exited...")
 
 
 

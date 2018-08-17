@@ -15,6 +15,7 @@ from itchat.content import *
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('./')
+import myDebug
 mySystem.Append_Us("", True)    
 
 
@@ -83,14 +84,14 @@ class QuoteThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        print ('StockQuote run')
+        myDebug.Print('StockQuote run')
         self.threadRunning = True;
         while self.threadRunning:
             self.source.queryStock()
             sleep(self.interval)
 
     def stop(self):
-        print ('StockQuote stop')
+        myDebug.Print('StockQuote stop')
         self.threadRunning = False;
 
           
@@ -109,7 +110,7 @@ if __name__ == "__main__":
             s.queryStock()
             sleep(3)
     except :
-        print ('StockQuote stop')
+        myDebug.Print('StockQuote stop')
       
 
     #exit()

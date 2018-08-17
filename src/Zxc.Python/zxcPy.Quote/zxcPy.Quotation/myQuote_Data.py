@@ -11,7 +11,7 @@ import sys, os, time, datetime, copy, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Data')
 mySystem.Append_Us("", False) 
-import myData_Trans, myIO, myIO_xlsx, myQuote_Setting
+import myData_Trans, myDebug, myIO, myIO_xlsx, myQuote_Setting
 
 
 #数据对象
@@ -57,7 +57,7 @@ class Quote_Data:
         else:
             times = self.time.split(":")
             datetime = myData_Trans.Tran_ToDatetime(self.date + " " + times[0] + ":" + times[1], "%Y-%m-%d %H:%M")
-            print(datetime , "-- New Minutes")
+            myDebug.Debug(datetime , "-- New Minutes")
             return datetime
     def getTime_str(self, bMinute = False):
         datetime = self.getTime(bMinute)
@@ -68,7 +68,7 @@ class Quote_Data:
 
     #输出
     def Print(self):
-        print(self.toString())
+        myDebug.Debug(self.toString())
         
 #数据对象--统计 
 class Quote_Data_Static():
@@ -273,7 +273,7 @@ class Quote_Datas:
         if(strDir == ""): strDir = self.dir
         dictDatas = {}
         if(True):
-            print("... load data(" + self.name + ")...")
+            myDebug.Print("... load data(" + self.name + ")...")
             path = strDir + self.fileName + ".csv"
             pDt_csv = myIO_xlsx.DtTable()
             pDt_csv.dataFieldType = ['datetime', 'float', 'float', 'float']             #数据字段类型集
