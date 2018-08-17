@@ -9,13 +9,8 @@ Created on  张斌 2016-10-16 09:00:00
 
 import sys
 import getopt
-import myData_Trans, myData_Json
+import myData_Trans, myData_Json, myDebug, myError
 
-
-#自定义错误
-class Usage(Exception):
-    def __init__(self, msg):
-        self.msg = msg
 
 #自定义参数(获取cmd等shell到的参数，并以该类返回便于直接参数调用) 
 class Usargv():
@@ -107,9 +102,9 @@ class Usargv():
                 print ("  for help you can use --help") 
                 raise Usage("Err")
 
-        except (Usage):
+        except (myError.Usage):
             print("Err:")
-            print(sys.stderr, Usage.msg)
+            print(sys.stderr, myError.myEx.msg)
             #print(sys.stderr, "for help use --help")
             return 2
 
@@ -197,3 +192,8 @@ if __name__ == '__main__':
     print("")
     main(["--prj2=GModel_Base22","--prj3=GModel_Base33"])
 
+    
+    try:
+        a = 1/ 0 
+    except (myError.myEx):
+        myDebug.Error(myEx.msg)

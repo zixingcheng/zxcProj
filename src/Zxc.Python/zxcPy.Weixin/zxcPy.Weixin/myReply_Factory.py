@@ -23,7 +23,7 @@ class myWx_Reply():
         self.nickName = ""
         self.robotAPI = myWeb_urlLib.myWeb(robot_API)   #WebAPI
         self.routeReply = "reply/"                      #消息处理接口路由名
-        self.MMsg = gol._Get_Setting('manageMsgs')      #消息管理对象
+        self.usrMMsg = gol._Get_Setting('manageMsgs')   #消息管理对象
         self.useMQ = bUseMQ
     def _Init(self, usrID, usrName, nickName = ""): 
         self.usrID = usrID
@@ -85,7 +85,7 @@ class myWx_Reply():
     def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgType = "TEXT", msgTime = 0, idGroup = "", isFromSelf = False, noteMsg = None):
         #组装请求参数字典
         # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
-        msg = self.MMsg.OnCreatMsg()
+        msg = self.usrMMsg.OnCreatMsg()
         msg["usrID"] = usrID
         msg["usrName"] = usrName
         msg["usrNameNick"] = usrNameNick
@@ -130,7 +130,7 @@ class myWx_Reply():
     
     #消息超时校检
     def Check_TimeOut(self, msg, nTimeOut = 600): 
-        return self.Check_TimeOut(msg, nTimeOut)
+        return self.usrMMsg.Check_TimeOut(msg, nTimeOut)
 
 
 #主启动程序

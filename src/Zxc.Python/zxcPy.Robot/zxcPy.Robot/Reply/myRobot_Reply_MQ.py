@@ -13,7 +13,7 @@ import mySystem
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("../Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myArgv, myWeb, myImport, myData, myDebug, myManager_Msg, myMQ_Rabbit, myRobot_Reply
+import myError, myWeb, myImport, myData, myDebug, myManager_Msg, myMQ_Rabbit, myRobot_Reply
 import myRoot, myRoot_Usr
 from myRobot_Reply  import myRobot_Reply
 
@@ -48,8 +48,8 @@ class myRobot_Reply_MQ(myRobot_Reply):
                 #调用消息处理(并推送消息管理器)
                 self.Done_ByMsg(msg, True)
                 return True
-            except (myArgv.Usage):
-                myDebug.Error(Usage.msg)
+            except (myError.myEx):
+                myDebug.Error(myEx.msg)
                 return True
         return False
     

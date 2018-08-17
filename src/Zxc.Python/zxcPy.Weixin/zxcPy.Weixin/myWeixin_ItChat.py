@@ -386,8 +386,9 @@ class myWeixin_ItChat(myThread.myThread):
             #消息发送
             self.Send_Msg(msg['usrID'], msg['usrName'], msg['msg'], msg['msgType'])
             return True
-        except :
-            return False
+        except (myError.myEx):
+            myDebug.Error(myEx.msg)
+            return True
 
             
 #webWeixin接口--命令封装类--未使用
