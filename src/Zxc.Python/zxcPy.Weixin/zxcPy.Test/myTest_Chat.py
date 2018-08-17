@@ -40,7 +40,7 @@ def Send_Msg(userFrom = "", msgInfo = "" , typeMsg = "TEXT"):
         #user = itchat.search_friends(wechatAccount = 'littlecodersh') 
         user = itchat.search_friends(name = userFrom)
         if(len(user) != 1):
-            myError.Error("用户未找到")
+            print("用户未找到")
             return
         userFrom = user[0]['UserName']
 

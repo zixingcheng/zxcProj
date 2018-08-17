@@ -101,10 +101,9 @@ class Usargv():
                 print ("    ***.py " + self.baseOptions + " or " + strLong)
                 print ("  for help you can use --help") 
                 raise Usage("Err")
-
-        except (myError.Usage):
-            print("Err:")
-            print(sys.stderr, myError.myEx.msg)
+            
+        except Exception as e:
+            myError.Error(e) 
             #print(sys.stderr, "for help use --help")
             return 2
 
@@ -195,5 +194,5 @@ if __name__ == '__main__':
     
     try:
         a = 1/ 0 
-    except (myError.myEx):
-        myDebug.Error(myEx.msg)
+    except Exception as e:
+        myError.Error(e) 

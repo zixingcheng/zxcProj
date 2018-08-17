@@ -386,8 +386,8 @@ class myWeixin_ItChat(myThread.myThread):
             #消息发送
             self.Send_Msg(msg['usrID'], msg['usrName'], msg['msg'], msg['msgType'])
             return True
-        except (myError.myEx):
-            myDebug.Error(myEx.msg)
+        except Exception as ex:
+            myError.Error(ex)  
             return True
 
             

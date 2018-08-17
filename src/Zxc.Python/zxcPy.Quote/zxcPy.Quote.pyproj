@@ -33,8 +33,6 @@
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Printer.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Qtimg_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Sina_Stock.py" />
-    <Compile Include="zxcPy.Test\myTest_Chat.py" />
-    <Compile Include="zxcPy.Test\myTest_Event.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.5" />

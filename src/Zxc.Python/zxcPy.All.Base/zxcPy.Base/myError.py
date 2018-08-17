@@ -13,16 +13,18 @@ import myDebug
 #自定义错误
 class myEx(Exception):
     def __init__(self, msg):
-        self.msg = msg
+        super().__init__(self) #初始化父类
+        self.msg = str(msg)
+    def ToString(self):
+        return self.msg
 
-
-def Error(msg, ErrType = "Error"):
-    print("ErrorInfo: %s, Type(%s)" %(msg, ErrType))
-
+def Error(ex, bSave = True):
+    pEx = myEx(ex)
+    myDebug.Error(pEx.msg)
 
     
 if __name__ == '__main__':   
     try:
         a = 1/ 0 
-    except (myEx):
-        myDebug.Error(myError.myEx.msg)
+    except Exception as e:
+        Error(e)
