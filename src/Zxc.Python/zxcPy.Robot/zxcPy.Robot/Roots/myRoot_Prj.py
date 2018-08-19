@@ -95,7 +95,7 @@ class myRoot_Prj():
     #功能开启与关闭
     def Start(self, usrID, usrName, nickName):  
         self.startUser = usrName
-    def Close(self, usrID, usrName, nickName):  
+    def Close(self):  
         self.startUser = ""
 
     #命令权限检查
@@ -216,7 +216,7 @@ class myRoots_Prj():
                 pUsers = gol._Get_Value('rootRobot_usrInfos', None)     #权限信息
                 for dtRow in dtSetting_user.dataMat:
                     #提取用户对象
-                    #prjRoot_user = myRoot_Usr.myRoot_Usr(usrName, usrName, "", "", self)
+                    #prjRoot_user = myRoot_Usr.myRoot_Usr("", usrName, usrName, "", self)
                     usrName = dtRow[lstFields_ind_user["用户名"]] 
                     pUser = pUsers._Find(usrName, usrName, usrName, "", "", True)
 

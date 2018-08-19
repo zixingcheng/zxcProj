@@ -92,9 +92,9 @@ class myWx_Reply():
         msg["usrID"] = usrID
         msg["usrName"] = usrName
         msg["usrNameNick"] = usrNameNick
+        msg['usrNameSelf'] = nameSelf      #自己发自己标识 
         msg["groupID"] = idGroup
         msg["groupName"] = nameGroup
-        msg['nameSelf'] = nameSelf      #自己发自己标识 
 
         msg["msg"] = strText
         msg["msgType"] = msgType
@@ -127,10 +127,10 @@ class myWx_Reply():
         usrMsg = {}
         usrMsg['usrID'] = usrID
         usrMsg['usrName'] = usrName
-        usrMsg['nameNick'] = nameNick
+        usrMsg['usrNameNick'] = nameNick
         usrMsg['groupID'] = idGroup
         usrMsg['groupName'] = groupName
-        usrMsg['nameSelf'] = nameSelf      #自己发自己标识 
+        usrMsg['usrNameSelf'] = nameSelf      #自己发自己标识 
         return usrMsg
     #处理封装返回消息(按标识内容处理)
     def get_NoteTag(self, msgType, msg):

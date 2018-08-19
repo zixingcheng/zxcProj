@@ -15,12 +15,12 @@ import myIO, myIO_xlsx, myData_Trans, myRoot_Prj
 
 #用户对象
 class myRoot_Usr():
-    def __init__(self, usrName, usrName_Nick = "", usrID = "", fromID = ""): 
+    def __init__(self, usrID, usrName, nameNick = "", plat = ""): 
         self.usrID_sys = str(uuid.uuid1())   #用户ID--系统ID(唯一)
-        self.usrID = ""         #用户ID
-        self.usrName = usrName  #用户名
-        self.usrName_Nick = ""  #用户名--昵称
-        self.usrPlants = []     #用户类型(来源平台集)
+        self.usrID = ""                 #用户ID
+        self.usrName = usrName          #用户名
+        self.usrName_Nick = nameNick    #用户名--昵称
+        self.usrPlants = []             #用户类型(来源平台集)
         self.usrTag = ""        #标签
         self.usrRamak = ""      #备注
         self.usrPhone = ""      #电话号码
@@ -29,32 +29,25 @@ class myRoot_Usr():
         self.usrTime_Regist = datetime.datetime.now()          #注册时间
         self.usrTime_Logined_Last = datetime.datetime.now()    #最后登录时间（请求）
         self.usrLoaded = False  
-        self.usrPrj = myRoot_UsrPrj(usrName, usrName_Nick, usrID)   #当前功能管理对象 
-        self._Init(usrName_Nick, usrID, fromID)
+        self.usrPrj = myRoot_UsrPrj(usrID, usrName, nameNick)   #当前功能管理对象 
+        self._Init(usrID, usrName, nameNick, plat)
     # 初始用户信息
-    def _Init(self, usrName_Nick = "", usrID = "", fromID = ""): 
-        if(usrName_Nick != ""): self.usrName_Nick = usrName_Nick
+    def _Init(self, usrID, usrName, nameNick = "", plat = ""): 
+        if(nameNick != ""): self.usrName_Nick = nameNick
+        if(usrName != ""): self.usrName = usrName
         if(usrID != ""): self.usrID = usrID
-        if(fromID != ""): 
-            if(fromID in self.usrPlants == False):
-                self.usrPlants.append(fromID)
-        self.usrPrj = myRoot_UsrPrj(self.usrName, self.usrName_Nick, self.usrID)       #当前功能管理对象 
+        if(plat != ""): 
+            if(plat in self.usrPlants == False):
+                self.usrPlants.append(plat)
+        self.usrPrj = myRoot_UsrPrj(self.usrID, self.usrName, self.usrName_Nick)       #当前功能管理对象 
         return True 
         
     #新消息处理
-    def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None, pPlat = "", bIsRegist = False):    
+    def Done(self, pPrj, Text, msgID = "", pPlat = "", pGroup = None, nameSelf = "", bIsRegist = False):    
         #提取功能设置信息
         if(pPrj == None): 
             self.usrPrj._Updata_DoInfo(pGroup)  #更新当前项目    
-            pPrj = self.usrPrj.prjInfo
-            if(pPrj == None): return None       #当前无功能启用
-
-            #权限检查
-            #bIsRoot = pPrj.IsRoot_user(self)   #查找用户权限 
-            if(pPrj.IsRegist_user(self.usrName, self.usrName_Nick, pGroup) == False):
-                return None                     #必须权限或注册用户 
-            if(pGroup != None and (pPrj.IsRegist_group(pGroup) == False)):
-                return None                     #必须权限或注册用户 
+            pPrj = self.usrPrj.prjInfo 
         if(self.usrPrj.prjInfo != None):
             if(pPrj.prjName != self.usrPrj.prjInfo.prjName):        #命令切换
                 prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
@@ -62,15 +55,15 @@ class myRoot_Usr():
 
         #提取当前功能对象
         prjClass = self.usrPrj.prjDo
-        if(prjClass == None): 
+        if(pPrj != None and prjClass == None): 
             prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
 
         #调用消息处理，及其他处理 
-        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup, pPlat, bIsRegist)
+        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup, pPlat, bIsRegist, toName, isSelf)
         return pReturn
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
-    def __init__(self, usrName, nickName = "", usrID = ""):
+    def __init__(self, usrID, usrName, nickName = ""):
         self.usrName = usrName
         self.nickName = nickName
         self.usrID = usrID
@@ -136,7 +129,6 @@ class myRoot_UsrPrj():
         pFind = self._Find_prjDo(prjDo)
         if(pFind != None):      
             pFind.isRunning = prjDo.isRunning       #更新当前功能状态
-            pFind.Close() 
             if(self.prjDo.isSingleUse == False):    #非单例运行功能移除   
                 self.prjDos.pop(prjDo.prjName)
         return True
@@ -156,22 +148,23 @@ class myRoot_UsrPrj():
                 prjDo = self.prjDos[x]
                 if(prjDo.isBackUse): continue
                 if(prjDo._Check()):
-                    prj = self.prjInfos.get(x, None)
-                    if(prj.IsRegist_user(self.usrName, self.nickName, pGroup)):    #用户已经注册该功能
-                        self.prjInfo = prj
-                        self.prjDo = self.prjDos.get(x, None)
-                        break;
+                    self.prjInfo = self.prjInfos.get(x, None)
+                    self.prjDo = self.prjDos.get(x, None)
         return True 
  
     #新消息处理
-    def Done(self, pPrj, prjDo, Text, msgID = "", isGroup = False, pGroup = None, pPlat = "", bIsRegist = False):         
+    def Done(self, pPrj, prjDo, Text, msgID = "", usrPlant = "", pGroup = None, nameSelf = "", bIsRegist = False):  
         #切换功能 
         self._Change_prjDo(prjDo, pPrj)
-        if(self.prjDo == None): return None    #None表示无命令，忽略 
+
+        #无可用功能执行后台功能
+        if(self.prjDo == None): 
+            usrInfo = self.get_UserInfo(usrPlant, pGroup, nameSelf)
+            self.Done_Back(Text, msgID, usrInfo)    #处理后台功能 
+            return None                             #None表示无命令，忽略 
             
         #调用处理命令对象
-        groupName = ""
-        if(pGroup != None): groupName = pGroup.groupName
+        usrInfo = self.get_UserInfo(usrPlant, pGroup, nameSelf)
         if(bIsRegist): 
             if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
                 pPrj.registoutUser(self.usrID, self.usrName, self.nickName, pGroup)
@@ -181,33 +174,47 @@ class myRoot_UsrPrj():
                 bIsRegistOut = False
             pReturn = self.prjDo.Done_Regist(Text, isGroup, groupName, self.usrID, self.usrName, bIsRegistOut) 
         else:
-            pReturn = self.prjDo.Done(Text, msgID, isGroup, groupName, self.usrID, self.usrName)
-            self._Updata_prjInfo(prjDo)     #功能信息同步
-
-            #处理后台功能 
-            for x in self.prjDos:
-                prjClass = self.prjDos[x]
-                if(prjClass.isBackUse):
-                    prjClass.Done(Text, msgID, isGroup, groupName, self.usrID, self.usrName)
-
+            if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
+                pReturn = self.prjDo.Done(Text, msgID, usrInfo)
+                self._Updata_prjInfo(prjDo)     #功能信息同步
+                 
         #补全返回信息
         if(pReturn != None):
             if(pPlat != ""): pReturn['plat'] = pPlat
-            if(pGroup != None):         #修正群回复ID信息
-                pReturn['usrID'] = ""
-                pReturn['usrName'] = pGroup.groupName
-                pReturn['groupID'] = pGroup.groupName
             
+        #处理后台功能 
+        self.Done_Back(Text, msgID, usrInfo) 
+
 		#命令有效性检查，失效则初始状态
         if(self.prjDo._Check() == False): 
             self._Close_prjDo(self.prjDo)
+            self.prjInfo.Close() 
             self.prjDo = None
         return pReturn;
+    def Done_Back(self, Text, msgID, usrInfo):         
+        #处理后台功能 
+        for x in self.prjDos:
+            prjClass = self.prjDos[x]
+            if(prjClass.isBackUse):
+                prjClass.Done(Text, msgID, usrInfo)
+    #处理封装返回用户信息
+    def get_UserInfo(self, usrPlant = "", pGroup = None, nameSelf = ""):
+        usrMsg = {}
+        usrMsg['usrID'] = self.usrID
+        usrMsg['usrName'] = self.usrName
+        usrMsg['usrNameNick'] = self.nickName 
+        usrMsg['usrNameSelf'] = nameSelf      #自己发自己标识 
+        if(pGroup != None):
+            usrMsg['groupID'] = pGroup.groupID
+            usrMsg['groupName'] = pGroup.groupName
+            usrMsg['groupType'] = pGroup.typeName
+        return usrMsg
 
 #用户对象集
 class myRoot_Usrs():
-    def __init__(self, usrName, userID): 
+    def __init__(self, userID, usrName, nickName = ""): 
         self.usrName = usrName      #归属用户
+        self.usrNameNick = nickName #归属用户昵称
         self.usrID_sys = userID     #归属用户ID
         self.usrList = {}           #用户集(按顺序索引)
         self.usrList_Name = {}      #用户集--(按名称索引)
@@ -231,7 +238,7 @@ class myRoot_Usrs():
 
         #转换为功能权限对象集
         for dtRow in dtUser.dataMat:
-            pUser = myRoot_Usr(dtRow[lstFields_ind["用户名"]])
+            pUser = myRoot_Usr("", dtRow[lstFields_ind["用户名"]])
             pUser.usrID_sys = dtRow[lstFields_ind["ID"]]
             pUser.usrName_Nick = dtRow[lstFields_ind["用户昵称"]]
             pUser.usrID = dtRow[lstFields_ind["用户ID"]]
@@ -289,7 +296,7 @@ class myRoot_Usrs():
  
         # 不存在
         if(bCreate_Auto and pUser == None):
-            pUser = myRoot_Usr(usrName, usrName_Nick, usrID, usrType)
+            pUser = myRoot_Usr(usrID, usrName, usrName_Nick, usrType)
             self._Index(pUser)
         # 信息更新, 并返回
         self._Refresh(pUser)
@@ -387,7 +394,7 @@ class myRoot_Usrs():
 
 #主启动程序
 if __name__ == "__main__":
-    pUsers = myRoot_Usrs("zxcPy", "@@zxcPy")
+    pUsers = myRoot_Usrs( "@@zxcPy", "zxcPy")
     pUser = pUsers.Add({'usrName': "Test",'usrName_Nick': "测试",'usrID': "@@1" ,'usrType': "wx"}, True)
     pUser = pUsers.Add({'usrName': "Test3",'usrName_Nick': "测试3",'usrID': "@@3" })
     pUsers.Del("测试3")

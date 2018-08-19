@@ -34,7 +34,7 @@ class myRoot():
         
         #用户集 
         if(self.usrInfos == None):
-            self.usrInfos = myRoot_Usr.myRoot_Usrs(self.usrName, self.usrID)   
+            self.usrInfos = myRoot_Usr.myRoot_Usrs(self.usrID,self.usrName)   
             gol._Set_Value('rootRobot_usrInfos', self.usrInfos)
         else:
             self.usrInfos.usrName = self.usrName
