@@ -34,8 +34,9 @@ class myRobot():
         self.isRootUse = False          #是否为系统级使用(系统内置功能) 
         self.isSingleUse = True         #是否为单例使用(非单例时每个用户专属) 
         self.isBackUse = False          #是否为后台使用(后台可运行多个，一般为系统级功能，如日志) 
+        self.isNoOwner = False          #是否为所有者除外不回复
         self.Init()                     #初始时间信息
-
+        
         # 基础信息--必须设置，自动提取作为配置信息
         self.prjName = "消息处理功能"   #功能名
         self.fileName = "myRobot"       #文件名
@@ -58,23 +59,24 @@ class myRobot():
         #消息处理  
         strReturn = None
         if(Text == self.doCmd):
-            strReturn = self._Title()
+            strReturn = self._Title(usrName, usrID)
         else:
             #检查
-            if(self._Check()):
+            if(self._Check()):  
+                if(self.isNoOwner and self.usrName == usrName): return None     #开启者除外 
                 strReturn = self._Done(Text, msgID, isGroup, idGroup, usrID, usrName)
             else:
                 return None
         #创建返回消息
         return self._Return(usrID, usrName, strReturn, idGroup)
     #消息处理注册--需要主动注册
-    def Done_Regist(self, Text, isGroup = False, idGroup = "", usrID = "", usrName = ""):        #消息处理  
+    def Done_Regist(self, Text, isGroup = False, idGroup = "", usrID = "", usrName = "", bRegistOut = False):        #消息处理  
         strReturn = None
         if(Text == self.doCmd):
             if(isGroup):
-                strReturn = self._Title(True, usrName)
+                strReturn = self._Title(usrName, usrID, True, bRegistOut)
             else:
-                strReturn = self._Title(True, "")
+                strReturn = self._Title("", "", True, bRegistOut)
         else: 
             return None
         #创建返回消息
@@ -112,11 +114,14 @@ class myRobot():
             self.Done(self.doCmd)       #启动关闭命令
 
     #开关提示信息
-    def _Title(self, bRegist = False, usrName = ""):
+    def _Title(self, usrName = "", usrID = "", bRegist = False, bRegistOut = False):
         if(self.isRunning):
-            if(bRegist):
+            if(bRegist or bRegistOut):
                 strReturn = myData.iif(usrName == "", "", "@" + usrName + "：")
-                strReturn += self.doTitle + "功能" + "--已注册\n\t" + self._Title_User_Opened() + "(" + str(self.tStart) + ")"
+                if(bRegistOut == False):
+                    strReturn += self.doTitle + "功能" + "--已注册\n\t" + self._Title_User_Opened() + "(" + str(self.tStart) + ")"
+                else:
+                    strReturn += self.doTitle + "功能" + "--已注销\n\t" + self._Title_User_Opened() + "(" + str(self.tStart) + ")"
             else:
                 self.isRunning = False      #标识非运行
                 self.isValid = True         #有效性恢复
@@ -124,6 +129,8 @@ class myRobot():
         else:
             self.Init()                 #初始基础信息
             self.isRunning = True       #标识运行
+            self.usrID = usrID          #功能所属用户ID(启动者)
+            self.usrName = usrName      #功能所属用户名称(启动者)
             strReturn = self.doTitle + "功能" + "--已开启\n\t" + self._Title_User_Opened() + "(" + str(self.tStart) + ")"
         myDebug.Print(strReturn)
         return strReturn
@@ -141,6 +148,7 @@ if __name__ == "__main__":
     print(pR.Done("Hello"))
     pR.Done("@@myRobot")["msg"]
     pR.Done_Regist("@@myRobot")["msg"]
+    pR.Done_Regist("@@myRobot",False,'','','',True)["msg"]
     print(pR.Done("Test....")["msg"])
     print(pR.Done("Test2...."))
     pR.Done("@@myRobot")["msg"]

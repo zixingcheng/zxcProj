@@ -40,6 +40,8 @@ class myRoot_Prj():
         self.rootGroups = myRoot_GroupInfo.myRoot_GroupsInfo("", "")    #已启用群集
         self.plantsEnable = []          #平台列表
         self.registedUsrs = []          #当前授权功能开启用户
+        self.startUser = ""             #功能开启用户
+        self.isNoOwner = False    #功能处理对启用者无效
         #self.infoLogs = {}              #日志消息
     def _Init(self, prjName, fileName, className, cmdStr, isEnable, isEnable_All, isEnable_one, isEnable_group, isEnable_groupAll): 
         self.prjName = prjName
@@ -58,7 +60,8 @@ class myRoot_Prj():
         self.prjClass = myImport.Import_Class(self.fileName, self.className)(usrName, usrID)
         self.isRoot = self.prjClass.isRootUse           #是否为系统级使用(系统内置功能) 
         self.isRunSingle = self.prjClass.isSingleUse    #是否为单例使用(单例时每个用户专属) 
-        self.isRunBack = self.prjClass.isBackUse        #是否为后台使用(后台可运行多个，一般为系统级功能，如日志) 
+        self.isRunBack = self.prjClass.isBackUse        #是否为后台使用(后台可运行多个，一般为系统级功能，如日志)  
+        self.isNoOwner = self.prjClass.isNoOwner        #是否为所有者除外不回复
         return self.prjClass
     #功能用户注册
     def registUser(self, usrID, usrName, nickName, groupID = "", isSelf = True):   
@@ -68,7 +71,19 @@ class myRoot_Prj():
         if(nickName != "" and (nickName in self.registedUsrs) == False):
             self.registedUsrs.append(nickName)
         return True 
-
+    def registoutUser(self, usrID, usrName, nickName, groupID = "", isSelf = True):   
+        #检查用户是否已经注册
+        if(usrName != "" and (usrName in self.registedUsrs)):
+            self.registedUsrs.remove(usrName)
+        if(nickName != "" and (nickName in self.registedUsrs)):
+            self.registedUsrs.remove(nickName)
+        return True 
+    
+    #功能开启与关闭
+    def Start(self, usrID, usrName, nickName):  
+        self.startUser = usrName
+    def Close(self, usrID, usrName, nickName):  
+        self.startUser = ""
 
     #命令权限检查
     def IsRoot_user(self, usr):  
@@ -92,7 +107,7 @@ class myRoot_Prj():
         #用户是否已经注册（单一注册）
         if(usrName in self.registedUsrs): return True
         if(nickName in self.registedUsrs): return True
-        if(pPrj.isRunBack == False):    #后台运行默认为已注册
+        if(self.isRunBack == True):         #后台运行默认为已注册
             return True
         return False
     def IsEnable_plant(self, plantName): 

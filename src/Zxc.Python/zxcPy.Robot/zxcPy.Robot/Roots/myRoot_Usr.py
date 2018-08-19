@@ -129,6 +129,7 @@ class myRoot_UsrPrj():
         pFind = self._Find_prjDo(prjDo)
         if(pFind != None):      
             pFind.isRunning = prjDo.isRunning       #更新当前功能状态
+            pFind.Close() 
             if(self.prjDo.isSingleUse == False):    #非单例运行功能移除   
                 self.prjDos.pop(prjDo.prjName)
         return True

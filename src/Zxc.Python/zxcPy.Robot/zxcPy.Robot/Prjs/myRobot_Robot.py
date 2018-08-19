@@ -21,6 +21,7 @@ class myRobot_Robot(myRobot.myRobot):
         self.doTitle = "聊天机器人"     #说明 
         self.prjName = "聊天机器人"     #功能名
         self.doCmd = "@@ChatRobot"      #启动命令 
+        self.isNoOwner = True           #是否为所有者除外不回复
 
         #创建机器人api  
         self.apiRobot = myWeb_urlLib.myWeb("http://openapi.tuling123.com", "", False)    #图灵机器人

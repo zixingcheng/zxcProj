@@ -67,7 +67,7 @@ class myRoot_GroupsInfo():
     
 #主启动程序
 if __name__ == "__main__":
-    pGroups = myRoot_GroupsInfo("WxGroup")
+    pGroups = myRoot_GroupsInfo("WxGroup", "zxc")
     pGroups.Add_Group("Test", "@asadafs")
     pGroups.Add_Group("test", "@001")
     pGroups.Add_Group("test2", "")
