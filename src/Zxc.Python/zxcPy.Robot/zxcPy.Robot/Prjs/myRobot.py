@@ -70,7 +70,7 @@ class myRobot():
         #创建返回消息
         return self._Return(usrID, usrName, strReturn, idGroup)
     #消息处理注册--需要主动注册
-    def Done_Regist(self, Text, isGroup = False, idGroup = "", usrID = "", usrName = "", bRegistOut = False):        #消息处理  
+    def Done_Regist(self, Text, isGroup = False, idGroup = "", usrID = "", usrName = "", bRegistOut = False):   #消息处理  
         strReturn = None
         if(Text == self.doCmd):
             if(isGroup):

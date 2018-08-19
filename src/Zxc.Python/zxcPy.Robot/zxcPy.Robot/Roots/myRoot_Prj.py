@@ -40,6 +40,7 @@ class myRoot_Prj():
         self.rootGroups = myRoot_GroupInfo.myRoot_GroupsInfo("", "")    #已启用群集
         self.plantsEnable = []          #平台列表
         self.registedUsrs = []          #当前授权功能开启用户
+        self.registedGroups = []        #当前授权功能开启的群
         self.startUser = ""             #功能开启用户
         self.isNoOwner = False    #功能处理对启用者无效
         #self.infoLogs = {}              #日志消息
@@ -64,19 +65,31 @@ class myRoot_Prj():
         self.isNoOwner = self.prjClass.isNoOwner        #是否为所有者除外不回复
         return self.prjClass
     #功能用户注册
-    def registUser(self, usrID, usrName, nickName, groupID = "", isSelf = True):   
+    def registUser(self, usrID, usrName, nickName, groupInfo = None, isSelf = True):   
         #检查用户是否已经注册
-        if(usrName != "" and (usrName in self.registedUsrs) == False):
-            self.registedUsrs.append(usrName)
-        if(nickName != "" and (nickName in self.registedUsrs) == False):
-            self.registedUsrs.append(nickName)
+        if(groupInfo == None):
+            if(usrName != "" and (usrName in self.registedUsrs) == False):
+                self.registedUsrs.append(usrName)
+            if(nickName != "" and (nickName in self.registedUsrs) == False):
+                self.registedUsrs.append(nickName)
+        else:
+            if(groupInfo.groupName != "" and (groupInfo.groupName in self.registedGroups) == False):
+                self.registedGroups.append(groupInfo.groupName)
+            if(groupInfo.groupID != "" and (groupInfo.groupID in self.registedGroups) == False):
+                self.registedGroups.append(groupInfo.groupID)
         return True 
-    def registoutUser(self, usrID, usrName, nickName, groupID = "", isSelf = True):   
+    def registoutUser(self, usrID, usrName, nickName, groupInfo = None, isSelf = True):   
         #检查用户是否已经注册
-        if(usrName != "" and (usrName in self.registedUsrs)):
-            self.registedUsrs.remove(usrName)
-        if(nickName != "" and (nickName in self.registedUsrs)):
-            self.registedUsrs.remove(nickName)
+        if(groupInfo == None):
+            if(usrName != "" and (usrName in self.registedUsrs)):
+                self.registedUsrs.remove(usrName)
+            if(nickName != "" and (nickName in self.registedUsrs)):
+                self.registedUsrs.remove(nickName)
+        else:
+            if(groupInfo.groupName != "" and (groupInfo.groupName in self.registedGroups)):
+                self.registedGroups.remove(groupInfo.groupName)
+            if(groupInfo.groupID != "" and (groupInfo.groupID in self.registedGroups)):
+                self.registedGroups.remove(groupInfo.groupID)
         return True 
     
     #功能开启与关闭
@@ -103,10 +116,19 @@ class myRoot_Prj():
             if(pGroup != None): return True
         return False
     def IsEnable_groupAll(self): return self.IsEnable() and self.isEnable_group and self.isEnable_groupAll;
-    def IsEnable_user(self, usrName, nickName): 
+    def IsRegist_user(self, usrName, nickName, pGroup): 
         #用户是否已经注册（单一注册）
+        if(pGroup != None): return self.IsRegist_group(pGroup)
         if(usrName in self.registedUsrs): return True
         if(nickName in self.registedUsrs): return True
+        if(self.isRunBack == True):         #后台运行默认为已注册
+            return True
+        return False
+    def IsRegist_group(self, pGroup): 
+        if(self.IsEnable_group(pGroup) == False): return False
+        #用户是否已经注册（单一注册）
+        if(pGroup.groupID in self.registedGroups): return True
+        if(pGroup.groupName in self.registedGroups): return True
         if(self.isRunBack == True):         #后台运行默认为已注册
             return True
         return False
@@ -156,7 +178,7 @@ class myRoots_Prj():
             prjRoot.isEnable_groupAll = myData.iif(dtRow[lstFields_ind["群同时有效"]] == True, True, False)
 
             #平台集合
-            lstGroup = list(dtRow[lstFields_ind["群列表"]])
+            lstGroup = dtRow[lstFields_ind["群列表"]].split(',')
             if(self.hasGol):
                 for x in lstGroup:
                     pGroup = pGroups.Find_Group(x, x, "", True)

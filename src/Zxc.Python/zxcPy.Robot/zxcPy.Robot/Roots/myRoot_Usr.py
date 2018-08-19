@@ -45,9 +45,16 @@ class myRoot_Usr():
     def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None, pPlat = "", bIsRegist = False):    
         #提取功能设置信息
         if(pPrj == None): 
-            self.usrPrj._Updata_DoInfo()        #更新当前项目    
+            self.usrPrj._Updata_DoInfo(pGroup)  #更新当前项目    
             pPrj = self.usrPrj.prjInfo
             if(pPrj == None): return None       #当前无功能启用
+
+            #权限检查
+            #bIsRoot = pPrj.IsRoot_user(self)   #查找用户权限 
+            if(pPrj.IsRegist_user(self.usrName, self.usrName_Nick, pGroup) == False):
+                return None                     #必须权限或注册用户 
+            if(pGroup != None and (pPrj.IsRegist_group(pGroup) == False)):
+                return None                     #必须权限或注册用户 
         if(self.usrPrj.prjInfo != None):
             if(pPrj.prjName != self.usrPrj.prjInfo.prjName):        #命令切换
                 prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
@@ -140,17 +147,17 @@ class myRoot_UsrPrj():
         if(self.prjInfo.prjName != prjDo.prjName): return False 
         
         #同步信息
-        self.prjInfo.isRunning = prjDo.isRunning       #更新当前功能状态 
+        self.prjInfo.isRunning = prjDo.isRunning        #更新当前功能状态 
         return True
     #更新当前功能
-    def _Updata_DoInfo(self): 
+    def _Updata_DoInfo(self, pGroup = None): 
         if(self.prjInfo == None):
             for x in self.prjDos:
                 prjDo = self.prjDos[x]
                 if(prjDo.isBackUse): continue
                 if(prjDo._Check()):
                     prj = self.prjInfos.get(x, None)
-                    if(prj.IsEnable_user(self.usrName, "")):    #用户已经注册该功能
+                    if(prj.IsRegist_user(self.usrName, self.nickName, pGroup)):    #用户已经注册该功能
                         self.prjInfo = prj
                         self.prjDo = self.prjDos.get(x, None)
                         break;
@@ -163,21 +170,33 @@ class myRoot_UsrPrj():
         if(self.prjDo == None): return None    #None表示无命令，忽略 
             
         #调用处理命令对象
-        if(bIsRegist):
-            pReturn = self.prjDo.Done_Regist(Text, self.usrID, self.usrName)
-            return pReturn
-        pReturn = self.prjDo.Done(Text, msgID, isGroup, pGroup, self.usrID, self.usrName)
-        self._Updata_prjInfo(prjDo)     #功能信息同步
+        groupName = ""
+        if(pGroup != None): groupName = pGroup.groupName
+        if(bIsRegist): 
+            if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
+                pPrj.registoutUser(self.usrID, self.usrName, self.nickName, pGroup)
+                bIsRegistOut = True
+            else:
+                pPrj.registUser(self.usrID, self.usrName, self.nickName, pGroup)
+                bIsRegistOut = False
+            pReturn = self.prjDo.Done_Regist(Text, isGroup, groupName, self.usrID, self.usrName, bIsRegistOut) 
+        else:
+            pReturn = self.prjDo.Done(Text, msgID, isGroup, groupName, self.usrID, self.usrName)
+            self._Updata_prjInfo(prjDo)     #功能信息同步
 
-        #处理后台功能 
-        for x in self.prjDos:
-            prjClass = self.prjDos[x]
-            if(prjClass.isBackUse):
-                prjClass.Done(Text, msgID, isGroup, pGroup, self.usrID, self.usrName)
+            #处理后台功能 
+            for x in self.prjDos:
+                prjClass = self.prjDos[x]
+                if(prjClass.isBackUse):
+                    prjClass.Done(Text, msgID, isGroup, groupName, self.usrID, self.usrName)
 
         #补全返回信息
         if(pReturn != None):
             if(pPlat != ""): pReturn['plat'] = pPlat
+            if(pGroup != None):         #修正群回复ID信息
+                pReturn['usrID'] = ""
+                pReturn['usrName'] = pGroup.groupName
+                pReturn['groupID'] = pGroup.groupName
             
 		#命令有效性检查，失效则初始状态
         if(self.prjDo._Check() == False): 

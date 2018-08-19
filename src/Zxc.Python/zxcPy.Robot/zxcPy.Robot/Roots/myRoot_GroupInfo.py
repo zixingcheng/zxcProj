@@ -46,7 +46,7 @@ class myRoot_GroupsInfo():
         return True
     # 查找群组
     def _Find_Group(self, pGroup):
-        return Find_Group(pGroup.groupName, pGroup.groupID, pGroup.typeName)
+        return self.Find_Group(pGroup.groupName, pGroup.groupID, pGroup.typeName)
     def Find_Group(self, groupName, groupID = "", typeName = "", bCreate_Auto = False): 
         pGroup = self.groupInfos.get(groupName, None)
         if(pGroup != None): return pGroup

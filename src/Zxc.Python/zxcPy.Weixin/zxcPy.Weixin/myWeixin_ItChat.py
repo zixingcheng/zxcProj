@@ -109,6 +109,7 @@ class myWeixin_ItChat(myThread.myThread):
         #获取所有好友信息
         #friends = itchat.get_friends() 
         friends = itchat.get_friends(update = True)[0:]   # 核心：得到frieds列表集，内含很多信息
+        groups  = itchat.get_chatrooms(update = True)
         
         #获取自己的UserName
         self.usrFriends = friends
@@ -158,15 +159,15 @@ class myWeixin_ItChat(myThread.myThread):
     def Get_User(self, usrID = "", usrName = ""):
         if(usrID[0:1] == "@"):
             pUsers = itchat.search_friends(userName = usrID)
-            if(len(pUsers) == 1): return pUsers[0]
+            if(pUsers != None and len(pUsers) == 1): return pUsers[0]
 
         #统配查询所有
         if(usrID != ""):
             pUsers = itchat.search_friends(name = usrID)
-            if(len(pUsers) == 1): return pUsers[0]
+            if(pUsers != None and len(pUsers) == 1): return pUsers[0]
         if(usrName != ""):
             pUsers = itchat.search_friends(name = usrName)
-            if(len(pUsers) == 1): return pUsers[0]
+            if(pUsers != None and len(pUsers) == 1): return pUsers[0]
 
         myDebug.Error("用户未找到::", usrID, usrName)
         return self.usrDefault  
@@ -174,15 +175,15 @@ class myWeixin_ItChat(myThread.myThread):
     def Get_User_group(self, roupID = "测试", groupName = ""):
         if(roupID[0:2] == "@@"):
             pUsers = itchat.search_chatrooms(userName = roupID)
-            if(len(pUsers) == 1): return pUsers[0]
+            if(pUsers != None and len(pUsers) == 1): return pUsers[0]
 
         #统配查询所有
         if(roupID != ""):
             pUsers = itchat.search_chatrooms(name = roupID)
-            if(len(pUsers) == 1): return pUsers[0]
+            if(pUsers != None and len(pUsers) == 1): return pUsers[0]
         if(groupName != ""):
             pUsers = itchat.search_chatrooms(name = groupName)
-            if(len(pUsers) == 1): return pUsers[0]
+            if(pUsers != None and len(pUsers) == 1): return pUsers[0]
 
         myDebug.Error("用户群未找到::", roupID, groupName)
         return self.usrDefault    
@@ -311,7 +312,7 @@ class myWeixin_ItChat(myThread.myThread):
         #注册普通文本消息回复(群消息)    
         if self.Auto_RreplyText_G != self.funStatus_RText_G:
             #注册普通文本消息回复                 
-            @itchat.msg_register([NOTE, TEXT], isGroupChat=True)
+            @itchat.msg_register([NOTE, TEXT, FRIENDS], isGroupChat=True)
             def Reply_Text_Group(msg): 
                 if self.Auto_RreplyText_G: 
                     #提取回复消息内容
@@ -384,7 +385,10 @@ class myWeixin_ItChat(myThread.myThread):
                 return True
 
             #消息发送
-            self.Send_Msg(msg['usrID'], msg['usrName'], msg['msg'], msg['msgType'])
+            if(msg.get('groupID', "") != ""):
+                self.Send_Msg(msg['usrID'], msg['groupID'], msg['msg'], msg['msgType'], 1)
+            else:
+                self.Send_Msg(msg['usrID'], msg['usrName'], msg['msg'], msg['msgType'])
             return True
         except Exception as ex:
             myError.Error(ex)  
