@@ -22,12 +22,13 @@ class myRobot_Repeater(myRobot.myRobot):
         self.doCmd = "@@Repeater"   #启动命令 
 
     #消息处理接口
-    def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
+    def _Done(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
         #复读机(回复相同消息)
-        if(isGroup):
-            return "@" + usrName + " " + Text 
-        else:
+        if(usrInfo.get('groupName', "")):
             return Text 
+        else:
+            usrName = usrInfo.get('usrName', "") 
+            return "@" + usrName + " " + Text 
     def _Title_User_Opened(self): 
         return "发送任何消息均同声回复..."
         

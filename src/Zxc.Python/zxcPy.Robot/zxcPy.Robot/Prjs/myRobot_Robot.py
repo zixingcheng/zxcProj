@@ -48,7 +48,7 @@ class myRobot_Robot(myRobot.myRobot):
 
 
     #消息处理接口
-    def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
+    def _Done(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
         #聊天机器人(接入第三方接口进行处理)
         strText = self._Done_ByTuling(Text)
         return strText 

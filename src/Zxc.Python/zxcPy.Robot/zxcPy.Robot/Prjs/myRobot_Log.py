@@ -10,7 +10,7 @@ import sys, os, time ,mySystem
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类 
 mySystem.Append_Us("", False) 
-import myDebug, myRobot, myManager_Msg
+import myDebug, myData, myRobot, myManager_Msg, myIO
 from myGlobal import gol   
 
     
@@ -23,12 +23,17 @@ class myRobot_Log(myRobot.myRobot):
         self.doCmd = "@@zxcRobot_Log"  #启动命令 
         self.isBackUse = True          #后台运行
         self.msgLogs = gol._Get_Setting('manageMsgs')   #全局消息日志管理器
+
+        #初始根目录信息
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        self.Dir_Base = os.path.abspath(os.path.join(strDir, "../.."))  
+        self.Dir_LogMsg = self.Dir_Base + "/Log/Msgs/"
+        self.usrMMsg.Init_LogDir(self.Dir_LogMsg)   #初始日志路径
         
     #消息处理接口
-    def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
+    def _Done(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
         #日志记录
-        #strText = Text + "--by zxcLog"
-        self.msgLogs.Log(self.usrID, self.usrName, "", Text, msgID) 
+        self.msgLogs.Log_ByDict(Text, msgID, msgType, usrInfo)  
         return "" 
 
     def _Title_User_Opened(self): 
@@ -40,14 +45,14 @@ if __name__ == "__main__":
     pR = myRobot_Log("zxc", "zxcID");
     pp = pR.Done("@@zxcRobot_Log")
     print(pR.Done("Hello"))
-    print(pR.Done("Test", "@zxcvbnm"))
+    print(pR.Done("Test", "@zxcvbnm", "TEXT", "zxcID", 'zxc'))
     print(pR.Done("Bye"))
     pp = pR.Done("@@zxcRobot_Log")
     print()
     time.sleep (1)
     
     #提取消息测试
-    pMsg = pR.msgLogs._Find_Log("zxcID").Find("@zxcvbnm")
+    pMsg = pR.msgLogs._Find_Log("zxcID","zxc", "").Find("@zxcvbnm")
     print("历史消息： msgID: " , pMsg.msgID, "msg: ", pMsg.msg)
     print()
     

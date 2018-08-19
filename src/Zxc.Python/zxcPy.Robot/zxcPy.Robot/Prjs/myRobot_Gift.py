@@ -180,8 +180,9 @@ class myRobot_Repeater(myRobot.myRobot):
         self.msg['FromUserName'] = self.usrName 
 
     #消息处理接口
-    def _Done(self, Text, msgID = "", isGroup = False, idGroup = "", usrID = "", usrName = ""):
+    def _Done(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
         #复读机(回复相同消息)
+        usrName = usrInfo['usrName']
         return "@" + usrName + " "+ Text 
     def _Title_User_Opened(self): 
         return "发送任何消息均同声回复..."

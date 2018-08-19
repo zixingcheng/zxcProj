@@ -113,7 +113,6 @@ class myManager_Msg():
     def _Log(self, msg = {}):
         return self.Log_ByDict(msg.get('msg', ""), msg.get('msgID', ""), msg.get('msgType', ""), msg)
     def _Find_Log_ByDict(self, usrInfo, bCreatAuto = True):
-        pMsgs = None
         nameGroup = usrInfo.get('groupName', "")
         if(nameGroup != ""):
             usrID = usrInfo.get('groupID', "")
@@ -126,6 +125,8 @@ class myManager_Msg():
         return self._Find_Log(usrID, usrName, usrNameNick, bCreatAuto)
     def _Find_Log(self, usrID, usrName, usrNameNick, bCreatAuto = False):
         #依次查询
+        pMsgs = None
+        if(usrID == "" and usrName == "" and usrNameNick == ""): return pMsgs
         if(usrID != ""): pMsgs = self.msgLogs.get(usrID, None)
         if(pMsgs == None):
             if(usrName != ""): pMsgs = self.msgInd_Name.get(usrName, None)
@@ -134,6 +135,7 @@ class myManager_Msg():
 
         #创建新消息集
         if(pMsgs == None and bCreatAuto):
+            if(usrID == ""): return pMsgs 
             pMsgs = myMsgs(usrID, usrName, usrNameNick, self.dirLog)
             self.msgLogs[usrID] = pMsgs
             if(usrName != ""): self.msgInd_Name[usrName] = usrID
@@ -220,7 +222,7 @@ if __name__ == '__main__':
    #消息日志
    pMMsg.Log("zxcID", "茶叶一主号", "", "测试消息py-00", "")
    pMMsg._Log(msg)
-   print(pMMsg._Find_Log("zxcID",  "茶叶一主号", "").Find(msg["msgID"]))
+   print(pMMsg._Find_Log("zxcID", "茶叶一主号", "").Find(msg["msgID"]))
 
    print()
     
