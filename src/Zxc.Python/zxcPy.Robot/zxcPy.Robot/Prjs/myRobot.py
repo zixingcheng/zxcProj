@@ -12,7 +12,9 @@ from datetime import datetime, timedelta
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("", False) 
-import myData, myEnum, myDebug
+
+import myData, myEnum, myDebug, myManager_Msg
+from myGlobal import gol 
 myDoType = myEnum.enum_index('Cmd')  # 命令类型枚举
 
 
@@ -41,8 +43,8 @@ class myRobot():
         self.isNoReply = True           #是否无回复操作--功能自带    
         
         # 初始返回消息
-        # self.msg = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "groupID":'', "plat":''} #同消息样例
-        self.msg = {"usrID":'', "usrName":'', "msg":'', "msgType":'TEXT', "plat":''} #同消息样例
+        self.usrMMsg = gol._Get_Setting('manageMsgs')     #消息管理器
+        self.msg = {}
         self.maxTime = 60 * 6       #有效时常 
     def Init(self): 
         self.isRunning = False          #是否启用中
@@ -63,9 +65,20 @@ class myRobot():
                 strReturn = self._Done(Text, msgID, isGroup, idGroup, usrID, usrName)
             else:
                 return None
-        
         #创建返回消息
         return self._Return(usrID, usrName, strReturn, idGroup)
+    #消息处理注册--需要主动注册
+    def Done_Regist(self, Text, isGroup = False, idGroup = "", usrID = "", usrName = ""):        #消息处理  
+        strReturn = None
+        if(Text == self.doCmd):
+            if(isGroup):
+                strReturn = self._Title(True, usrName)
+            else:
+                strReturn = self._Title(True, "")
+        else: 
+            return None
+        #创建返回消息
+        return self._Return(usrID, usrName, strReturn, "")
         
     #合法性(时效)
     def _Check(self):
@@ -86,6 +99,7 @@ class myRobot():
         return Text
     #创建返回消息
     def _Return(self, usrID, usrName, Text, idGroup):
+        self.msg = self.usrMMsg.OnCreatMsg()
         self.msg['usrID'] = usrID
         self.msg['usrName'] = usrName
         self.msg['msg'] = Text  
@@ -98,11 +112,15 @@ class myRobot():
             self.Done(self.doCmd)       #启动关闭命令
 
     #开关提示信息
-    def _Title(self):
+    def _Title(self, bRegist = False, usrName = ""):
         if(self.isRunning):
-            self.isRunning = False      #标识非运行
-            self.isValid = True         #有效性恢复
-            strReturn = self.doTitle + "功能" + "--已关闭\n\t" + self._Title_User_Closed() + "(" + str(self.tStart) + ")"
+            if(bRegist):
+                strReturn = myData.iif(usrName == "", "", "@" + usrName + "：")
+                strReturn += self.doTitle + "功能" + "--已注册\n\t" + self._Title_User_Opened() + "(" + str(self.tStart) + ")"
+            else:
+                self.isRunning = False      #标识非运行
+                self.isValid = True         #有效性恢复
+                strReturn = self.doTitle + "功能" + "--已关闭\n\t" + self._Title_User_Closed() + "(" + str(self.tStart) + ")"
         else:
             self.Init()                 #初始基础信息
             self.isRunning = True       #标识运行
@@ -122,6 +140,7 @@ if __name__ == "__main__":
     time.sleep (0)
     print(pR.Done("Hello"))
     pR.Done("@@myRobot")["msg"]
+    pR.Done_Regist("@@myRobot")["msg"]
     print(pR.Done("Test....")["msg"])
     print(pR.Done("Test2...."))
     pR.Done("@@myRobot")["msg"]

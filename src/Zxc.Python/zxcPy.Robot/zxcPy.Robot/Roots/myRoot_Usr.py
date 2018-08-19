@@ -42,7 +42,7 @@ class myRoot_Usr():
         return True 
         
     #新消息处理
-    def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None, pPlat = ""):    
+    def Done(self, pPrj, Text, msgID = "", isGroup = False, pGroup = None, pPlat = "", bIsRegist = False):    
         #提取功能设置信息
         if(pPrj == None): 
             self.usrPrj._Updata_DoInfo()        #更新当前项目    
@@ -59,7 +59,7 @@ class myRoot_Usr():
             prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
 
         #调用消息处理，及其他处理 
-        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup, pPlat)
+        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup, pPlat, bIsRegist)
         return pReturn
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
@@ -148,17 +148,23 @@ class myRoot_UsrPrj():
                 prjDo = self.prjDos[x]
                 if(prjDo.isBackUse): continue
                 if(prjDo._Check()):
-                    self.prjInfo = self.prjInfos.get(x, None)
-                    self.prjDo = self.prjDos.get(x, None)
+                    prj = self.prjInfos.get(x, None)
+                    if(prj.IsEnable_user(self.usrName, "")):    #用户已经注册该功能
+                        self.prjInfo = prj
+                        self.prjDo = self.prjDos.get(x, None)
+                        break;
         return True 
  
     #新消息处理
-    def Done(self, pPrj, prjDo, Text, msgID = "", isGroup = False, pGroup = None, pPlat = ""):         
+    def Done(self, pPrj, prjDo, Text, msgID = "", isGroup = False, pGroup = None, pPlat = "", bIsRegist = False):         
         #切换功能 
         self._Change_prjDo(prjDo, pPrj)
         if(self.prjDo == None): return None    #None表示无命令，忽略 
             
         #调用处理命令对象
+        if(bIsRegist):
+            pReturn = self.prjDo.Done_Regist(Text, self.usrID, self.usrName)
+            return pReturn
         pReturn = self.prjDo.Done(Text, msgID, isGroup, pGroup, self.usrID, self.usrName)
         self._Updata_prjInfo(prjDo)     #功能信息同步
 

@@ -81,15 +81,16 @@ class myRobot_Reply():
         #命令识别
         pPrj = None 
         pUser = None 
+        bIsRegist = False
         if(strText[0:2] == "@@"):
-            pPrj, pUser = self._Create_Cmd(usrID, usrName, nickName, strText[2:], isGroup, idGroup, usrPlant, True)
+            pPrj, pUser, bIsRegist = self._Create_Cmd(usrID, usrName, nickName, strText[2:], isGroup, idGroup, usrPlant, True)
         else:
             #查找用户
             pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlant)
       
         #查找用户, 调用消息处理方法调用
         if(pUser != None):
-            msgR = pUser.Done(pPrj, strText, msgID, isGroup, idGroup, usrPlant)
+            msgR = pUser.Done(pPrj, strText, msgID, isGroup, idGroup, usrPlant, bIsRegist)
             if(msgR != None and isSelf):         #自己所发消息，需要调整usrName为对方(去除以使用nickName)，否则无法发送
                 msgR['usrName'] = nickName   
             return msgR
@@ -135,20 +136,24 @@ class myRobot_Reply():
     #是否可启动命令用户
     def _IsEnable_Usr(self, pUser, pPrj, isGroup, pGroup = None, isCommand = False):
         #必须可用
-        if(pPrj.IsEnable() == False): return False
+        bRigist = False
+        if(pPrj.IsEnable() == False): return False, bRigist
 
         #区分是否运行状态，非运行，必须root用户启用
         bIsRoot = pPrj.IsRoot_user(pUser)   #查找用户权限 
-        if(isCommand or pPrj.IsRunning() == False): #命令必须权限用户启用 
-            if(bIsRoot == False): return False 
+        if(pPrj.IsRunning() == False):      #命令必须权限用户启用 
+            if(isCommand and bIsRoot == False): 
+                return False, bRigist       #启动命令必须权限用户 
         else:   #运行时，仅非统一启动时，需要个人启动
-            if(pPrj.IsEnable_All() == False): return False
-            
+            if(pPrj.IsEnable_All() == False): return False, bRigist
+            if(isCommand and bIsRoot == False):
+                bRigist = True              #标识为注册
+                
         #群有效区分
-        if(isGroup):                     #群有效，且为设置群
-            return pPrj.IsEnable_group(pGroup)
+        if(isGroup):                        #群有效，且为设置群
+            return pPrj.IsEnable_group(pGroup), bRigist
         else:
-            return pPrj.IsEnable_one()   #单人有效(一对一)
+            return pPrj.IsEnable_one(), bRigist  #单人有效(一对一)
             
     #命令处理（@@命令，一次开启，再次关闭）
     def _Create_Cmd(self, usrID, usrName, nickName, prjCmd, isGroup, idGroup, usrPlant = "", isCommand = False):    
@@ -156,23 +161,28 @@ class myRobot_Reply():
         pPrj = self.root.rootPrjs._Find(prjCmd)
         if(pPrj == None):
             print(">>Create Prj(%s) Faield" % (prjCmd))
-            return None, None
-        if(pPrj.IsEnable() == False): return None, None     #必须启用
+            return None, None, False
+        if(pPrj.IsEnable() == False): return None, None, False     #必须启用
 
         #查找用户（功能开启全部可用则当前用户）  
         pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlant)   
-        if(pUser == None): return None, None
+        if(pUser == None): return None, None, False
 
         #功能权限验证 
-        bEnable = self._IsEnable_Usr(pUser, pPrj, isGroup, idGroup, isCommand)
-        if(bEnable == False): return None, None             #必须可用
+        bEnable, bRigist = self._IsEnable_Usr(pUser, pPrj, isGroup, idGroup, isCommand)
+        if(bEnable == False): return None, None, False             #必须可用
+
+        #功能注册用户
+        if(bRigist):
+            pPrj.registUser(usrID, usrName, nickName, idGroup)
+
 
         #动态实例 (非单例，单独实例并缓存) 
         if(pPrj.IsRunSingle() == False):      
             prjClass = pPrj.creatIntance()          #实例对象--专有      
             prjClass.isRunning = pPrj.isRunning     #同步运行状态
             pUser.usrPrj._Change_prjDo(prjClass)    #切换功能 
-        return pPrj, pUser  
+        return pPrj, pUser, bRigist  
      
 
 #主启动程序

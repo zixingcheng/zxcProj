@@ -85,6 +85,8 @@ if __name__ == "__main__":
 
     #功能测试 
     pMMsg.OnHandleMsg(msg, plat)
+    print()
+    myDebug.Print("Change user")
     
    #队列消息测试
     if(True == True): 
@@ -92,6 +94,7 @@ if __name__ == "__main__":
         nTimes = 3
         msg["usrName"] = "茶叶一主号"
         msg["usrNameNick"] = ""    
+        pMMsg.OnHandleMsg(msg, plat)    #调整为需要主动开启
 
         #启动自己功能
         for x in range(0, nTimes):

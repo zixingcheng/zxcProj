@@ -139,10 +139,13 @@ class myManager_Msg():
         return msg
 
     #消息超时校检
-    def Check_TimeOut(self, msg, nTimeOut = 600, nTimeNow = myData_Trans.Tran_ToTime_int()):  
+    def Check_TimeOut(self, msg, nTimeOut = 600, nTimeNow = -1):  
         #时间校检, 十分钟内缓存数据有效(过早时间数据忽略)
         msgTime = msg.get('time', -1)
-        if(abs(msgTime - nTimeNow) >= 600): return True
+        if(nTimeNow < 0): nTimeNow = myData_Trans.Tran_ToTime_int()
+        if(abs(msgTime - nTimeNow) >= 600): 
+            myDebug.Warnning("已超时::", nTimeNow, ",", msgTime)
+            return True
         return False
               
 #初始全局消息管理器

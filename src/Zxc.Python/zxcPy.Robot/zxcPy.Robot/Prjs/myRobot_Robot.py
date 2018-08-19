@@ -53,7 +53,7 @@ class myRobot_Robot(myRobot.myRobot):
         return strText 
 
     def _Title_User_Opened(self): 
-        return "消息机器人自动回复..."
+        return "发送任何消息均机器人回复..."
     
     #图灵机器人
     def _Done_ByTuling(self, Text):
