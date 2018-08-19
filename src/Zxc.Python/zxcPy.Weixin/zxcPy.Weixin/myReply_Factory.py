@@ -45,27 +45,30 @@ class myWx_Reply():
 
         #区分群与个人
         idGroup = "" 
+        nameGroup = ""
+        nameSelf = ""
         isFromSelf = False
         if(isGroup):
-            usrID = msg.get('FromUserName',"")          #发消息人ID
+            usrID = msg.get('ActualUserName',"")        #发消息人ID
             usrName = msg.get('ActualNickName',"")      #发消息人昵称
-            idGroup = msg['User'].get('NickName',"")    #应优先群名称
+            nickName = msg.get('ActualNickName',"")     #发消息人昵称
+
+            idGroup = msg['User'].get('UserName',"")    #群ID
+            nameGroup = msg['User'].get('NickName',"")  #群名称
             if(self.usrID == usrID):
-                usrID = msg.get('ToUserName',"")        #发消息ID，调整为目标用户(群ID)
-                usrName = self.usrName                  #发消息人名称，调整为自己
-                isFromSelf = True                       #标识来源自己
-            nickName = ""                               #不使用
+                nameSelf = self.usrName                 #发消息人名称，调整为自己
+                usrName = self.usrName                   
+                nickName = usrName
         else:
             #区分自己发送
             usrID = msg.get('FromUserName',"")          #发消息人ID
+            usrName = msg['User'].get('RemarkName',"")  #发消息人备注名称
             nickName = msg['User'].get('NickName',"")   #发消息人昵称
             if(self.usrID == usrID):
                 usrID = msg.get('ToUserName',"")        #发消息ID，调整为目标用户
-                usrName = self.usrName                  #发消息人名称，调整为自己
-                isFromSelf = True                       #标识来源自己
-                myDebug.Debug(nickName, msgID, strText, usrID)
-            else:
-                usrName = msg['User'].get('RemarkName',"")  #发消息人备注名称
+                nameSelf = self.usrName                 #发消息人名称，调整为自己
+        if(usrName == ""): usrName = nickName           #无MarkName使用nickName
+        myDebug.Debug(nameSelf,",", usrID,",", usrName,",", nickName, ",", msgID, ",",strText, ",", idGroup, ",",nameGroup)
 
         #Note信息(增加Note标识及提取信息)
         noteMsg = self.get_NoteTag(msgType, msg)
@@ -80,9 +83,9 @@ class myWx_Reply():
         #return msgR
         
         #调用 
-        return self.Done(usrID, usrName, nickName, strText, msgID, msgType, msgTime, idGroup, isFromSelf, noteMsg)         
+        return self.Done(usrID, usrName, nickName, strText, msgID, msgType, msgTime, idGroup, nameGroup, nameSelf, noteMsg)         
     #按命令处理返回消息(按标识内容处理)
-    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgType = "TEXT", msgTime = 0, idGroup = "", isFromSelf = False, noteMsg = None):
+    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgType = "TEXT", msgTime = 0, idGroup = "", nameGroup = '', nameSelf = '', noteMsg = None):
         #组装请求参数字典
         # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
         msg = self.usrMMsg.OnCreatMsg()
@@ -90,11 +93,13 @@ class myWx_Reply():
         msg["usrName"] = usrName
         msg["usrNameNick"] = usrNameNick
         msg["groupID"] = idGroup
+        msg["groupName"] = nameGroup
+        msg['nameSelf'] = nameSelf      #自己发自己标识 
+
         msg["msg"] = strText
         msg["msgType"] = msgType
         if(msgTime > 0): msg['time'] = msgTime 
         msg["plat"] = "wx"
-        msg["isSelf"] = isFromSelf
         if(noteMsg != None): msg['noteInfo'] = noteMsg      #加入通知信息 noteMsg  
         print("请求消息:: ", msg)
 
@@ -117,6 +122,16 @@ class myWx_Reply():
             pass
         return None
     
+    #处理封装返回用户信息
+    def get_UserInfo(self, usrID, usrName, nameNick, groupID, groupName, nameSelf):
+        usrMsg = {}
+        usrMsg['usrID'] = usrID
+        usrMsg['usrName'] = usrName
+        usrMsg['nameNick'] = nameNick
+        usrMsg['groupID'] = idGroup
+        usrMsg['groupName'] = groupName
+        usrMsg['nameSelf'] = nameSelf      #自己发自己标识 
+        return usrMsg
     #处理封装返回消息(按标识内容处理)
     def get_NoteTag(self, msgType, msg):
         if(msgType != "NOTE"): return None

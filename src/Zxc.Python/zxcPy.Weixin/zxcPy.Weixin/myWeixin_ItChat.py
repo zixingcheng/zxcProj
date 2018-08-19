@@ -229,10 +229,10 @@ class myWeixin_ItChat(myThread.myThread):
         
         #回复自己判断(调整为目标用户)
         myDebug.Debug("消息回复::", msgR)
-        if(msgR.get('isSelf', False) == True):          #自己时，主动发送个对方处理信息(无法自动回复给自己)
+        if(msgR.get('groupName', '') == ''):            #区分群、个人
             self.Send_Msg(msgR['usrID'], msgR['usrName'], msgR['msg'], msgR['msgType'])
         else:
-            self.Send_Msg(msgR['usrID'], msgR['usrName'], msgR['msg'], msgR['msgType'])
+            self.Send_Msg(msgR['groupID'], msgR['groupName'], msgR['msg'], msgR['msgType'], 1)
         return None
     #定义消息接收方法回调
     def callback_RecvMsg(self, body):
