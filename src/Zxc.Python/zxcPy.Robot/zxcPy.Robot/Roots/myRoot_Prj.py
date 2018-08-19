@@ -65,7 +65,7 @@ class myRoot_Prj():
         self.isNoOwner = self.prjClass.isNoOwner        #是否为所有者除外不回复
         return self.prjClass
     #功能用户注册
-    def registUser(self, usrID, usrName, nickName, groupInfo = None, isSelf = True):   
+    def registUser(self, usrID, usrName, nickName, groupInfo = None, nameSelf = ""):   
         #检查用户是否已经注册
         if(groupInfo == None):
             if(usrName != "" and (usrName in self.registedUsrs) == False):
@@ -78,7 +78,7 @@ class myRoot_Prj():
             if(groupInfo.groupID != "" and (groupInfo.groupID in self.registedGroups) == False):
                 self.registedGroups.append(groupInfo.groupID)
         return True 
-    def registoutUser(self, usrID, usrName, nickName, groupInfo = None, isSelf = True):   
+    def registoutUser(self, usrID, usrName, nickName, groupInfo = None, nameSelf = ""):   
         #检查用户是否已经注册
         if(groupInfo == None):
             if(usrName != "" and (usrName in self.registedUsrs)):
@@ -100,9 +100,9 @@ class myRoot_Prj():
 
     #命令权限检查
     def IsRoot_user(self, usr):  
-        if(self.rootUsers._Find(usr.usrName, usr.usrName, usr.usrName, usr.usrName) != None):
+        if(self.rootUsers._Find(usr.usrID, usr.usrName, usr.usrName_Nick, "") != None):
             return True
-        return (self.rootUsers_up._Find(usr.usrName, usr.usrName, usr.usrName, usr.usrName) != None)
+        return (self.rootUsers_up._Find(usr.usrID, usr.usrName, usr.usrName_Nick, "") != None)
     def IsRunning(self): return self.isRunning; 
     def IsRunSingle(self): return self.isRunSingle; 
     def IsEnable(self): return self.isEnable; 
@@ -111,7 +111,7 @@ class myRoot_Prj():
     def IsEnable_group(self, pGroup): 
         if(self.IsEnable_groupAll()): return True
         if(self.IsEnable() and self.isEnable_group):
-            if(len(self.rootGroups.groupInfos) < 1): return True   #未设置群则全部有效
+            if(len(self.rootGroups.groupInfos) < 1): return True        #未设置群则全部有效
             pGroup = self.rootGroups._Find_Group(pGroup)
             if(pGroup != None): return True
         return False
@@ -122,6 +122,8 @@ class myRoot_Prj():
         if(usrName in self.registedUsrs): return True
         if(nickName in self.registedUsrs): return True
         if(self.isRunBack == True):         #后台运行默认为已注册
+            return True
+        if(self.startUser == usrName or self.startUser == nickName):    #当前用户为启动用户    
             return True
         return False
     def IsRegist_group(self, pGroup): 

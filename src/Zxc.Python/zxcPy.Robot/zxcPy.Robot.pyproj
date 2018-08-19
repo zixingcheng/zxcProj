@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0e89e814-5d61-43f4-9065-03483bb5ba80}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>myRobot_API.py</StartupFile>
+    <StartupFile>zxcPy.Robot\Reply\myRobot_Reply.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

@@ -39,7 +39,8 @@ class myMsgs():
         self.usrMsgs = []               #消息集
         self.pathLog = ""
         if(dirLog != ""):
-            self.pathLog = dirLog + self.usrNameNick + ".csv"
+            nameFile = myData.iif(self.usrNameNick == '', self.usrName, self.usrNameNick)
+            self.pathLog = dirLog + nameFile + ".csv"
             if(os.path.exists(self.pathLog) == False):
                 myIO.Save_File(self.pathLog, "时间,用户名,消息,消息类型", False, True) 
 

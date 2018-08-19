@@ -43,7 +43,7 @@ class myRoot_Usr():
         return True 
         
     #新消息处理
-    def Done(self, pPrj, Text, msgID = "", pPlat = "", pGroup = None, nameSelf = "", bIsRegist = False):    
+    def Done(self, pPrj, Text, msgID = "", msgType = "TEXT", pPlat = "", pGroup = None, nameSelf = "", bIsRegist = False):    
         #提取功能设置信息
         if(pPrj == None): 
             self.usrPrj._Updata_DoInfo(pGroup)  #更新当前项目    
@@ -59,7 +59,7 @@ class myRoot_Usr():
             prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
 
         #调用消息处理，及其他处理 
-        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, isGroup, pGroup, pPlat, bIsRegist, toName, isSelf)
+        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, msgType, pPlat, pGroup, nameSelf, bIsRegist)
         return pReturn
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
@@ -153,50 +153,53 @@ class myRoot_UsrPrj():
         return True 
  
     #新消息处理
-    def Done(self, pPrj, prjDo, Text, msgID = "", usrPlant = "", pGroup = None, nameSelf = "", bIsRegist = False):  
+    def Done(self, pPrj, prjDo, Text, msgID = "", msgType = "TEXT", usrPlant = "", pGroup = None, nameSelf = "", bIsRegist = False):  
         #切换功能 
         self._Change_prjDo(prjDo, pPrj)
 
         #无可用功能执行后台功能
         if(self.prjDo == None): 
             usrInfo = self.get_UserInfo(usrPlant, pGroup, nameSelf)
-            self.Done_Back(Text, msgID, usrInfo)    #处理后台功能 
-            return None                             #None表示无命令，忽略 
+            self.Done_Back(Text, msgID, msgType, usrInfo)   #处理后台功能 
+            return None                                     #None表示无命令，忽略 
             
         #调用处理命令对象
+        pReturn = None
         usrInfo = self.get_UserInfo(usrPlant, pGroup, nameSelf)
         if(bIsRegist): 
             if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
-                pPrj.registoutUser(self.usrID, self.usrName, self.nickName, pGroup)
+                pPrj.registoutUser(self.usrID, self.usrName, self.nickName, pGroup, nameSelf)
                 bIsRegistOut = True
             else:
-                pPrj.registUser(self.usrID, self.usrName, self.nickName, pGroup)
+                pPrj.registUser(self.usrID, self.usrName, self.nickName, pGroup, nameSelf)
                 bIsRegistOut = False
-            pReturn = self.prjDo.Done_Regist(Text, isGroup, groupName, self.usrID, self.usrName, bIsRegistOut) 
+            pReturn = self.prjDo.Done_Regist(Text, usrInfo, bIsRegistOut) 
         else:
             if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
-                pReturn = self.prjDo.Done(Text, msgID, usrInfo)
+                pReturn = self.prjDo.Done_ByDict(Text, msgID, msgType, usrInfo)
                 self._Updata_prjInfo(prjDo)     #功能信息同步
                  
         #补全返回信息
         if(pReturn != None):
-            if(pPlat != ""): pReturn['plat'] = pPlat
+            if(usrPlant != ""): pReturn['plat'] = usrPlant
             
         #处理后台功能 
-        self.Done_Back(Text, msgID, usrInfo) 
+        self.Done_Back(Text, msgID, msgType, usrInfo) 
 
 		#命令有效性检查，失效则初始状态
+        self.prjInfo.startUser = self.prjDo.usrName
+        self.prjInfo.isRunning = self.prjDo.isRunning
         if(self.prjDo._Check() == False): 
             self._Close_prjDo(self.prjDo)
             self.prjInfo.Close() 
             self.prjDo = None
         return pReturn;
-    def Done_Back(self, Text, msgID, usrInfo):         
+    def Done_Back(self, Text, msgID, msgType = "TEXT", usrInfo = {}):         
         #处理后台功能 
         for x in self.prjDos:
             prjClass = self.prjDos[x]
             if(prjClass.isBackUse):
-                prjClass.Done(Text, msgID, usrInfo)
+                prjClass.Done_ByDict(Text, msgID, msgType, usrInfo)
     #处理封装返回用户信息
     def get_UserInfo(self, usrPlant = "", pGroup = None, nameSelf = ""):
         usrMsg = {}
@@ -279,7 +282,7 @@ class myRoot_Usrs():
         dtUser.Save(self.Dir_Setting, "UserInfo", 0, 0, True, "用户信息表")
 
     #查找 
-    def _Find(self, usrName, usrName_Nick, usrID, usrID_sys = "", usrType = "", bCreate_Auto = False): 
+    def _Find(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrType = "", bCreate_Auto = False): 
         pUser = None
 
         #按名称查找
@@ -317,7 +320,7 @@ class myRoot_Usrs():
             pUser.usrName = pUser.usrName_Nick
 
         # 不存在才可添加    
-        if(self._Find(pUser.usrName, pUser.usrName_Nick, pUser.usrID, pUser.usrID_sys, "", False) == None):
+        if(self._Find(pUser.usrID, pUser.usrName, pUser.usrName_Nick, pUser.usrID_sys, "", False) == None):
             self._Index(pUser)
             return True
         return False 
@@ -354,8 +357,8 @@ class myRoot_Usrs():
 
     
     # 用户是否存在
-    def IsExist(self, usrName, usrName_Nick, usrID, usrID_sys = ""): 
-        pUser = self._Find(usrName, usrName_Nick, usrID, usrID_sys, "", False) 
+    def IsExist(self, usrID, usrName, usrName_Nick, usrID_sys = ""): 
+        pUser = self._Find(usrID, usrName, usrName_Nick, usrID_sys, "", False) 
         if(pUser == None): return False
         return True
     # 添加用户
@@ -367,8 +370,8 @@ class myRoot_Usrs():
         if(usrName == None): return False
 
         # 新用户
-        pUser = self._Find(usrName, usrName_Nick, usrID, "", usrType, True)
-        if(pUser.usrLoaded and canUpdata == False): return False
+        pUser = self._Find(usrID, usrName, usrName_Nick, "", usrType, True)
+        if(pUser.usrLoaded and canUpdata == False): return True
 
         # 信息更新
         pUser.usrPhone = msgInfo.get("usrPhone", "")  
@@ -379,10 +382,10 @@ class myRoot_Usrs():
             if(not usrType in pUser.usrPlants):
                 pUser.usrPlants.append(usrType)
         return True
-    # 添加用户
-    def Del(self, usrName): 
+    # 删除用户
+    def Del(self, usrID, usrName, usrName_Nick): 
         usrName = usrName.strip().lower()
-        pUser = self._Find(usrName, usrName, "", "", "", False) 
+        pUser = self._Find(usrID, usrName, usrName_Nick, "", "", False) 
         if(pUser == None): return False
         self.usrList.pop(pUser.usrInd)
         self.usrList_Name.pop(pUser.usrName)
@@ -395,9 +398,9 @@ class myRoot_Usrs():
 #主启动程序
 if __name__ == "__main__":
     pUsers = myRoot_Usrs( "@@zxcPy", "zxcPy")
-    pUser = pUsers.Add({'usrName': "Test",'usrName_Nick': "测试",'usrID': "@@1" ,'usrType': "wx"}, True)
-    pUser = pUsers.Add({'usrName': "Test3",'usrName_Nick': "测试3",'usrID': "@@3" })
-    pUsers.Del("测试3")
+    print(pUsers.Add({'usrName': "Test",'usrName_Nick': "测试",'usrID': "@@1" ,'usrType': "wx"}, True))
+    print(pUsers.Add({'usrName': "Test3",'usrName_Nick': "测试3",'usrID': "@@3" }))
+    print(pUsers.Del("", "", "测试3"))
 
     pUsers._Save()
-    print(pUser)
+    print()
