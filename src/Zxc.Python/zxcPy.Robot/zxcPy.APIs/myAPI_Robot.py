@@ -60,10 +60,7 @@ class myAPI_Robot_Reply(myWeb.myAPI):
 #初始消息处理对象
 def init_Reply():     
     #全局对象提取
-    ms_Reply = gol._Get_Value('rootReply', None)
-    if(ms_Reply == None):
-        ms_Reply = myRobot_Reply_MQ.myRobot_Reply_MQ()
-        gol._Set_Value('rootReply', ms_Reply)
+    ms_Reply = gol._Get_Value('robotReply', None)
     return ms_Reply
 #集中添加所有API
 def add_APIs(pWeb):     

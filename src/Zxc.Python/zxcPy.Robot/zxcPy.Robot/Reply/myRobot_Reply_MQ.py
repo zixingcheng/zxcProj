@@ -58,11 +58,18 @@ class myRobot_Reply_MQ(myRobot_Reply):
         self.isRunning = True
         self._Init_MQ(self.isRunning)
 
+#初始全局消息管理器
+from myGlobal import gol 
+gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
+if(gol._Get_Setting('robotReply', None)== None):
+    gol._Set_Setting('robotReply', myRobot_Reply_MQ(True))    #实例 机器人消息处理工厂类 
+    print("sdfdfssfsfsf")
+
 
 #主启动程序
 if __name__ == "__main__":
     #机器人消息处理
-    pWxReply = myRobot_Reply_MQ(True)
+    pWxReply = gol._Get_Setting('robotReply')
     
     #实例生产者、消费者
     from myGlobal import gol 

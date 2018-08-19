@@ -50,9 +50,9 @@ class myWeb(myThread.myThread):
         #    return "Hello World......!" 
  
     #运行
-    def run(self): 
+    def run(self, use_reloader=False): 
         #官方启动方式参见：http://flask.pocoo.org/docs/0.12/quickstart/#a-minimal-application
-        self.app.run(host = self.host, port = self.port, debug = self.debug)  
+        self.app.run(host = self.host, port = self.port, debug = self.debug, use_reloader = use_reloader)  
 
 #API接口类(Restful)
 class myAPI(Resource):

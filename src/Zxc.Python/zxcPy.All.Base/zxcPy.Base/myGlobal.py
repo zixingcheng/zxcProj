@@ -36,7 +36,7 @@ class gol():
 
     def _Set_Value(key, value, cover = False):
         """ 定义一个全局变量 """
-        if(cover):
+        if(cover == False):
             if(_global_dict.get(key, None) == None):
                 _global_dict[key] = value
         else:
@@ -46,9 +46,9 @@ class gol():
         return _global_dict.get(key, defValue)
 
     #全局设置
-    def _Set_Setting(key, value, cover = False):
+    def _Set_Setting(key, value, cover = True):
         dictSet = _global_dict["golSetting"]
-        if(cover):
+        if(cover == False):
             if(dictSet.get(key, None) == None):
                 dictSet[key] = value
         else:
