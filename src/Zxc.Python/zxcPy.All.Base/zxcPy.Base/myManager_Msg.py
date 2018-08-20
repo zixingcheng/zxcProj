@@ -113,7 +113,7 @@ class myManager_Msg():
         return True
     def _Log(self, msg = {}):
         return self.Log_ByDict(msg.get('msg', ""), msg.get('msgID', ""), msg.get('msgType', ""), msg)
-    def _Find_Log_ByDict(self, usrInfo, bCreatAuto = True):
+    def _Find_Log_ByDict(self, usrInfo, bCreatAuto = False):
         nameGroup = usrInfo.get('groupName', "")
         if(nameGroup != ""):
             usrID = usrInfo.get('groupID', "")

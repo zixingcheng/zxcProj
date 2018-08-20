@@ -92,7 +92,7 @@ class myWx_Reply():
         msg["usrID"] = usrID
         msg["usrName"] = usrName
         msg["usrNameNick"] = usrNameNick
-        msg['usrNameSelf'] = nameSelf      #自己发自己标识 
+        msg['usrNameSelf'] = nameSelf       #自己发自己标识 
         msg["groupID"] = idGroup
         msg["groupName"] = nameGroup
 
@@ -100,7 +100,9 @@ class myWx_Reply():
         msg["msgType"] = msgType
         if(msgTime > 0): msg['time'] = msgTime 
         msg["plat"] = "wx"
-        if(noteMsg != None): msg['noteInfo'] = noteMsg      #加入通知信息 noteMsg  
+        if(noteMsg != None): 
+            msg['noteInfo'] = noteMsg       #加入通知信息 noteMsg  
+            msg["msg"] = str(noteMsg)       #调整消息内容为noteMsg
         print("请求消息:: ", msg)
 
         #请求robotAPI
@@ -122,16 +124,6 @@ class myWx_Reply():
             pass
         return None
     
-    #处理封装返回用户信息
-    def get_UserInfo(self, usrID, usrName, nameNick, groupID, groupName, nameSelf):
-        usrMsg = {}
-        usrMsg['usrID'] = usrID
-        usrMsg['usrName'] = usrName
-        usrMsg['usrNameNick'] = nameNick
-        usrMsg['groupID'] = idGroup
-        usrMsg['groupName'] = groupName
-        usrMsg['usrNameSelf'] = nameSelf      #自己发自己标识 
-        return usrMsg
     #处理封装返回消息(按标识内容处理)
     def get_NoteTag(self, msgType, msg):
         if(msgType != "NOTE"): return None

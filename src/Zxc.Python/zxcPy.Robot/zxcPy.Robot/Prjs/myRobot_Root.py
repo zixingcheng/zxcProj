@@ -16,8 +16,8 @@ from myGlobal import gol
     
 #机器人类--权限提升
 class myRobot_Root(myRobot.myRobot):
-    def __init__(self, usrName, usrID):
-        super().__init__(usrName, usrID)
+    def __init__(self, usrID = "", usrName = ""):
+        super().__init__(usrID, usrName)
         self.doTitle = "Robot_Root"     #说明 
         self.prjName = "Robot_Root"     #功能名
         self.doCmd = "@@zxcRobot_Root"  #启动命令 
@@ -56,7 +56,7 @@ class myRobot_Root(myRobot.myRobot):
 
 #主启动程序
 if __name__ == "__main__":
-    pR = myRobot_Root("zxc", "zxcID");
+    pR = myRobot_Root("zxcID", "zxc");
     pp = pR.Done("@@zxcRobot_Root")
     print(pp)
     print(pR.Done("Hello"))

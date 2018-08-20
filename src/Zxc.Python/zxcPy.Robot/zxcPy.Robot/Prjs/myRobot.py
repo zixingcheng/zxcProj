@@ -20,7 +20,7 @@ myDoType = myEnum.enum_index('Cmd')  # 命令类型枚举
 
 #机器人基类
 class myRobot():
-    def __init__(self, usrName = "", usrID = ""):
+    def __init__(self, usrID = "", usrName = ""):
         # 功能信息
         self.doType = myDoType.Cmd  #类型   
         self.doTitle = "Robot"      #说明 

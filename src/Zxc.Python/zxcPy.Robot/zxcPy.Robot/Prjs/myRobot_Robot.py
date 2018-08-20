@@ -16,8 +16,8 @@ from myGlobal import gol
     
 #机器人类--聊天机器人
 class myRobot_Robot(myRobot.myRobot):
-    def __init__(self, usrName, usrID):
-        super().__init__(usrName, usrID)
+    def __init__(self, usrID = "", usrName = ""):
+        super().__init__(usrID, usrName)
         self.doTitle = "聊天机器人"     #说明 
         self.prjName = "聊天机器人"     #功能名
         self.doCmd = "@@ChatRobot"      #启动命令 
@@ -78,7 +78,7 @@ class myRobot_Robot(myRobot.myRobot):
 
 #主启动程序
 if __name__ == "__main__":
-    pR = myRobot_Robot("zxc", "zxcID");
+    pR = myRobot_Robot("zxcID", "zxc")
     pp = pR.Done("@@ChatRobot")
     myDebug.Debug(pR.Done("Hello"))
     myDebug.Debug(pR.Done("北京 天气"))

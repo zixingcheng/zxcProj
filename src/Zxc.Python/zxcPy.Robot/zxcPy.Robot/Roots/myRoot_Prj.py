@@ -57,8 +57,8 @@ class myRoot_Prj():
     #def Log(self, usrName, usrInfo):  
     #    self.infoLogs[datetime.datetime.now] = usrName + "::" + usrInfo
     #实例功能对象
-    def creatIntance(self, usrName, usrID):      
-        self.prjClass = myImport.Import_Class(self.fileName, self.className)(usrName, usrID)
+    def creatIntance(self, usrID, usrName):      
+        self.prjClass = myImport.Import_Class(self.fileName, self.className)(usrID, usrName)
         self.isRoot = self.prjClass.isRootUse           #是否为系统级使用(系统内置功能) 
         self.isRunSingle = self.prjClass.isSingleUse    #是否为单例使用(单例时每个用户专属) 
         self.isRunBack = self.prjClass.isBackUse        #是否为后台使用(后台可运行多个，一般为系统级功能，如日志)  
@@ -188,7 +188,7 @@ class myRoots_Prj():
             prjRoot.plantsEnable = list(dtRow[lstFields_ind["平台列表"]])
 
             #实例功能对象并缓存索引
-            prjRoot.creatIntance(self.usrName, self.usrID)
+            prjRoot.creatIntance(self.usrID, self.usrName)
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
 
@@ -196,17 +196,24 @@ class myRoots_Prj():
         if(True): 	 
             prjRoot = myRoot_Prj()
             prjRoot._Init("权限提升", "myRobot_Root", "myRobot_Root", "zxcRobot_Root", True, False, True, False, False)
-            prjRoot.creatIntance(self.usrName, self.usrID)
+            prjRoot.creatIntance(self.usrID, self.usrName)
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
 
             prjLog = myRoot_Prj()
             prjLog._Init("消息日志", "myRobot_Log", "myRobot_Log", "zxcRobot_Log", True, False, True, False, False)
-            prjLog.creatIntance(self.usrName, self.usrID)
-            prjLog.prjClass.Done("@@zxcRobot_Log", "")       #自启动
+            prjLog.creatIntance(self.usrID, self.usrName)
+            prjLog.prjClass.Done("@@zxcRobot_Log", "")          #自启动
             self.prjRoots[prjLog.prjName] = prjLog
             self.prjCmds[prjLog.cmdStr.lower()] = prjLog.prjName
         
+            prjRevoke = myRoot_Prj()
+            prjRevoke._Init("通知消息", "myRobot_Note", "myRobot_Note", "zxcRobot_Note", True, False, True, False, False)
+            prjRevoke.creatIntance(self.usrID, self.usrName)
+            prjRevoke.prjClass.Done("@@zxcRobot_Note", "")      #自启动
+            self.prjRoots[prjRevoke.prjName] = prjRevoke
+            self.prjCmds[prjRevoke.cmdStr.lower()] = prjRevoke.prjName
+
         #用户权限设置
         if(True): 	 
             #提取字段信息 

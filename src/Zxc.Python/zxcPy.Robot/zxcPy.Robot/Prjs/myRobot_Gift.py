@@ -172,8 +172,8 @@ class myManager_Gift():
 
 #机器人类----红包(记录、查询)
 class myRobot_Repeater(myRobot.myRobot):
-    def __init__(self, usrName, usrID):
-        super().__init__(usrName, usrID)
+    def __init__(self, usrID = "", usrName = ""):
+        super().__init__(usrID, usrName)
         self.doTitle = "复读机"     #说明 
         self.prjName = "复读机"     #功能名
         self.doCmd = "@@Repeater"   #启动命令 

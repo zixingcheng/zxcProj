@@ -16,8 +16,8 @@ from myGlobal import gol
     
 #机器人类--日志
 class myRobot_Log(myRobot.myRobot):
-    def __init__(self, usrName, usrID):
-        super().__init__(usrName, usrID)
+    def __init__(self, usrID = "", usrName = ""):
+        super().__init__(usrID, usrName)
         self.doTitle = "Robot_Log"     #说明 
         self.prjName = "消息日志"      #功能名
         self.doCmd = "@@zxcRobot_Log"  #启动命令 
@@ -32,8 +32,10 @@ class myRobot_Log(myRobot.myRobot):
         
     #消息处理接口
     def _Done(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
-        #日志记录
-        self.msgLogs.Log_ByDict(Text, msgID, msgType, usrInfo)  
+        #日志记录（屏蔽NOTE类型）
+        if(msgType.upper() != "NOTE"):  
+            self.msgLogs.Log_ByDict(Text, msgID, msgType, usrInfo)  
+            myDebug.Debug("已记录消息：", Text, "("+ msgID +") ", msgType, " from::", str(usrInfo))
         return "" 
 
     def _Title_User_Opened(self): 
@@ -42,18 +44,18 @@ class myRobot_Log(myRobot.myRobot):
 
 #主启动程序
 if __name__ == "__main__":
-    pR = myRobot_Log("zxc", "zxcID");
-    pp = pR.Done("@@zxcRobot_Log")
-    print(pR.Done("Hello"))
-    print(pR.Done("Test", "@zxcvbnm", "TEXT", "zxcID", 'zxc'))
-    print(pR.Done("Bye"))
-    pp = pR.Done("@@zxcRobot_Log")
+    pR = myRobot_Log("zxcID", "zxcName");
+    pR.Done("@@zxcRobot_Log")
+    myDebug.Debug(pR.Done("Hello"))
+    pR.Done("Test", "@zxcvbnm", "TEXT", "zxcID", 'zxcName', "zxcNameNick")
+    pR.Done("Bye")
+    pR.Done("@@zxcRobot_Log")
     print()
     time.sleep (1)
-    
+        
     #提取消息测试
     pMsg = pR.msgLogs._Find_Log("zxcID","zxc", "").Find("@zxcvbnm")
-    print("历史消息： msgID: " , pMsg.msgID, "msg: ", pMsg.msg)
+    myDebug.Debug("历史消息： msgID: " , pMsg.msgID, "msg: ", pMsg.msg)
     print()
     
     pp = pR.Done("@@zxcRobot_Log")
