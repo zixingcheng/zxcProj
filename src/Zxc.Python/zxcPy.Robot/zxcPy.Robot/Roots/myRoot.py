@@ -11,7 +11,7 @@ import sys, os, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__) 
 mySystem.Append_Us("", False) 
-import myRoot_Prj, myRoot_Usr, myRoot_GroupInfo, myRoot_Plant
+import myRoot_Prj, myRoot_Usr, myRoot_GroupInfo, myRoot_Plat
 from myGlobal import gol   
 
 
@@ -24,7 +24,7 @@ class myRoot():
         self.rootPrjs = None            #功能集 
         self.usrInfos = None            #用户集 
         self.usrGroups = None           #用户群组集
-        self.usrPlants = None           #平台集
+        self.usrPlats = None           #平台集
 
         self.Init()                     #信息初始
     def Init(self):  
@@ -56,14 +56,14 @@ class myRoot():
             self.rootPrjs.usrID = self.usrID
         
         #平台集   
-        if(self.usrPlants == None):
-            self.usrPlants = myRoot_Plant.myRoot_Plants(self.usrName, self.usrID)   
+        if(self.usrPlats == None):
+            self.usrPlats = myRoot_Plat.myRoot_Plats(self.usrName, self.usrID)   
         else:
-            self.usrPlants.usrName = self.usrName
-            self.usrPlants.usrID = self.usrID
-        self.Init_Plants()  #初始平台             
-    def Init_Plants(self, plant = "wx"):  
-        self.usrPlants.Regist(self.usrName, self.usrID, plant)
+            self.usrPlats.usrName = self.usrName
+            self.usrPlats.usrID = self.usrID
+        self.Init_Plats()  #初始平台             
+    def Init_Plats(self, plat = "wx"):  
+        self.usrPlats.Regist(self.usrName, self.usrID, plat)
     def Init_UserInfo(self, usrName, usrNameNick, usrID):  
         gol._Set_Setting('usrName', usrName)
         gol._Set_Setting('usrNameNick', usrNameNick)

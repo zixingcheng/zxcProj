@@ -20,7 +20,7 @@ class myRoot_Usr():
         self.usrID = ""                 #用户ID
         self.usrName = usrName          #用户名
         self.usrName_Nick = nameNick    #用户名--昵称
-        self.usrPlants = []             #用户类型(来源平台集)
+        self.usrPlats = []             #用户类型(来源平台集)
         self.usrTag = ""        #标签
         self.usrRamak = ""      #备注
         self.usrPhone = ""      #电话号码
@@ -37,8 +37,8 @@ class myRoot_Usr():
         if(usrName != ""): self.usrName = usrName
         if(usrID != ""): self.usrID = usrID
         if(plat != ""): 
-            if(plat in self.usrPlants == False):
-                self.usrPlants.append(plat)
+            if(plat in self.usrPlats == False):
+                self.usrPlats.append(plat)
         self.usrPrj = myRoot_UsrPrj(self.usrID, self.usrName, self.usrName_Nick)       #当前功能管理对象 
         return True 
         
@@ -153,19 +153,19 @@ class myRoot_UsrPrj():
         return True 
  
     #新消息处理
-    def Done(self, pPrj, prjDo, Text, msgID = "", msgType = "TEXT", usrPlant = "", pGroup = None, nameSelf = "", bIsRegist = False):  
+    def Done(self, pPrj, prjDo, Text, msgID = "", msgType = "TEXT", usrPlat = "", pGroup = None, nameSelf = "", bIsRegist = False):  
         #切换功能 
         self._Change_prjDo(prjDo, pPrj)
 
         #无可用功能执行后台功能
         if(self.prjDo == None): 
-            usrInfo = self.get_UserInfo(usrPlant, pGroup, nameSelf)
+            usrInfo = self.get_UserInfo(usrPlat, pGroup, nameSelf)
             self.Done_Back(Text, msgID, msgType, usrInfo)   #处理后台功能 
             return None                                     #None表示无命令，忽略 
             
         #调用处理命令对象
         pReturn = None
-        usrInfo = self.get_UserInfo(usrPlant, pGroup, nameSelf)
+        usrInfo = self.get_UserInfo(usrPlat, pGroup, nameSelf)
         if(bIsRegist): 
             if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
                 pPrj.registoutUser(self.usrID, self.usrName, self.nickName, pGroup, nameSelf)
@@ -181,7 +181,7 @@ class myRoot_UsrPrj():
                  
         #补全返回信息
         if(pReturn != None):
-            if(usrPlant != ""): pReturn['plat'] = usrPlant
+            if(usrPlat != ""): pReturn['usrPlat'] = usrPlat
             
         #处理后台功能 
         self.Done_Back(Text, msgID, msgType, usrInfo) 
@@ -201,12 +201,13 @@ class myRoot_UsrPrj():
             if(prjClass.isBackUse):
                 prjClass.Done_ByDict(Text, msgID, msgType, usrInfo)
     #处理封装返回用户信息
-    def get_UserInfo(self, usrPlant = "", pGroup = None, nameSelf = ""):
+    def get_UserInfo(self, usrPlat = "", pGroup = None, nameSelf = ""):
         usrMsg = {}
         usrMsg['usrID'] = self.usrID
         usrMsg['usrName'] = self.usrName
         usrMsg['usrNameNick'] = self.nickName 
-        usrMsg['usrNameSelf'] = nameSelf      #自己发自己标识 
+        usrMsg['usrNameSelf'] = nameSelf        #自己发自己标识 
+        usrMsg['usrPlat'] = usrPlat             #自己发自己标识 
         if(pGroup != None):
             usrMsg['groupID'] = pGroup.groupID
             usrMsg['groupName'] = pGroup.groupName
@@ -245,7 +246,7 @@ class myRoot_Usrs():
             pUser.usrID_sys = dtRow[lstFields_ind["ID"]]
             pUser.usrName_Nick = dtRow[lstFields_ind["用户昵称"]]
             pUser.usrID = dtRow[lstFields_ind["用户ID"]]
-            pUser.usrPlants = dtRow[lstFields_ind["来源平台"]].split(',')
+            pUser.usrPlats = dtRow[lstFields_ind["来源平台"]].split(',')
             pUser.usrPhone = dtRow[lstFields_ind["电话"]]
             pUser.usrTag = dtRow[lstFields_ind["标签"]]
             pUser.usrRamak = dtRow[lstFields_ind["备注"]]
@@ -269,7 +270,7 @@ class myRoot_Usrs():
             pValues.append(pUser.usrName)
             pValues.append(pUser.usrName_Nick)
             pValues.append(pUser.usrID)
-            pValues.append(myData_Trans.Tran_ToStr(pUser.usrPlants))
+            pValues.append(myData_Trans.Tran_ToStr(pUser.usrPlats))
             pValues.append(pUser.usrPhone)
             pValues.append(pUser.usrTag)
             pValues.append(pUser.usrRamak)
@@ -379,8 +380,8 @@ class myRoot_Usrs():
         pUser.usrRamak = msgInfo.get("usrRamak", "")  
         pUser.usrNotes = msgInfo.get("usrNotes", "") 
         if(usrType != ""):
-            if(not usrType in pUser.usrPlants):
-                pUser.usrPlants.append(usrType)
+            if(not usrType in pUser.usrPlats):
+                pUser.usrPlats.append(usrType)
         return True
     # 删除用户
     def Del(self, usrID, usrName, usrName_Nick): 

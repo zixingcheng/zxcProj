@@ -54,7 +54,7 @@ class Quote_Listener:
         msg["usrName"] = to_user
         msg["msg"] = text + "\n" + strTag
         msg["msgType"] = type
-        msg["plat"] = plat
+        msg["usrPlat"] = plat
         return msg
     #创建消息内容
     def OnCreatMsgstr(self, quoteDatas):

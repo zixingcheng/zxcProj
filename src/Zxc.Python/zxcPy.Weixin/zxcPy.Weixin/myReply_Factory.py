@@ -87,7 +87,7 @@ class myWx_Reply():
     #按命令处理返回消息(按标识内容处理)
     def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgType = "TEXT", msgTime = 0, idGroup = "", nameGroup = '', nameSelf = '', noteMsg = None):
         #组装请求参数字典
-        # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
+        # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'usrPlat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
         msg = self.usrMMsg.OnCreatMsg()
         msg["usrID"] = usrID
         msg["usrName"] = usrName
@@ -97,9 +97,10 @@ class myWx_Reply():
         msg["groupName"] = nameGroup
 
         msg["msg"] = strText
+        msg["msgID"] = msgID
         msg["msgType"] = msgType
         if(msgTime > 0): msg['time'] = msgTime 
-        msg["plat"] = "wx"
+        msg["usrPlat"] = "wx"
         if(noteMsg != None): 
             msg['noteInfo'] = noteMsg       #加入通知信息 noteMsg  
             msg["msg"] = str(noteMsg)       #调整消息内容为noteMsg

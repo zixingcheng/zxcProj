@@ -35,7 +35,7 @@ class myRobot_Log(myRobot.myRobot):
         #日志记录（屏蔽NOTE类型）
         if(msgType.upper() != "NOTE"):  
             self.msgLogs.Log_ByDict(Text, msgID, msgType, usrInfo)  
-            myDebug.Debug("已记录消息：", Text, "("+ msgID +") ", msgType, " from::", str(usrInfo))
+            myDebug.Debug("已记录消息：", Text, "("+ str(msgID) +") ", msgType, " from::", str(usrInfo))
         return "" 
 
     def _Title_User_Opened(self): 

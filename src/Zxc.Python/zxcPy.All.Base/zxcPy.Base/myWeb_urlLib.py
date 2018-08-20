@@ -151,6 +151,6 @@ if __name__ == "__main__":
 
     
     pWeb = myWeb("http://127.0.0.1:8668/zxcAPI/robot")
-    robotPath = "reply/{'usrName': '信阳毛尖--杨帆桥', 'msgID': '', 'msg': '宝宝', 'usrNameNick': '信阳毛尖--杨帆桥', 'usrID': '@c1744fd767656b64a495d7cabeb1041674dec223e5de0438def46d78b6c90f2b','msgType': 'TEXT', 'plat': 'wx', 'groupID': ''}"
+    robotPath = "reply/{'usrName': '信阳毛尖--杨帆桥', 'msgID': '', 'msg': '宝宝', 'usrNameNick': '信阳毛尖--杨帆桥', 'usrID': '@c1744fd767656b64a495d7cabeb1041674dec223e5de0438def46d78b6c90f2b','msgType': 'TEXT', 'usrPlat': 'wx', 'groupID': ''}"
     strReturn = pWeb.Do_API_get(robotPath, "zxcAPI-py")
     print(strReturn)

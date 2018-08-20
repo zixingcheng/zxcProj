@@ -38,7 +38,7 @@ class myRoot_Prj():
         self.rootUsers = myRoot_Usr.myRoot_Usrs("", "")                 #根权限用户集
         self.rootUsers_up = myRoot_Usr.myRoot_Usrs("", "")              #提升权限用户集
         self.rootGroups = myRoot_GroupInfo.myRoot_GroupsInfo("", "")    #已启用群集
-        self.plantsEnable = []          #平台列表
+        self.PlatsEnable = []          #平台列表
         self.registedUsrs = []          #当前授权功能开启用户
         self.registedGroups = []        #当前授权功能开启的群
         self.startUser = ""             #功能开启用户
@@ -134,11 +134,11 @@ class myRoot_Prj():
         if(self.isRunBack == True):         #后台运行默认为已注册
             return True
         return False
-    def IsEnable_plant(self, plantName): 
-        if(plantName == ""):
+    def IsEnable_Plat(self, PlatName): 
+        if(PlatName == ""):
             return self.IsEnable(); 	
         else:
-            return self.IsEnable() and (plantName in self.plantsEnable); 	 
+            return self.IsEnable() and (PlatName in self.PlatsEnable); 	 
 #功能权限集对象
 class myRoots_Prj():
     def __init__(self, usrName, usrID, bgetGol = True): 
@@ -185,7 +185,7 @@ class myRoots_Prj():
                 for x in lstGroup:
                     pGroup = pGroups.Find_Group(x, x, "", True)
                     prjRoot.rootGroups.groupInfos[x] = pGroup
-            prjRoot.plantsEnable = list(dtRow[lstFields_ind["平台列表"]])
+            prjRoot.PlatsEnable = list(dtRow[lstFields_ind["平台列表"]])
 
             #实例功能对象并缓存索引
             prjRoot.creatIntance(self.usrID, self.usrName)

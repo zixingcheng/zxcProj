@@ -22,7 +22,6 @@ class myRobot_Note(myRobot.myRobot):
         self.prjName = "通知消息"       #功能名
         self.doCmd = "@@zxcRobot_Note"  #启动命令 
         self.isBackUse = True           #后台运行
-        self.msgLogs = gol._Get_Setting('manageMsgs')   #全局消息日志管理器
         self.perfixRevoke = ['告诉你一个秘密！', '偷偷告诉你哦！', '哈哈，发现你了！', '万能的机器人告诉我：']
                 
     #消息处理接口
@@ -43,7 +42,7 @@ class myRobot_Note(myRobot.myRobot):
     #消息撤回通知        
     def _Done_Revoke(self, msg, msgID, msgType, usrInfo = {}):
         strReturn = ""
-        pMsgs = self.msgLogs._Find_Log_ByDict(usrInfo, False)
+        pMsgs = self.usrMMsg._Find_Log_ByDict(usrInfo, False)
         if(pMsgs != None): 
             msgID_old = msg.get('old_msg_id', "")
             pMsg = pMsgs.Find(msgID_old)

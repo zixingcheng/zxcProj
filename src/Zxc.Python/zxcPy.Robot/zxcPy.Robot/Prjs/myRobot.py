@@ -28,7 +28,7 @@ class myRobot():
         self.usrName = usrName      #功能所属用户名称(启动者)
         self.usrID = usrID          #功能所属用户ID(启动者)
         self.strText_L = ""         #命令信息（缓存上次） 
-        self._Init()                 #初始基础信息
+        self._Init()                #初始基础信息
     def _Init(self): 
         self.isEnable = True            #是否可用
         self.isRootUse = False          #是否为系统级使用(系统内置功能) 
@@ -41,7 +41,7 @@ class myRobot():
         self.prjName = "消息处理功能"   #功能名
         self.fileName = "myRobot"       #文件名
         self.className = "myRobot"      #类名
-        self.isNoReply = True           #是否无回复操作--功能自带    
+        self.isNoReply = True           #是否无回复操作--功能自带  
         
         # 初始返回消息
         self.usrMMsg = gol._Get_Setting('manageMsgs')     #消息管理器
@@ -55,9 +55,9 @@ class myRobot():
         self.tLast = datetime.now()
 
     #消息处理接口
-    def Done(self, Text, msgID = "", msgType = "TEXT", usrID = "", usrName = "zxcRobot",  usrNameNick = '', idGroup = '', nameGroup = "", nameSelf = ''):
+    def Done(self, Text, msgID = "", msgType = "TEXT", usrID = "", usrName = "zxcRobot",  usrNameNick = '', usrPlat = '', idGroup = '', nameGroup = "", nameSelf = ''):
         #消息处理  
-        usrInfo = self.get_UserInfo(usrID, usrName, usrNameNick, idGroup, nameGroup, nameSelf)
+        usrInfo = self.usrMMsg.OnCreatMsg_UsrInfo(usrID, usrName, usrNameNick, usrPlat, idGroup, nameGroup, nameSelf)
         return self.Done_ByDict(Text, msgID, msgType, usrInfo)
     def Done_ByDict(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
         strReturn = None
@@ -82,15 +82,8 @@ class myRobot():
         strReturn = self._Title(usrInfo, True, bRegistOut)
         return self._Return(strReturn, usrInfo)
     #处理封装返回用户信息
-    def get_UserInfo(self, usrID, usrName, nameNick, groupID, groupName, nameSelf):
-        usrInfo = {}
-        usrInfo['usrID'] = usrID
-        usrInfo['usrName'] = usrName
-        usrInfo['usrNameNick'] = nameNick
-        usrInfo['groupID'] = groupID
-        usrInfo['groupName'] = groupName
-        usrInfo['usrNameSelf'] = nameSelf      #自己发自己标识 
-        return usrInfo
+    def get_UserInfo(self, usrID, usrName, usrNameNick, usrPlat, groupID, groupName, nameSelf):
+        return self.usrMMsg.OnCreatMsg_UsrInfo(usrID, usrName, usrNameNick, usrPlat, groupID, groupName, nameSelf)
         
     #合法性(时效)
     def _Check(self):
@@ -116,6 +109,7 @@ class myRobot():
         self.msg['usrName'] = usrInfo.get('usrName', '')
         self.msg['usrNameNick'] = usrInfo.get('usrNameNick', '')
         self.msg['usrNameSelf'] = usrInfo.get('usrNameSelf', '')
+        self.msg['usrPlat'] = usrInfo.get('usrPlat', '')
         self.msg['groupID'] = usrInfo.get('groupID', '')
         self.msg['groupName'] = usrInfo.get('groupName', '')
         self.msg['msg'] = Text  
@@ -161,7 +155,7 @@ if __name__ == "__main__":
     print(pR.Done("Hello"))
     pR.Done("@@myRobot")["msg"]
 
-    usrInfo = pR.get_UserInfo("", "", "", "", "", "")
+    usrInfo = pR.get_UserInfo("", "", "", "", "", "", "")
     pR.Done_Regist("@@myRobot", usrInfo)["msg"]
     pR.Done_Regist("@@myRobot", usrInfo, True)["msg"]
     print(pR.Done("Test....")["msg"])

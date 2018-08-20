@@ -16,11 +16,12 @@ myMsgPlat = myEnum.enum('robot', 'wx')
 
 #自定义消息对象
 class myMsg():
-    def __init__(self, msg, msgID, usrFrom, msgType = myMsgType.TEXT): 
+    def __init__(self, msg, msgID, msgType = myMsgType.TEXT, usrFrom = '', usrPlat = ''): 
         self.msg = msg              #消息内容
-        self.msgID = msgID          #消息标识
+        self.msgID = str(msgID)     #消息标识
         self.msgType = msgType      #消息类型
-        self.usrFrom = usrFrom      #消息来源
+        self.usrFrom = usrFrom      #消息来源用户
+        self.usrPlat = usrPlat      #消息来源平台
         self.msgUrl = ""            #消息链接(多媒体)
         self.msgTime = datetime.datetime.now()  #消息示例时间 
     def toCSVString(self):
@@ -45,9 +46,9 @@ class myMsgs():
                 myIO.Save_File(self.pathLog, "时间,用户名,消息,消息类型", False, True) 
 
     #添加消息
-    def Add(self, msg, msgID = '', usrFrom = '', msgType = myMsgType.TEXT):
+    def Add(self, msg, msgID = '', msgType = myMsgType.TEXT, usrFrom = '', usrPlat = ''):
         if(msg == ""): return False
-        pMsg = myMsg(msg, msgID, msgType)
+        pMsg = myMsg(msg, msgID, msgType, usrFrom, usrPlat)
         return self._Add(pMsg)
     def _Add(self, msg, bSave = False):
         if(msg == None): return False
@@ -73,7 +74,7 @@ class myManager_Msg():
     def __init__(self, dir = ""):
         self.usePrint = True
         self.useVoice = False  
-        self.msgExramp = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "groupID":'', "plat":''} #消息样例
+        self.msgExramp = {"usrID":'', "usrName":'', "usrNameNick":'', "msg":'', "msgID":'', "msgType":'TEXT', "groupID":'', "usrPlat":''} #消息样例
         self.msgLogs = {}
         self.msgInd_Name = {}
         self.msgInd_Nick = {}
@@ -96,11 +97,11 @@ class myManager_Msg():
     #初始消息日志路径   
     def Init_LogDir(self, dir):
         self.dirLog = dir
-        myIO.mkdir(self.dirLog)
+        myIO.mkdir(self.dirLog, False)
         
     #添加消息
-    def Log(self, usrID, usrName, usrNameNick, msg, msgID, msgType = myMsgType.TEXT, idGroup = '', nameGroup = '', nameSelf = ''):
-        usrInfo = self.OnCreatMsg_UsrInfo(usrID, usrName, usrNameNick, idGroup, nameGroup, nameSelf)
+    def Log(self, usrID, usrName, usrNameNick, msg, msgID, msgType = myMsgType.TEXT, usrPlat = '', idGroup = '', nameGroup = '', nameSelf = ''):
+        usrInfo = self.OnCreatMsg_UsrInfo(usrID, usrName, usrNameNick, usrPlat, idGroup, nameGroup, nameSelf)
         return self.Log_ByDict(msg, msgID, msgType, usrInfo)
     def Log_ByDict(self, msg, msgID, msgType, usrInfo):
         pMsgs = self._Find_Log_ByDict(usrInfo, True)
@@ -108,7 +109,8 @@ class myManager_Msg():
             if(msg == ""): return False
             nameSelf = usrInfo.get('usrNameSelf', "")
             usrName = myData.iif(nameSelf == "", usrInfo.get('usrName', ""), nameSelf)
-            pMsg = myMsg(msg, msgID, usrName, msgType)
+            usrPlat = usrInfo.get('usrPlat', "")
+            pMsg = myMsg(msg, msgID, msgType, usrName, usrPlat)
             pMsgs._Add(pMsg) 
         return True
     def _Log(self, msg = {}):
@@ -149,7 +151,7 @@ class myManager_Msg():
         strMsg = msg.get('msg')
 
         #文字输出
-        typePlatform = myData.iif(plat == "", msg.get("plat", myMsgPlat.wx), plat)
+        typePlatform = myData.iif(plat == "", msg.get("usrPlat", myMsgPlat.wx), plat)
         if(self.usePrint):
             myDebug.Print("消息管理器::", typePlatform + ">> ",strMsg)
 
@@ -176,11 +178,12 @@ class myManager_Msg():
             msg['time'] = myData_Trans.Tran_ToTime_int()
         return msg
     #创建封装用户信息
-    def OnCreatMsg_UsrInfo(self, usrID, usrName, nameNick, groupID, groupName, nameSelf):
+    def OnCreatMsg_UsrInfo(self, usrID, usrName, nameNick, usrPlat, groupID, groupName, nameSelf):
         usrInfo = {}
         usrInfo['usrID'] = usrID
         usrInfo['usrName'] = usrName
         usrInfo['usrNameNick'] = nameNick
+        usrInfo['usrPlat'] = usrPlat
         usrInfo['groupID'] = groupID
         usrInfo['groupName'] = groupName
         usrInfo['usrNameSelf'] = nameSelf      #自己发自己标识 
@@ -215,7 +218,7 @@ if __name__ == '__main__':
    msg["msg"] = "测试消息py"
    msg["msgID"] = "msgID-***"
    msg["msgType"] = "TEXT"
-   msg["plat"] = "wx"
+   msg["usrPlat"] = "wx"
    pMMsg.OnHandleMsg(msg)
    print()
 

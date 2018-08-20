@@ -22,20 +22,20 @@ from myGlobal import gol
 
 
 #API-平台注册
-class myAPI_Robot_RegistPlant(myWeb.myAPI): 
-    def get(self, usrName, usrID, plantName):
+class myAPI_Robot_RegistPlat(myWeb.myAPI): 
+    def get(self, usrName, usrID, PlatName):
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
-        if(plantName == ""): return pMsg
+        if(PlatName == ""): return pMsg
         
         #提取平台集 
         pRoot = gol._Get_Value('rootRobot')
-        pPlants = pRoot.usrPlants
-        pPlant = pPlants.Find(plantName)
-        if(pPlant == None):
-            pPlant = pPlants.Regist(usrName, usrID, plantName)
+        pPlats = pRoot.usrPlats
+        pPlat = pPlats.Find(PlatName)
+        if(pPlat == None):
+            pPlat = pPlats.Regist(usrName, usrID, PlatName)
         
         pMsg['result'] = True
-        pMsg['toke'] = pPlant.usrToken
+        pMsg['toke'] = pPlat.usrToken
 
         #初始消息处理对象
         init_Reply()._Init()
@@ -68,7 +68,7 @@ def add_APIs(pWeb):
     init_Reply()
 
     # 创建Web API
-    pWeb.add_API(myAPI_Robot_RegistPlant, '/zxcAPI/robot/regist/plant/<usrName>/<usrID>/<plantName>')
+    pWeb.add_API(myAPI_Robot_RegistPlat, '/zxcAPI/robot/regist/Plat/<usrName>/<usrID>/<PlatName>')
     pWeb.add_API(myAPI_Robot_Reply, '/zxcAPI/robot/reply/<msgInfo>')
 
 
@@ -80,25 +80,25 @@ if __name__ == '__main__':
     print()
 
     #测试
-    namePlant = "wx"
+    namePlat = "wx"
     token = ""
 
     #注册平台, 取token
-    pReg = myAPI_Robot_RegistPlant()
+    pReg = myAPI_Robot_RegistPlat()
     token = pReg.get("myTest", "@zxcv", "wx")
     print("token::", token)
     print()
 
 
     #消息处理借接口
-    # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'plat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
+    # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'usrPlat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
     pMMsg = myManager_Msg.myManager_Msg()
     msg = pMMsg.OnCreatMsg()
     msg["usrID"] = "zxc_0"
     msg["usrName"] = "墨紫"
     msg["usrNameNick"] = ""
     msg["msg"] = "Repeater"
-    msg["plat"] = "wx"
+    msg["usrPlat"] = "wx"
     myDebug.Debug("消息结构：", msg)
     print()
     

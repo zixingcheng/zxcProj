@@ -62,8 +62,8 @@ class myRobot_Reply_MQ(myRobot_Reply):
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 if(gol._Get_Setting('robotReply', None)== None):
-    gol._Set_Setting('robotReply', myRobot_Reply_MQ(True))    #实例 机器人消息处理工厂类 
-    print("sdfdfssfsfsf")
+    gol._Set_Setting('robotReply', myRobot_Reply_MQ(True))    #实例 机器人消息处理工厂类
+    print()
 
 
 #主启动程序
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     pMMsg = gol._Get_Setting('manageMsgs')
     
     #用户信息 
-    msg = {"usrID":'zxc_0', "usrName":'墨紫', "usrNameNick":'', "msg":'', "msgType":'TEXT', "plat":'wx'} #消息样例
+    msg = {"usrID":'zxc_0', "usrName":'墨紫', "usrNameNick":'', "msg":'', "msgType":'TEXT', "usrPlat":'wx'} #消息样例
     plat = 'robot'
        
 

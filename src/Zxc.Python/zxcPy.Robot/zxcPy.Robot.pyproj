@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0e89e814-5d61-43f4-9065-03483bb5ba80}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>zxcPy.Robot\Reply\myRobot_Reply.py</StartupFile>
+    <StartupFile>myRobot_API.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -30,7 +30,7 @@
     <Compile Include="zxcPy.Robot\Reply\myRobot_Reply.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Repeater.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Root.py" />
-    <Compile Include="zxcPy.Robot\Roots\myRoot_Plant.py" />
+    <Compile Include="zxcPy.Robot\Roots\myRoot_Plat.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_GroupInfo.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_Usr.py" />

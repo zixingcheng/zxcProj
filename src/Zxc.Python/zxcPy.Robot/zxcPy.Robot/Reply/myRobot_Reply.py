@@ -66,13 +66,11 @@ class myRobot_Reply():
         msgText = msg.get('msg', "")
         msgID = msg.get('msgID', "")
         msgType = msg.get('msgType', "")
-        plat = msg.get('plat', "")
+        plat = msg.get('usrPlat', "")
 
         #按消息类型进一步处理('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
         if(msgType == myManager_Msg.myMsgType.TEXT):
-            msgText = msgText
-        else:
-            return None 
+            msgText = msgText 
 
         #调用 
         msgR = self.Done(usrID, usrName, usrNameNick, msgText, msgID, msgType, plat, groupID, groupName, nameSelf)
@@ -83,23 +81,23 @@ class myRobot_Reply():
             self.OnHandleMsg(msgR)      #消息处理
         return msgR
     #按命令处理返回消息(按标识内容处理)
-    def Done(self, usrID, usrName, nickName, strText, msgID = "", msgType = 'TEXT', usrPlant = "", idGroup = "", nameGroup = "", nameSelf = ""):
+    def Done(self, usrID, usrName, nickName, strText, msgID = "", msgType = 'TEXT', usrPlat = "", idGroup = "", nameGroup = "", nameSelf = ""):
         #命令识别
         pPrj = None 
         pUser = None 
         pGroup = None
         bIsRegist = False
         if(strText[0:2] == "@@"):
-            pPrj, pUser, bIsRegist = self._Create_Cmd(usrID, usrName, nickName, strText[2:], usrPlant, idGroup, nameGroup, nameSelf, True)
+            pPrj, pUser, bIsRegist = self._Create_Cmd(usrID, usrName, nickName, strText[2:], usrPlat, idGroup, nameGroup, nameSelf, True)
         else:
             #查找用户
-            pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlant)
+            pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlat)
       
         #查找用户, 调用消息处理方法调用
         if(pUser != None):
             if(nameGroup != ""):               
-                pGroup = self._Find_Group(idGroup, usrID, usrName, nickName, usrPlant)   
-            msgR = pUser.Done(pPrj, strText, msgID, msgType, usrPlant, pGroup, nameSelf, bIsRegist) 
+                pGroup = self._Find_Group(idGroup, nameGroup, usrPlat)   
+            msgR = pUser.Done(pPrj, strText, msgID, msgType, usrPlat, pGroup, nameSelf, bIsRegist) 
             return msgR
         return None
      
@@ -126,17 +124,17 @@ class myRobot_Reply():
         self.isRunning = False
 
     #查找用户（不存在则自动创建）
-    def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlant = ""): 
+    def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlat = ""): 
         #按消息生成对应对象 
-        pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlant, False)
+        pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, False)
         if(pUser == None or len(pUser.usrPrj.prjDos) < 1):      #非参与用户，于全局用户集信息提取，不存在的自动生成
-            pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlant, True)
+            pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, True)
             pUser.usrPrj._Add_prjDos(self.root.rootPrjs)
             self.usrReplys._Add(pUser)
         return pUser
-    def _Find_Group(self, idGroup, nameGroup, usrPlant = ""): 
+    def _Find_Group(self, idGroup, nameGroup, usrPlat = ""): 
         #按消息生成对应对象 
-        pGroup = self.root.usrGroups.Find_Group(idGroup, nameGroup, usrPlant, False)
+        pGroup = self.root.usrGroups.Find_Group(idGroup, nameGroup, usrPlat, False)
         return pGroup
     #是否管理员账户（直接提升权限）
     def _IsRoot_Usr(self, usrName):
@@ -167,7 +165,7 @@ class myRobot_Reply():
             return pPrj.IsEnable_one(), bRigist  #单人有效(一对一)
             
     #命令处理（@@命令，一次开启，再次关闭） 
-    def _Create_Cmd(self, usrID, usrName, nickName, prjCmd, usrPlant = "", idGroup = "", nameGroup = "", nameSelf = "", isCommand = False):    
+    def _Create_Cmd(self, usrID, usrName, nickName, prjCmd, usrPlat = "", idGroup = "", nameGroup = "", nameSelf = "", isCommand = False):    
         #查找功能权限对象
         pPrj = self.root.rootPrjs._Find(prjCmd)
         if(pPrj == None):
@@ -176,8 +174,8 @@ class myRobot_Reply():
         if(pPrj.IsEnable() == False): return None, None, False      #必须启用
 
         #查找用户（功能开启全部可用则当前用户）  
-        pGroup = self._Find_Group(idGroup, nameGroup, usrPlant)   
-        pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlant)   
+        pGroup = self._Find_Group(idGroup, nameGroup, usrPlat)   
+        pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlat)   
         if(pUser == None): return None, pUser, False
         
         #功能权限验证 
@@ -220,38 +218,38 @@ if __name__ == "__main__":
     usrID = "zxc_0"
     usrName = "墨紫"
     nickName = ""
-    usrPlant = "wx"
+    usrPlat = "wx"
     msgType = "TEXT"
     msgID = ""
 
     
     #复读机功能测试
-    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlant)
-    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello Rep', msgID, msgType, usrPlant))
-    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'zxczxc', "@zxcvbnm", msgType, usrPlant))
-    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Bye Repeater', msgID, msgType, usrPlant))
-    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlant) 
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlat)
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello Rep', msgID, msgType, usrPlat))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'zxczxc', "@zxcvbnm", msgType, usrPlat))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Bye Repeater', msgID, msgType, usrPlat))
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlat) 
     print()
 
     #复读功能再次开启与关闭
-    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlant) 
-    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlant)  
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlat) 
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlat)  
     print()
 
 
     #聊天机器人测试
-    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlant) 
-    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello Robot', msgID, msgType, usrPlant))
-    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'God Job...', msgID, msgType, usrPlant))
-    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Bye Robot', msgID, msgType, usrPlant))
-    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlant) 
+    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlat) 
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello Robot', msgID, msgType, usrPlat))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'God Job...', msgID, msgType, usrPlat))
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Bye Robot', msgID, msgType, usrPlat))
+    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlat) 
     print()
 
 
     #交互启动测试 
-    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlant) 
-    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlant) 
-    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello ChatRobot...', msgID, msgType, usrPlant))
+    pWxReply.Done(usrID, usrName, nickName, '@@Repeater', msgID, msgType, usrPlat) 
+    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlat) 
+    myDebug.Debug(pWxReply.Done(usrID, usrName, nickName, 'Hello ChatRobot...', msgID, msgType, usrPlat))
     print()
     myDebug.Print("Change user")
     
@@ -264,7 +262,7 @@ if __name__ == "__main__":
         msg["usrID"] = usrID
         msg["usrName"] = "茶叶一主号"     
         msg["usrNameNick"] = ""     
-        msg["plat"] = usrPlant
+        msg["usrPlat"] = usrPlat
         msg["msg"] = "@@ChatRobot" 
 
         #启动自己功能
@@ -277,7 +275,7 @@ if __name__ == "__main__":
             time.sleep(0.01) 
 
     time.sleep(2) 
-    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlant) 
+    pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlat) 
     print()
 
 
