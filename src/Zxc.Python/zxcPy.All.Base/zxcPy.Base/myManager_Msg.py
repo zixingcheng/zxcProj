@@ -174,7 +174,7 @@ class myManager_Msg():
                 #特殊消息处理
                 toUser = msg.get('to_usrName', "")
                 if(toUser != ""):
-                    toUser = myData.iif(toUser.lower() != "slef", toUser, self.usrNameSelfs.get(typePlatform, toUser))
+                    toUser = myData.iif(toUser.lower() != "self", toUser, self.usrNameSelfs.get(typePlatform, toUser))
                     msg['usrID'] = ""
                     msg['usrName'] = toUser     #调整toUser
                     msg['usrNameNick'] = ""

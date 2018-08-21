@@ -37,7 +37,8 @@ class myRoot_Prj():
         self.isEnable_groupAll = False  #群同时有效
         self.rootUsers = myRoot_Usr.myRoot_Usrs("", "")                 #根权限用户集
         self.rootUsers_up = myRoot_Usr.myRoot_Usrs("", "")              #提升权限用户集
-        self.rootGroups = myRoot_GroupInfo.myRoot_GroupsInfo("", "")    #已启用群集
+        self.usrGroups = myRoot_GroupInfo.myRoot_GroupsInfo("", "")     #可启用群集
+        self.usrGroups_sys = gol._Get_Value('rootRobot_usrGroups_sys')  #所有可用群集
         self.PlatsEnable = []          #平台列表
         self.registedUsrs = []          #当前授权功能开启用户
         self.registedGroups = []        #当前授权功能开启的群
@@ -111,8 +112,10 @@ class myRoot_Prj():
     def IsEnable_group(self, pGroup): 
         if(self.IsEnable_groupAll()): return True
         if(self.IsEnable() and self.isEnable_group):
-            if(len(self.rootGroups.groupInfos) < 1): return True        #未设置群则全部有效
-            pGroup = self.rootGroups._Find_Group(pGroup)
+            if(len(self.usrGroups.groupInfos) < 1):    #未设置群则使用有效群组
+                pGroup = self.usrGroups_sys._Find_Group(pGroup)
+                if(pGroup != None): return True
+            pGroup = self.usrGroups._Find_Group(pGroup)
             if(pGroup != None): return True
         return False
     def IsEnable_groupAll(self): return self.IsEnable() and self.isEnable_group and self.isEnable_groupAll;
@@ -146,7 +149,7 @@ class myRoots_Prj():
         self.usrID = usrID      #用户名
         self.prjRoots = {}      #功能权限集
         self.prjCmds = {}       #功能命令集
-        self.hasGol = bgetGol   #由全局提取
+        self.hasGol = bgetGol   #由全局提取 
         # self.prjRoots_user = {} #功能权限用户集
         
         #初始根目录信息
@@ -166,7 +169,7 @@ class myRoots_Prj():
 
         #转换为功能权限对象集
         if(self.hasGol):
-            pGroups = gol._Get_Value('rootRobot_usrGroups', None)     #群组信息
+            pGroups = gol._Get_Value('rootRobot_usrGroups_sys')  #所有可用群集
         for dtRow in dtSetting.dataMat:
             prjRoot = myRoot_Prj()
             prjRoot.prjName = dtRow[lstFields_ind["功能名称"]]
@@ -184,7 +187,7 @@ class myRoots_Prj():
             if(self.hasGol):
                 for x in lstGroup:
                     pGroup = pGroups.Find_Group(x, x, "", True)
-                    prjRoot.rootGroups.groupInfos[x] = pGroup
+                    prjRoot.usrGroups._Index(pGroup)
             prjRoot.PlatsEnable = list(dtRow[lstFields_ind["平台列表"]])
 
             #实例功能对象并缓存索引

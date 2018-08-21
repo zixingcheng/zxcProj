@@ -37,18 +37,18 @@ class myRobot_Reply():
         myDebug.Print("消息处理工厂--已初始 (%s::%s--%s)" % (self.usrName, self.usrNameNick, self.usrTag))
     def _Init(self): 
         #初始用户全局功能权限对象 
-        self.root = gol._Get_Value('rootRobot')     #权限信息
+        self.root = gol._Get_Value('rootRobot')         #权限信息
         if(self.root != None):
             self.usrName = self.root.usrName
             self.usrNameNick =self.root.usrNameNick
             self.usrTag =self.root.usrID
-            self.usrReplys = myRoot_Usr.myRoot_Usrs(self.usrName, self.usrTag)   #消息用户集 
+            self.usrReplys = myRoot_Usr.myRoot_Usrs("", "")   #消息用户集 
             
         #初始根目录信息
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.Dir_Base = os.path.abspath(os.path.join(strDir, "../.."))  
         self.Dir_LogMsg = self.Dir_Base + "/Log/Msgs/"
-        self.usrMMsg.Init_LogDir(self.Dir_LogMsg)   #初始日志路径
+        self.usrMMsg.Init_LogDir(self.Dir_LogMsg)       #初始日志路径
         
     #处理封装返回消息(按标识内容处理)
     def Done_ByMsg(self, msg, bOnHandleMsg = False):
@@ -89,8 +89,10 @@ class myRobot_Reply():
         pUser = None 
         pGroup = None
         bIsRegist = False
+        isCommand = False
         if(strText[0:2] == "@@"):
-            pPrj, pUser, bIsRegist = self._Create_Cmd(usrID, usrName, nickName, strText[2:], usrPlat, idGroup, nameGroup, nameSelf, True)
+            isCommand = True
+            pPrj, pUser, bIsRegist = self._Create_Cmd(usrID, usrName, nickName, strText[2:], usrPlat, idGroup, nameGroup, nameSelf, isCommand)
         else:
             #查找用户
             pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlat)
@@ -99,7 +101,7 @@ class myRobot_Reply():
         if(pUser != None):
             if(nameGroup != ""):               
                 pGroup = self._Find_Group(idGroup, nameGroup, usrPlat)   
-            msgR = pUser.Done(pPrj, strText, msgID, msgType, usrPlat, pGroup, nameSelf, bIsRegist) 
+            msgR = pUser.Done(pPrj, strText, msgID, msgType, usrPlat, pGroup, nameSelf, bIsRegist, isCommand) 
             return msgR
         return None
      
@@ -134,7 +136,7 @@ class myRobot_Reply():
         self.isRunning = False
 
     #查找用户（不存在则自动创建）
-    def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlat = ""): 
+    def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlat = "",idGroup = "", nameGroup = ""): 
         #按消息生成对应对象 
         pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, False)
         if(pUser == None or len(pUser.usrPrj.prjDos) < 1):      #非参与用户，于全局用户集信息提取，不存在的自动生成
@@ -144,7 +146,7 @@ class myRobot_Reply():
         return pUser
     def _Find_Group(self, idGroup, nameGroup, usrPlat = ""): 
         #按消息生成对应对象 
-        pGroup = self.root.usrGroups.Find_Group(idGroup, nameGroup, usrPlat, False)
+        pGroup = self.root.usrGroups.Find_Group(idGroup, nameGroup, usrPlat, True, False)
         return pGroup
     #是否管理员账户（直接提升权限）
     def _IsRoot_Usr(self, usrName):
@@ -153,7 +155,7 @@ class myRobot_Reply():
         if pRoot.prjRoot == None : return False
         return True
     #是否可启动命令用户
-    def _IsEnable_Usr(self, pUser, pPrj, isGroup, pGroup = None, isCommand = False):
+    def _IsEnable_Usr(self, pUser, pPrj, idGroup = "", neamGroup = "", isCommand = False):
         #必须可用
         bRigist = False
         if(pPrj.IsEnable() == False): return False, bRigist
@@ -169,7 +171,8 @@ class myRobot_Reply():
                 bRigist = True              #标识为注册
                 
         #群有效区分
-        if(isGroup):                        #群有效，且为设置群
+        if(neamGroup != ""):                #群有效，且为设置群
+            pGroup = self._Find_Group(idGroup, nameGroup, usrPlat)   
             return pPrj.IsEnable_group(pGroup), bRigist
         else:
             return pPrj.IsEnable_one(), bRigist  #单人有效(一对一)
@@ -184,13 +187,12 @@ class myRobot_Reply():
         if(pPrj.IsEnable() == False): return None, None, False      #必须启用
 
         #查找用户（功能开启全部可用则当前用户）  
-        pGroup = self._Find_Group(idGroup, nameGroup, usrPlat)   
         pUser = self._Find_Usr(usrID, usrName, nickName, "", usrPlat)   
         if(pUser == None): return None, pUser, False
         
         #功能权限验证 
         isGroup = nameGroup != ""
-        bEnable, bRigist = self._IsEnable_Usr(pUser, pPrj, isGroup, pGroup, isCommand)
+        bEnable, bRigist = self._IsEnable_Usr(pUser, pPrj, idGroup, nameGroup, isCommand)
         if(bEnable == False): return None, pUser, False             #必须可用
 
         #功能注册用户

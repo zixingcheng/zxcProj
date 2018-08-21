@@ -43,7 +43,7 @@ class myRoot_Usr():
         return True 
         
     #新消息处理
-    def Done(self, pPrj, Text, msgID = "", msgType = "TEXT", pPlat = "", pGroup = None, nameSelf = "", bIsRegist = False):    
+    def Done(self, pPrj, Text, msgID = "", msgType = "TEXT", pPlat = "", pGroup = None, nameSelf = "", bIsRegist = False, isCommand = False):    
         #提取功能设置信息
         if(pPrj == None): 
             self.usrPrj._Updata_DoInfo(pGroup)  #更新当前项目    
@@ -59,7 +59,7 @@ class myRoot_Usr():
             prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
 
         #调用消息处理，及其他处理 
-        pReturns = self.usrPrj.Done(pPrj, prjClass, Text, msgID, msgType, pPlat, pGroup, nameSelf, bIsRegist)
+        pReturns = self.usrPrj.Done(pPrj, prjClass, Text, msgID, msgType, pPlat, pGroup, nameSelf, bIsRegist, isCommand)
         return pReturns
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
@@ -153,7 +153,7 @@ class myRoot_UsrPrj():
         return True 
  
     #新消息处理
-    def Done(self, pPrj, prjDo, Text, msgID = "", msgType = "TEXT", usrPlat = "", pGroup = None, nameSelf = "", bIsRegist = False):  
+    def Done(self, pPrj, prjDo, Text, msgID = "", msgType = "TEXT", usrPlat = "", pGroup = None, nameSelf = "", bIsRegist = False, isCommand = False):  
         #切换功能 
         pReturns = []
         self._Change_prjDo(prjDo, pPrj)
@@ -176,7 +176,7 @@ class myRoot_UsrPrj():
                 bIsRegistOut = False
             pReturn = self.prjDo.Done_Regist(Text, usrInfo, bIsRegistOut) 
         else:
-            if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
+            if(isCommand or pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
                 pReturn = self.prjDo.Done_ByDict(Text, msgID, msgType, usrInfo)
                 self._Updata_prjInfo(prjDo)     #功能信息同步
                  
@@ -238,7 +238,8 @@ class myRoot_Usrs():
         self.Dir_Setting = self.Dir_Base + "/Setting"
         self.Path_SetUser = self.Dir_Setting + "/UserInfo.xls"
         self.lstFields = ["ID","用户名","用户昵称","用户ID","来源平台","电话","标签","备注","描述","注册时间","最后登录时间"]
-        self._Init()
+        if(userID != "" and usrName != "" and nickName != ""):
+            self._Init()
     #初始参数信息等   
     def _Init(self):            
         #提取字段信息 

@@ -23,7 +23,9 @@ class myRoot():
         self.usrID = "zxcRobot"         #归属用户ID
         self.rootPrjs = None            #功能集 
         self.usrInfos = None            #用户集 
+        self.usrInfos_sys = None        #用户集 
         self.usrGroups = None           #用户群组集
+        self.usrGroups_sys = None       #用户群组集
         self.usrPlats = None           #平台集
 
         self.Init()                     #信息初始
@@ -34,19 +36,20 @@ class myRoot():
         
         #用户集 
         if(self.usrInfos == None):
-            self.usrInfos = myRoot_Usr.myRoot_Usrs(self.usrID,self.usrName)   
+            self.usrInfos = myRoot_Usr.myRoot_Usrs("", "")   
+            self.usrInfos_sys = myRoot_Usr.myRoot_Usrs(self.usrID,self.usrName)   
             gol._Set_Value('rootRobot_usrInfos', self.usrInfos)
-        else:
-            self.usrInfos.usrName = self.usrName
-            self.usrInfos.usrID = self.usrID
+        self.usrInfos.usrName = self.usrName
+        self.usrInfos.usrID = self.usrID
 
         #群组集
         if(self.usrGroups == None):
-            self.usrGroups = myRoot_GroupInfo.myRoot_GroupsInfo(self.usrName, self.usrID)   
-            gol._Set_Value('rootRobot_usrGroups', self.usrGroups)
-        else:
-            self.usrGroups.usrName = self.usrName
-            self.usrGroups.usrID = self.usrID
+            self.usrGroups = myRoot_GroupInfo.myRoot_GroupsInfo("", "")  
+            self.usrGroups_sys = myRoot_GroupInfo.myRoot_GroupsInfo(self.usrID, self.usrName)   
+            gol._Set_Value('rootRobot_usrGroups', self.usrGroups)  
+            gol._Set_Value('rootRobot_usrGroups_sys', self.usrGroups_sys)
+        self.usrGroups.usrName = self.usrName
+        self.usrGroups.usrID = self.usrID
 
         #功能集
         if(self.rootPrjs == None):
