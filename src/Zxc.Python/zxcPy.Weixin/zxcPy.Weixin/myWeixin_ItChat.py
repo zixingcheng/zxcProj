@@ -380,18 +380,18 @@ class myWeixin_ItChat(myThread.myThread):
     def Run_Monitor_Cmd_ByMQ(self, strMsg):  
         try:
             myDebug.Debug("接收队列消息wx::", strMsg)  
-            msg = ast.literal_eval(strMsg) 
+            msgR = ast.literal_eval(strMsg) 
             
             #时间校检, 十分钟内缓存数据有效(过早时间数据忽略)
-            if(self.wxReply.Check_TimeOut(msg)):
+            if(self.wxReply.Check_TimeOut(msgR)):
                 myDebug.Debug("--队列消息已超时wx::", strMsg)  
                 return True
 
             #消息发送
-            if(msg.get('groupID', "") != ""):
-                self.Send_Msg(msg['usrID'], msg['groupID'], msg['msg'], msg['msgType'], 1)
+            if(msgR.get('groupName', '') == ''):            #区分群、个人
+                self.Send_Msg(msgR['usrID'], msgR['usrName'], msgR['msg'], msgR['msgType'])
             else:
-                self.Send_Msg(msg['usrID'], msg['usrName'], msg['msg'], msg['msgType'])
+                self.Send_Msg(msgR['groupID'], msgR['groupName'], msgR['msg'], msgR['msgType'], 1)
             return True
         except Exception as ex:
             myError.Error(ex)  
