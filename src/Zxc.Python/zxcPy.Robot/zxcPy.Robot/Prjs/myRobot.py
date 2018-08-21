@@ -42,6 +42,7 @@ class myRobot():
         self.fileName = "myRobot"       #文件名
         self.className = "myRobot"      #类名
         self.isNoReply = True           #是否无回复操作--功能自带  
+        self.enableGroups = {}            #可用群组
         
         # 初始返回消息
         self.usrMMsg = gol._Get_Setting('manageMsgs')     #消息管理器
@@ -53,6 +54,9 @@ class myRobot():
         self.tStart = datetime.now()
         self.tNow = datetime.now()
         self.tLast = datetime.now()
+    #初始可用群组
+    def Init_EnableGroup(self, groupName = ""): 
+        if(groupName != ""): self.enableGroups[groupName] = True
 
     #消息处理接口
     def Done(self, Text, msgID = "", msgType = "TEXT", usrID = "", usrName = "zxcRobot",  usrNameNick = '', usrPlat = '', idGroup = '', nameGroup = "", nameSelf = ''):
@@ -65,7 +69,7 @@ class myRobot():
             strReturn = self._Title(usrInfo)
         else:
             #检查
-            if(self._Check()):  
+            if(self._Check(usrInfo)):  
                 if(self.isNoOwner):
                     if(usrInfo.get('usrNameSelf', "") == self.usrName): 
                         return None     #开启者除外 
@@ -86,7 +90,7 @@ class myRobot():
         return self.usrMMsg.OnCreatMsg_UsrInfo(usrID, usrName, usrNameNick, usrPlat, groupID, groupName, nameSelf)
         
     #合法性(时效)
-    def _Check(self):
+    def _Check(self, usrInfo = None):
         if(self.isRunning == False or self.isEnable == False or self.isValid == False):
             return False
         
@@ -95,9 +99,16 @@ class myRobot():
         if((self.tNow - self.tLast).total_seconds() > self.maxTime):
             self.isValid = False
             return self.isValid
-        
         self.tLast = self.tNow    
+
+        #群组检查
+        if(usrInfo != None):
+            nameGroup = usrInfo.get('groupName', "")
+            return self._IsEnable_Group(nameGroup)
         return True
+    def _IsEnable_Group(self, nameGroup):
+        if(nameGroup == ""): return True
+        return self.enableGroups.get(nameGroup, False) 
     #消息处理--继承类重写，实现处理逻辑功能(可指定来源用户ID及名称)
     def _Done(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
         self.strText_L = Text 

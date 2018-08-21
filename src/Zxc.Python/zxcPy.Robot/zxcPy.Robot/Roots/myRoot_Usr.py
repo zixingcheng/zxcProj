@@ -166,6 +166,7 @@ class myRoot_UsrPrj():
             
         #调用处理命令对象
         pReturn = None
+        IsEnable = False
         usrInfo = self.get_UserInfo(usrPlat, pGroup, nameSelf)
         if(bIsRegist): 
             if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
@@ -176,7 +177,10 @@ class myRoot_UsrPrj():
                 bIsRegistOut = False
             pReturn = self.prjDo.Done_Regist(Text, usrInfo, bIsRegistOut) 
         else:
-            if(isCommand or pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
+            #校检用户群组可用
+            if(isCommand or pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)): IsEnable = True
+            if(pGroup != None): IsEnable = pPrj.IsEnable_group(pGroup)
+            if(IsEnable):
                 pReturn = self.prjDo.Done_ByDict(Text, msgID, msgType, usrInfo)
                 self._Updata_prjInfo(prjDo)     #功能信息同步
                  
@@ -203,7 +207,7 @@ class myRoot_UsrPrj():
             prjClass = self.prjDos[x]
             if(prjClass.isBackUse):
                 pReturn = prjClass.Done_ByDict(Text, msgID, msgType, usrInfo)
-                if(pReturn != None or pReturn != ""):
+                if(pReturn != None and pReturn != ""):
                     pReturns.append(pReturn)
         return pReturns
     #处理封装返回用户信息

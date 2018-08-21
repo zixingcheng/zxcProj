@@ -64,6 +64,12 @@ class myRoot_Prj():
         self.isRunSingle = self.prjClass.isSingleUse    #是否为单例使用(单例时每个用户专属) 
         self.isRunBack = self.prjClass.isBackUse        #是否为后台使用(后台可运行多个，一般为系统级功能，如日志)  
         self.isNoOwner = self.prjClass.isNoOwner        #是否为所有者除外不回复
+        
+        #同步可用群组信息 
+        keys = self.usrGroups_sys.groupList.keys()
+        for x in keys:
+            pGroup = self.usrGroups_sys.groupList[x]
+            self.prjClass.Init_EnableGroup(pGroup.groupName)
         return self.prjClass
     #功能用户注册
     def registUser(self, usrID, usrName, nickName, groupInfo = None, nameSelf = ""):   

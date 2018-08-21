@@ -81,7 +81,7 @@ class myRobot_Reply():
                 if(msgR.get('msg', "") == ""): continue
                 self.OnHandleMsg(msgR)              #消息处理
                 myDebug.Debug("处理消息::", msgR)  
-        return msgR
+        return msgRs
     #按命令处理返回消息(按标识内容处理)
     def Done(self, usrID, usrName, nickName, strText, msgID = "", msgType = 'TEXT', usrPlat = "", idGroup = "", nameGroup = "", nameSelf = ""):
         #命令识别
@@ -146,7 +146,7 @@ class myRobot_Reply():
         return pUser
     def _Find_Group(self, idGroup, nameGroup, usrPlat = ""): 
         #按消息生成对应对象 
-        pGroup = self.root.usrGroups.Find_Group(idGroup, nameGroup, usrPlat, True, False)
+        pGroup = self.root.usrGroups.Find_Group(idGroup, nameGroup, usrPlat, True)
         return pGroup
     #是否管理员账户（直接提升权限）
     def _IsRoot_Usr(self, usrName):
