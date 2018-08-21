@@ -11,7 +11,7 @@ import myEnum, myData, myData_Trans, myDebug, myIO, myWeb_urlLib, myMQ_Rabbit #,
 
 
 #定义消息类型枚举
-myMsgType = myEnum.enum('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
+myMsgType = myEnum.enum('TEXT', 'IMAGE', 'VOICE', 'VIDEO', 'NOTE')
 myMsgPlat = myEnum.enum('robot', 'wx')
 
 #自定义消息对象
@@ -80,10 +80,12 @@ class myManager_Msg():
         self.msgInd_Nick = {}
         self.usrWebs = {}           #在线消息集    
         self.usrMQs = {}            #消息队列  
+        self.usrNameSelfs = {}      #各个平台标识的自己用户名（接收特殊消息）  
         self.dirLog = dir
     #初始API、消息队列    
-    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx')):
+    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), usrHelper = ''):
         if(plat == None or plat == ""): return 
+        self.usrNameSelfs[plat] = usrHelper      #自定义的特殊用户名(特殊发送目标)
 
         #消息队列
         if(msgMQ_Sender != None): 
@@ -169,6 +171,14 @@ class myManager_Msg():
 
             usrMQ = self.usrMQs.get(typePlatform, None)
             if(usrMQ != None):
+                #特殊消息处理
+                toUser = msg.get('to_usrName', "")
+                if(toUser != ""):
+                    toUser = myData.iif(toUser.lower() != "slef", toUser, self.usrNameSelfs.get(typePlatform, toUser))
+                    msg['usrID'] = ""
+                    msg['usrName'] = toUser     #调整toUser
+                    msg['usrNameNick'] = ""
+                #转发消息
                 usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
                 myDebug.Print("消息管理器转发::", usrMQ.nameQueue + ">> ",strMsg)
     #创建新消息
@@ -203,8 +213,8 @@ class myManager_Msg():
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Setting('manageMsgs', myManager_Msg())    #实例 消息管理器并初始消息api及消息队列 
-gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "") #不使用api回调
-gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "") #不使用api回调
+gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "")    #不使用api回调
+gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "", usrHelper = 'filehelper')    #不使用api回调
 
 
 if __name__ == '__main__':

@@ -124,8 +124,9 @@ class myWeixin_ItChat(myThread.myThread):
         
 
         #消息发送测试
-        #self.Send_Msg("", "茶叶一主号", "测试消息", "TEXT", 0)
-        #self.Send_Msg("", "测试", "测试消息", "TEXT", 1)
+        #self.Send_Msg("", "茶叶一主号", "测试消息1", "TEXT", 0)
+        #self.Send_Msg("", "测试", "测试消息22", "TEXT", 1)
+        #self.Send_Msg("", "filehelper", "测试消息33", "TEXT", 1)
  
         #将friends列表存下来，看看内容
         if(bSave):
@@ -206,12 +207,14 @@ class myWeixin_ItChat(myThread.myThread):
     #发送消息接口(typeUser, 0: 好友 1：群 2：公众号)
     def Send_Msg(self, usrID, usrName = "", msgInfo = "" , typeMsg = "TEXT", typeUser = 0):
         #用户检测(@开头为用户名，filehelper，其他需要检索实际用户名)
-        if(typeUser == 0):
-            pUser = self.Get_User(usrID, usrName)
-        else:
-            pUser = self.Get_User_group(usrID, usrName)
-        userName = pUser['UserName']
-        if(userName == ""): return 
+        userName = usrName
+        if(userName != "filehelper"):
+            if(typeUser == 0):
+                pUser = self.Get_User(usrID, usrName)
+            else:
+                pUser = self.Get_User_group(usrID, usrName)
+            userName = pUser['UserName']
+            if(userName == ""): return 
 
         #发送消息
         typeMsg = typeMsg.upper()
