@@ -113,6 +113,7 @@ class myRobot():
         self.msg['groupID'] = usrInfo.get('groupID', '')
         self.msg['groupName'] = usrInfo.get('groupName', '')
         self.msg['msg'] = Text  
+        self.msg['to_usrName'] = usrInfo.get('to_usrName', '')      #调整的转发用户名(自己"self")
         return self.msg
     #关闭功能
     def _Close(self):
