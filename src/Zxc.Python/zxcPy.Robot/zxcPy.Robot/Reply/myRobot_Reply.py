@@ -73,12 +73,14 @@ class myRobot_Reply():
             msgText = msgText 
 
         #调用 
-        msgR = self.Done(usrID, usrName, usrNameNick, msgText, msgID, msgType, plat, groupID, groupName, nameSelf)
-        myDebug.Debug("处理消息::", msgR)  
+        msgRs = self.Done(usrID, usrName, usrNameNick, msgText, msgID, msgType, plat, groupID, groupName, nameSelf)
 
         #推送结果至消息管理器 
         if(bOnHandleMsg):   
-            self.OnHandleMsg(msgR)      #消息处理
+            for msgR in msgRs:                      #处理所有返回消息，忽略无内容的
+                if(msgR.get('msg', "") == ""): continue
+                self.OnHandleMsg(msgR)              #消息处理
+                myDebug.Debug("处理消息::", msgR)  
         return msgR
     #按命令处理返回消息(按标识内容处理)
     def Done(self, usrID, usrName, nickName, strText, msgID = "", msgType = 'TEXT', usrPlat = "", idGroup = "", nameGroup = "", nameSelf = ""):
@@ -108,9 +110,17 @@ class myRobot_Reply():
         #必须有处理消息存在
         strMsg = msg.get('msg', "")
         if(strMsg != ""):
+            #拆分'\n'取行最大
+            lines = strMsg.split('\n')
+            nLen = 0
+            for x in lines:
+                nLength = len(x)
+                if(nLength > nLen): nLen = nLength
+            nMax = myData.iif(nLen > 15, 40, 32)
+
             #尾部标签
             strTag = "  --zxcRobot  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
-            strTag = (32 - len(strTag)) * " " + strTag
+            strTag = (nMax - len(strTag)) * " " + strTag
             msg["msg"] = strMsg + "\n" + strTag
 
             #消息管理器处理消息

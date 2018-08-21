@@ -59,8 +59,8 @@ class myRoot_Usr():
             prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
 
         #调用消息处理，及其他处理 
-        pReturn = self.usrPrj.Done(pPrj, prjClass, Text, msgID, msgType, pPlat, pGroup, nameSelf, bIsRegist)
-        return pReturn
+        pReturns = self.usrPrj.Done(pPrj, prjClass, Text, msgID, msgType, pPlat, pGroup, nameSelf, bIsRegist)
+        return pReturns
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
     def __init__(self, usrID, usrName, nickName = ""):
@@ -155,13 +155,14 @@ class myRoot_UsrPrj():
     #新消息处理
     def Done(self, pPrj, prjDo, Text, msgID = "", msgType = "TEXT", usrPlat = "", pGroup = None, nameSelf = "", bIsRegist = False):  
         #切换功能 
+        pReturns = []
         self._Change_prjDo(prjDo, pPrj)
 
         #无可用功能执行后台功能
         if(self.prjDo == None): 
             usrInfo = self.get_UserInfo(usrPlat, pGroup, nameSelf)
-            self.Done_Back(Text, msgID, msgType, usrInfo)   #处理后台功能 
-            return None                                     #None表示无命令，忽略 
+            pReturns = self.Done_Back(Text, msgID, msgType, usrInfo)    #处理后台功能 
+            return pReturns                                             #None表示无命令，忽略 
             
         #调用处理命令对象
         pReturn = None
@@ -184,7 +185,8 @@ class myRoot_UsrPrj():
             if(usrPlat != ""): pReturn['usrPlat'] = usrPlat
             
         #处理后台功能 
-        self.Done_Back(Text, msgID, msgType, usrInfo) 
+        pReturns = self.Done_Back(Text, msgID, msgType, usrInfo) 
+        pReturns.append(pReturn)
 
 		#命令有效性检查，失效则初始状态
         self.prjInfo.startUser = self.prjDo.usrName
@@ -193,13 +195,17 @@ class myRoot_UsrPrj():
             self._Close_prjDo(self.prjDo)
             self.prjInfo.Close() 
             self.prjDo = None
-        return pReturn;
+        return pReturns
     def Done_Back(self, Text, msgID, msgType = "TEXT", usrInfo = {}):         
         #处理后台功能 
+        pReturns = []
         for x in self.prjDos:
             prjClass = self.prjDos[x]
             if(prjClass.isBackUse):
-                prjClass.Done_ByDict(Text, msgID, msgType, usrInfo)
+                pReturn = prjClass.Done_ByDict(Text, msgID, msgType, usrInfo)
+                if(pReturn != None or pReturn != ""):
+                    pReturns.append(pReturn)
+        return pReturns
     #处理封装返回用户信息
     def get_UserInfo(self, usrPlat = "", pGroup = None, nameSelf = ""):
         usrMsg = {}

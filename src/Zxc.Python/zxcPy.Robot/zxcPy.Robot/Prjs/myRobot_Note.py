@@ -22,7 +22,7 @@ class myRobot_Note(myRobot.myRobot):
         self.prjName = "通知消息"       #功能名
         self.doCmd = "@@zxcRobot_Note"  #启动命令 
         self.isBackUse = True           #后台运行
-        self.perfixRevoke = ['告诉你一个秘密！', '偷偷告诉你哦！', '哈哈，发现你了！', '万能的机器人告诉我：']
+        self.perfixRevoke = ['告诉你一个秘密，', '偷偷告诉你哦，', '哈哈，发现你了！', '万能的机器人告诉我，', '小样，被我发现了吧。', '别想跑哦，我发现']
                 
     #消息处理接口
     def _Done(self, Text, msgID = "", msgType = "NOTE", usrInfo = {}):
@@ -51,16 +51,17 @@ class myRobot_Note(myRobot.myRobot):
                 indPrefix = random.randint(0, len(self.perfixRevoke) - 1)
                 strPrefix = self.perfixRevoke[indPrefix]
 
-                #组装撤回描述
-                strReturn = strPrefix + "\n"
-                strReturn += pMsg.usrFrom + " 撤回了一条消息!\n"
+                #组装撤回描述个人消息发送到文件助手
+                #strReturn = myData.iif(usrInfo.get('groupName', "") == "", "", "@" + )
+                strReturn = "@" + pMsg.usrFrom + " "    
+                strReturn += strPrefix + "你刚撤回了条消息。\n"
 
                 #按消息内容组装 
                 msgType_old = pMsg.msgType.upper()
                 if(msgType_old == "TEXT"):
-                    strReturn += "消息内容::" + pMsg.msg 
+                    strReturn += "消息内容：\"" + pMsg.msg + "\""
                 elif(msgType_old == "SHARING"):
-                    strReturn += "分享链接::" + pMsg.msgUrl 
+                    strReturn += "分享链接：\"" + pMsg.msgUrl + "\""
         return strReturn 
 
     def _Title_User_Opened(self): 
