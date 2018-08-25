@@ -25,7 +25,10 @@ class DtTable:
         self.dataFieldType = [] #数据字段类型集
         self.sheet = None       #Sheet
         self.sheet_index = 0    #Sheet索引号
-
+    def _Rows(self, row_end = -1):
+        return myData.iif(row_end < 0 , len(self.dataMat), row_end)
+    def _Cloumns(self, col_end = -1):
+        return myData.iif(col_end < 0 , len(self.dataField), col_end)
         
     #载入文件数据
     def Load(self, strPath, sheet_index = 0, row_start = 1, col_start = 0, all_row = True, field_index = 0):
@@ -84,7 +87,6 @@ class DtTable:
             pValues = lstLines[i].split(strsplit)
             self.dataMat.append(pValues)
         return True
-
     #载入文件数据行
     def loadDt_Row(self, ind_row, col_start = 0, isField = False):         
         pTypes = self.dataFieldType
@@ -112,8 +114,8 @@ class DtTable:
         pSheet = pWorkbook.add_sheet(pName, cell_overwrite_ok = cell_overwrite) 
         
         #循环向sheet页中写入数据
-        nCols = len(self.dataField)
-        nRows = myData.iif(row_end < 0 , len(self.dataMat), row_end)
+        nCols = self._Cloumns(col_end)
+        nRows = self._Rows(row_end)
         if(nRows > 0):
             nCols = myData.iif(col_end < 0 , len(self.dataMat[0]), col_end)
         
@@ -124,17 +126,8 @@ class DtTable:
         # 写入值
         for i in range(row_start, nRows):
             pValues = self.dataMat[i] 
-            for j in range(col_start, nCols):
-                if(bSave_AsStr):
-                    strVaulue = str(pValues[j])
-                else:
-                    strVaulue = pValues[j]
-
-                #特殊类型转换
-                if(type(pValues[j]) == bool):
-                    strVaulue = myData.iif(pValues[j], "TRUE", "FALSE")
-                elif(type(pValues[j]) == datetime.datetime):
-                    strVaulue = myData_Trans.Tran_ToDatetime_str(pValues[j])
+            for j in range(col_start, nCols): 
+                strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr)
                 pSheet.write(i - row_start + 1, j - col_start, strVaulue)                
         
         #保存该excel文件,有同名文件时直接覆盖
@@ -144,27 +137,62 @@ class DtTable:
         pWorkbook.save(strPath)
         return True 
     #保存数据
-    def Save_csv(self, strDir, fileName, isUtf = False, row_start = 0, col_start = 0, sheet_name = "", symbol = ",", row_end = -1, col_end = -1):  
-        nRows = myData.iif(row_end < 0 , len(self.dataMat), row_end)
-        nCols = myData.iif(col_end < 0 , len(self.dataMat[0]), col_end)
+    def Save_csv(self, strDir, fileName, isUtf = False, row_start = 0, col_start = 0, symbol = ",", row_end = -1, col_end = -1, bSave_AsStr = True):  
+        nCols = self._Cloumns(col_end)
+        nRows = self._Rows(row_end)
+        if(nRows > 0):
+            nCols = myData.iif(col_end < 0 , len(self.dataMat[0]), col_end)
         
-        #循环所有格子组装数据
+        # 写入字段
         strLines = ""
+        for j in range(col_start, nCols):
+            if(strLines == ""):
+                strLines += self.dataField[j]
+            else:
+                strLines += symbol + self.dataField[j]
+        strLines += "\n"
+
+        #循环所有格子组装数据 
         for i in range(row_start, nRows):
             pValues = self.dataMat[i] 
             strLine = str(pValues[col_start])
-            for j in range(col_start + 1, nCols):
-                strTemp = str(pValues[j])
-                if(strTemp.count(",") > 0):   
-                    strTemp = "\"" + strTemp + "\""
-                elif(strTemp.count('\"') > 0):   
-                    strTemp = strTemp.replace("\"","\"\"")
-                strLine += symbol + str(strTemp)
-            strLines += strLine + "\r\n"
+            for j in range(col_start, nCols):
+                strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr)
+                if(strLine == ""):
+                    strLine += strVaulue
+                else:
+                    strLine += symbol + strVaulue
+            strLines += strLine + "\r\n" 
 
         #保存该csv文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".csv"
         myIO.Save_File(strPath, strLines, isUtf)
+        return True     #保存数据 
+    def Save_csv_append(self, file, pValues = [], isUtf = False, col_start = 0, symbol = ",", col_end = -1, bSave_AsStr = True):   
+        # 写入字段
+        strLines = ""
+        nRows = self._Rows(-1)
+        nCols = self._Cloumns(col_end) 
+        if(nRows == 0):
+            for j in range(col_start, nCols):
+                if(strLines == ""):
+                    strLines += self.dataField[j]
+                else:
+                    strLines += symbol + self.dataField[j]
+            myIO.Save_File(file, strLines, isUtf, True) 
+        
+        #组装行数据
+        strLine = ""
+        for j in range(col_start, nCols):
+            strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr)
+            if(strLine == ""):
+                strLine += strVaulue
+            else:
+                strLine += symbol + strVaulue
+        
+        #文件追加数据内容
+        with open(file, 'a+') as f:
+            f.write("\n" + strLine)    
         return True 
     #保存数据测试
     def Save_Test(self, strPath, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = "", row_end = -1, col_end = -1):  
@@ -183,11 +211,25 @@ class DtTable:
         """  
         return True 
     
+    #转换行格子数据为字符串
+    def Trans_Value_str(self, value, bSave_AsStr = True):        
+        if(bSave_AsStr):
+            strVaulue = str(value)
+        else:
+            strVaulue = value
+
+        #特殊类型转换
+        if(type(value) == bool):
+            strVaulue = myData.iif(value, "TRUE", "FALSE")
+        elif(type(value) == datetime.datetime):
+            strVaulue = myData_Trans.Tran_ToDatetime_str(value)
+        return strVaulue
+
     #字段索引
     def Get_Index_Field(self, fieldName):
         return self.dataField.index(fieldName);
     def Get_Index_Fields(self, fieldNames):
-        inds = {}
+        inds = {} 
         for x in fieldNames:
             inds[x] = self.Get_Index_Field(x)
         return inds;
