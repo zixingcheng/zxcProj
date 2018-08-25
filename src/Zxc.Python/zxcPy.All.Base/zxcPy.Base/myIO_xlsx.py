@@ -84,7 +84,9 @@ class DtTable:
         
         #循环提取所有行
         for i in range(row_start, len(lstLines)):
-            pValues = lstLines[i].split(strsplit)
+            pValues = lstLines[i].strip().split(strsplit)
+            while(len(pValues) < self._Cloumns()):
+                pValues.append("")
             self.dataMat.append(pValues)
         return True
     #载入文件数据行
@@ -154,15 +156,12 @@ class DtTable:
 
         #循环所有格子组装数据 
         for i in range(row_start, nRows):
+            strLine = ""
             pValues = self.dataMat[i] 
-            strLine = str(pValues[col_start])
             for j in range(col_start, nCols):
-                strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr)
-                if(strLine == ""):
-                    strLine += strVaulue
-                else:
-                    strLine += symbol + strVaulue
-            strLines += strLine + "\r\n" 
+                strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr) 
+                strLine += symbol + strVaulue
+            strLines += strLine[len(symbol):-1] + "\n" 
 
         #保存该csv文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".csv"

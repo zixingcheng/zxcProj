@@ -34,6 +34,7 @@ class myObj_Bill():
         self.usrSrc = usrSrc 
         self.usrBillType = usrBillType
         self.usrTime = myData.iif(dateTime == "", datetime.datetime.now(), dateTime)
+        if(type(self.usrTime) == str): self.usrTime =  myData_Trans.Tran_ToDatetime(dateTime, "%Y-%m-%d")
         self.recordTime = recordTime
         self.remark = remark
 
@@ -43,7 +44,7 @@ class myObj_Bill():
         else:
             self.usrMoney = usrMoney * -1
     def ToList(self): 
-        lstValue = [self.recordTime, self.id, self.usrID, self.usrMoney, self.usrBillType, self.usrSrc, self.usrTime.strftime("%Y-%m-%d"), self.idDel, self.remark]
+        lstValue = [self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.id, self.usrID, self.usrMoney, self.usrBillType, self.usrSrc, self.usrTime.strftime("%Y-%m-%d"), self.idDel, self.remark]
         return lstValue
     def ToString(self, nSpace = 0): 
         strSpace = " " * nSpace
@@ -97,7 +98,8 @@ class myObj_Bills():
         self.pathData = path
 
         #装载账单记录
-        self.usrDB = {}
+        self.usrDB = {} 
+        self.indLst = []
         for dtRow in dtDB.dataMat:
             bill = myObj_Bill()
             bill.id = int(dtRow[lstFields_ind["编号"]])
@@ -108,8 +110,9 @@ class myObj_Bills():
             bill.usrTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["账单时间"]], "%Y-%m-%d")
             bill.recordTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["记录时间"]])
             bill.remark = dtRow[lstFields_ind["备注"]]
-            bill.idDel = myData.iif(dtRow[lstFields_ind["是否删除"]] == True, True, False)
-            self.usrDB[bill.recordTime] = bill
+            bill.idDel = myData.iif(dtRow[lstFields_ind["是否删除"]] == True, True, False) 
+            self.usrDB[bill.id] = bill
+            self.indLst.append(bill.id)     # 顺序记录索引
         self.dtDB = dtDB
              
     #添加账单记录
@@ -121,19 +124,33 @@ class myObj_Bills():
         if(bill.usrID == "" or bill.usrMoney <= 0 or bill.usrSrc == ""):
             return "用户名、账单金额、账单来源，输入不全。"
         if(self._Check(bill) == False): return "账单信息已经存在。"
-
+        
         #添加(记录索引)
-        bill.id = len(self.usrDB)
-        self.usrDB[bill.recordTime] = bill
-        self.dtDB.Save_csv_append(self.pathData, bill.ToList())   
+        bill.id = len(self.usrDB) + 1
+        self.usrDB[bill.id] = bill 
+
+        #取ID号(usrTime排序)
+        bAppend = True
+        nID = len(self.indLst) - 1                      #索引最后一个序号
+        if(nID >= 0):
+            bill_Last = self._Find(self.indLst[nID])    #索引依次往前-usrTime排序
+            while(nID >= 0 and bill_Last != None and bill_Last.usrTime > bill.usrTime):
+                nID -= 1
+                bill_Last = self._Find(self.indLst[nID])
+                bAppend = False
+        self.indLst.insert(nID + 1, bill.id)    # 记录索引
+
+        #保存--排序
+        bill_Last = self._Find(bill.id - 1)
+        if(bAppend == False):
+            self.Save_DB()
+        else:
+            self.dtDB.Save_csv_append(self.pathData, bill.ToList())   
         return "添加成功，账单信息如下：\n" + bill.ToString(4)
     
     #查询、统计
     def _Find(self, id): 
-        ind = self.ind_IDs.get(id, None)
-        if(ind == None): return None
-        return self.usrGifts[ind]
-
+        return self.usrDB.get(id, None)
     #检查是否已经存在   
     def _Check(self, bill): 
         keys = self.usrDB.keys()
@@ -143,31 +160,15 @@ class myObj_Bills():
         return True
     
     #当前数据进行保存   
-    def Save_DB(self): 
-        dtDB = myIO_xlsx.DtTable()    #用户信息表
-        dtDB.dataName = "dataName"
-        dtDB.dataField = self.lstFields
-        dtDB.dataFieldType = ['int', 'string', 'float', 'string', 'string', 'string', 'bool', 'datetime', 'datetime', 'string']
-       
+    def Save_DB(self):  
         #组装行数据
-        keys = list(self.usrDB.keys())
-        keys.sort(key = None, reverse = True) #键值排序
-        for x in keys:
-            bill = self.usrDB[x]
-            pValues = []
-            pValues.append(bill.id)
-            pValues.append(bill.usrID)
-            pValues.append(bill.usrMoney)
-            pValues.append(bill.usrSrc) 
-            pValues.append(bill.usrBillType)
-            pValues.append(bill.idDel)
-            pValues.append(bill.usrTime.strftime("%Y-%m-%d"))
-            pValues.append(bill.recordTime.strftime("%Y-%m-%d %H:%M:%S"))
-            pValues.append(bill.remark)
-            dtDB.dataMat.append(pValues)
+        self.dtDB.dataMat = []
+        for x in self.indLst:
+            bill = self._Find(x) 
+            self.dtDB.dataMat.append(bill.ToList())
 
-        # 保存
-        dtDB.Save(self.dir, self.usrID, 0, 0, True, "账单记录")
+        #保存
+        self.dtDB.Save_csv(self.dir, self.usrID, False, 0, 0)
         
 #管家功能--账单
 class myManager_Bill():
@@ -209,6 +210,10 @@ if __name__ == "__main__":
     pBills = pManager['Test']
 
     pBills.Add(10.2, "门口超市", "购物")
+    pBills.Add(20.4, "门口超市", "买菜", "", "2018-8-20")
+    pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-22")
+    pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-23")
+    pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-16")
 
     exit()
 
