@@ -11,11 +11,11 @@ import sys, os, time , datetime, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("", False) 
-import myEnum, myIO, myIO_xlsx, myData, myData_Trans 
+import myEnum, myIO, myIO_xlsx, myData, myData_Trans, myDebug 
 
 
 #定义账单类型枚举
-myBillType = myEnum.enum('投资', '红包', '买菜', '买衣服', '购物')
+myBillType = myEnum.enum('购物', '买菜', '买衣服', '投资', '红包', '投资回笼')
 
 #账单对象
 class myObj_Bill():
@@ -39,12 +39,12 @@ class myObj_Bill():
         self.remark = remark
 
         #收支判断
-        if(self.IsInCome):
+        if(self.IsInCome()):
             self.usrMoney = usrMoney
         else:
             self.usrMoney = usrMoney * -1
     def ToList(self): 
-        lstValue = [self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.id, self.usrID, self.usrMoney, self.usrBillType, self.usrSrc, self.usrTime.strftime("%Y-%m-%d"), self.idDel, self.remark]
+        lstValue = [self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.id, self.usrBillType, self.usrMoney, self.usrSrc, self.usrTime.strftime("%Y-%m-%d"), self.idDel, self.remark]
         return lstValue
     def ToString(self, nSpace = 0): 
         strSpace = " " * nSpace
@@ -71,13 +71,15 @@ class myObj_Bill():
         return strBill
     #是否收入（是为正支出为负）
     def IsInCome(self): 
-        if(self.usrBillType == myBillType.投资 or self.usrBillType == myBillType.投资):
+        if(self.usrBillType == myBillType.红包 or self.usrBillType == myBillType.投资回笼):
             return True
         return False
     def IsSame(self, bill, days = 3): 
         if(bill.usrBillType == self.usrBillType):
             if(abs((bill.usrTime - self.usrTime).days) < days):    #7天内算相同
-                if(self.usrSrc == bill.usrSrc): return True
+                if(self.usrSrc == bill.usrSrc): 
+                    if(self.idDel == bill.idDel):
+                        return True
 #账单对象集
 class myObj_Bills():
     def __init__(self, usrID, dir = ""):  
@@ -91,7 +93,7 @@ class myObj_Bills():
         dtDB = myIO_xlsx.DtTable()
         dtDB.Load_csv(path, 1, 0, True, 0, ',')
 
-        lstFields = ["记录时间","编号","用户名","账单金额","账单分类","账单来源","账单时间","是否删除","备注"]
+        lstFields = ["记录时间","编号","账单分类","账单金额","账单来源","账单时间","是否删除","备注"]
         if(dtDB.sheet == None): dtDB.dataField = lstFields
         lstFields_ind = dtDB.Get_Index_Fields(lstFields)
         self.lstFields = lstFields
@@ -103,7 +105,7 @@ class myObj_Bills():
         for dtRow in dtDB.dataMat:
             bill = myObj_Bill()
             bill.id = int(dtRow[lstFields_ind["编号"]])
-            bill.usrID = dtRow[lstFields_ind["用户名"]]
+            bill.usrID = self.usrID
             bill.usrMoney = float(dtRow[lstFields_ind["账单金额"]])
             bill.usrSrc = dtRow[lstFields_ind["账单来源"]] 
             bill.usrBillType = dtRow[lstFields_ind["账单分类"]]
@@ -116,12 +118,12 @@ class myObj_Bills():
         self.dtDB = dtDB
              
     #添加账单记录
-    def Add(self, usrMoney, usrSrc, usrCause = "", remark = "", dateTime = ""): 
+    def Add(self, usrMoney, usrSrc, usrBillType = "", remark = "", dateTime = ""): 
        bill = myObj_Bill()
-       bill.Init(self.usrID, usrMoney, usrSrc, usrCause, dateTime, remark, datetime.datetime.now())
+       bill.Init(self.usrID, usrMoney, usrSrc, usrBillType, dateTime, remark, datetime.datetime.now())
        return self._Add(bill)
     def _Add(self, bill): 
-        if(bill.usrID == "" or bill.usrMoney <= 0 or bill.usrSrc == ""):
+        if(bill.usrID == "" or bill.usrMoney == 0 or bill.usrSrc == ""):
             return "用户名、账单金额、账单来源，输入不全。"
         if(self._Check(bill) == False): return "账单信息已经存在。"
         
@@ -131,14 +133,10 @@ class myObj_Bills():
 
         #取ID号(usrTime排序)
         bAppend = True
-        nID = len(self.indLst) - 1                      #索引最后一个序号
-        if(nID >= 0):
-            bill_Last = self._Find(self.indLst[nID])    #索引依次往前-usrTime排序
-            while(nID >= 0 and bill_Last != None and bill_Last.usrTime > bill.usrTime):
-                nID -= 1
-                bill_Last = self._Find(self.indLst[nID])
-                bAppend = False
-        self.indLst.insert(nID + 1, bill.id)    # 记录索引
+        nID = self._Find_ind(bill.usrTime)
+        if(nID != len(self.indLst) - 1):        #索引最后一个序号
+            bAppend = False 
+        self.indLst.insert(nID, bill.id)        # 记录索引
 
         #保存--排序
         bill_Last = self._Find(bill.id - 1)
@@ -149,6 +147,70 @@ class myObj_Bills():
         return "添加成功，账单信息如下：\n" + bill.ToString(4)
     
     #查询、统计
+    def Query(self, usrSrc = '', usrBillType = "", startTime = '', endTime = '', nMonth = 1): 
+        #查询参数校正
+        if(type(startTime) != datetime.datetime): startTime = self._Trans_Time_moth(datetime.datetime.now(), nMonth) 
+        if(type(endTime) != datetime.datetime): endTime = datetime.datetime.now()
+
+        #循环查询
+        lstBill = []
+        ind_S = self._Find_ind(startTime)
+        ind_E = self._Find_ind(endTime)
+        for x in range(ind_S, ind_E):
+            bill = self._Find(self.indLst[x])        
+            if(usrSrc != "" and usrSrc != bill.usrSrc): continue
+            if(usrBillType != "" and usrBillType != bill.usrBillType): continue
+            lstBill.append(bill)
+        return lstBill, startTime, endTime 
+    def Static(self, usrSrc = '', usrBillType = "", startTime = '', endTime = '', nMonth = 1): 
+        lstBill, startTime, endTime  = self.Query(usrSrc, usrBillType, startTime, endTime, nMonth)
+        
+        #统计
+        dSum_Out = 0 
+        dSum_Out_投资 = 0 
+        dSum_In_红包 = 0 
+        dSum_In_分红 = 0 
+        for x in lstBill:
+            if(x.usrMoney < 0):
+                if(x.usrBillType == myBillType.投资):
+                    dSum_Out_投资 += x.usrMoney
+                else:
+                    dSum_Out += x.usrMoney
+            else:
+                if(x.usrBillType == myBillType.红包):
+                    dSum_In_红包 += x.usrMoney
+                elif(x.usrBillType == myBillType.投资回笼):
+                    dSum_In_分红 += x.usrMoney
+        dSum = dSum_Out + dSum_Out_投资 + dSum_In_分红 + dSum_In_红包 
+
+        #输出信息
+        strPerfix = "\n" + " " * 4
+        strOut = "账单统计(" + self.usrID + ")："
+        if(dSum_Out < 0):
+            strOut += strPerfix + "消费：" + str(round(dSum_Out, 2)) + "元"
+        if(dSum_Out_投资 < 0):
+            strOut += strPerfix + "投资：" + str(round(dSum_Out_投资, 2)) + "元"
+        if(dSum_In_分红 > 0):
+            strOut += strPerfix + "投资回笼：" + str(round(dSum_In_分红, 2)) + "元"
+        if(dSum_In_红包 > 0):
+            strOut += strPerfix + "红包收入：" + str(round(dSum_In_红包, 2)) + "元"
+        strOut += strPerfix + "总资产：" + str(round(dSum, 2)) + "元"
+        strOut += "\n账单时间：" + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
+        if(usrBillType != ""): 
+            strOut += "\n账单分类：" + usrBillType      
+        if(usrSrc != ""): 
+            strOut += "\n账单来源：" + usrSrc
+        return strOut
+
+    def _Find_ind(self, usrTime): 
+        #取ID号(usrTime排序)
+        nID = len(self.indLst) - 1                      #索引最后一个序号
+        if(nID >= 0):
+            bill_Last = self._Find(self.indLst[nID])    #索引依次往前-usrTime排序
+            while(nID >= 0 and bill_Last != None and bill_Last.usrTime > usrTime):
+                nID -= 1
+                bill_Last = self._Find(self.indLst[nID])
+        return nID + 1
     def _Find(self, id): 
         return self.usrDB.get(id, None)
     #检查是否已经存在   
@@ -159,6 +221,22 @@ class myObj_Bills():
             if(bill.IsSame(billTemp)): return False
         return True
     
+    #时间转换为月初
+    def _Trans_Time_moth(self, dtTime = '', nMonth = 1): 
+        if(type(dtTime) != datetime.datetime): dtTime = datetime.datetime.now() 
+        dtTime = dtTime - datetime.timedelta(days=(dtTime.day - 1))
+        while(nMonth > 1):
+            dtTime = self._Trans_Time_moth(dtTime - datetime.timedelta(days=1))
+            nMonth -= 1
+        strTime = myData_Trans.Tran_ToDatetime_str(dtTime, "%Y-%m-%d")
+        return myData_Trans.Tran_ToDatetime(strTime, "%Y-%m-%d")
+    #时间转换为年初
+    def _Trans_Time_year(self, dtTime = "", nYears = 1): 
+        if(type(dtTime) != datetime.datetime): dtTime = datetime.datetime.now() 
+        nMonths = dtTime.month 
+        if(nYears > 1): nMonths += (nYears -1) * 12
+        return self._Trans_Time_moth(dtTime, nMonths)
+
     #当前数据进行保存   
     def Save_DB(self):  
         #组装行数据
@@ -214,6 +292,21 @@ if __name__ == "__main__":
     pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-22")
     pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-23")
     pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-16")
+    
+    pBills.Add(1000, "股票", "投资", "", "2018-5-16")
+    pBills.Add(1200, "股票", "投资回笼", "", "2018-8-16")
+    pBills.Add(100, "老豆", "红包", "", "2018-8-18")
+    pBills.Add(100, "老豆", "红包", "", "2018-1-18")
+
+    #查询统计测试
+    myDebug.Debug(pBills.Static())
+    myDebug.Debug(pBills.Static("", "", "", "", 3))
+    myDebug.Debug(pBills.Static("", "", "", "", 6))
+    myDebug.Debug(pBills.Static("", "", "", "", 12))
+    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 1), "", 12))
+
+    myDebug.Debug(pBills.Static("", "红包", pBills._Trans_Time_year("", 1), "", 12))
+    myDebug.Debug(pBills.Static("老豆", "红包", pBills._Trans_Time_year("", 1), "", 12))
 
     exit()
 
