@@ -174,11 +174,16 @@ class myObj_Bills():
 
         #统计
         dSum_Out = 0 
+        dSum_Out_投资 = 0 
+        dSum_In_投资 = 0 
         dSum_In = 0 
         for x in lstBill:
             if(x.usrBillType == myBillType.投资回笼):       #投资收益单独计算
                 bill = self._Find(int(x.usrSrc))            #查找投资编号,计算收益
                 lstSum[x.usrBillType] += x.usrMoney + bill.usrMoney
+                dSum_In_投资 += bill.usrMoney               #投资已回收项  
+                if(startTime > bill.usrTime):              #投资在当前时间前，累加投资项，否则计算有误
+                    lstSum[myBillType.投资] += bill.usrMoney
             else:
                 lstSum[x.usrBillType] += x.usrMoney
                 
@@ -188,7 +193,8 @@ class myObj_Bills():
             if(dSum > 0): dSum_In += dSum
             elif(dSum < 0): dSum_Out += dSum
         dSum_Out -= lstSum[myBillType.投资]       #剔除投资(投资记负但非消费)
-            
+        dSum_Out_投资 = lstSum[myBillType.投资] - dSum_In_投资
+        
         #输出信息
         strPerfix = "\n" + " " * 4
         strOut = "账单统计(" + self.usrID + ")："
@@ -197,10 +203,13 @@ class myObj_Bills():
             strOut += strPerfix + "红包收入：" + str(round(lstSum[myBillType.红包], 2)) + "元"
         if(lstSum[myBillType.投资回笼] > 0):
             strOut += strPerfix + "投资收益：" + str(round(lstSum[myBillType.投资回笼], 2)) + "元"
-        if(lstSum[myBillType.投资] < 0):
-            strOut += strPerfix + "总投资：" + str(-round(lstSum[myBillType.投资], 2)) + "元"
+            if(dSum_In_投资 < 0):
+                strOut += strPerfix + "    " + "投资回笼：" + str(round(-dSum_In_投资, 2)) + "元"
+
+        if(dSum_Out_投资 < 0):
+            strOut += strPerfix + "投资总计：" + str(-round(dSum_Out_投资, 2)) + "元"
         if(dSum_Out < 0):
-            strOut += strPerfix + "总消费：" + str(round(-dSum_Out, 2)) + "元"
+            strOut += strPerfix + "消费总计：" + str(round(-dSum_Out, 2)) + "元"
             #消费细分：
             for x in keys:
                 if(lstSum[x] < 0 and x != myBillType.投资):
@@ -211,6 +220,8 @@ class myObj_Bills():
         if(usrSrc != ""): 
             strOut += "\n账单来源：" + usrSrc
         return strOut
+
+    #查找
     def _Find_ind(self, usrTime): 
         #取ID号(usrTime排序)
         nID = len(self.indLst) - 1                      #索引最后一个序号
@@ -322,7 +333,9 @@ if __name__ == "__main__":
 
     #复杂统计
     pBills = pManager['多多']
-    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 1), "", 12))
+    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 1), "", 0))
+    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 2), "", 0))
+    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 3), "", 0))
 
 
     exit()
