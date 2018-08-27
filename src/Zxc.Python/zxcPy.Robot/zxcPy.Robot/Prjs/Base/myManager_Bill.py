@@ -59,7 +59,7 @@ class myObj_Bill():
                 else:
                     strBill += strSpace + "收入来源: " + self.usrSrc + "\n"
             else:
-                strBill += strSpace + "支出目标: " + self.usrSrc + "\n"
+                strBill += strSpace + "支出对象: " + self.usrSrc + "\n"
             strBill += strSpace + "账单类型: " + self.usrBillType + "\n"
             strBill += strSpace + "账单时间: " + myData_Trans.Tran_ToDatetime_str(self.usrTime, "%Y-%m-%d") + "\n"
             strBill += strSpace + "备注: " + self.remark 
@@ -129,7 +129,7 @@ class myObj_Bills():
         self.dtDB = dtDB
              
     #添加账单记录
-    def Add(self, usrSrc, usrMoney, usrBillType = "", remark = "", dateTime = ""): 
+    def Add(self, usrSrc, usrMoney, usrBillType = "", dateTime = "", remark = ""): 
        bill = myObj_Bill()
        bill.Init(self.usrID, usrSrc, usrMoney, usrBillType, dateTime, remark, datetime.datetime.now())
        return self._Add(bill)
@@ -156,8 +156,7 @@ class myObj_Bills():
         else:
             self.dtDB.Save_csv_append(self.pathData, bill.ToList())   
         return "添加成功，账单信息如下：\n" + bill.ToString(4)
-    
-    #查询、统计
+     
     def Query(self, usrSrc = '', usrBillType = "", startTime = '', endTime = '', nMonth = 1): 
         #查询参数校正
         if(type(startTime) != datetime.datetime): startTime = self._Trans_Time_moth(datetime.datetime.now(), nMonth) 
@@ -165,7 +164,7 @@ class myObj_Bills():
 
         #循环查询
         lstBill = []
-        ind_S = self._Find_ind(startTime)
+        ind_S = self._Find_ind(startTime, True)
         ind_E = self._Find_ind(endTime)
         for x in range(ind_S, ind_E):
             bill = self._Find(self.indLst[x])   
@@ -229,8 +228,6 @@ class myObj_Bills():
         if(usrSrc != ""): 
             strOut += "\n账单来源：" + usrSrc
         return strOut
-
-  
     def Static_max(self, usrSrc = '', usrBillType = "", bSum = False, nTop = 10, startTime = '', endTime = '', nMonth = 1): 
         lstBill, startTime, endTime  = self.Query(usrSrc, usrBillType, startTime, endTime, nMonth)
 
@@ -243,7 +240,7 @@ class myObj_Bills():
             dictTimes = {}
             lstStatics = []
             for x in lstBill:
-                if(x.usrSrc == "未记名"): continue
+                if(x.usrSrc == "未记名" or x.usrBillType == myBillType.投资回笼): continue
                 dSum = dictSum.get(x.usrSrc, 0)  
                 dSum += x.usrMoney
                 dictSum[x.usrSrc] = dSum
@@ -257,7 +254,7 @@ class myObj_Bills():
         #输出
         ind = 0
         strPerfix = "\n" + " " * 4
-        strOut = myData.iif(bSum, "累计最高", "单次最高") + "(Top" + str(nTop) + ")" 
+        strOut = "Top " + str(nTop) + " " + myData.iif(bSum, "累计金额", "单次金额") + "(" + self.usrID + ")："
         strOut += strPerfix + "排名，来源，金额，类型，编号，时间"
         for x in range(0, len(lstValues)):
             bill = lstValues[x]
@@ -277,14 +274,19 @@ class myObj_Bills():
         return strOut
     
     #查找
-    def _Find_ind(self, usrTime): 
+    def _Find_ind(self, usrTime, bIn = False): 
         #取ID号(usrTime排序)
         nID = len(self.indLst) - 1                      #索引最后一个序号
         if(nID >= 0):
             bill_Last = self._Find(self.indLst[nID])    #索引依次往前-usrTime排序
-            while(nID >= 0 and bill_Last != None and bill_Last.usrTime > usrTime):
-                nID -= 1
-                bill_Last = self._Find(self.indLst[nID])
+            if(bIn == False):
+                while(nID >= 0 and bill_Last != None and bill_Last.usrTime > usrTime):
+                    nID -= 1
+                    bill_Last = self._Find(self.indLst[nID])
+            else:
+                while(nID >= 0 and bill_Last != None and bill_Last.usrTime >= usrTime):
+                    nID -= 1
+                    bill_Last = self._Find(self.indLst[nID])
         return nID + 1
     def _Find(self, id): 
         return self.usrDB.get(id, None)
@@ -368,16 +370,16 @@ if __name__ == "__main__":
     pBills = pManager['Test']
 
     pBills.Add("门口超市", 10.2, "购物")
-    pBills.Add("门口超市", 20.4, "买菜", "", "2018-8-20")
-    pBills.Add("西边菜市场", 10.4, "买菜", "", "2018-8-22")
-    pBills.Add("西边菜市场", 10.4, "买菜", "", "2018-8-23")
-    pBills.Add("西边菜市场", 10.4, "买菜", "", "2018-8-16")
+    pBills.Add("门口超市", 20.4, "买菜", "2018-8-20")
+    pBills.Add("西边菜市场", 10.4, "买菜","2018-8-22")
+    pBills.Add("西边菜市场", 10.4, "买菜", "2018-8-23")
+    pBills.Add("西边菜市场", 10.4, "买菜", "2018-8-16")
     
-    pBills.Add("股票", 1000, "投资", "", "2018-5-16")
+    pBills.Add("股票", 1000, "投资", "2018-5-16")
     pBill = pBills.Query("股票", "投资", "", "", 4)
-    pBills.Add(str(pBill[0][0].id), 1200, "投资回笼", "", "2018-8-16")
-    pBills.Add("老豆", 100, "红包", "", "2018-8-18")
-    pBills.Add("老豆", 100, "红包", "", "2018-1-18")
+    pBills.Add(str(pBill[0][0].id), 1200, "投资回笼","2018-8-16")
+    pBills.Add("老豆", 100, "红包", "2018-8-18")
+    pBills.Add("老豆", 100, "红包", "2018-1-18")
 
     #查询统计测试
     myDebug.Debug(pBills.Static())

@@ -54,6 +54,7 @@ class myRobot():
         self.tStart = datetime.now()
         self.tNow = datetime.now()
         self.tLast = datetime.now()
+        self.perfix = "\n" + " " * 4
     #初始可用群组
     def Init_EnableGroup(self, groupName = ""): 
         if(groupName != ""): self.enableGroups[groupName] = True

@@ -22,9 +22,10 @@
   <ItemGroup>
     <Compile Include="myRobot_API.py" />
     <Compile Include="zxcPy.APIs\myAPI_Robot.py" />
+    <Compile Include="zxcPy.Robot\Prjs\Base\myManager_Bill.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Note.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Log.py" />
-    <Compile Include="zxcPy.Robot\Prjs\myRobot_Gift.py" />
+    <Compile Include="zxcPy.Robot\Prjs\myRobot_Bill.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Robot.py" />
     <Compile Include="zxcPy.Robot\Reply\myRobot_Reply_MQ.py" />
     <Compile Include="zxcPy.Robot\Reply\myRobot_Reply.py" />
@@ -42,14 +43,17 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Data\DB_Bill\" />
     <Folder Include="Setting\" />
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Robot\" />
+    <Folder Include="zxcPy.Robot\Prjs\Base\" />
     <Folder Include="zxcPy.Robot\Reply\" />
     <Folder Include="zxcPy.Robot\Roots\" />
     <Folder Include="zxcPy.Robot\Prjs\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\DB_Bill\多多.csv" />
     <Content Include="README.md" />
     <Content Include="Setting\Setting.xlsx" />
   </ItemGroup>

@@ -161,7 +161,7 @@ class DtTable:
             for j in range(col_start, nCols):
                 strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr) 
                 strLine += symbol + strVaulue
-            strLines += strLine[len(symbol):-1] + "\n" 
+            strLines += strLine[len(symbol):] + "\n" 
 
         #保存该csv文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".csv"
