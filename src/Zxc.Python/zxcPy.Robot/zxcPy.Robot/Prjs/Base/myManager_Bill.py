@@ -28,9 +28,9 @@ class myObj_Bill():
         self.usrBillType = ""   #账单类型
         self.usrTime = None     #发生时间
         self.recordTime = None  #记录时间
-        self.idDel = False      #是否已删除
+        self.isDel = False      #是否已删除
         self.remark = ""        #备注
-    def Init(self, usrID, usrMoney, usrSrc, usrBillType = "", dateTime = "", remark = "", recordTime = datetime.datetime.now()): 
+    def Init(self, usrID, usrSrc, usrMoney, usrBillType = "", dateTime = "", remark = "", recordTime = datetime.datetime.now()): 
         self.usrID = usrID 
         self.usrSrc = usrSrc 
         self.usrBillType = usrBillType
@@ -45,7 +45,7 @@ class myObj_Bill():
         else:
             self.usrMoney = usrMoney * -1
     def ToList(self): 
-        lstValue = [self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.id, self.usrBillType, self.usrMoney, self.usrSrc, self.usrTime.strftime("%Y-%m-%d"), self.idDel, self.remark]
+        lstValue = [self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.id, self.usrBillType, self.usrMoney, self.usrSrc, self.usrTime.strftime("%Y-%m-%d"), self.isDel, self.remark]
         return lstValue
     def ToString(self, nSpace = 0, isSimple = False): 
         if(isSimple == False):
@@ -89,7 +89,7 @@ class myObj_Bill():
         if(bill.usrBillType == self.usrBillType):
             if(abs((bill.usrTime - self.usrTime).days) < days):    #7天内算相同
                 if(self.usrSrc == bill.usrSrc): 
-                    if(self.idDel == bill.idDel):
+                    if(self.isDel == bill.isDel):
                         return True
 #账单对象集
 class myObj_Bills():
@@ -123,15 +123,15 @@ class myObj_Bills():
             bill.usrTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["账单时间"]], "%Y-%m-%d")
             bill.recordTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["记录时间"]])
             bill.remark = dtRow[lstFields_ind["备注"]]
-            bill.idDel = myData.iif(dtRow[lstFields_ind["是否删除"]] == True, True, False) 
+            bill.isDel = myData.iif(dtRow[lstFields_ind["是否删除"]] == True, True, False) 
             self.usrDB[bill.id] = bill
             self.indLst.append(bill.id)     # 顺序记录索引
         self.dtDB = dtDB
              
     #添加账单记录
-    def Add(self, usrMoney, usrSrc, usrBillType = "", remark = "", dateTime = ""): 
+    def Add(self, usrSrc, usrMoney, usrBillType = "", remark = "", dateTime = ""): 
        bill = myObj_Bill()
-       bill.Init(self.usrID, usrMoney, usrSrc, usrBillType, dateTime, remark, datetime.datetime.now())
+       bill.Init(self.usrID, usrSrc, usrMoney, usrBillType, dateTime, remark, datetime.datetime.now())
        return self._Add(bill)
     def _Add(self, bill): 
         if(bill.usrID == "" or bill.usrMoney == 0 or bill.usrSrc == ""):
@@ -168,7 +168,8 @@ class myObj_Bills():
         ind_S = self._Find_ind(startTime)
         ind_E = self._Find_ind(endTime)
         for x in range(ind_S, ind_E):
-            bill = self._Find(self.indLst[x])        
+            bill = self._Find(self.indLst[x])   
+            if(bill.isDel): continue     
             if(usrSrc != "" and usrSrc != bill.usrSrc): continue
             if(usrBillType != "" and usrBillType != bill.usrBillType): continue
             lstBill.append(bill)
@@ -353,25 +354,30 @@ class myManager_Bill():
     #用户账单
     def __getitem__(self, usrID):
         return self._Find(usrID, True)
-            
+              
+#初始全局消息管理器
+from myGlobal import gol 
+gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
+gol._Set_Setting('manageBills', myManager_Bill(""))     #实例 账单管理器 
+         
 
 #主启动程序
 if __name__ == "__main__":
     #测试红包记录
-    pManager = myManager_Bill("")
+    pManager = gol._Get_Setting('manageBills', None)
     pBills = pManager['Test']
 
-    pBills.Add(10.2, "门口超市", "购物")
-    pBills.Add(20.4, "门口超市", "买菜", "", "2018-8-20")
-    pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-22")
-    pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-23")
-    pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-16")
+    pBills.Add("门口超市", 10.2, "购物")
+    pBills.Add("门口超市", 20.4, "买菜", "", "2018-8-20")
+    pBills.Add("西边菜市场", 10.4, "买菜", "", "2018-8-22")
+    pBills.Add("西边菜市场", 10.4, "买菜", "", "2018-8-23")
+    pBills.Add("西边菜市场", 10.4, "买菜", "", "2018-8-16")
     
-    pBills.Add(1000, "股票", "投资", "", "2018-5-16")
+    pBills.Add("股票", 1000, "投资", "", "2018-5-16")
     pBill = pBills.Query("股票", "投资", "", "", 4)
-    pBills.Add(1200, str(pBill[0][0].id), "投资回笼", "", "2018-8-16")
-    pBills.Add(100, "老豆", "红包", "", "2018-8-18")
-    pBills.Add(100, "老豆", "红包", "", "2018-1-18")
+    pBills.Add(str(pBill[0][0].id), 1200, "投资回笼", "", "2018-8-16")
+    pBills.Add("老豆", 100, "红包", "", "2018-8-18")
+    pBills.Add("老豆", 100, "红包", "", "2018-1-18")
 
     #查询统计测试
     myDebug.Debug(pBills.Static())
