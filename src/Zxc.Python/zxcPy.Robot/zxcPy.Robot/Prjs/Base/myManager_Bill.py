@@ -7,6 +7,7 @@ Created on  张斌 2018-08-24 15:58:00
     管家功能--账单(记录、查询)
 """
 import sys, os, time , datetime, mySystem
+from operator import itemgetter, attrgetter
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__)
@@ -46,21 +47,28 @@ class myObj_Bill():
     def ToList(self): 
         lstValue = [self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.id, self.usrBillType, self.usrMoney, self.usrSrc, self.usrTime.strftime("%Y-%m-%d"), self.idDel, self.remark]
         return lstValue
-    def ToString(self, nSpace = 0): 
-        strSpace = " " * nSpace
-        strBill = strSpace + "编号: " + str(self.id) + "\n"
-        strBill += strSpace + "账单人: " + self.usrID + "\n"
-        strBill += strSpace + "账单金额: " + str(self.usrMoney) + "元 \n"
-        if(self.usrMoney > 0):
-            if(self.usrBillType == myBillType.投资回笼):
-                strBill += strSpace + "收入来源: 投资回笼，投资账单编号（" + str(self.usrSrc) + "）\n"
+    def ToString(self, nSpace = 0, isSimple = False): 
+        if(isSimple == False):
+            strSpace = " " * nSpace
+            strBill = strSpace + "编号: " + str(self.id) + "\n"
+            strBill += strSpace + "账单人: " + self.usrID + "\n"
+            strBill += strSpace + "账单金额: " + str(round(self.usrMoney, 2)) + "元 \n"
+            if(self.usrMoney > 0):
+                if(self.usrBillType == myBillType.投资回笼):
+                    strBill += strSpace + "收入来源: 投资回笼，投资账单编号（" + str(self.usrSrc) + "）\n"
+                else:
+                    strBill += strSpace + "收入来源: " + self.usrSrc + "\n"
             else:
-                strBill += strSpace + "收入来源: " + self.usrSrc + "\n"
+                strBill += strSpace + "支出目标: " + self.usrSrc + "\n"
+            strBill += strSpace + "账单类型: " + self.usrBillType + "\n"
+            strBill += strSpace + "账单时间: " + myData_Trans.Tran_ToDatetime_str(self.usrTime, "%Y-%m-%d") + "\n"
+            strBill += strSpace + "备注: " + self.remark 
         else:
-            strBill += strSpace + "支出目标: " + self.usrSrc + "\n"
-        strBill += strSpace + "账单类型: " + self.usrBillType + "\n"
-        strBill += strSpace + "账单时间: " + myData_Trans.Tran_ToDatetime_str(self.usrTime, "%Y-%m-%d") + "\n"
-        strBill += strSpace + "备注: " + self.remark 
+            strBill = self.usrSrc
+            strBill += "，" + str(round(self.usrMoney, 2)) + "元"
+            strBill += "，" + self.usrBillType
+            strBill += "，" + str(self.id) 
+            strBill += "，" + myData_Trans.Tran_ToDatetime_str(self.usrTime, "%Y-%m-%d") 
         return strBill
     def ToString2(self, nSpace = 0): 
         strSpace = " " * nSpace
@@ -221,6 +229,52 @@ class myObj_Bills():
             strOut += "\n账单来源：" + usrSrc
         return strOut
 
+  
+    def Static_max(self, usrSrc = '', usrBillType = "", bSum = False, nTop = 10, startTime = '', endTime = '', nMonth = 1): 
+        lstBill, startTime, endTime  = self.Query(usrSrc, usrBillType, startTime, endTime, nMonth)
+
+        #统计         
+        if(usrSrc != ""): bSum = False
+        if(bSum == False):      #最大金额统计
+            lstValues = sorted(lstBill, key=lambda myObj_Bill: myObj_Bill.usrMoney, reverse=True)   # sort by usrMoney
+        else:                   #累计统计
+            dictSum = {}
+            dictTimes = {}
+            lstStatics = []
+            for x in lstBill:
+                if(x.usrSrc == "未记名"): continue
+                dSum = dictSum.get(x.usrSrc, 0)  
+                dSum += x.usrMoney
+                dictSum[x.usrSrc] = dSum
+                dictTimes[x.usrSrc] = dictTimes.get(x.usrSrc, 0) + 1
+
+            keys = dictSum.keys()
+            for x in keys:
+                lstStatics.append((x, dictSum[x], dictTimes[x]))
+            lstValues = sorted(lstStatics, key=itemgetter(1), reverse=True)   # sort by usrMoney
+
+        #输出
+        ind = 0
+        strPerfix = "\n" + " " * 4
+        strOut = myData.iif(bSum, "累计最高", "单次最高") + "(Top" + str(nTop) + ")" 
+        strOut += strPerfix + "排名，来源，金额，类型，编号，时间"
+        for x in range(0, len(lstValues)):
+            bill = lstValues[x]
+            strTop = "Top " + str(ind + 1) + "："
+            if(bSum == False):
+                if(bill.usrSrc == "未记名"): continue
+                strOut += strPerfix + strTop + bill.ToString(0, True)
+            else:
+                strOut += strPerfix + strTop + bill[0] + "，" + str(round(bill[1], 2)) + "元，" + str(bill[2]) + "次"
+            ind += 1
+            if(ind >= nTop): break 
+        strOut += "\n账单时间：" + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
+        if(usrBillType != ""): 
+            strOut += "\n账单分类：" + usrBillType      
+        if(usrSrc != ""): 
+            strOut += "\n账单来源：" + usrSrc
+        return strOut
+    
     #查找
     def _Find_ind(self, usrTime): 
         #取ID号(usrTime排序)
@@ -337,6 +391,12 @@ if __name__ == "__main__":
     myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 2), "", 0))
     myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 3), "", 0))
 
+    myDebug.Debug(pBills.Static_max("", "红包", False, 10, pBills._Trans_Time_year("", 3), "", 0))
+    print()
+    myDebug.Debug(pBills.Static_max("", "红包", True, 10, pBills._Trans_Time_year("", 3), "", 0))
+    print()
+    myDebug.Debug(pBills.Static_max("爸爸", "红包", True, 10, pBills._Trans_Time_year("", 3), "", 0))
+    
 
     exit()
 
