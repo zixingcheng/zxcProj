@@ -52,7 +52,10 @@ class myObj_Bill():
         strBill += strSpace + "账单人: " + self.usrID + "\n"
         strBill += strSpace + "账单金额: " + str(self.usrMoney) + "元 \n"
         if(self.usrMoney > 0):
-            strBill += strSpace + "收入来源: " + self.usrSrc + "\n"
+            if(self.usrBillType == myBillType.投资回笼):
+                strBill += strSpace + "收入来源: 投资回笼，投资账单编号（" + str(self.usrSrc) + "）\n"
+            else:
+                strBill += strSpace + "收入来源: " + self.usrSrc + "\n"
         else:
             strBill += strSpace + "支出目标: " + self.usrSrc + "\n"
         strBill += strSpace + "账单类型: " + self.usrBillType + "\n"
@@ -165,43 +168,49 @@ class myObj_Bills():
     def Static(self, usrSrc = '', usrBillType = "", startTime = '', endTime = '', nMonth = 1): 
         lstBill, startTime, endTime  = self.Query(usrSrc, usrBillType, startTime, endTime, nMonth)
         
+        #统计项目初始
+        lstSum = {}
+        for x in myBillType: lstSum[x] = 0
+
         #统计
         dSum_Out = 0 
-        dSum_Out_投资 = 0 
-        dSum_In_红包 = 0 
-        dSum_In_分红 = 0 
+        dSum_In = 0 
         for x in lstBill:
-            if(x.usrMoney < 0):
-                if(x.usrBillType == myBillType.投资):
-                    dSum_Out_投资 += x.usrMoney
-                else:
-                    dSum_Out += x.usrMoney
+            if(x.usrBillType == myBillType.投资回笼):       #投资收益单独计算
+                bill = self._Find(int(x.usrSrc))            #查找投资编号,计算收益
+                lstSum[x.usrBillType] += x.usrMoney + bill.usrMoney
             else:
-                if(x.usrBillType == myBillType.红包):
-                    dSum_In_红包 += x.usrMoney
-                elif(x.usrBillType == myBillType.投资回笼):
-                    dSum_In_分红 += x.usrMoney
-        dSum = dSum_Out + dSum_Out_投资 + dSum_In_分红 + dSum_In_红包 
-
+                lstSum[x.usrBillType] += x.usrMoney
+                
+        keys = lstSum.keys()
+        for x in keys:
+            dSum = lstSum[x]
+            if(dSum > 0): dSum_In += dSum
+            elif(dSum < 0): dSum_Out += dSum
+        dSum_Out -= lstSum[myBillType.投资]       #剔除投资(投资记负但非消费)
+            
         #输出信息
         strPerfix = "\n" + " " * 4
         strOut = "账单统计(" + self.usrID + ")："
+        strOut += "\n" + "总资产：" + str(round(dSum_Out + dSum_In, 2)) + "元"
+        if(lstSum[myBillType.红包] > 0):
+            strOut += strPerfix + "红包收入：" + str(round(lstSum[myBillType.红包], 2)) + "元"
+        if(lstSum[myBillType.投资回笼] > 0):
+            strOut += strPerfix + "投资收益：" + str(round(lstSum[myBillType.投资回笼], 2)) + "元"
+        if(lstSum[myBillType.投资] < 0):
+            strOut += strPerfix + "总投资：" + str(-round(lstSum[myBillType.投资], 2)) + "元"
         if(dSum_Out < 0):
-            strOut += strPerfix + "消费：" + str(round(dSum_Out, 2)) + "元"
-        if(dSum_Out_投资 < 0):
-            strOut += strPerfix + "投资：" + str(round(dSum_Out_投资, 2)) + "元"
-        if(dSum_In_分红 > 0):
-            strOut += strPerfix + "投资回笼：" + str(round(dSum_In_分红, 2)) + "元"
-        if(dSum_In_红包 > 0):
-            strOut += strPerfix + "红包收入：" + str(round(dSum_In_红包, 2)) + "元"
-        strOut += strPerfix + "总资产：" + str(round(dSum, 2)) + "元"
+            strOut += strPerfix + "总消费：" + str(round(-dSum_Out, 2)) + "元"
+            #消费细分：
+            for x in keys:
+                if(lstSum[x] < 0 and x != myBillType.投资):
+                    strOut += strPerfix + "    " + x +"：" + str(round(-lstSum[x], 2)) + "元"
         strOut += "\n账单时间：" + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
         if(usrBillType != ""): 
             strOut += "\n账单分类：" + usrBillType      
         if(usrSrc != ""): 
             strOut += "\n账单来源：" + usrSrc
         return strOut
-
     def _Find_ind(self, usrTime): 
         #取ID号(usrTime排序)
         nID = len(self.indLst) - 1                      #索引最后一个序号
@@ -213,6 +222,7 @@ class myObj_Bills():
         return nID + 1
     def _Find(self, id): 
         return self.usrDB.get(id, None)
+
     #检查是否已经存在   
     def _Check(self, bill): 
         keys = self.usrDB.keys()
@@ -220,7 +230,6 @@ class myObj_Bills():
             billTemp = self.usrDB[x]
             if(bill.IsSame(billTemp)): return False
         return True
-    
     #时间转换为月初
     def _Trans_Time_moth(self, dtTime = '', nMonth = 1): 
         if(type(dtTime) != datetime.datetime): dtTime = datetime.datetime.now() 
@@ -294,7 +303,8 @@ if __name__ == "__main__":
     pBills.Add(10.4, "西边菜市场", "买菜", "", "2018-8-16")
     
     pBills.Add(1000, "股票", "投资", "", "2018-5-16")
-    pBills.Add(1200, "股票", "投资回笼", "", "2018-8-16")
+    pBill = pBills.Query("股票", "投资", "", "", 4)
+    pBills.Add(1200, str(pBill[0][0].id), "投资回笼", "", "2018-8-16")
     pBills.Add(100, "老豆", "红包", "", "2018-8-18")
     pBills.Add(100, "老豆", "红包", "", "2018-1-18")
 
@@ -307,6 +317,13 @@ if __name__ == "__main__":
 
     myDebug.Debug(pBills.Static("", "红包", pBills._Trans_Time_year("", 1), "", 12))
     myDebug.Debug(pBills.Static("老豆", "红包", pBills._Trans_Time_year("", 1), "", 12))
+    print()
+
+
+    #复杂统计
+    pBills = pManager['多多']
+    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 1), "", 12))
+
 
     exit()
 
