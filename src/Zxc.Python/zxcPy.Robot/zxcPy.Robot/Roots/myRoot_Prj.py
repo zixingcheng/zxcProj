@@ -118,7 +118,7 @@ class myRoot_Prj():
     def IsEnable_group(self, pGroup): 
         if(self.IsEnable_groupAll()): return True
         if(self.IsEnable() and self.isEnable_group):
-            if(len(self.usrGroups.groupInfos) < 1):    #未设置群则使用有效群组
+            if(len(self.usrGroups.groupList) < 1):    #未设置群则使用有效群组
                 pGroup = self.usrGroups_sys._Find_Group(pGroup)
                 if(pGroup != None): return True
             pGroup = self.usrGroups._Find_Group(pGroup)

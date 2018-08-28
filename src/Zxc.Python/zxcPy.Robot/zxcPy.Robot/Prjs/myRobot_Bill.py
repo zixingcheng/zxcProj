@@ -23,6 +23,7 @@ class myRobot_Bill(myRobot.myRobot):
         self.doTitle = "账单管家"       #说明 
         self.prjName = "账单管家"       #功能名
         self.doCmd = "@@BillManager"    #启动命令 
+        self.isSingleUse = False        #是否为单例使用(非单例时每个用户专属) 
         self.msg['FromUserName'] = self.usrName 
 
         self.manageBills = gol._Get_Setting('manageBills', None)    #使用全局账单管理器
@@ -124,17 +125,17 @@ class myRobot_Bill(myRobot.myRobot):
         return "输入命令进行账单管家操作... 帮助命令：\"@帮助\"."
     def _Title_Helper(self): 
         strReturn = "账单管家命令提示："
-        strReturn += self.perfix + "@帮助：输出所有命令及参数示例"
+        strReturn += self.perfix + "@帮助：输出所有命令说明"
         strReturn += self.perfix + "@当前设置：输出当前设置信息"
         strReturn += self.perfix + "@账单人：参数(\"账单所属人\")"
-        strReturn += self.perfix + "@账单类型：提取可用账单细分类型"
+        strReturn += self.perfix + "@账单类型：提取可用账单类型"
         strReturn += self.perfix + "@类型：切换到固定账单分类"
         strReturn += self.perfix + "@来源：切换到固定账单来源"
         strReturn += self.perfix + "@新增：参数(\"来源 金额 类型 时间 备注\")"
-        strReturn += self.perfix + "@统计：参数(\"n年/月  来源 类型\")"
-        strReturn += self.perfix + "@统计单次：参数(\"n年/月 来源 类型\")"
-        strReturn += self.perfix + "@统计累计：参数(\"n年/月 来源 类型\")"
-        strReturn += "\n以上命令，参数间以空格区分，示例：\"@统计 3年\""
+        strReturn += self.perfix + "@统计：参数(\"n年/月\")"
+        strReturn += self.perfix + "@统计单次：参数(\"n年/月\")"
+        strReturn += self.perfix + "@统计累计：参数(\"n年/月\")"
+        strReturn += "\n以上命令，参数间以空格区分，示例命令：\"@统计 3年\""
         return strReturn
 
 

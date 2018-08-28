@@ -78,6 +78,7 @@ class myRobot_Reply():
         #推送结果至消息管理器 
         if(bOnHandleMsg):   
             for msgR in msgRs:                      #处理所有返回消息，忽略无内容的
+                if(msgR == None): continue
                 if(msgR.get('msg', "") == ""): continue
                 self.OnHandleMsg(msgR)              #消息处理
                 myDebug.Debug("处理消息::", msgR)  
@@ -155,7 +156,7 @@ class myRobot_Reply():
         if pRoot.prjRoot == None : return False
         return True
     #是否可启动命令用户
-    def _IsEnable_Usr(self, pUser, pPrj, idGroup = "", neamGroup = "", isCommand = False):
+    def _IsEnable_Usr(self, pUser, pPrj, idGroup = "", nameGroup = "", isCommand = False):
         #必须可用
         bRigist = False
         if(pPrj.IsEnable() == False): return False, bRigist
@@ -171,7 +172,7 @@ class myRobot_Reply():
                 bRigist = True              #标识为注册
                 
         #群有效区分
-        if(neamGroup != ""):                #群有效，且为设置群
+        if(nameGroup != ""):                #群有效，且为设置群
             pGroup = self._Find_Group(idGroup, nameGroup, usrPlat)   
             return pPrj.IsEnable_group(pGroup), bRigist
         else:
@@ -182,7 +183,7 @@ class myRobot_Reply():
         #查找功能权限对象
         pPrj = self.root.rootPrjs._Find(prjCmd)
         if(pPrj == None):
-            print(">>Create Prj(%s) Faield" % (prjCmd))
+            print(">>Create Prj(%s) Failed" % (prjCmd))
             return None, None, False
         if(pPrj.IsEnable() == False): return None, None, False      #必须启用
 
@@ -204,9 +205,9 @@ class myRobot_Reply():
 
         #动态实例 (非单例，单独实例并缓存) 
         if(pPrj.IsRunSingle() == False):      
-            prjClass = pPrj.creatIntance()          #实例对象--专有      
-            prjClass.isRunning = pPrj.isRunning     #同步运行状态
-            pUser.usrPrj._Change_prjDo(prjClass)    #切换功能 
+            prjClass = pPrj.creatIntance(usrName, nickName)     #实例对象--专有      
+            prjClass.isRunning = pPrj.isRunning                 #同步运行状态
+            pUser.usrPrj._Change_prjDo(prjClass, pPrj)          #切换功能 
         return pPrj, pUser, bRigist  
      
 
@@ -285,17 +286,50 @@ if __name__ == "__main__":
             msg["msg"] = "hello world " + str(x)
             pWxReply.Done_ByMsg(msg, True)
             time.sleep(0.01) 
-
-    time.sleep(2) 
+            
+    #关闭聊天机器人
+    time.sleep(1) 
     pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlat) 
     print()
-
-
-
-    #消息提取测试
-    #pMsg = pR.msgLogs._Find_Log("zxcID").Find("@zxcvbnm")
+    print()
+    
+    #非单例交互测试 
+    myDebug.Print("Change model")
+    msg["usrName"] = "茶叶一主号"     
+    msg["groupName"] = "测试群" 
+    msg["msg"] = "@@BillManager" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))    
+    
+    #非单例交互测试 
+    msg["msg"] = "@帮助" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))    
+    msg["msg"] = "@账单人 Test" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    msg["msg"] = "@类型 红包" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
+    msg["msg"] = "@来源 老豆" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
+    print()  
+    
+    #添加、查询
+    msg["msg"] = "@新增 老豆 100 红包 2018-8-1 测试" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    msg["msg"] = "@统计 1月" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
+    msg["msg"] = "@统计单次 1年  " 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
+    msg["msg"] = "@统计累计 1年" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
+    print() 
+     
+    msg["msg"] = "@账单人 多多" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))
+    msg["msg"] = "@统计累计 3年" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    
+    msg["msg"] = "@@BillManager" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    print() 
 
     exit()
 
- 
- 

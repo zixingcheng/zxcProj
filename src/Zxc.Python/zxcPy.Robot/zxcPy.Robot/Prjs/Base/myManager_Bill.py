@@ -212,27 +212,27 @@ class myObj_Bills():
         #输出信息
         strPerfix = "\n" + " " * 4
         strOut = "账单统计(" + self.usrID + ")："
-        strOut += "\n" + "总资产：" + str(round(dSum_Out + dSum_In, 2)) + "元"
+        strOut += "\n" + "总资产：" + str(round(dSum_Out + dSum_In, 1)) + "元"
         if(lstSum[myBillType.红包] > 0):
-            strOut += strPerfix + "红包收入：" + str(round(lstSum[myBillType.红包], 2)) + "元"
+            strOut += strPerfix + "红包收入：" + str(round(lstSum[myBillType.红包], 1)) + "元"
         if(lstSum[myBillType.投资回笼] > 0):
             strOut += strPerfix + "投资收益：" + str(round(lstSum[myBillType.投资回笼], 2)) + "元"
             if(dSum_In_投资 < 0):
                 strOut += strPerfix + "    " + "投资回笼：" + str(round(-dSum_In_投资, 2)) + "元"
 
         if(dSum_Out_投资 < 0):
-            strOut += strPerfix + "投资总计：" + str(-round(dSum_Out_投资, 2)) + "元"
+            strOut += strPerfix + "投资总计：" + str(-round(dSum_Out_投资, 1)) + "元"
         if(dSum_Out < 0):
-            strOut += strPerfix + "消费总计：" + str(round(-dSum_Out, 2)) + "元"
+            strOut += strPerfix + "消费总计：" + str(round(-dSum_Out, 1)) + "元"
             #消费细分：
             for x in keys:
                 if(lstSum[x] < 0 and x != myBillType.投资):
-                    strOut += strPerfix + "    " + x +"：" + str(round(-lstSum[x], 2)) + "元"
-        strOut += "\n账单时间：" + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
+                    strOut += strPerfix + "    " + x +"：" + str(round(-lstSum[x], 1)) + "元"
         if(usrBillType != ""): 
             strOut += "\n账单分类：" + usrBillType      
         if(usrSrc != ""): 
             strOut += "\n账单来源：" + usrSrc
+        strOut += "\n账单时间：" + strPerfix + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
         return strOut
     def Static_max(self, usrSrc = '', usrBillType = "", bSum = False, nTop = 10, startTime = '', endTime = '', nMonth = 1): 
         lstBill, startTime, endTime  = self.Query(usrSrc, usrBillType, startTime, endTime, nMonth, ["投资", "投资回笼"])
@@ -269,14 +269,14 @@ class myObj_Bills():
             if(bSum == False): 
                 strOut += strPerfix + strTop + bill.ToString(0, True)
             else:
-                strOut += strPerfix + strTop + bill[0] + "，" + str(round(bill[1], 2)) + "元，" + str(bill[2]) + "次"
+                strOut += strPerfix + strTop + bill[0] + "，" + str(int(bill[1])) + "元，" + str(bill[2]) + "次"
             ind += 1
             if(ind >= nTop): break 
-        strOut += "\n账单时间：" + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
         if(usrBillType != ""): 
             strOut += "\n账单分类：" + usrBillType      
         if(usrSrc != ""): 
             strOut += "\n账单来源：" + usrSrc
+        strOut += "\n账单时间：" + strPerfix + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
         return strOut
     
     #查找

@@ -42,12 +42,12 @@ class myRobot():
         self.fileName = "myRobot"       #文件名
         self.className = "myRobot"      #类名
         self.isNoReply = True           #是否无回复操作--功能自带  
-        self.enableGroups = {}            #可用群组
+        self.enableGroups = {}          #可用群组
         
         # 初始返回消息
         self.usrMMsg = gol._Get_Setting('manageMsgs')     #消息管理器
         self.msg = {}
-        self.maxTime = 60 * 6       #有效时常 
+        self.maxTime = 60 * 6           #有效时常 
     def Init(self): 
         self.isRunning = False          #是否启用中
         self.isValid = True             #合法性 
@@ -126,6 +126,7 @@ class myRobot():
         self.msg['groupName'] = usrInfo.get('groupName', '')
         self.msg['msg'] = Text  
         self.msg['to_usrName'] = usrInfo.get('to_usrName', '')      #调整的转发用户名(自己"self")
+        self.msg['prjTag'] = self.prjName                           #功能标识  
         return self.msg
     #关闭功能
     def _Close(self):

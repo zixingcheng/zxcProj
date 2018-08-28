@@ -107,8 +107,11 @@ class myRoot_UsrPrj():
                 self._Add_prjDo(prj.prjClass) 
             elif(prj.isRunBack == True):        #后台运行
                 self._Add_prjDo(prj.prjClass) 
-    #增加功能
+    #增加功能   
     def _Change_prjDo(self, prjDo, pPrj): 
+        if(not pPrj.IsRunSingle()): 
+            self._Add_prjDo(prjDo)
+            return True     #非单例不更换，等同后台运行
         if(self.prjDo == None):				        #当前无命令，直接更新命令
             self._Add_prjDo(prjDo)
             self.prjDo = prjDo
@@ -205,7 +208,7 @@ class myRoot_UsrPrj():
         pReturns = []
         for x in self.prjDos:
             prjClass = self.prjDos[x]
-            if(prjClass.isBackUse):
+            if(prjClass.isBackUse or prjClass.isSingleUse == False):
                 pReturn = prjClass.Done_ByDict(Text, msgID, msgType, usrInfo)
                 if(pReturn != None and pReturn != ""):
                     pReturns.append(pReturn)
