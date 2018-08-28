@@ -81,6 +81,7 @@ class myRobot_Bill(myRobot.myRobot):
                 remark = self._Get_Param(cmds, nLen, 5, "")
                 return self.bills.Add(usrSrc, float(cmds[2]), typeBill, dateTime, remark)
         elif(cmd == "统计"):  
+            cmds = Text[1:].split(" ")
             if(len(cmds) > 1  ): 
                 usrSrc, typeBill, startTime, endTime, nMonth = self._Get_QueryParam(cmds) 
                 return self.bills.Static(usrSrc, typeBill, startTime, endTime, nMonth)
@@ -90,7 +91,7 @@ class myRobot_Bill(myRobot.myRobot):
                 usrSrc, typeBill, startTime, endTime, nMonth = self._Get_QueryParam(cmds) 
                 return self.bills.Static_max(usrSrc, typeBill, False, 10, startTime, endTime, nMonth)
         elif(cmd == "统计累计"):  
-            cmds = Text[1:].split(" ")
+            cmds = Text[1:].split(" ") 
             if(len(cmds) > 1  ): 
                 usrSrc, typeBill, startTime, endTime, nMonth = self._Get_QueryParam(cmds) 
                 return self.bills.Static_max("", typeBill, True, 10, startTime, endTime, nMonth)

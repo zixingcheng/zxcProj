@@ -326,6 +326,8 @@ if __name__ == "__main__":
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))
     msg["msg"] = "@统计累计 3年" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    msg["msg"] = "@统计 3年  " 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
     
     msg["msg"] = "@@BillManager" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
