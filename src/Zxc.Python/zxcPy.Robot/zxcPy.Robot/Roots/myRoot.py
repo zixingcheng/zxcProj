@@ -80,7 +80,7 @@ gol._Set_Value('rootRobot', myRoot())
 
 #主启动程序
 if __name__ == "__main__":
-    pRoot = gol._Get_Value('rootRobot', myRoot())
+    pRoot = gol._Get_Value('rootRobot', None)
     print(pRoot.usrName)
 
     gol._Set_Setting('usrName', "zxcRobot2")

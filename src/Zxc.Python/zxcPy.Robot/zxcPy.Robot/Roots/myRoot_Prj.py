@@ -58,7 +58,7 @@ class myRoot_Prj():
     #def Log(self, usrName, usrInfo):  
     #    self.infoLogs[datetime.datetime.now] = usrName + "::" + usrInfo
     #实例功能对象
-    def creatIntance(self, usrID, usrName):      
+    def creatIntance(self, usrID, usrName):     
         self.prjClass = myImport.Import_Class(self.fileName, self.className)(usrID, usrName)
         self.isRoot = self.prjClass.isRootUse           #是否为系统级使用(系统内置功能) 
         self.isRunSingle = self.prjClass.isSingleUse    #是否为单例使用(单例时每个用户专属) 
@@ -240,14 +240,15 @@ class myRoots_Prj():
 
                     #添加系统级权限用户 
                     bRoot = myData.iif(dtRow[lstFields_ind_user["功能权限"]] == True, True, False)
-                    lstPrj = list(dtRow[lstFields_ind_user["功能列表"]])
+                    lstPrj = dtRow[lstFields_ind_user["功能列表"]]
+                    if(lstPrj.count(',') > 0): lstPrj = lstPrj.split(',')
                     if(bRoot):
                         if(len(lstPrj) < 1):    #所有有效
                             for x in self.prjRoots.keys():
                                 self.prjRoots[x].rootUsers._Add(pUser)
                         else:
                             for x in self.prjRoots.keys():
-                                if(x.prjName in lstPrj):
+                                if(self.prjRoots[x].prjName in lstPrj):
                                     self.prjRoots[x].rootUsers._Add(pUser) 
     #查找 
     def _Find(self, prjName): 
@@ -282,5 +283,5 @@ class myRoots_Prj():
 
 #主启动程序
 if __name__ == "__main__":
-    pRoots = myRoots_Prj("zxcTest", "@Test", False)
+    pRoots = myRoots_Prj("zxcTest", "@Test", True)
     print(pRoots.prjRoots)

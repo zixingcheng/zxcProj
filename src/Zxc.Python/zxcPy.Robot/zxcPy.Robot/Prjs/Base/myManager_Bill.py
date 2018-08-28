@@ -157,12 +157,13 @@ class myObj_Bills():
             self.dtDB.Save_csv_append(self.pathData, bill.ToList())   
         return "添加成功，账单信息如下：\n" + bill.ToString(4)
      
-    def Query(self, usrSrc = '', usrBillType = "", startTime = '', endTime = '', nMonth = 1): 
+    def Query(self, usrSrc = '', usrBillType = "", startTime = '', endTime = '', nMonth = 1, exceptTypes = []): 
         #查询参数校正
         if(type(startTime) != datetime.datetime): startTime = self._Trans_Time_moth(datetime.datetime.now(), nMonth) 
         if(type(endTime) != datetime.datetime): endTime = datetime.datetime.now()
 
         #循环查询
+        nLen = len(exceptTypes)
         lstBill = []
         ind_S = self._Find_ind(startTime, True)
         ind_E = self._Find_ind(endTime)
@@ -171,6 +172,11 @@ class myObj_Bills():
             if(bill.isDel): continue     
             if(usrSrc != "" and usrSrc != bill.usrSrc): continue
             if(usrBillType != "" and usrBillType != bill.usrBillType): continue
+            if(nLen > 0):
+                if(bill.usrBillType in exceptTypes): 
+                    continue    
+                if(bill.usrSrc == "未记名"):
+                    continue  
             lstBill.append(bill)
         return lstBill, startTime, endTime 
     def Static(self, usrSrc = '', usrBillType = "", startTime = '', endTime = '', nMonth = 1): 
@@ -229,12 +235,13 @@ class myObj_Bills():
             strOut += "\n账单来源：" + usrSrc
         return strOut
     def Static_max(self, usrSrc = '', usrBillType = "", bSum = False, nTop = 10, startTime = '', endTime = '', nMonth = 1): 
-        lstBill, startTime, endTime  = self.Query(usrSrc, usrBillType, startTime, endTime, nMonth)
+        lstBill, startTime, endTime  = self.Query(usrSrc, usrBillType, startTime, endTime, nMonth, ["投资", "投资回笼"])
 
         #统计         
+        bReverse = True
         if(usrSrc != ""): bSum = False
         if(bSum == False):      #最大金额统计
-            lstValues = sorted(lstBill, key=lambda myObj_Bill: myObj_Bill.usrMoney, reverse=True)   # sort by usrMoney
+            lstValues = sorted(lstBill, key=lambda myObj_Bill: myObj_Bill.usrMoney, reverse=bReverse)   # sort by usrMoney
         else:                   #累计统计
             dictSum = {}
             dictTimes = {}
@@ -249,18 +256,17 @@ class myObj_Bills():
             keys = dictSum.keys()
             for x in keys:
                 lstStatics.append((x, dictSum[x], dictTimes[x]))
-            lstValues = sorted(lstStatics, key=itemgetter(1), reverse=True)   # sort by usrMoney
+            lstValues = sorted(lstStatics, key=itemgetter(1), reverse=bReverse)   # sort by usrMoney
 
         #输出
         ind = 0
         strPerfix = "\n" + " " * 4
         strOut = "Top " + str(nTop) + " " + myData.iif(bSum, "累计金额", "单次金额") + "(" + self.usrID + ")："
-        strOut += strPerfix + "排名，来源，金额，类型，编号，时间"
+        strOut += strPerfix + myData.iif(bSum, "排名，来源，金额，次数", "排名，来源，金额，类型，编号，时间")
         for x in range(0, len(lstValues)):
             bill = lstValues[x]
             strTop = "Top " + str(ind + 1) + "："
-            if(bSum == False):
-                if(bill.usrSrc == "未记名"): continue
+            if(bSum == False): 
                 strOut += strPerfix + strTop + bill.ToString(0, True)
             else:
                 strOut += strPerfix + strTop + bill[0] + "，" + str(round(bill[1], 2)) + "元，" + str(bill[2]) + "次"

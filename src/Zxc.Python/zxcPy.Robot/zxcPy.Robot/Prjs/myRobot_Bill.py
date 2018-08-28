@@ -12,7 +12,7 @@ import sys, os, time , datetime, mySystem
 mySystem.Append_Us("../Roots", False, __file__)
 mySystem.Append_Us("../Prjs/Base", False, __file__)
 mySystem.Append_Us("", False) 
-import myIO, myIO_xlsx, myData, myData_Trans, myDebug, myManager_Bill, myRoot, myRobot
+import myIO, myIO_xlsx, myData, myData_Trans, myDebug, myManager_Bill, myRobot
 from myGlobal import gol 
 
 
