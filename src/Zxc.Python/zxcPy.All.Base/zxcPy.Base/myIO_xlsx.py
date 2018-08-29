@@ -152,7 +152,6 @@ class DtTable:
                 strLines += self.dataField[j]
             else:
                 strLines += symbol + self.dataField[j]
-        strLines += "\n"
 
         #循环所有格子组装数据 
         for i in range(row_start, nRows):
@@ -161,7 +160,7 @@ class DtTable:
             for j in range(col_start, nCols):
                 strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr) 
                 strLine += symbol + strVaulue
-            strLines += strLine[len(symbol):] + "\n" 
+            strLines += "\n" + strLine[len(symbol):]
 
         #保存该csv文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".csv"

@@ -66,7 +66,7 @@ class myRobot():
         return self.Done_ByDict(Text, msgID, msgType, usrInfo)
     def Done_ByDict(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
         strReturn = None
-        if(Text == self.doCmd):
+        if(Text == self.doCmd or Text == "@@" + self.prjName):      #命令兼容功能名
             strReturn = self._Title(usrInfo)
         else:
             #检查

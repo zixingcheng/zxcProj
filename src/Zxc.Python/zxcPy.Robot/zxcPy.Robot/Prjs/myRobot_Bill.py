@@ -27,8 +27,8 @@ class myRobot_Bill(myRobot.myRobot):
         self.msg['FromUserName'] = self.usrName 
 
         self.manageBills = gol._Get_Setting('manageBills', None)    #使用全局账单管理器
-        self.billTypes = myManager_Bill.myBillType                  #账单类型集
-        self.bills = myManager_Bill.myObj_Bills("")                  #账单对象-当前
+        self.billTypes = myManager_Bill.myTradeType                 #账单类型集
+        self.bills = myManager_Bill.myObj_Bills("")                 #账单对象-当前
         self.billUsr = ""               #账单归属人-当前
         self.billSrcUsr = ""            #账单来源人-当前
         self.billType = ""              #账单归属人-当前
@@ -130,7 +130,7 @@ class myRobot_Bill(myRobot.myRobot):
         strReturn += self.perfix + "@当前设置：输出当前设置信息"
         strReturn += self.perfix + "@账单人：参数(\"账单所属人\")"
         strReturn += self.perfix + "@账单类型：提取可用账单类型"
-        strReturn += self.perfix + "@类型：切换到固定账单分类"
+        strReturn += self.perfix + "@类型：切换到固定账单类型"
         strReturn += self.perfix + "@来源：切换到固定账单来源"
         strReturn += self.perfix + "@新增：参数(\"来源 金额 类型 时间 备注\")"
         strReturn += self.perfix + "@统计：参数(\"n年/月\")"
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     myDebug.Debug(pR.Done("@统计累计 1年  ")['msg'])
 
 
-    pR.Done("@@BillManager")
+    pR.Done("@@账单管家")
 
     exit()
      
