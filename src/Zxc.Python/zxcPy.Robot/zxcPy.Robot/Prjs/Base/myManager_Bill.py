@@ -434,13 +434,14 @@ class myObj_Bills():
         #输出信息
         strPerfix = "\n" + " " * 4
         strOut = "账单统计(" + self.usrID + ")："
-        strOut += "\n" + "总资产：" + str(round(dSum_In - dSum_Out + dSum_In_投资 + dSum_收益, 2)) + "元"
-        if(dSum_Out_投资 > 0):
-            strOut += strPerfix + "投资收益：" + str(round(dSum_收益, 2)) + "元"
-            strOut += strPerfix + "    " + "投资总计：" + str(round(dSum_In_投资, 2)) + "元"
-            strOut += strPerfix + "    " + "投资回笼：" + str(round(dSum_Out_投资, 2)) + "元"
+        strOut += "\n" + "总资产：" + str(round(dSum_In - dSum_Out, 2)) + "元"
         if(dSum_红包 > 0):
             strOut += strPerfix + "红包收入：" + str(round(dSum_红包, 2)) + "元"
+        if(dSum_Out_投资 > 0):
+            strOut += strPerfix + "投资收益：" + str(round(dSum_收益, 2)) + "元"
+            strOut += strPerfix + "    " + "投资累计：" + str(round(dSum_In_投资, 2)) + "元" 
+            strOut += strPerfix + "    " + "投资回笼：" + str(round(dSum_Out_投资 - dSum_收益, 2)) + "元"
+            strOut += strPerfix + "    " + "投资总计：" + str(round(dSum_In_投资 - dSum_Out_投资 + dSum_收益, 2)) + "元"
         if(dSum_Out > 0):
             strOut += strPerfix + "消费总计：" + str(round(dSum_Out, 2)) + "元"
             #消费细分：
