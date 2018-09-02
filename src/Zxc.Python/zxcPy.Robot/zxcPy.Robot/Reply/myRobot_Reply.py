@@ -303,35 +303,61 @@ if __name__ == "__main__":
     #非单例交互测试 
     msg["msg"] = "@帮助" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))    
+    msg["msg"] = "@账单类型" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    msg["msg"] = "@交易品类" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    msg["msg"] = "@当前设置" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True)) 
+
     msg["msg"] = "@账单人 Test" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
-    msg["msg"] = "@类型 红包" 
+    msg["msg"] = "@类型 受赠" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
-    msg["msg"] = "@来源 老豆" 
+    msg["msg"] = "@品类 人际" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
-    print()  
-    
+    msg["msg"] = "@交易人 老豆" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    msg["msg"] = "@交易品 红包" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))    
+    msg["msg"] = "@当前设置" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True)) 
+    print()   
+
+
     #添加、查询
-    msg["msg"] = "@新增 老豆 100 红包 2018-8-1 测试" 
+    msg["msg"] = "@新增 老豆 100 0 1 红包 2018-2-1 测试" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
     msg["msg"] = "@统计 1月" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
-    msg["msg"] = "@统计单次 1年  " 
+    msg["msg"] = "@统计 3月" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
-    msg["msg"] = "@统计累计 1年" 
+    msg["msg"] = "@统计单次 3月  "       #参数(\"n年/月 交易人 品名 品类 品子类 起始时间 截止时间\")
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
-    print() 
-     
+    msg["msg"] = "@统计累计 1年"         
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))   
+    print()  
+
+
+    #切换账单人
     msg["msg"] = "@账单人 多多" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))
-    msg["msg"] = "@统计累计 3年" 
+    msg["msg"] = "@交易人 爸爸" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))
+    msg["msg"] = "@统计单次 3年" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
-    msg["msg"] = "@统计 3年  " 
+    msg["msg"] = "@统计单次 3年 -" 
+
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    msg["msg"] = "@统计累计 3年 -" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+    msg["msg"] = "@统计 3年 - - - -" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
     
+
     msg["msg"] = "@@BillManager" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
     print() 
-
+     
     exit()
 

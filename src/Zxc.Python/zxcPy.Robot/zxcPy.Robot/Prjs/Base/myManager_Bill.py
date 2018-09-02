@@ -98,17 +98,11 @@ class myObj_Bill():
         
         self.isDel = tradeInfo.get("isDel", False)
         self.remark = tradeInfo.get("remark", "")
-        self.Init_TypeInfo(usrBillType, tradeTarget, tradeType)
+        self.Init_TypeInfo(usrBillType, tradeTarget, tradeType, tradeTypeTarget)
     #初始类型信息
     def Init_TypeInfo(self, usrBillType, tradeTarget, tradeType = "", tradeTypeTarget = ""): 
         self.usrBillType = myData.iif(usrBillType == "" or usrBillType.count("买") == 1, myBileType.买入, myBileType.卖出)
         self.tradeTarget = tradeTarget
-        if(usrBillType != "" and tradeTarget != "" and tradeType != ""):     #有明确指定则不解析
-            if(self.usrBillType == ""): self.usrBillType = usrBillType
-            self.tradeType = tradeType
-            self.tradeTypeTarget = tradeTypeTarget
-            self.tradeTarget = tradeTarget
-            return True
 
         if(tradeType == ""): tradeType= usrBillType.replace("买入", "").replace("买", "").replace("卖出", "").replace("卖", "")
         if(tradeTarget == "红包"):
@@ -139,10 +133,16 @@ class myObj_Bill():
         elif(tradeType in myTradeType_投资):
             self.tradeType = myTradeType.投资 
             self.tradeTypeTarget = tradeType 
+        elif(usrBillType != "" and tradeTarget != "" and tradeType != ""):     #有明确指定则不解析
+            self.usrBillType = usrBillType
+            self.tradeType = tradeType
+            self.tradeTypeTarget = tradeTypeTarget
+            self.tradeTarget = tradeTarget
         else:
             #买卖区分
             if(tradeType == "" or tradeTarget == ""): return False 
             self.tradeType = tradeType
+        return True
     #生成信息字典
     def OnCreat_BillInfo(self): 
         billInfo = {}
@@ -183,10 +183,10 @@ class myObj_Bill():
         else:
             strBill = self.tradeParty
             strBill += "，" + str(round(self.tradeMoney, 2)) + "元" 
-            if(usrBillType != ""): strBill += "，" + self.usrBillType
-            if(tradeTarget != ""): strBill += "，" + self.tradeTarget
-            if(tradeType != ""): strBill += "，" + self.tradeType
-            if(tradeTypeTarget != ""): strBill += "，" + self.tradeTypeTarget
+            if(usrBillType == ""): strBill += "，" + self.usrBillType
+            if(tradeTarget == ""): strBill += "，" + self.tradeTarget
+            if(tradeType == ""): strBill += "，" + self.tradeType
+            if(tradeTypeTarget == ""): strBill += "，" + self.tradeTypeTarget
             strBill += "，" + str(self.tradeID) 
             strBill += "，" + myData_Trans.Tran_ToDatetime_str(self.tradeTime, "%Y-%m-%d") 
         return strBill
@@ -463,16 +463,19 @@ class myObj_Bills():
                         if(dSum_C > 0):  
                             strOut += strPerfix + "    " * 2 + x +"：" + str(round(dSum_C, 2)) + "元"
                  
-        if(usrBillType != ""): strOut += "\n账单类型：" + usrBillType           
+        if(usrBillType != ""): strOut += "\n账单类型：" + usrBillType    
+        if(tradeTarget != ""): strOut += "\n交易品名：" + tradeTarget          
         if(tradeParty != ""): strOut += "\n交易方：" + tradeParty
-        if(tradeType != ""): strOut += "\n交易归类：" + tradeType       
-        if(tradeTypeTarget != ""): strOut += "\n交易子类：" + tradeTypeTarget  
-        if(tradeTarget != ""): strOut += "\n交易物：" + tradeTarget   
+        if(tradeType != ""): strOut += "\n交易品类：" + tradeType       
+        if(tradeTypeTarget != ""): strOut += "\n交易品子类：" + tradeTypeTarget  
         strOut += "\n账单时间：" + strPerfix + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
         return strOut
     def Static_max(self, startTime = '', endTime = '', nMonth = 1, tradeParty = '', usrBillType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = "", bSum = False, nTop = 10, bMoney = True): 
-        lstBill, startTime, endTime  = self.Query(startTime, endTime, nMonth, tradeParty, usrBillType, tradeTarget, tradeType, tradeTypeTarget, True)
-
+        if(myTradeType.投资 != tradeType):
+            lstBill, startTime, endTime  = self.Query(startTime, endTime, nMonth, tradeParty, usrBillType, tradeTarget, tradeType, tradeTypeTarget, True, [], [myTradeType.投资])
+        else:   #投资相关需单独统计
+            lstBill, startTime, endTime  = self.Query(startTime, endTime, nMonth, tradeParty, usrBillType, tradeTarget, tradeType, tradeTypeTarget, True, [], [])
+        
         #统计        
         bReverse = True 
         if(tradeParty != ""): bSum = False
@@ -503,11 +506,11 @@ class myObj_Bills():
         if(bSum):
             strOut += strPerfix + "排名，交易方，金额，次数"
         else:
-            strOut += strPerfix +  "排名，交易方"
-            if(usrBillType != ""): strOut += "，分类"
-            if(tradeTarget != ""): strOut += "，品名"  
-            if(tradeType != ""): strOut += "，品类"  
-            if(tradeTypeTarget != ""): strOut += "，子品类" 
+            strOut += strPerfix +  "排名，交易方，金额"
+            if(usrBillType == ""): strOut += "，分类"
+            if(tradeTarget == ""): strOut += "，品名"  
+            if(tradeType == ""): strOut += "，品类"  
+            if(tradeTypeTarget == ""): strOut += "，子品类" 
             strOut += "，编号，时间" 
 
         for x in range(0, len(lstValues)):
@@ -520,11 +523,11 @@ class myObj_Bills():
             ind += 1
             if(ind >= nTop): break 
                  
-        if(usrBillType != ""): strOut += "\n账单类型：" + usrBillType           
+        if(usrBillType != ""): strOut += "\n账单类型：" + usrBillType    
+        if(tradeTarget != ""): strOut += "\n交易品名：" + tradeTarget          
         if(tradeParty != ""): strOut += "\n交易方：" + tradeParty
-        if(tradeType != ""): strOut += "\n交易归类：" + tradeType       
-        if(tradeTypeTarget != ""): strOut += "\n交易子类：" + tradeTypeTarget  
-        if(tradeTarget != ""): strOut += "\n交易物：" + tradeTarget   
+        if(tradeType != ""): strOut += "\n交易品类：" + tradeType       
+        if(tradeTypeTarget != ""): strOut += "\n交易品子类：" + tradeTypeTarget  
         strOut += "\n账单时间：" + strPerfix + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
         return strOut
     
