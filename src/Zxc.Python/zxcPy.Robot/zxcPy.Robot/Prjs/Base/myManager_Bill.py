@@ -167,7 +167,7 @@ class myObj_Bill():
     def ToList(self): 
         lstValue = [self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.tradeID, self.usrBillType, self.tradeParty, self.tradeType, self.tradeTypeTarget, self.tradeTarget, self.tradePrice, self.tradeNum, self.tradeNum_Stock, self.tradeMoney, self.tradePoundage, self.tradeProfit, self.tradeTime.strftime("%Y-%m-%d %H:%M:%S"), self.tradeID_Relation, self.isDel, self.remark]
         return lstValue
-    def ToString(self, nSpace = 0, isSimple = False): 
+    def ToString(self, nSpace = 0, isSimple = False, usrBillType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = ""): 
         if(isSimple == False):
             strSpace = " " * nSpace
             strBill = strSpace + "编号: " + str(self.tradeID) + "\n"
@@ -182,8 +182,11 @@ class myObj_Bill():
             strBill += strSpace + "备注: " + self.remark 
         else:
             strBill = self.tradeParty
-            strBill += "，" + str(round(self.tradeMoney, 2)) + "元"
-            strBill += "，" + self.usrBillType
+            strBill += "，" + str(round(self.tradeMoney, 2)) + "元" 
+            if(usrBillType != ""): strBill += "，" + self.usrBillType
+            if(tradeTarget != ""): strBill += "，" + self.tradeTarget
+            if(tradeType != ""): strBill += "，" + self.tradeType
+            if(tradeTypeTarget != ""): strBill += "，" + self.tradeTypeTarget
             strBill += "，" + str(self.tradeID) 
             strBill += "，" + myData_Trans.Tran_ToDatetime_str(self.tradeTime, "%Y-%m-%d") 
         return strBill
@@ -467,20 +470,22 @@ class myObj_Bills():
         if(tradeTarget != ""): strOut += "\n交易物：" + tradeTarget   
         strOut += "\n账单时间：" + strPerfix + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
         return strOut
-    def Static_max(self, tradeParty = '', usrBillType = "", bSum = False, nTop = 10, startTime = '', endTime = '', nMonth = 1): 
-        lstBill, startTime, endTime  = self.Query(startTime, endTime, nMonth, tradeParty, usrBillType, ["投资", "投资回笼"])
+    def Static_max(self, startTime = '', endTime = '', nMonth = 1, tradeParty = '', usrBillType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = "", bSum = False, nTop = 10, bMoney = True): 
+        lstBill, startTime, endTime  = self.Query(startTime, endTime, nMonth, tradeParty, usrBillType, tradeTarget, tradeType, tradeTypeTarget, True)
 
-        #统计         
-        bReverse = True
+        #统计        
+        bReverse = True 
         if(tradeParty != ""): bSum = False
         if(bSum == False):      #最大金额统计
-            lstValues = sorted(lstBill, key=lambda myObj_Bill: myObj_Bill.usrMoney, reverse=bReverse)   # sort by usrMoney
+            if(bMoney):
+                lstValues = sorted(lstBill, key=lambda myObj_Bill: myObj_Bill.tradeMoney, reverse=bReverse)   # sort by tradeMoney
+            else:
+                lstValues = sorted(lstBill, key=lambda myObj_Bill: myObj_Bill.tradeTime, reverse=bReverse)    # sort by tradeTime
         else:                   #累计统计
             dictSum = {}
             dictTimes = {}
             lstStatics = []
-            for x in lstBill:
-                if(x.tradeParty == "未记名" or x.usrBillType == myTradeType.投资回笼): continue
+            for x in lstBill: 
                 dSum = dictSum.get(x.tradeParty, 0)  
                 dSum += x.tradeMoney
                 dictSum[x.tradeParty] = dSum
@@ -489,26 +494,37 @@ class myObj_Bills():
             keys = dictSum.keys()
             for x in keys:
                 lstStatics.append((x, dictSum[x], dictTimes[x]))
-            lstValues = sorted(lstStatics, key=itemgetter(1), reverse=bReverse)   # sort by usrMoney
+            lstValues = sorted(lstStatics, key=itemgetter(1), reverse=bReverse)   # sort by tradeMoney
 
         #输出
         ind = 0
         strPerfix = "\n" + " " * 4
         strOut = "Top " + str(nTop) + " " + myData.iif(bSum, "累计金额", "单次金额") + "(" + self.usrID + ")："
-        strOut += strPerfix + myData.iif(bSum, "排名，来源，金额，次数", "排名，来源，金额，类型，编号，时间")
+        if(bSum):
+            strOut += strPerfix + "排名，交易方，金额，次数"
+        else:
+            strOut += strPerfix +  "排名，交易方"
+            if(usrBillType != ""): strOut += "，分类"
+            if(tradeTarget != ""): strOut += "，品名"  
+            if(tradeType != ""): strOut += "，品类"  
+            if(tradeTypeTarget != ""): strOut += "，子品类" 
+            strOut += "，编号，时间" 
+
         for x in range(0, len(lstValues)):
             bill = lstValues[x]
             strTop = "Top " + str(ind + 1) + "："
             if(bSum == False): 
-                strOut += strPerfix + strTop + bill.ToString(0, True)
+                strOut += strPerfix + strTop + bill.ToString(0, True, usrBillType, tradeTarget, tradeType, tradeTypeTarget)
             else:
                 strOut += strPerfix + strTop + bill[0] + "，" + str(int(bill[1])) + "元，" + str(bill[2]) + "次"
             ind += 1
             if(ind >= nTop): break 
-        if(usrBillType != ""): 
-            strOut += "\n账单类型：" + usrBillType      
-        if(tradeParty != ""): 
-            strOut += "\n账单来源：" + tradeParty
+                 
+        if(usrBillType != ""): strOut += "\n账单类型：" + usrBillType           
+        if(tradeParty != ""): strOut += "\n交易方：" + tradeParty
+        if(tradeType != ""): strOut += "\n交易归类：" + tradeType       
+        if(tradeTypeTarget != ""): strOut += "\n交易子类：" + tradeTypeTarget  
+        if(tradeTarget != ""): strOut += "\n交易物：" + tradeTarget   
         strOut += "\n账单时间：" + strPerfix + myData_Trans.Tran_ToDatetime_str(startTime, "%Y-%m-%d") + " 至 " + myData_Trans.Tran_ToDatetime_str(endTime, "%Y-%m-%d") 
         return strOut
     
@@ -647,11 +663,13 @@ if __name__ == "__main__":
     myDebug.Debug(pBills.Static(pBills._Trans_Time_year("", 2), "", 0))
     myDebug.Debug(pBills.Static(pBills._Trans_Time_year("", 3), "", 0))
 
-    myDebug.Debug(pBills.Static_max("", "红包", False, 10, pBills._Trans_Time_year("", 3), "", 0))
+    myDebug.Debug(pBills.Static_max(pBills._Trans_Time_year("", 3), "", 0, "", "受赠", "红包", "", "", False, 10))
     print()
-    myDebug.Debug(pBills.Static_max("", "红包", True, 10, pBills._Trans_Time_year("", 3), "", 0))
+    myDebug.Debug(pBills.Static_max(pBills._Trans_Time_year("", 3), "", 0, "", "受赠", "红包", "", "", True, 10))
     print()
-    myDebug.Debug(pBills.Static_max("爸爸", "红包", True, 10, pBills._Trans_Time_year("", 3), "", 0))
+    myDebug.Debug(pBills.Static_max(pBills._Trans_Time_year("", 3), "", 0, "爸爸", "受赠", "红包", "", "", True, 10))
+    print()
+    myDebug.Debug(pBills.Static_max(pBills._Trans_Time_year("", 3), "", 0, "爸爸", "受赠", "红包", "", "", True, 10, False))
     
 
     exit()
