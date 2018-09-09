@@ -303,6 +303,8 @@ if __name__ == "__main__":
     #非单例交互测试 
     msg["msg"] = "@帮助" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))    
+    msg["msg"] = "@我的账单人" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
     msg["msg"] = "@账单类型" 
     myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
     msg["msg"] = "@交易品类" 

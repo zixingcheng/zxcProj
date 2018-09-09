@@ -25,7 +25,7 @@ class myRobot_Bill(myRobot.myRobot):
         self.doCmd = "@@BillManager"    #启动命令 
         self.isSingleUse = False        #是否为单例使用(非单例时每个用户专属) 
         self.msg['FromUserName'] = self.usrName 
-
+        
         self.manageBills = gol._Get_Setting('manageBills', None)    #使用全局账单管理器
         self.billTypes = myManager_Bill.myBileType                  #账单类型集
         self.billTradeTypes = myManager_Bill.myTradeType            #交易品类型集
@@ -59,10 +59,27 @@ class myRobot_Bill(myRobot.myRobot):
             return "账单默认设置：" + strReturn
         elif(cmd == "账单人"):
             if(len(cmds) > 1): 
-                self.bills = self.manageBills._Find(cmds[1])
-                if(self.bills == None): return "账单人(" + cmds[1] + ")不存在！，但你仍可以指定该名称进行添加。"
-                self.billUsr = cmds[1]
+                #账单人检查
+                billName = cmds[1]
+                self.bills = self.manageBills._Find(billName)
+                if(self.bills == None): return "账单人(" + billName + ")不存在！，但你仍可以指定该名称进行添加。"
+                
+                #权限检查
+                if(self.usrInfos != None):
+                    pUser = self.usrInfos._Find("", self.usrName, self.usrName, usrInfo.get('usrPlat', ''))
+                    if(not billName in pUser.usrRelations):
+                        return "权限不足，账单人(" + billName + ")拒绝操作！请使用\"@我的账单人\"查询可用账单人。"
+                self.billUsr = billName
                 return "已切换到账单人(" + cmds[1] + ")。"
+        elif(cmd == "我的账单人"):
+            #我的账单人
+            strReturn = ""
+            if(self.usrInfos != None):
+                pUser = self.usrInfos._Find("", self.usrName, self.usrName, usrInfo.get('usrPlat', ''))
+                if(pUser != None):
+                    for x in pUser.usrRelations:
+                        strReturn += "，" + x 
+            return "我的账单人：" + myData.iif(strReturn == "", "无", strReturn[1:])
         elif(cmd == "账单类型"):
             for x in range(0, len(self.billTypes)):
                 strReturn += "，" + self.billTypes[x]
@@ -187,6 +204,7 @@ if __name__ == "__main__":
     pR = myRobot_Bill("zxcID", "zxcName");
     pR.Done("@@BillManager")
     myDebug.Debug(pR.Done("@帮助")['msg'])
+    myDebug.Debug(pR.Done("@我的账单人")['msg'])
     myDebug.Debug(pR.Done("@账单类型")['msg'])
     myDebug.Debug(pR.Done("@交易品类")['msg'])
     myDebug.Debug(pR.Done("@当前设置")['msg'])

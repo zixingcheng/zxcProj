@@ -45,7 +45,8 @@ class myRobot():
         self.enableGroups = {}          #可用群组
         
         # 初始返回消息
-        self.usrMMsg = gol._Get_Setting('manageMsgs')     #消息管理器
+        self.usrMMsg = gol._Get_Setting('manageMsgs')                   #消息管理器
+        self.usrInfos = gol._Get_Value('rootRobot_usrInfos', None)      #用户信息集
         self.msg = {}
         self.maxTime = 60 * 6           #有效时常 
     def Init(self): 
