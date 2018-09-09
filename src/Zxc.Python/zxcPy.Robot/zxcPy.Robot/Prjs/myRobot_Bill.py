@@ -144,6 +144,8 @@ class myRobot_Bill(myRobot.myRobot):
             if(len(cmds) > 1  ): 
                 tradeParty, typeBill, tradeTarget, tradeType, tradeTargetType, startTime, endTime, nMonth = self._Get_QueryParam(cmds) 
                 return self.bills.Static_max(startTime, endTime, nMonth, tradeParty, typeBill, tradeTarget, tradeType, tradeTargetType, True, 30, False)
+        else:
+            strReturn = "未识别的命令，请使用\"@帮助\"查询可用命令。"
         return strReturn
         
     #解析通用查询、统计参数
@@ -179,11 +181,12 @@ class myRobot_Bill(myRobot.myRobot):
         return strCmd
 
     def _Title_User_Opened(self): 
-        return "输入命令进行账单管家操作... 帮助命令：\"@帮助\"."
+        return "输入命令进行账单管家操作... 帮助命令：\"@帮助\"。"
     def _Title_Helper(self): 
         strReturn = "账单管家命令提示："
         strReturn += self.perfix + "@帮助：输出所有命令说明"
         strReturn += self.perfix + "@当前设置：输出当前设置信息"
+        strReturn += self.perfix + "@我的账单人：输出关联账单人信息"
         strReturn += self.perfix + "@账单人：参数(\"账单所属人\")"
         strReturn += self.perfix + "@账单类型：提取可用账单类型"
         strReturn += self.perfix + "@类型：切换到固定账单类型"

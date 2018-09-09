@@ -62,7 +62,7 @@ class myRoot_Usr():
             prjClass = self.usrPrj.prjDos.get(pPrj.prjName, None) 
 
         #调用消息处理，及其他处理 
-        pReturns = self.usrPrj.Done(pPrj, prjClass, Text, msgID, msgType, pPlat, pGroup, nameSelf, bIsRegist, isCommand)
+        pReturns = self.usrPrj.Done(pPrj, prjClass, Text, msgID, msgType, pPlat, self, pGroup, nameSelf, bIsRegist, isCommand)
         return pReturns
 #消息回复用户功能管理类
 class myRoot_UsrPrj():
@@ -159,21 +159,21 @@ class myRoot_UsrPrj():
         return True 
  
     #新消息处理
-    def Done(self, pPrj, prjDo, Text, msgID = "", msgType = "TEXT", usrPlat = "", pGroup = None, nameSelf = "", bIsRegist = False, isCommand = False):  
+    def Done(self, pPrj, prjDo, Text, msgID = "", msgType = "TEXT", usrPlat = "", pUser = None, pGroup = None, nameSelf = "", bIsRegist = False, isCommand = False):  
         #切换功能 
         pReturns = []
         self._Change_prjDo(prjDo, pPrj)
 
         #无可用功能执行后台功能
         if(self.prjDo == None): 
-            usrInfo = self.get_UserInfo(usrPlat, pGroup, nameSelf)
+            usrInfo = self.get_UserInfo(usrPlat, pUser, pGroup, nameSelf)
             pReturns = self.Done_Back(Text, msgID, msgType, usrInfo)    #处理后台功能 
             return pReturns                                             #None表示无命令，忽略 
             
         #调用处理命令对象
         pReturn = None
         IsEnable = False
-        usrInfo = self.get_UserInfo(usrPlat, pGroup, nameSelf)
+        usrInfo = self.get_UserInfo(usrPlat, pUser, pGroup, nameSelf)
         if(bIsRegist): 
             if(pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)):
                 pPrj.registoutUser(self.usrID, self.usrName, self.nickName, pGroup, nameSelf)
@@ -187,8 +187,9 @@ class myRoot_UsrPrj():
             if(isCommand or pPrj.IsRegist_user(self.usrName, self.nickName, pGroup)): IsEnable = True
             if(pGroup != None): IsEnable = pPrj.IsEnable_group(pGroup)
             if(IsEnable):
-                pReturn = self.prjDo.Done_ByDict(Text, msgID, msgType, usrInfo)
-                self._Updata_prjInfo(prjDo)     #功能信息同步
+                if(self.prjDo.isSingleUse == True):
+                    pReturn = self.prjDo.Done_ByDict(Text, msgID, msgType, usrInfo)
+                    self._Updata_prjInfo(prjDo)     #功能信息同步
                  
         #补全返回信息
         if(pReturn != None):
@@ -217,11 +218,16 @@ class myRoot_UsrPrj():
                     pReturns.append(pReturn)
         return pReturns
     #处理封装返回用户信息
-    def get_UserInfo(self, usrPlat = "", pGroup = None, nameSelf = ""):
+    def get_UserInfo(self, usrPlat = "", pUser = None, pGroup = None, nameSelf = ""):
         usrMsg = {}
-        usrMsg['usrID'] = self.usrID
-        usrMsg['usrName'] = self.usrName
-        usrMsg['usrNameNick'] = self.nickName 
+        if(pGroup != None):
+            usrMsg['usrID'] = pUser.usrID
+            usrMsg['usrName'] = pUser.usrName
+            usrMsg['usrNameNick'] = pUser.usrName_Nick
+        else:
+            usrMsg['usrID'] = self.usrID
+            usrMsg['usrName'] = self.usrName
+            usrMsg['usrNameNick'] = self.nickName 
         usrMsg['usrNameSelf'] = nameSelf        #自己发自己标识 
         usrMsg['usrPlat'] = usrPlat             #自己发自己标识 
         if(pGroup != None):
@@ -305,7 +311,7 @@ class myRoot_Usrs():
         dtUser.Save(self.Dir_Setting, "UserInfo", 0, 0, True, "用户信息表")
 
     #查找 
-    def _Find(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrType = "", bCreate_Auto = False, bUpdataSys = True): 
+    def _Find(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrType = "", bCreate_Auto = False, bUpdataSys = True, bUpdata = False): 
         pUser = None
 
         #按名称查找
@@ -319,6 +325,12 @@ class myRoot_Usrs():
             pUser = self._Find_ByID(usrID.lower())
         if(pUser == None):
             pUser = self._Find_ByID_sys(usrID_sys.lower())
+
+        #同步信息
+        if(bUpdata == True):
+            pUser.usrID = usrID
+            pUser.usrName = usrName
+            pUser.usrName_Nick = usrName_Nick
 
         # 不存在
         pUser_sys = None

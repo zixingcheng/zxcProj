@@ -138,10 +138,10 @@ class myRobot_Reply():
 
     #查找用户（不存在则自动创建）
     def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlat = "",idGroup = "", nameGroup = ""): 
-        #按消息生成对应对象 
-        pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, False)
+        #按消息生成对应对象  
+        pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, False, False, True)
         if(pUser == None or len(pUser.usrPrj.prjDos) < 1):      #非参与用户，于全局用户集信息提取，不存在的自动生成
-            pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, True)
+            pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, True, False, True)
             pUser.usrPrj._Add_prjDos(self.root.rootPrjs)
             self.usrReplys._Add(pUser)
         return pUser
@@ -156,7 +156,7 @@ class myRobot_Reply():
         if pRoot.prjRoot == None : return False
         return True
     #是否可启动命令用户
-    def _IsEnable_Usr(self, pUser, pPrj, idGroup = "", nameGroup = "", isCommand = False):
+    def _IsEnable_Usr(self, pUser, pPrj, idGroup = "", nameGroup = "", usrPlat = "", isCommand = False):
         #必须可用
         bRigist = False
         if(pPrj.IsEnable() == False): return False, bRigist
@@ -193,7 +193,7 @@ class myRobot_Reply():
         
         #功能权限验证 
         isGroup = nameGroup != ""
-        bEnable, bRigist = self._IsEnable_Usr(pUser, pPrj, idGroup, nameGroup, isCommand)
+        bEnable, bRigist = self._IsEnable_Usr(pUser, pPrj, idGroup, nameGroup, usrPlat, isCommand)
         if(bEnable == False): return None, pUser, False             #必须可用
 
         #功能注册用户
