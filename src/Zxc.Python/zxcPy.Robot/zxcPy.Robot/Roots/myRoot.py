@@ -23,7 +23,7 @@ class myRoot():
         self.usrID = "zxcRobot"         #归属用户ID
         self.rootPrjs = None            #功能集 
         self.usrInfos = None            #用户集 
-        self.usrInfos_sys = None        #用户集 
+        self.usrInfos_sys = None        #用户集-系统用户 
         self.usrGroups = None           #用户群组集
         self.usrGroups_sys = None       #用户群组集
         self.usrPlats = None           #平台集
@@ -37,8 +37,9 @@ class myRoot():
         #用户集 
         if(self.usrInfos == None):
             self.usrInfos = myRoot_Usr.myRoot_Usrs("", "")   
-            self.usrInfos_sys = myRoot_Usr.myRoot_Usrs(self.usrID,self.usrName)   
+            self.usrInfos_sys = myRoot_Usr.myRoot_Usrs(self.usrID,self.usrName, self.usrNameNick)   
             gol._Set_Value('rootRobot_usrInfos', self.usrInfos)
+            gol._Set_Value('rootRobot_usrInfos_sys', self.usrInfos_sys)
         self.usrInfos.usrName = self.usrName
         self.usrInfos.usrID = self.usrID
 
@@ -71,7 +72,7 @@ class myRoot():
         gol._Set_Setting('usrName', usrName)
         gol._Set_Setting('usrNameNick', usrNameNick)
         gol._Set_Setting('usrID', usrID)
-        self.Init();
+        self.Init(); 
              
 #定义全局方法集并缓存
 gol._Init()         #先必须在主模块初始化（只在Main模块需要一次即可）

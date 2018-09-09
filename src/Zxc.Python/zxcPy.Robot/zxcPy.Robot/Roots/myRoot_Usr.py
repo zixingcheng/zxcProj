@@ -6,11 +6,12 @@ Created on  张斌 2018-06-25 10:58:00
 
     机器人-用户对象 真实用户对象，可能来自多个平台
 """
-import sys, os, datetime, uuid, mySystem 
+import sys, os, copy, datetime, uuid, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)    
 import myIO, myIO_xlsx, myData_Trans, myRoot_Prj
+from myGlobal import gol   
 
 
 #用户对象
@@ -19,8 +20,10 @@ class myRoot_Usr():
         self.usrID_sys = str(uuid.uuid1())   #用户ID--系统ID(唯一)
         self.usrID = ""                 #用户ID
         self.usrName = usrName          #用户名
+        self.usrName_Full = ""          #用户姓名
         self.usrName_Nick = nameNick    #用户名--昵称
-        self.usrPlats = []             #用户类型(来源平台集)
+        self.usrRelations = []          #用户关联姓名集
+        self.usrPlats = []              #用户类型(来源平台集)
         self.usrTag = ""        #标签
         self.usrRamak = ""      #备注
         self.usrPhone = ""      #电话号码
@@ -109,7 +112,7 @@ class myRoot_UsrPrj():
                 self._Add_prjDo(prj.prjClass) 
     #增加功能   
     def _Change_prjDo(self, prjDo, pPrj): 
-        if(not pPrj.IsRunSingle()): 
+        if(pPrj != None and not pPrj.IsRunSingle()): 
             self._Add_prjDo(prjDo)
             return True     #非单例不更换，等同后台运行
         if(self.prjDo == None):				        #当前无命令，直接更新命令
@@ -244,7 +247,7 @@ class myRoot_Usrs():
         self.Dir_Base = os.path.abspath(os.path.join(strDir, "../.."))  
         self.Dir_Setting = self.Dir_Base + "/Setting"
         self.Path_SetUser = self.Dir_Setting + "/UserInfo.xls"
-        self.lstFields = ["ID","用户名","用户昵称","用户ID","来源平台","电话","标签","备注","描述","注册时间","最后登录时间"]
+        self.lstFields = ["ID","用户名","用户昵称","用户ID","用户姓名","来源平台","电话","标签","备注","描述","注册时间","最后登录时间"]
         if(userID != "" and usrName != "" and nickName != ""):
             self._Init()
     #初始参数信息等   
@@ -260,6 +263,10 @@ class myRoot_Usrs():
             pUser.usrID_sys = dtRow[lstFields_ind["ID"]]
             pUser.usrName_Nick = dtRow[lstFields_ind["用户昵称"]]
             pUser.usrID = dtRow[lstFields_ind["用户ID"]]
+            pUser.usrName_Full = dtRow[lstFields_ind["用户姓名"]]
+            if(pUser.usrName_Full != ""):
+                pUser.usrRelations.append(pUser.usrName_Full)
+
             pUser.usrPlats = dtRow[lstFields_ind["来源平台"]].split(',')
             pUser.usrPhone = dtRow[lstFields_ind["电话"]]
             pUser.usrTag = dtRow[lstFields_ind["标签"]]
@@ -273,7 +280,7 @@ class myRoot_Usrs():
         dtUser = myIO_xlsx.DtTable()    #用户信息表
         dtUser.dataName = "dataName"
         dtUser.dataField = self.lstFields
-        dtUser.dataFieldType = ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'datetime', 'datetime']
+        dtUser.dataFieldType = ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'datetime', 'datetime']
        
         # 组装行数据
         keys = self.usrList.keys()
@@ -283,7 +290,8 @@ class myRoot_Usrs():
             pValues.append(pUser.usrID_sys)
             pValues.append(pUser.usrName)
             pValues.append(pUser.usrName_Nick)
-            pValues.append(pUser.usrID)
+            pValues.append(pUser.usrID) 
+            pValues.append(pUser.usrName_Full) 
             pValues.append(myData_Trans.Tran_ToStr(pUser.usrPlats))
             pValues.append(pUser.usrPhone)
             pValues.append(pUser.usrTag)
@@ -297,7 +305,7 @@ class myRoot_Usrs():
         dtUser.Save(self.Dir_Setting, "UserInfo", 0, 0, True, "用户信息表")
 
     #查找 
-    def _Find(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrType = "", bCreate_Auto = False): 
+    def _Find(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrType = "", bCreate_Auto = False, bUpdataSys = True): 
         pUser = None
 
         #按名称查找
@@ -311,11 +319,26 @@ class myRoot_Usrs():
             pUser = self._Find_ByID(usrID.lower())
         if(pUser == None):
             pUser = self._Find_ByID_sys(usrID_sys.lower())
- 
+
         # 不存在
+        pUser_sys = None
         if(bCreate_Auto and pUser == None):
-            pUser = myRoot_Usr(usrID, usrName, usrName_Nick, usrType)
+            #查找默认用户库
+            if(bUpdataSys == True):
+                usrInfos_sys = gol._Get_Value('rootRobot_usrInfos_sys')
+                if(usrInfos_sys != None):
+                    pUser_sys = usrInfos_sys._Find(usrID, usrName, usrName_Nick, "", usrType, False, False)
+
+            #实力新用户信息
+            if(pUser_sys != None):
+                pUser = copy.deepcopy(pUser_sys)
+                pUser.usrID = usrID
+                pUser.usrName = usrName
+                pUser.usrName_Nick = usrName_Nick
+            else:
+                pUser = myRoot_Usr(usrID, usrName, usrName_Nick, usrType)
             self._Index(pUser)
+
         # 信息更新, 并返回
         self._Refresh(pUser)
         return pUser
@@ -412,10 +435,13 @@ class myRoot_Usrs():
 
 #主启动程序
 if __name__ == "__main__":
-    pUsers = myRoot_Usrs( "@@zxcPy", "zxcPy")
+    pUsers = myRoot_Usrs( "@@zxcPy", "zxcPy", "测试")
     print(pUsers.Add({'usrName': "Test",'usrName_Nick': "测试",'usrID': "@@1" ,'usrType': "wx"}, True))
     print(pUsers.Add({'usrName': "Test3",'usrName_Nick': "测试3",'usrID': "@@3" }))
     print(pUsers.Del("", "", "测试3"))
+    print(pUsers.Add({'usrName': "Test_001",'usrName_Nick': "茶叶一主号",'usrID': "-" ,'usrType': "wx"}, True))
+
+    pUser = pUsers._Find("", "", "茶叶一主号")
 
     pUsers._Save()
     print()

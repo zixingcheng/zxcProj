@@ -226,7 +226,7 @@ class myRoots_Prj():
         #用户权限设置
         if(True): 	 
             #提取字段信息 
-            lstFields_user = ["用户名","功能权限","功能列表"]
+            lstFields_user = ["用户名","功能权限","功能列表","关联人列表"]
             lstFields_ind_user = dtSetting_user.Get_Index_Fields(lstFields_user)
 
             #转换为功能权限对象集
@@ -236,7 +236,7 @@ class myRoots_Prj():
                     #提取用户对象
                     #prjRoot_user = myRoot_Usr.myRoot_Usr("", usrName, usrName, "", self)
                     usrName = dtRow[lstFields_ind_user["用户名"]] 
-                    pUser = pUsers._Find(usrName, usrName, usrName, "", "", True)
+                    pUser = pUsers._Find(usrName, usrName, usrName, "", "", True) 
 
                     #添加系统级权限用户 
                     bRoot = myData.iif(dtRow[lstFields_ind_user["功能权限"]] == True, True, False)
@@ -250,6 +250,9 @@ class myRoots_Prj():
                             for x in self.prjRoots.keys():
                                 if(self.prjRoots[x].prjName in lstPrj):
                                     self.prjRoots[x].rootUsers._Add(pUser) 
+                    #用户关联权限用户姓名集
+                    lstUsr = dtRow[lstFields_ind_user["关联人列表"]].strip().split(',')
+                    pUser.usrRelations = pUser.usrRelations + lstUsr
     #查找 
     def _Find(self, prjName): 
         prjName = prjName.lower()
