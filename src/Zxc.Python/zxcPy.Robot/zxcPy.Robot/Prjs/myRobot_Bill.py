@@ -111,19 +111,25 @@ class myRobot_Bill(myRobot.myRobot):
         elif(cmd == "新增"): 
             nLen = len(cmds)
             if(nLen > 2): 
+                #"@新增：参数(\"交易人 金额 品名 单价 数量 时间 备注 类型 品类 品子类\")"
                 tradeParty = myData.iif(cmds[1] == "", self.billTradeParty, cmds[1])
-                tradeTarget = self._Get_Param(cmds, nLen, 5, self.billTradeParty)
+                tradeTarget = self._Get_Param(cmds, nLen, 3, self.billTradeParty)
                 typeBill = self._Get_Param(cmds, nLen, 8, self.billType)
                 tradeType = self._Get_Param(cmds, nLen, 9, self.billTradeType)
                 tradeTargetType = self._Get_Param(cmds, nLen, 10, self.billTradeTargetType)
-                tradePrice = self._Get_Param(cmds, nLen, 3, 0)
-                tradeNum = self._Get_Param(cmds, nLen, 4, 1)
+                tradePrice = self._Get_Param(cmds, nLen, 4, 0)
+                tradeNum = self._Get_Param(cmds, nLen, 5, 1)
                 
                 if(typeBill in self.billTypes == False):
                     return "账单类型(" + typeBill + ")不存在，请使用\"@账单类型\"查询可用类型。"
                 dateTime = self._Get_Param(cmds, nLen, 6, "")
                 remark = self._Get_Param(cmds, nLen, 7, "")
-                return self.bills.Add(tradeParty, float(cmds[2]), tradeTarget, typeBill, tradeType, tradeTargetType, dateTime, remark, float(tradePrice), float(tradeNum))
+                
+                recorder = ""
+                if(self.usrInfos != None):
+                    pUser = self.usrInfos._Find("", self.usrName, self.usrName, usrInfo.get('usrPlat', ''))
+                    if(pUser != None): recorder = pUser.usrName_Full
+                return self.bills.Add(recorder, tradeParty, float(cmds[2]), tradeTarget, typeBill, tradeType, tradeTargetType, dateTime, remark, float(tradePrice), float(tradeNum))
         elif(cmd == "统计"):  
             cmds = Text[1:].split(" ")
             if(len(cmds) > 1  ): 
@@ -193,7 +199,7 @@ class myRobot_Bill(myRobot.myRobot):
         strReturn += self.perfix + "@交易品类：提取可用交易品类"
         strReturn += self.perfix + "@品类：切换到固定交易品类"
         strReturn += self.perfix + "@交易人：切换到固定账单交易人"
-        strReturn += self.perfix + "@新增：参数(\"交易人 金额 品名 单价 价格 时间 备注 类型 品类 品子类\")"
+        strReturn += self.perfix + "@新增：参数(\"交易人 金额 品名 单价 数量 时间 备注 类型 品类 品子类\")"
         strReturn += self.perfix + "@统计：参数(\"n年/月\")"
         strReturn += self.perfix + "@统计单次：参数(\"n年/月\")"
         strReturn += self.perfix + "@统计累计：参数(\"n年/月\")"
@@ -219,7 +225,7 @@ if __name__ == "__main__":
     myDebug.Debug(pR.Done("@当前设置")['msg'])
     
     #添加、查询
-    myDebug.Debug(pR.Done("@新增 老豆 100 0 1 红包 2018-8-1 测试")['msg'])
+    myDebug.Debug(pR.Done("@新增 老豆 100 红包 0 1 2018-8-1 测试")['msg'])
     myDebug.Debug(pR.Done("@统计 1月")['msg'])
     myDebug.Debug(pR.Done("@统计 1年")['msg'])
     myDebug.Debug(pR.Done("@统计 1年   2018-8-1 2018-8-16")['msg'])

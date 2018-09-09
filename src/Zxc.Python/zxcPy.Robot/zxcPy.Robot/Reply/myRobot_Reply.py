@@ -167,7 +167,7 @@ class myRobot_Reply():
             if(isCommand and bIsRoot == False): 
                 return False, bRigist       #启动命令必须权限用户 
         else:   #运行时，仅非统一启动时，需要个人启动
-            if(pPrj.IsEnable_All() == False): return False, bRigist
+            if(pPrj.isRunSingle and pPrj.IsEnable_All() == False): return False, bRigist
             if(isCommand and bIsRoot == False):
                 bRigist = True              #标识为注册
                 

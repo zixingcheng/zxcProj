@@ -50,7 +50,7 @@ class myRoot_GroupsInfo():
         for dtRow in dtGroup.dataMat:
             pGroup = myRoot_GroupInfo("", dtRow[lstFields_ind["群组名"]])
             pGroup.groupID = dtRow[lstFields_ind["ID"]]
-            pGroup.typeName = dtRow[lstFields_ind["来源平台"]].split(',')
+            pGroup.typeName = dtRow[lstFields_ind["来源平台"]].split('、')
             pGroup.groupDesc = dtRow[lstFields_ind["描述"]]
             pGroup.groupTime_Regist = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["注册时间"]])
             pGroup.groupTime_Logined_Last = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["最后登录时间"]])

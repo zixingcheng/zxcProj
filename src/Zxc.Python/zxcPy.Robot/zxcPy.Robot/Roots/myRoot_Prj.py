@@ -189,12 +189,12 @@ class myRoots_Prj():
             prjRoot.isEnable_groupAll = myData.iif(dtRow[lstFields_ind["群同时有效"]] == True, True, False)
 
             #平台集合
-            lstGroup = dtRow[lstFields_ind["群列表"]].split(',')
+            lstGroup = dtRow[lstFields_ind["群列表"]].split('、')
             if(self.hasGol):
                 for x in lstGroup:
                     pGroup = pGroups.Find_Group(x, x, "", True)
                     prjRoot.usrGroups._Index(pGroup)
-            prjRoot.PlatsEnable = list(dtRow[lstFields_ind["平台列表"]])
+            prjRoot.PlatsEnable = dtRow[lstFields_ind["平台列表"]].split('、')
 
             #实例功能对象并缓存索引
             prjRoot.creatIntance(self.usrID, self.usrName)
@@ -241,7 +241,7 @@ class myRoots_Prj():
                     #添加系统级权限用户 
                     bRoot = myData.iif(dtRow[lstFields_ind_user["功能权限"]] == True, True, False)
                     lstPrj = dtRow[lstFields_ind_user["功能列表"]]
-                    if(lstPrj.count(',') > 0): lstPrj = lstPrj.split(',')
+                    if(lstPrj.count('、') > 0): lstPrj = lstPrj.split('、')
                     if(bRoot):
                         if(len(lstPrj) < 1):    #所有有效
                             for x in self.prjRoots.keys():
@@ -251,7 +251,7 @@ class myRoots_Prj():
                                 if(self.prjRoots[x].prjName in lstPrj):
                                     self.prjRoots[x].rootUsers._Add(pUser) 
                     #用户关联权限用户姓名集
-                    lstUsr = dtRow[lstFields_ind_user["关联人列表"]].strip().split(',')
+                    lstUsr = dtRow[lstFields_ind_user["关联人列表"]].strip().split('、')
                     pUser.usrRelations = pUser.usrRelations + lstUsr
     #查找 
     def _Find(self, prjName): 

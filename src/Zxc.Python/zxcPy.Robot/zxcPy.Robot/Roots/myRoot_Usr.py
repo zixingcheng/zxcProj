@@ -273,7 +273,7 @@ class myRoot_Usrs():
             if(pUser.usrName_Full != ""):
                 pUser.usrRelations.append(pUser.usrName_Full)
 
-            pUser.usrPlats = dtRow[lstFields_ind["来源平台"]].split(',')
+            pUser.usrPlats = dtRow[lstFields_ind["来源平台"]].split('、')
             pUser.usrPhone = dtRow[lstFields_ind["电话"]]
             pUser.usrTag = dtRow[lstFields_ind["标签"]]
             pUser.usrRamak = dtRow[lstFields_ind["备注"]]
