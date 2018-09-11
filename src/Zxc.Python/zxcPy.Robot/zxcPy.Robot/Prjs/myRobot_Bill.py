@@ -59,16 +59,18 @@ class myRobot_Bill(myRobot.myRobot):
             return "账单默认设置：" + strReturn
         elif(cmd == "账单人"):
             if(len(cmds) > 1): 
-                #账单人检查
-                billName = cmds[1]
-                self.bills = self.manageBills._Find(billName)
-                if(self.bills == None): return "账单人(" + billName + ")不存在！，但你仍可以指定该名称进行添加。"
-                
                 #权限检查
+                billName = cmds[1]
                 if(self.usrInfos != None):
                     pUser = self.usrInfos._Find("", self.usrName, self.usrName, usrInfo.get('usrPlat', ''))
                     if(not billName in pUser.usrRelations):
                         return "权限不足，账单人(" + billName + ")拒绝操作！请使用\"@我的账单人\"查询可用账单人。"
+                    
+                #账单人检查
+                self.bills = self.manageBills._Find(billName)
+                if(self.bills == None): 
+                    self.bills = self.manageBills._Find(billName, True)
+                    return "账单人(" + billName + ")不存在！，但你仍可以指定该名称进行添加。"
                 self.billUsr = billName
                 return "已切换到账单人(" + cmds[1] + ")。"
         elif(cmd == "我的账单人"):
