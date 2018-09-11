@@ -28,7 +28,7 @@ class Quote_Listener:
     def OnRecvQuote(self, quoteDatas):pass 
     #消息处理
     def OnHandleMsg(self, quoteDatas, strMsg):
-        if(quoteDatas.autoSave == False): return False    #屏蔽旧数据处理
+        if(quoteDatas.autoSave == False): return False      #屏蔽旧数据处理
         if(strMsg == ""): return False
 
         #通知处理
@@ -37,7 +37,7 @@ class Quote_Listener:
             #生成用户消息
             msg = self.OnCreatMsgInfo(x, strMsg, quoteDatas.data.time)
             if(self.pMMsg != None):
-                self.pMMsg.OnHandleMsg(msg)              #推送至消息处理器处理
+                self.pMMsg.OnHandleMsg(msg, "", True)       #推送至消息处理器处理(使用消息校正)
         return True
     #创建新消息
     def OnCreatMsgInfo(self, to_user, text, time = '', type = "TEXT", plat = myManager_Msg.myMsgPlat.wx):
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     pListener = myListener_Printer.Quote_Listener_Printer()
     #pListener.OnRecvQuote(myQuote_Data.Quote_Data())
 
-    users = ['茶叶一主号', '老婆']
+    users = ['茶叶一主号', '@*测试群']
     for i in range(0, 2):
         for x in users:
             strMsg = "Hello " + x 

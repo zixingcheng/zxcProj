@@ -148,9 +148,13 @@ class myManager_Msg():
         return pMsgs
 
     #消息处理（可指定plat）
-    def OnHandleMsg(self, msg, plat = ""):
+    def OnHandleMsg(self, msg, plat = "", bCheck = False):
         if(msg == None): return
         strMsg = msg.get('msg')
+
+        #消息内容校正
+        if(bCheck):
+            self.OnHandleMsg_Check(msg, plat)
 
         #文字输出
         typePlatform = myData.iif(plat == "", msg.get("usrPlat", myMsgPlat.wx), plat)
@@ -181,6 +185,19 @@ class myManager_Msg():
                 #转发消息
                 usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
                 myDebug.Print("消息管理器转发::", usrMQ.nameQueue + ">> ",strMsg)
+    #消息内容校正
+    def OnHandleMsg_Check(self, msg, plat = ""):
+        if(msg == None): return
+        usrName = msg.get('usrName', "")
+        if(len(usrName) > 2 and usrName[0:2] == "@*"):      #用户为群用户
+            if(msg.get('groupID', "") == "" and msg.get('groupName', "") == ""):
+                msg['groupID'] = ""
+                msg['groupName'] = usrName[2:]
+                msg['usrID'] = ""
+                msg['usrName'] = ""
+                msg['usrNameNick'] = ""
+        return True
+ 
     #创建新消息
     def OnCreatMsg(self, bCreatTime = True):
         msg = copy.deepcopy(self.msgExramp)
@@ -229,6 +246,9 @@ if __name__ == '__main__':
    msg["msgID"] = "msgID-***"
    msg["msgType"] = "TEXT"
    msg["usrPlat"] = "wx"
+   pMMsg.OnHandleMsg(msg)
+
+   msg["usrName"] = "@*测试群"
    pMMsg.OnHandleMsg(msg)
    print()
 

@@ -202,8 +202,11 @@ class myWeixin_ItChat(myThread.myThread):
 
         #增加记录日志--消息管理器实现 
 
-        #调用 
-        return self.Send_Msg(msg.get('usrID', ""), msg['usrName'], msg['msg'], msg['msgType'])
+        #调用 消息发送
+        if(msgR.get('groupID', '') != '' or msgR.get('groupName', '') != ''):       #区分群、个人
+            return self.Send_Msg(msgR['groupID'], msgR['groupName'], msgR['msg'], msgR['msgType'], 1)
+        else:
+            return self.Send_Msg(msgR['usrID'], msgR['usrName'], msgR['msg'], msgR['msgType'])
     #发送消息接口(typeUser, 0: 好友 1：群 2：公众号)
     def Send_Msg(self, usrID, usrName = "", msgInfo = "" , typeMsg = "TEXT", typeUser = 0):
         #用户检测(@开头为用户名，filehelper，其他需要检索实际用户名)
@@ -388,10 +391,10 @@ class myWeixin_ItChat(myThread.myThread):
                 return True
 
             #消息发送
-            if(msgR.get('groupName', '') == ''):            #区分群、个人
-                self.Send_Msg(msgR['usrID'], msgR['usrName'], msgR['msg'], msgR['msgType'])
-            else:
+            if(msgR.get('groupID', '') != '' or msgR.get('groupName', '') != ''):       #区分群、个人
                 self.Send_Msg(msgR['groupID'], msgR['groupName'], msgR['msg'], msgR['msgType'], 1)
+            else:
+                self.Send_Msg(msgR['usrID'], msgR['usrName'], msgR['msg'], msgR['msgType'])
             return True
         except Exception as ex:
             myError.Error(ex)  

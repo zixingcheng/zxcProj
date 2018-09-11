@@ -85,6 +85,7 @@ class DtTable:
         #循环提取所有行
         for i in range(row_start, len(lstLines)):
             pValues = lstLines[i].strip().split(strsplit)
+            if(len(pValues) < 1): continue
             while(len(pValues) < self._Cloumns()):
                 pValues.append("")
             self.dataMat.append(pValues)
