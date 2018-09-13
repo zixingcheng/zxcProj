@@ -270,7 +270,7 @@ if __name__ == "__main__":
     if(True == True):  
         #循环测试
         nTimes = 5
-        pMMsg = myManager_Msg.myManager_Msg()
+        pMMsg = gol._Get_Setting('manageMsgs', None)
         msg = pMMsg.OnCreatMsg()
         msg["usrID"] = usrID
         msg["usrName"] = "茶叶一主号"     

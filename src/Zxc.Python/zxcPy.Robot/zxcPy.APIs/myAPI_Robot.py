@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     #消息处理借接口
     # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'usrPlat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
-    pMMsg = myManager_Msg.myManager_Msg()
+    pMMsg = gol._Get_Setting('manageMsgs', None)
     msg = pMMsg.OnCreatMsg()
     msg["usrID"] = "zxc_0"
     msg["usrName"] = "墨紫"

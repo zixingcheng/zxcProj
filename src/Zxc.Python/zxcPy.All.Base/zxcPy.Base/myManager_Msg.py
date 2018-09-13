@@ -83,7 +83,7 @@ class myManager_Msg():
         self.usrNameSelfs = {}      #各个平台标识的自己用户名（接收特殊消息）  
         self.dirLog = dir
     #初始API、消息队列    
-    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), usrHelper = ''):
+    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = None, usrHelper = ''):
         if(plat == None or plat == ""): return 
         self.usrNameSelfs[plat] = usrHelper      #自定义的特殊用户名(特殊发送目标)
 
@@ -250,6 +250,7 @@ if __name__ == '__main__':
 
    msg["usrName"] = "@*测试群"
    pMMsg.OnHandleMsg(msg)
+   pMMsg.OnHandleMsg(msg, '', True)
    print()
 
 
