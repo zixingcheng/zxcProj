@@ -26,8 +26,10 @@
     <Compile Include="zxcPy.Quotation\myQuote_Source.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Setting.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myData_Trade.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\myData_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Hourly.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_FixedMonitor.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Rise_Fall_asInt.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_StaticsM5.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Printer.py" />
@@ -43,6 +45,7 @@
     <Folder Include="zxcPy.Quotation\" />
     <Folder Include="zxcPy.Quotation\Quote_Data\" />
     <Folder Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\" />
+    <Folder Include="zxcPy.Quotation\Quote_Data\Data_Trade\" />
     <Folder Include="zxcPy.Quotation\Quote_Listener\" />
     <Folder Include="zxcPy.Quotation\Quote_Source\" />
     <Folder Include="zxcPy.Test\" />

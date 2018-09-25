@@ -15,7 +15,7 @@ import myData_Trans, myQuote_Data, myQuote_Listener
     
 
 #行情监听--整点播报
-class myListener_Hourly(myQuote_Listener.Quote_Listener):
+class Quote_Listener_Hourly(myQuote_Listener.Quote_Listener):
     def __init__(self):
         myQuote_Listener.Quote_Listener.__init__(self, 'Hourly')
         self.values = {}

@@ -163,7 +163,7 @@ if __name__ == "__main__":
     #示例数据监控(暂只支持单源，多源需要调整完善)
     pQuote = mySource_Sina_Stock.Source_Sina_Stock()
     pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
-    pQuote.addListener(myListener_Hourly.myListener_Hourly())
+    pQuote.addListener(myListener_Hourly.Quote_Listener_Hourly())
     pQuote.addListener(myListener_Rise_Fall_asInt.Quote_Listener_Rise_Fall_asInt())
 
     #线程执行   

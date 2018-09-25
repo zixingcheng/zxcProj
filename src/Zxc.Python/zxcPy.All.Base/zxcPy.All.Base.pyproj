@@ -29,6 +29,9 @@
     <Compile Include="zxcPy.Base\myManager_Msg.py" />
     <Compile Include="zxcPy.Base\myVoice.py" />
     <Compile Include="zxcPy.Base\myGlobal.py" />
+    <Compile Include="zxcPy.Base\myWeb\forms.py" />
+    <Compile Include="zxcPy.Base\myWeb\views.py" />
+    <Compile Include="zxcPy.Base\myWeb\models.py" />
     <Compile Include="zxcPy.Base\myWeb_urlLib.py" />
     <Compile Include="zxcPy.Install\Install.py" />
     <Compile Include="zxcPy.Base\myArgv.py" />
@@ -51,6 +54,7 @@
     <Compile Include="zxcPy.Base\myWeb\myWeb.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="zxcPy.Base\myWeb\HTML\test.html" />
     <Content Include="zxcPy.Install\pip_install.bat" />
     <Content Include="zxcPy.Base\myWeb\__pycache__\Config.cpython-35.pyc" />
     <Content Include="zxcPy.Base\__pycache__\myData.cpython-35.pyc" />
@@ -60,6 +64,7 @@
   <ItemGroup>
     <Folder Include="zxcPy.Base\" />
     <Folder Include="zxcPy.Base\myWeb\" />
+    <Folder Include="zxcPy.Base\myWeb\HTML\" />
     <Folder Include="zxcPy.Base\myWeb\__pycache__\" />
     <Folder Include="zxcPy.Base\__pycache__\" />
     <Folder Include="zxcPy.Install\" />

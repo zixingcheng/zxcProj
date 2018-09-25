@@ -324,6 +324,7 @@ class myObj_Bills():
             dSum = bill.tradeNum
             for x in bills_Last:
                 if(dSum <= 0): break
+                bAppend = False
                 if(x.tradeNum_Stock >= bill.tradeNum):            #相等，一对一
                     x.tradeNum_Stock = x.tradeNum_Stock - bill.tradeNum   
                     x.tradeID_Relation = myData.iif(x.tradeID_Relation == "", str(bill.tradeID), str(x.tradeID_Relation) + "、" + str(bill.tradeID))
@@ -470,6 +471,8 @@ class myObj_Bills():
                         dSum_C = lst消费类型[x].get("SUM", 0)
                         if(dSum_C > 0):  
                             strOut += strPerfix + "    " * 2 + x +"：" + str(round(dSum_C, 2)) + "元"
+        #当前账目余额
+        strOut += strPerfix + "现金总计：" + str(round(dSum_In - dSum_Out - (dSum_In_投资 - dSum_Out_投资 + dSum_收益), 2)) + "元"
                  
         if(usrBillType != ""): strOut += "\n账单类型：" + usrBillType    
         if(tradeTarget != ""): strOut += "\n交易品名：" + tradeTarget          
@@ -669,7 +672,7 @@ if __name__ == "__main__":
     #复杂统计
     pBills = pManager['多多']
     myDebug.Debug(pBills.Static(pBills._Trans_Time_year("", 1), "", 0, "", "", "", "", ""))
-
+    
     myDebug.Debug(pBills.Static(pBills._Trans_Time_year("", 1), "", 0))
     myDebug.Debug(pBills.Static(pBills._Trans_Time_year("", 2), "", 0))
     myDebug.Debug(pBills.Static(pBills._Trans_Time_year("", 3), "", 0))

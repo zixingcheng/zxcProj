@@ -6,7 +6,7 @@ Created on  张斌 2018-07-23 11:00:00
 
     消息处理器--通用消息处理器
 """
-import sys, os, copy, datetime
+import sys, os, copy, time, datetime, threading
 import myEnum, myData, myData_Trans, myDebug, myIO, myWeb_urlLib, myMQ_Rabbit #, myVoice 
 
 
@@ -81,7 +81,15 @@ class myManager_Msg():
         self.usrWebs = {}           #在线消息集    
         self.usrMQs = {}            #消息队列  
         self.usrNameSelfs = {}      #各个平台标识的自己用户名（接收特殊消息）  
+        self.usrMsgs_Buffer = []    #异步消息集    
         self.dirLog = dir
+
+        #创建线程
+        if(True):
+            self.isRuning = True
+            self.thrd_Handle = threading.Thread(target = self.OnHandleMsg_ByThread)
+            self.thrd_Handle.setDaemon(False)
+            self.thrd_Handle.start()
     #初始API、消息队列    
     def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = None, usrHelper = ''):
         if(plat == None or plat == ""): return 
@@ -148,13 +156,21 @@ class myManager_Msg():
         return pMsgs
 
     #消息处理（可指定plat）
-    def OnHandleMsg(self, msg, plat = "", bCheck = False):
+    def OnHandleMsg(self, msg, plat = "", bCheck = False, nSleep = 0):
         if(msg == None): return
         strMsg = msg.get('msg')
+        
+        #异步延迟消息处理
+        if(nSleep > 0):
+            self.OnHandleMsg_Check(msg, plat)
+            msg["timeLimit"] = datetime.datetime.now() + datetime.timedelta(seconds=nSleep)
+            self.usrMsgs_Buffer.append(msg)
+            return 
 
         #消息内容校正
         if(bCheck):
             self.OnHandleMsg_Check(msg, plat)
+
 
         #文字输出
         typePlatform = myData.iif(plat == "", msg.get("usrPlat", myMsgPlat.wx), plat)
@@ -185,6 +201,41 @@ class myManager_Msg():
                 #转发消息
                 usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
                 myDebug.Print("消息管理器转发::", usrMQ.nameQueue + ">> ",strMsg)
+    #运行（线程检测, 异步延时发送）
+    def OnHandleMsg_ByThread(self): 
+        try:
+            #线程循环
+            while self.isRuning:
+                try:
+                    #循环所有缓存进行处理
+                    for x in self.usrMsgs_Buffer:
+                        bNeedSend = False
+                        time = x.get("timeLimit", "")
+                        if(time == "" and myData_Trans.Is_Numberic(time)):
+                            bNeedSend = True
+                        else:
+                            if(type(time) != datetime.datetime):
+                                time = myData_Trans.Tran_ToDatetime(time)
+                            time_N = datetime.datetime.now() 
+                            if(time_N >= time): 
+                                bNeedSend = True
+
+                        #消息发送
+                        if(bNeedSend == False): continue
+                        x['timeLimit'] = ""
+                        self.OnHandleMsg(x, "")
+                        self.usrMsgs_Buffer.remove(x)
+                
+                    # 延时
+                    self.OnHandleMsg_ByThread_sleep(0.5)
+                except :
+                    myDebug.Error("Err:: Run_OnHandleMsg_ByThread... ")
+        except :
+            myDebug.Error("Err:: Run_OnHandleMsg_ByThread... Restart...")
+        myDebug.Print('Thread Run_OnHandleMsg_ByThread is exiting...')
+    #运行（线程延时，直接写报错）
+    def OnHandleMsg_ByThread_sleep(self, nSleep): 
+        time.sleep(nSleep)
     #消息内容校正
     def OnHandleMsg_Check(self, msg, plat = ""):
         if(msg == None): return
@@ -196,6 +247,7 @@ class myManager_Msg():
                 msg['usrID'] = ""
                 msg['usrName'] = ""
                 msg['usrNameNick'] = ""
+        if(plat != ""): msg['usrPlat'] = plat
         return True
  
     #创建新消息
@@ -225,6 +277,7 @@ class myManager_Msg():
             myDebug.Warnning("已超时::", nTimeNow, ",", msgTime)
             return True
         return False
+    
               
 #初始全局消息管理器
 from myGlobal import gol 
@@ -251,6 +304,8 @@ if __name__ == '__main__':
    msg["usrName"] = "@*测试群"
    pMMsg.OnHandleMsg(msg)
    pMMsg.OnHandleMsg(msg, '', True)
+   msg["msg"] = "测试消息py--延时"
+   pMMsg.OnHandleMsg(msg, '', False, 5)
    print()
 
 
@@ -259,5 +314,6 @@ if __name__ == '__main__':
    pMMsg._Log(msg)
    print(pMMsg._Find_Log("zxcID", "茶叶一主号", "").Find(msg["msgID"]))
 
+   time.sleep(10)
    print()
     

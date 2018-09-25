@@ -1,0 +1,18 @@
+﻿<!-- extend from base layout -->
+{% extends "base.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
+
+{% block content %}
+  <h1>Sign In</h1>
+  <form action="" method="post" name="login">
+      {{ form.hidden_tag() }}
+      <p>
+          Please enter your OpenID:<br>				#文本显示Please enter.....  
+          {{ form.openid(size=80) }}<br>			#通过views.py里return render_template来渲染这个变量，form实例里面的openid属性(长度80)
+          {% for error in form.openid.errors %}     #捕捉openid这个实例的errors信息
+            <span style="color: red;">[{{ error }}]</span>  #用span截取这个error信息并渲染颜色
+          {% endfor %}<br>
+      </p>
+      <p>{{ form.remember_me }} Remember Me</p>
+      <p><input type="submit" value="Sign In"></p>
+  </form>
+{% endblock %}

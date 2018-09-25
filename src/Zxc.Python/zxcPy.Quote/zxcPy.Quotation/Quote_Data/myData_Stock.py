@@ -226,7 +226,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
         strTag0 = myData.iif(dValue_N ==0, "平", strTag0) 
              
         dRF = dValue_N * 100
-        strMsg += ", " + strTag0 + str(round(dRF,2)) + "%;"  
+        strMsg += ", " + strTag0 + str(round(dRF,2)) + "%."  
         return strMsg
 
     #输出
