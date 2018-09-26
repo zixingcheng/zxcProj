@@ -25,6 +25,7 @@ class Quote_Listener:
         self.pMMsg = gol._Get_Setting('manageMsgs')
     def getName(self):
         return self.name  
+    def OnUpdataSet(self, quoteDatas):pass 
     def OnRecvQuote(self, quoteDatas):pass 
     #消息处理
     def OnHandleMsg(self, quoteDatas, strMsg, nSleep = 0):

@@ -10,8 +10,10 @@ import sys, os, time, datetime, copy, mySystem
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Data')
+mySystem.m_strFloders.append('/Quote_Listener')
 mySystem.Append_Us("", False) 
 import myData_Trans, myDebug, myIO, myIO_xlsx, myQuote_Setting
+from myGlobal import gol 
 
 
 #数据对象
@@ -175,7 +177,8 @@ class Quote_Datas:
         self.autoSave = True
         self.autoSave_interval_M = 2
         self.timeM = -1
-        self.stoped = False
+        self.stoped = False 
+        self.manageTrades = gol._Get_Setting('manageBills_Stock', None)    #使用交易管理器
 
         #保存基础数据
         self.dir = "./Data/" + self.name + "/"
@@ -236,6 +239,16 @@ class Quote_Datas:
             self.setData(pData)                                         #设置数据(不允许保存)
         self.autoSave = bCanSave                                        #恢复自动保存
         return bInited
+    #提取用户买入信息
+    def queryTrade(self, usrName):
+        #交易记录
+        self.tradeBills = self.manageTrades._Find(usrName)
+        if(self.tradeBills == None): 
+            self.tradeBills = self.manageBills._Find(billName, True)
+
+        #查询所有未卖出(12个月内)
+        lstBill, startTime, endTime = self.tradeBills.Query('', '', 12, '', '买入', self.name, '投资',"股票")
+        return lstBill
 
     #保存为excel数据
     #保存数据

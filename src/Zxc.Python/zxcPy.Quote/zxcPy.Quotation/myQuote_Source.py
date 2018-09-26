@@ -11,8 +11,10 @@ import threading
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Source')
+mySystem.Append_Us("../../zxcPy.Robot/zxcPy.Robot/Prjs/Base", False, __file__)
 mySystem.Append_Us("", False)    
-import myQuote_Data, myData_Trans, myDebug, myQuote_Listener
+import myData_Trans, myDebug, myIO
+import myQuote_Data, myQuote_Listener, myManager_Bill
 from myGlobal import gol 
 
 #行情来源
@@ -25,7 +27,14 @@ class Quote_Source:
         self.datasNow = None
         self.listeners = []
         self.interval_M = 1       #分钟级间隔
+        self._initSetting()       #初始设置
         self.setTime()            #设置(时效) 
+    def _initSetting(self):
+        #初始根目录信息
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        Dir_Base = os.path.abspath(os.path.join(strDir, ".."))  
+        Dir_DataDB = Dir_Base + "/Data/DB_Trade/" 
+        gol._Set_Setting('manageBills_Stock', myManager_Bill.myManager_Bill(Dir_DataDB ))     #实例 交易管理器   
     def _getDefault_Param(self):  #默认配置
         pSets = gol._Get_Value('setsQuote')
         if(pSets != None):
@@ -74,6 +83,10 @@ class Quote_Source:
         if(pDatas == None):                     #不存在时初始 
             pDatas = self.newDatas(data, self.interval_M)
             self.datas[data.name] = pDatas
+            
+            #监听配置更新
+            for listener in self.listeners : 
+                listener.OnUpdataSet(pDatas)
         else:     
             if(pDatas.stoped): return None      #终止接收
             pDatas.setData(data)                #设置值
@@ -158,13 +171,19 @@ def mainloop(thread):
 #主启动程序
 if __name__ == "__main__":
     import mySource_Sina_Stock
-    import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly
+    import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor
 
     #示例数据监控(暂只支持单源，多源需要调整完善)
     pQuote = mySource_Sina_Stock.Source_Sina_Stock()
     pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
     pQuote.addListener(myListener_Hourly.Quote_Listener_Hourly())
     pQuote.addListener(myListener_Rise_Fall_asInt.Quote_Listener_Rise_Fall_asInt())
+    
+    #初始定点监测
+    pSets = gol._Get_Value('setsQuote')
+    for x in pSets.setUsers:
+        pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
+
 
     #线程执行   
     thread = Quote_Thread(pQuote)

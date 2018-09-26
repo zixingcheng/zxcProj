@@ -6,13 +6,13 @@ Created on  张斌 2018-05-03 14:58:00
 
     监听--类 定点监控
 """
-import sys, os, math, copy, mySystem 
+import sys, os, math, copy, datetime, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/zxcPy.Quotation')
 mySystem.Append_Us("../Quote_Source", False, __file__)
 mySystem.Append_Us("", False)    
-import myData, myQuote_Data, myQuote_Listener  
+import myData, myData_Trans, myQuote_Data, myQuote_Listener  
 
 
 #定点监测类 
@@ -40,7 +40,7 @@ class myListener_Fixed():
             if(monitorValue < monitorValue_Base): monitorValue = -1
         self.monitorType = monitorValue
     def _getKey(self):
-        strKey = myData.iif(self.monitorType > 0, "+", "-")
+        strKey = myData.iif(self.monitorType > 0, "+", "")
         strKey += str(round(self.monitorValue, 4)) + "-" +  str(round(self.monitorValue_Base, 4))
         return strKey
 
@@ -117,8 +117,9 @@ class myListener_Fixed():
                 
 #行情监听--涨跌幅整数位
 class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
-    def __init__(self):
+    def __init__(self, usrName = 'Test'):
         myQuote_Listener.Quote_Listener.__init__(self, 'FixedMonitor')
+        self.usrName = usrName
         self.monitors = {}
     def _addMonitor(self, key, pMonitor):
         if(type(pMonitor) != myListener_Fixed): return False
@@ -127,6 +128,33 @@ class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
             monitor = {}
             self.monitors[key] = monitor
         monitor[pMonitor._getKey()] = pMonitor 
+    def _removeMonitor(self, key):
+        self.monitors[key] = {}
+    def OnUpdataSet(self, quoteDatas):
+        #设置有效检查
+        if(self.IsEnable(quoteDatas)== False): return
+
+        #买入交易记录
+        lstBill = quoteDatas.queryTrade(self.usrName)
+
+        #生成所有定点监测配置 
+        self._removeMonitor(quoteDatas.name)
+        for x in lstBill:
+            if(x.tradeNum_Stock < 100): continue    #忽略剩余量较少的
+
+            tradePrice = x.tradePrice
+            tradeNum = x.tradeNum_Stock          #交易数量
+            tradeTime = x.tradeTime
+            if(type(tradeTime) == datetime.datetime):
+                tradeTime = myData_Trans.Tran_ToDatetime_str(tradeTime, "%Y-%m-%d")
+
+            #生成配置
+            self._addMonitor(quoteDatas.name, myListener_Fixed(tradePrice, 0.04, tradeNum, tradeTime))
+            self._addMonitor(quoteDatas.name, myListener_Fixed(tradePrice, -0.02, tradeNum, tradeTime))  
+        return True
+
+    def loadSetting(self, usrName):
+        pass 
 
     #处理接收信息
     def OnRecvQuote(self, quoteDatas): 

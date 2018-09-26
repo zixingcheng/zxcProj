@@ -607,6 +607,8 @@ class myManager_Bill():
             self.Dir_Base = os.path.abspath(os.path.join(strDir, "../../.."))  
             self.Dir_DataDB = self.Dir_Base + "/Data/DB_Bill/"
             myIO.mkdir(self.Dir_DataDB, False)
+        else:
+            self.Dir_DataDB = dir
         self._Init()            #初始参数信息等 
     #初始参数信息等   
     def _Init(self): 
