@@ -26,7 +26,7 @@ class myListener_Fixed():
         self.poundage = 0.005               #手续费修正值 
         self.tradeNum = nNum                #交易数量
         self.tradeTime = time               #交易时间
-        self.lastValue = 0                  #上次监控价格
+        self.lastValue = -9999              #上次监控价格
 
         self.isPercentage = False           #是否为百分比
         self.warnTimes = 2                  #报警次数
@@ -50,14 +50,18 @@ class myListener_Fixed():
         strSufixPre = "    "
         strSuggest = ""
 
-        #差价比例0.5以内不计算
+        #差价比例控制
         valuePer = (value - self.monitorValue_Base) / self.monitorValue_Base - self.poundage
+        if(self.lastValue == -9999): self.lastValue = self.monitorValue_Base
         valuePer_L = (self.lastValue - self.monitorValue_Base) / self.monitorValue_Base - self.poundage
-        if(abs(valuePer - valuePer_L < 0.00125)): return strReturn
 
 
         #高低限处理
         if (self.monitorType > 0):   #超过判断
+            #上涨区间控制
+            if(valuePer - valuePer_L < 0.0025):    #上涨，区间必须大于0.25%,最大幅度0.5%
+                return strReturn
+
             #超限判断
             if(self.isPercentage == True): value = valuePer     #百分比处理
             if(value >= self.monitorValue):  
@@ -83,6 +87,10 @@ class myListener_Fixed():
                         strSuggest = "预期盈利，建议止盈."
                     if(self.monitorValueMax < valuePer): self.monitorValueMax = valuePer    #更新最大值处理
         else: 
+            #下跌区间控制
+            if(valuePer - valuePer_L > 0.0025):    #下跌，区间必须大于0.25%,最大幅度0.5%
+                return strReturn 
+
             #超限判断
             if(self.isPercentage == True): value = valuePer     #百分比处理
             if(value <= self.monitorValue):  
@@ -106,11 +114,11 @@ class myListener_Fixed():
                             strSuggest = "预期亏损逾" + str(round((valuePer - valuePer_M) * 100, 1)) + "%，建议止损."
                     else:
                         strSuggest = "预期亏损，建议止损."
-                    if(self.monitorValueMin < valuePer): self.monitorValueMin = valuePer  #更新最小值处理
+                    if(self.monitorValueMin < valuePer): self.monitorValueMin = valuePer    #更新最小值处理
         if(strReturn == ""): return  strReturn
 
         #详情信息
-        self.lastValue = value
+        self.lastValue = round((value + self.poundage + 1) * self.monitorValue_Base, 2)     #实际价格               
         strReturn += "\n" + strSufixPre + "交易量价: " +  str(round(self.tradeNum, 0)) + "股, " + str(self.monitorValue_Base) + "元.\n" + strSufixPre + "交易时间: " + self.tradeTime + "."
         strReturn += "\n" + strSufixPre + strSuggest
         return strReturn
@@ -128,8 +136,11 @@ class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
             monitor = {}
             self.monitors[key] = monitor
         monitor[pMonitor._getKey()] = pMonitor 
-    def _removeMonitor(self, key):
-        self.monitors[key] = {}
+    def _removeMonitor(self, key, bNew = False):
+        if(self.monitors.get(key, None) != None and bNew == True):
+            self.monitors[key] = {}
+
+    #更新定点配置
     def OnUpdataSet(self, quoteDatas):
         #设置有效检查
         if(self.IsEnable(quoteDatas)== False): return
@@ -152,10 +163,6 @@ class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
             self._addMonitor(quoteDatas.name, myListener_Fixed(tradePrice, 0.04, tradeNum, tradeTime))
             self._addMonitor(quoteDatas.name, myListener_Fixed(tradePrice, -0.02, tradeNum, tradeTime))  
         return True
-
-    def loadSetting(self, usrName):
-        pass 
-
     #处理接收信息
     def OnRecvQuote(self, quoteDatas): 
         #设置有效检查
@@ -179,6 +186,7 @@ class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
                 for x in range(0, pMonitor.warnTimes):
                     strMsg = strMsg_str + "\n定点监测: " + strTemp 
                     self.OnHandleMsg(quoteDatas, strMsg, 5 * x )    # 多次延时提醒
+                    print(strMsg)
 
     #功能是否可用
     def IsEnable(self, quoteDatas):
@@ -194,16 +202,19 @@ if __name__ == "__main__":
     import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly
 
     #示例数据监控(暂只支持单源，多源需要调整完善)
-    pQuote = mySource_Sina_Stock.Source_Sina_Stock('sh600822')
+    pQuote = mySource_Sina_Stock.Source_Sina_Stock('sz002124')
     pListener = Quote_Listener_FixedMonitor() 
     pQuote.addListener(pListener)
+    pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
 
     #添加固定监测项
-    key = '上海物贸'
+    key = '天邦股份'
     #pListener._addMonitor(key, myListener_Fixed(10.8, 11.2, 1000, "2018-08-19"))
     #pListener._addMonitor(key, myListener_Fixed(11.8, 11.5, 1000, "2018-08-19"))
     #pListener._addMonitor(key, myListener_Fixed(10.8, 0.03, 1000, "2018-08-19"))
-    pListener._addMonitor(key, myListener_Fixed(11.8, -0.04, 1000, "2018-08-19"))
+    #pListener._addMonitor(key, myListener_Fixed(11.8, -0.04, 1000, "2018-08-19"))
+    pListener._addMonitor(key, myListener_Fixed(5.36, -0.01, 1000, "2018-08-19"))
+    pListener._addMonitor(key, myListener_Fixed(5.33, 0.01, 1000, "2018-08-19"))
 
     #查询数据
     while True:
