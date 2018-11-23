@@ -31,6 +31,7 @@ bld/
 *__[Tt]emp/
 *__[Tt]emp.*
 *[Bb]uck[Uu]p*/
+*.lock
 
 Services/
 模型文档/

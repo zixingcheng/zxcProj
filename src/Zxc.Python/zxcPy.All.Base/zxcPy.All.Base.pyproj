@@ -60,6 +60,7 @@
     <Content Include="zxcPy.Base\__pycache__\myData.cpython-35.pyc" />
     <Content Include="zxcPy.Base\__pycache__\myData_Trans.cpython-35.pyc" />
     <Content Include="zxcPy.Base\__pycache__\myEnum.cpython-35.pyc" />
+    <Content Include="zxcPy.Install\阿里云部署说明--Linux-Centos7.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="zxcPy.Base\" />
