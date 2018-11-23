@@ -6,6 +6,9 @@ Created on  张斌 2018-04-22 20:05:00
 
     全局变量
 """ 
+import sys, os, codecs, mySystem 
+import myIO 
+
 
 #全局变量
 class gol():    
@@ -33,6 +36,10 @@ class gol():
             
             if(bPrint):
                 print("->>", "\t--已初始全局变量\r\n")  
+    def _Close(bPrint = False):     #关闭，清空部分特殊对象
+       pMMsg = gol._Get_Setting('manageMsgs', None)
+       if(pMMsg != None):
+           pMMsg._Close()
 
     def _Set_Value(key, value, cover = False):
         """ 定义一个全局变量 """
@@ -55,6 +62,48 @@ class gol():
             dictSet[key] = value
     def _Get_Setting(key, defValue = None):
         return _global_dict["golSetting"].get(key, defValue)
+    
+    
+    #检查脚本是否已经运行（运行生成lock文件）
+    def _Run_Lock(_path_): 
+        # 提取脚本路径
+        strName = myIO.getFileName(_path_)
+        strPath = os.path.split(os.path.realpath(_path_))[0] + "/" + strName + ".lock"
+
+        isDone = True
+        if(os.path.exists(strPath)):
+            # 尝试删除，如果删除失败则运行中
+            try:
+                os.remove(strPath)
+            except :
+                isDone = False  
+        isDone = not os.path.exists(strPath)
+
+        #创建锁定
+        if(isDone):
+            lockfile = codecs.open(strPath, 'w+', 'utf-8')
+            gol._Set_Setting(strPath, lockfile)
+            #pFile.close()      #不关闭保持独占
+        else:
+            print("脚本已启动! --" + strPath)
+            gol._Close()
+        return isDone
+    def _Run_UnLock(_path_): 
+        # 提取脚本路径
+        strName = myIO.getFileName(_path_)
+        strPath = os.path.split(os.path.realpath(_path_))[0] + "/" + strName + ".lock"
+
+        #文件删除
+        isDone = True 
+        lockfile = gol._Get_Setting(strPath, None)
+        if(lockfile != None):
+            try:
+                lockfile.close()      #关闭独占
+                os.remove(strPath)
+            except :
+                isLock = False
+        isLock = not os.path.exists(strPath) 
+        return isLock
 
 
 from myGlobal import gol   

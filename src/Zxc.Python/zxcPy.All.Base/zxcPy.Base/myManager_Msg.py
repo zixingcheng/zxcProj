@@ -108,6 +108,9 @@ class myManager_Msg():
     def Init_LogDir(self, dir):
         self.dirLog = dir
         myIO.mkdir(self.dirLog, False)
+    #关闭
+    def _Close(self):
+        self.isRuning = False
         
     #添加消息
     def Log(self, usrID, usrName, usrNameNick, msg, msgID, msgType = myMsgType.TEXT, usrPlat = '', idGroup = '', nameGroup = '', nameSelf = ''):
@@ -313,7 +316,8 @@ if __name__ == '__main__':
    pMMsg.Log("zxcID", "茶叶一主号", "", "测试消息py-00", "")
    pMMsg._Log(msg)
    print(pMMsg._Find_Log("zxcID", "茶叶一主号", "").Find(msg["msgID"]))
-
-   time.sleep(10)
+   
+   gol._Close()
+   time.sleep(1)
    print()
     

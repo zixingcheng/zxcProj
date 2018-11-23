@@ -4,7 +4,7 @@ Created on  张斌 2018-08-13 18:30:00
     @author: zhang bin
     @email:  zhangbin@gsafety.com
 
-    MQ 消息队列操作 
+    MQ 消息队列操作 （需要rabbitmq， 安装教程网上很多）
 """
 import sys, time, pika, threading
 import myData
