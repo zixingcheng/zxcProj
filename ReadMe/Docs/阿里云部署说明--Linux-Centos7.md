@@ -381,23 +381,29 @@ crontabs软件包是用来安装、卸装、或列举用来驱动 cron 守护进
 ### 自写定时任务 
 
 	每周一到周五 的9-15点 的每5分钟 时执行命令（启动脚本-行情监测）。
-	*/1 9-15 * * 1-5 python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Quote/myQuote_Source.py
-	
+	*/1 9-15 * * 1-5 sh /root/Public/UpLoad/Temp/ReadMe/run_zxcPy_Quote.sh
+
 	每天 的8-23点 的每2分钟 时执行命令（启动脚本-机器人、微信）。
-	*/5 8-23 * * * python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Weixin/zxcPy.Weixin/myWeixin_ItChat.py
-	*/6 8-23 * * * python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Robot/myRobot_API.py
+	*/5 8-23 * * * sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh 
 	
+	每天 的0点 0分钟 时执行命令（脚本自动更新）。
+	00 0 * * 5 sh /root/Public/myPrjs/zxcProj/ReadMe/git_zxcPy.sh
 	
-	crontab -e
+	命令： crontab -e
 	*/1 8-23 * * * python /root/Public/UpLoad/Temp/hello.py
 
 ### 脚本启动
 
-存在问题，只启动一个，优先定时任务启动方式
-sh /root/Public/UpLoad/Temp/run_zxcpy.sh
+git 更新脚本：
+	
+	sh /root/Public/myPrjs/zxcProj/ReadMe/git_zxcPy.sh
 
-	#!/bin/sh
+启动脚本
+	sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh	(Robot+Weixin)
+	sh /root/Public/UpLoad/Temp/ReadMe/run_zxcPy_Quote.sh		(Qoute)
+	 
 
+单个启动：
 	#启动微信后台
 	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Weixin/zxcPy.Weixin/myWeixin_ItChat.py
 
