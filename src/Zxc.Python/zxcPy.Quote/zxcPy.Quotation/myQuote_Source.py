@@ -170,6 +170,11 @@ def mainloop(thread):
 
 #主启动程序
 if __name__ == "__main__":
+    #单例运行检测
+    if(gol._Run_Lock(__file__) == False):
+       exit(0)
+
+
     import mySource_Sina_Stock
     import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor
 
@@ -181,8 +186,8 @@ if __name__ == "__main__":
     
     #初始定点监测
     pSets = gol._Get_Value('setsQuote')
-    for x in pSets.setUsers:
-        pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
+    #for x in pSets.setUsers:
+    #    pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
 
 
     #线程执行   
@@ -192,6 +197,8 @@ if __name__ == "__main__":
     mainloop(thread)
     myDebug.Print("Quote thread exited...")
 
-
+    #退出
+    gol._Run_UnLock(__file__)
+    exit(0)
 
  

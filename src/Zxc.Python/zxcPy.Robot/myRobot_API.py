@@ -20,14 +20,21 @@ from myGlobal import gol
 #主程序启动
 if __name__ == '__main__': 
     gol._Init()             #先必须在主模块初始化（只在Main模块需要一次即可）
+    #单例运行检测
+    if(gol._Run_Lock(__file__) == False):
+       exit(0)
     #gol._Set_Setting("CanPrint", False)
-    import myAPI_Robot      #回重启导致多次输出信息，调整为不输出打印信息
     
     # 创建新线程
+    import myAPI_Robot      #回重启导致多次输出信息，调整为不输出打印信息
     pWeb = myWeb.myWeb("127.0.0.1", 8668)
     pWeb.add_API(myWeb.myAPI, '/test')
 
     # 添加Robot接口并启动API
     myAPI_Robot.add_APIs(pWeb)
     pWeb.run()
+
+    #退出
+    gol._Run_UnLock(__file__)
+    exit(0)
     

@@ -432,6 +432,10 @@ class myWeixin_CmdThread (threading.Thread):  #继承父类threading.Thread
 
 #主启动程序
 if __name__ == "__main__":
+    #单例运行检测
+    if(gol._Run_Lock(__file__) == False):
+       exit(0)
+
     #声明Weixin操作对象
     pWeixin = myWeixin_ItChat('zxcWx', False)
     
@@ -446,5 +450,6 @@ if __name__ == "__main__":
     pWeixin.Run_ByThread();
 
     #退出
-    exit()
+    gol._Run_UnLock(__file__)
+    exit(0)
 
