@@ -252,14 +252,17 @@ class myRoot_Usrs():
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.Dir_Base = os.path.abspath(os.path.join(strDir, "../.."))  
         self.Dir_Setting = self.Dir_Base + "/Setting"
-        self.Path_SetUser = self.Dir_Setting + "/UserInfo.xls"
+        self.Path_SetUser = self.Dir_Setting + "/UserInfo.csv"
         self.lstFields = ["ID","用户名","用户昵称","用户ID","用户姓名","来源平台","电话","标签","备注","描述","注册时间","最后登录时间"]
         if(userID != "" and usrName != "" and nickName != ""):
             self._Init()
     #初始参数信息等   
     def _Init(self):            
         #提取字段信息 
-        dtUser = myIO_xlsx.loadDataTable(self.Path_SetUser, 0, 1)            #用户信息
+        #dtUser = myIO_xlsx.loadDataTable(self.Path_SetUser, 0, 1)            #用户信息
+        dtUser = myIO_xlsx.DtTable() 
+        dtUser.Load_csv(self.Path_SetUser, 1, 0)
+         
         if(len(dtUser.dataMat) < 1 or len(dtUser.dataField) < 1): return
         lstFields_ind = dtUser.Get_Index_Fields(self.lstFields)
 
@@ -308,7 +311,9 @@ class myRoot_Usrs():
             dtUser.dataMat.append(pValues)
 
         # 保存
-        dtUser.Save(self.Dir_Setting, "UserInfo", 0, 0, True, "用户信息表")
+        # dtUser.Save(self.Dir_Setting, "UserInfo", 0, 0, True, "用户信息表")
+        dtUser.Save_csv(self.Dir_Setting, "UserInfo", False, 0, 0)
+        
 
     #查找 
     def _Find(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrType = "", bCreate_Auto = False, bUpdataSys = True, bUpdata = False): 
@@ -404,6 +409,14 @@ class myRoot_Usrs():
         # 信息更新
         if(pUser != None):
             pUser.usrTime_Logined_Last = datetime.datetime.now()
+
+            #更新项目信息
+            usrID = pUser.usrPrj.usrID 
+            pUser.usrPrj.nickName = pUser.usrName_Nick
+            pUser.usrPrj.usrName = pUser.usrName
+            pUser.usrPrj.usrID = pUser.usrID
+            if(usrID != pUser.usrID and len(pUser.usrID) > 5):
+                self._Save()        #保存信息
 
     
     # 用户是否存在

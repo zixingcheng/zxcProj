@@ -75,7 +75,7 @@ class DtTable:
 
         #提取字段信息   
         if(True):
-            self.dataField  = lstLines[row_field].split(strsplit)
+            self.dataField  = lstLines[row_field].strip().split(strsplit)
             nFields = len(self.dataField )
 
         #提取内容
