@@ -22,6 +22,7 @@ class myRobot_Note(myRobot.myRobot):
         self.prjName = "通知消息"       #功能名
         self.doCmd = "@@zxcRobot_Note"  #启动命令 
         self.isBackUse = True           #后台运行
+        self.maxTime = -1               #永久有效 
         self.perfixRevoke = ['告诉你一个秘密，', '偷偷告诉你哦，', '哈哈，发现你了！', '万能的机器人告诉我，', '小样，被我发现了吧。', '别想跑哦，我看到你了，']
                 
     #消息处理接口

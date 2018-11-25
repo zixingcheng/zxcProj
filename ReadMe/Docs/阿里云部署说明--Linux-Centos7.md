@@ -386,8 +386,8 @@ crontabs软件包是用来安装、卸装、或列举用来驱动 cron 守护进
 	每天 的8-23点 的每2分钟 时执行命令（启动脚本-机器人、微信）。
 	*/5 8-23 * * * sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh 
 	
-	每天 的0点 0分钟 时执行命令（脚本自动更新）。
-	00 0 * * 5 sh /root/Public/myPrjs/zxcProj/ReadMe/git_zxcPy.sh
+	每天 的0点 0分钟 每八个时执行命令（脚本自动更新）。
+	00 */8 * * * sh /root/Public/myPrjs/zxcProj/ReadMe/git_zxcPy.sh
 	
 	命令： crontab -e
 	*/1 8-23 * * * python /root/Public/UpLoad/Temp/hello.py

@@ -98,7 +98,7 @@ class myRobot():
         
         #时效
         self.tNow = datetime.now()
-        if((self.tNow - self.tLast).total_seconds() > self.maxTime):
+        if(self.maxTime > 0 and (self.tNow - self.tLast).total_seconds() > self.maxTime):
             self.isValid = False
             return self.isValid
         self.tLast = self.tNow    

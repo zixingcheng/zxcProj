@@ -22,6 +22,7 @@ class myRobot_Log(myRobot.myRobot):
         self.prjName = "消息日志"      #功能名
         self.doCmd = "@@zxcRobot_Log"  #启动命令 
         self.isBackUse = True          #后台运行
+        self.maxTime = -1              #永久有效 
         self.msgLogs = gol._Get_Setting('manageMsgs')   #全局消息日志管理器
 
         #初始根目录信息
