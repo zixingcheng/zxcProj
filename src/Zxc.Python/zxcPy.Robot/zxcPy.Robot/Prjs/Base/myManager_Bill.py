@@ -236,7 +236,7 @@ class myObj_Bills():
     def _Init_DB(self, path): 
         #提取字段信息  
         dtDB = myIO_xlsx.DtTable()
-        dtDB.Load_csv(path, 1, 0, True, 0, ',')
+        dtDB.Load_csv(path, 1, 0, True, 0, ',', isUtf = True)
         
         lstFields = ["编号","账单类型","交易方","交易类型","交易子类","交易内容","交易单价","交易数量","剩余数量","交易金额","手续费","交易收益","交易时间","关联编号","是否删除","记录人","记录时间","备注"]
         if(dtDB.sheet == None): dtDB.dataField = lstFields
@@ -596,7 +596,7 @@ class myObj_Bills():
             self.dtDB.dataMat.append(bill.ToList())
 
         #保存
-        self.dtDB.Save_csv(self.dir, self.usrID, False, 0, 0)
+        self.dtDB.Save_csv(self.dir, self.usrID, True, 0, 0)
         
 #管家功能--账单
 class myManager_Bill():
@@ -643,6 +643,7 @@ if __name__ == "__main__":
     #测试红包记录
     pManager = gol._Get_Setting('manageBills', None)
     pBills = pManager['Test']
+    #pManager['朱美娜'].Save_DB()
     
     pBills.Add("", "门口超市", 10.2, "蔬菜", "", "", "", "")
     pBills.Add("", "门口超市", 20.4, "菜", "", "", "", "2018-8-20")
