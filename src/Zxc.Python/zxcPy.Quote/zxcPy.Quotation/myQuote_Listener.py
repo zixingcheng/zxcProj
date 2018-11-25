@@ -11,7 +11,7 @@ import sys, os, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Listener')
 mySystem.Append_Us("", False) 
-import myQuote_Data
+import myQuote_Data, myManager_Msg
 
 #初始全局消息管理器
 from myGlobal import gol 
@@ -79,5 +79,5 @@ if __name__ == "__main__":
             strMsg = "Hello " + x 
             msg = pListener.OnCreatMsgInfo(x, strMsg, str(i))
             if(pMMsg != None):
-                pMMsg.OnHandleMsg(msg)
+                pMMsg.OnHandleMsg(msg, '', True)
     print()

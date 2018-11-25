@@ -306,7 +306,7 @@ if __name__ == '__main__':
 
    msg["usrName"] = "@*测试群"
    pMMsg.OnHandleMsg(msg)
-   pMMsg.OnHandleMsg(msg, '', True)
+   pMMsg.OnHandleMsg(msg, '', True)     #必须check
    msg["msg"] = "测试消息py--延时"
    pMMsg.OnHandleMsg(msg, '', False, 5)
    print()
