@@ -14,7 +14,7 @@ mySystem.m_strFloders.append('/Quote_Source')
 mySystem.Append_Us("../../zxcPy.Robot/zxcPy.Robot/Prjs/Base", False, __file__)
 mySystem.Append_Us("", False)    
 import myData_Trans, myDebug, myIO
-import myQuote_Data, myQuote_Listener, myManager_Bill
+import myQuote_Data, myManager_Bill
 from myGlobal import gol 
 
 #行情来源
@@ -126,9 +126,13 @@ class Quote_Source:
     #设置(时效)
     def setTime(self):
         self.dtDay = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")                 #当前天
-        self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 9:29:30")      #起始时间
-        self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:30")        #结束时间
+        self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 9:26:30")      #起始时间
+        self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:30")       #结束时间
         self.timeIntervals = 0
+
+        #时间段监测
+        tNow = datetime.datetime.now()
+        return (self.startTime < tNow and tNow < self.endTime)
 
 #行情监听线程
 class Quote_Thread(threading.Thread):
@@ -139,6 +143,11 @@ class Quote_Thread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
+        if(self.source.setTime() == False):
+            myDebug.Print('StockQuote stoped.\n         --not stock time.')
+            time.sleep(1)
+            return 
+
         myDebug.Print('StockQuote run')
         self.threadRunning = True;
         while self.threadRunning:
@@ -163,7 +172,7 @@ is_exit = False
 def mainloop(thread):
     global is_exit
     try:
-        while True:
+        while is_exit:
             time.sleep(1)
     except:
         thread.stop()
@@ -175,17 +184,17 @@ if __name__ == "__main__":
        exit(0)
 
 
-    import mySource_Sina_Stock
-    import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor
-
     #示例数据监控(暂只支持单源，多源需要调整完善)
-    pQuote = mySource_Sina_Stock.Source_Sina_Stock()
+    import mySource_Sina_Stock
+    pQuote = mySource_Sina_Stock.Source_Sina_Stock() 
+
+    #添加监听对象
+    import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor
     pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
     pQuote.addListener(myListener_Hourly.Quote_Listener_Hourly())
     pQuote.addListener(myListener_Rise_Fall_asInt.Quote_Listener_Rise_Fall_asInt())
-    
-    #初始定点监测
     pSets = gol._Get_Value('setsQuote')
+
     #for x in pSets.setUsers:
     #    pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
 
@@ -198,7 +207,7 @@ if __name__ == "__main__":
     myDebug.Print("Quote thread exited...")
 
     #退出
-    gol._Run_UnLock(__file__)
+    #gol._Run_UnLock(__file__)
     exit(0)
 
  

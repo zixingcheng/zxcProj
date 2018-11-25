@@ -11,7 +11,7 @@ import sys, os, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Listener')
 mySystem.Append_Us("", False) 
-import myManager_Msg, myQuote_Data
+import myQuote_Data
 
 #初始全局消息管理器
 from myGlobal import gol 
@@ -41,7 +41,7 @@ class Quote_Listener:
                 self.pMMsg.OnHandleMsg(msg, "", True, nSleep)   #推送至消息处理器处理(使用消息校正)
         return True
     #创建新消息
-    def OnCreatMsgInfo(self, to_user, text, time = '', type = "TEXT", plat = myManager_Msg.myMsgPlat.wx):
+    def OnCreatMsgInfo(self, to_user, text, time = '', type = "TEXT", plat = 'wx'):
         if(self.pMMsg != None):
             msg = self.pMMsg.OnCreatMsg()
         else: msg ={}
