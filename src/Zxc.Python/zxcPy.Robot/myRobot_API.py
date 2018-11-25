@@ -24,6 +24,8 @@ if __name__ == '__main__':
     if(gol._Run_Lock(__file__) == False):
        exit(0)
     #gol._Set_Setting("CanPrint", False)
+
+    import myRobot_Updata   #更新说明
     
     # 创建新线程
     import myAPI_Robot      #回重启导致多次输出信息，调整为不输出打印信息

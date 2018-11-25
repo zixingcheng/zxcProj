@@ -24,6 +24,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="mySystem.py" />
+    <Compile Include="zxcPy.Base\myIO_md.py" />
     <Compile Include="zxcPy.Base\myMQ_Rabbit_Recv_Test.py" />
     <Compile Include="zxcPy.Base\myMQ_Rabbit.py" />
     <Compile Include="zxcPy.Base\myManager_Msg.py" />

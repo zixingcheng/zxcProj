@@ -31,6 +31,7 @@
     <Compile Include="zxcPy.Robot\Reply\myRobot_Reply.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Repeater.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Root.py" />
+    <Compile Include="myRobot_Updata.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_Plat.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_GroupInfo.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot.py" />
@@ -56,6 +57,7 @@
     <Content Include="Data\DB_Bill\多多.csv" />
     <Content Include="README.md" />
     <Content Include="Setting\Setting.xlsx" />
+    <Content Include="Updata.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
