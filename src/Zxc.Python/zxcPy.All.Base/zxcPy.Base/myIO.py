@@ -10,9 +10,17 @@ import os, time, codecs
 import shutil
 
  
+#检查路径    
+def checkPath(path):
+    if(path.count("\\")):
+        path = path.replace("\\", "/")
+    while(path.count("//") > 0):
+        path = path.replace("//", "/")
+    return path
 #删除文件夹
 def deldir(path): 
     # 去除首位空格
+    path = checkPath(path)
     path = path.strip()
     
     # 去除尾部 \ 符号
@@ -24,6 +32,7 @@ def deldir(path):
 #创建文件夹，存在则忽略
 def mkdir(path, bTitle = True, bNew = False): 
     # 去除首位空格
+    path = checkPath(path)
     path = path.strip()
     
     # 去除尾部 \ 符号
@@ -53,7 +62,6 @@ def mkdir(path, bTitle = True, bNew = False):
         if(bTitle): print (path + ' 目录已存在')
         return False
     
-    
 #提取文件名集(递归子文件)
 def getFiles(path, wildcard = "", iswalk = True):
     #提取文件后缀
@@ -66,7 +74,7 @@ def getFiles(path, wildcard = "", iswalk = True):
         for name in files:
             for suffix in suffixs:
                 if(name.endswith(suffix)):
-                    list_Files.append(Trans_NoBOM(path) + "\\" + Trans_NoBOM(name))
+                    list_Files.append(checkPath(Trans_NoBOM(path) + "/" + Trans_NoBOM(name)))
                     break
         return list_Files
     
@@ -78,6 +86,7 @@ def getFiles(path, wildcard = "", iswalk = True):
     return list_Files
 def getFileName(path, isNosuffix = True):
     #提取文件后缀
+    path = checkPath(path)
     name = os.path.basename(path)
 
     if(isNosuffix):
@@ -88,6 +97,7 @@ def getFileName(path, isNosuffix = True):
 #提取文件信息
 def getContent(path, noBOM = False, bList = False, isUtf = True):
     #提取文件Json串
+    path = checkPath(path)
     if (os.path.exists(path) == False):
         if(bList): return None
         else: return ""
@@ -115,6 +125,7 @@ def getContent(path, noBOM = False, bList = False, isUtf = True):
 #提取文件信息
 def getContents(path, noBOM = False, isUtf = True):
     #提取文件Json串
+    path = checkPath(path)
     if (os.path.exists(path) == False):
         return ""
     if(isUtf):
@@ -138,6 +149,7 @@ def getContents(path, noBOM = False, isUtf = True):
 #提取文件信息, 指定标识处终止
 def getContent_EndByTag(path, strTag = "@@", noBOM = False, isUtf = True):
     #打开文件提取数据
+    path = checkPath(path)
     if (os.path.exists(path) == False):
         return "",[] 
     if(isUtf):
@@ -171,6 +183,7 @@ def getContent_EndByTag(path, strTag = "@@", noBOM = False, isUtf = True):
 
 #获取代码文件路径函数 2017-10-18
 def getPath_ByFile(file):
+    file = checkPath(file)
     strDir = os.path.split(os.path.realpath(file))[0]
     strName = os.path.split(os.path.realpath(file))[1]
     return (strDir, strName)
@@ -179,6 +192,7 @@ def getPath_ByFile(file):
 #定义文件拷贝函数 2017-10-18
 def copyFile(scrPath,  targetDir, name = ""):
     #组装目标文件路径
+    scrPath = checkPath(scrPath)
     fileName = os.path.basename(scrPath)
     if(name != ""):
         fileName = name
@@ -218,6 +232,7 @@ def Trans_NoBOM(strBom):
 
 #保存文件信息
 def Save_File(path, text, isUtf = True, isNoBoom = True):
+    path = checkPath(path)
     if(isUtf):
         pFile = codecs.open(path, 'w', 'utf-8')
     else:
