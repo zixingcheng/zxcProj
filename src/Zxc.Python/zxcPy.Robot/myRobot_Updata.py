@@ -29,7 +29,7 @@ class myRobot_Updata():
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.Dir_Base = os.path.abspath(os.path.join(strDir, ""))  
 
-        self.mdUpdata = myIO_md.myMD(self.Dir_Base + "/Updata.md")
+        self.mdUpdata = myIO_md.myMD(self.Dir_Base + "/Docs/Updata.md")
         pNode = self.mdUpdata[0]
         self.version = pNode.titleName
         self.verText = pNode.getContent().strip()

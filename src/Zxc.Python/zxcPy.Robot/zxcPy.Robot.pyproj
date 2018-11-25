@@ -45,6 +45,7 @@
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Data\DB_Bill\" />
+    <Folder Include="Docs\" />
     <Folder Include="Setting\" />
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Robot\" />
@@ -57,7 +58,7 @@
     <Content Include="Data\DB_Bill\多多.csv" />
     <Content Include="README.md" />
     <Content Include="Setting\Setting.xlsx" />
-    <Content Include="Updata.md" />
+    <Content Include="Docs\Updata.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
