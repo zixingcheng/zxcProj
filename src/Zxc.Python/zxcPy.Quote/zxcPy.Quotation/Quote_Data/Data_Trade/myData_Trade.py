@@ -103,8 +103,7 @@ class myObj_Bills():
     def _Init_DB(self, path): 
         #提取字段信息  
         dtDB = myIO_xlsx.DtTable()
-        dtDB.Load_csv(path, 1, 0, True, 0, ',')
-        记录时间	编号	交易类型			交易数量	交易金额	手续费	交易时间	卖出编号	收益	是否删除	备注
+        dtDB.Load_csv(path, 1, 0, True, 0, ',', isUtf = True)
 
         lstFields = ["记录时间","编号","交易类型","交易内容","交易单价","交易数量","交易金额","手续费","交易时间","卖出编号","收益","是否删除","备注"]
         if(dtDB.sheet == None): dtDB.dataField = lstFields
@@ -156,7 +155,7 @@ class myObj_Bills():
         if(bAppend == False):
             self.Save_DB()
         else:
-            self.dtDB.Save_csv_append(self.pathData, bill.ToList())   
+            self.dtDB.Save_csv_append(self.pathData, bill.ToList(), isUtf = True)   
         return "添加成功，账单信息如下：\n" + bill.ToString(4)
      
     def Query(self, usrSrc = '', usrBillType = "", startTime = '', endTime = '', nMonth = 1, exceptTypes = []): 
@@ -331,7 +330,7 @@ class myObj_Bills():
             self.dtDB.dataMat.append(bill.ToList())
 
         #保存
-        self.dtDB.Save_csv(self.dir, self.usrID, False, 0, 0)
+        self.dtDB.Save_csv(self.dir, self.usrID, True, 0, 0)
         
 #管家功能--账单
 class myManager_Bill():

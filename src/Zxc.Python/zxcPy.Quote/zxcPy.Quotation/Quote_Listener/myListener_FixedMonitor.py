@@ -27,6 +27,7 @@ class myListener_Fixed():
         self.tradeNum = nNum                #交易数量
         self.tradeTime = time               #交易时间
         self.lastValue = -9999              #上次监控价格
+        self.vecTrend = []                  #趋势
 
         self.isPercentage = False           #是否为百分比
         self.warnTimes = 2                  #报警次数
@@ -49,6 +50,7 @@ class myListener_Fixed():
         strReturn = ""
         strSufixPre = "    "
         strSuggest = ""
+        strSuggest2 = ""
 
         #差价比例控制
         valuePer = (value - self.monitorValue_Base) / self.monitorValue_Base - self.poundage
@@ -59,7 +61,7 @@ class myListener_Fixed():
         #高低限处理
         if (self.monitorType > 0):   #超过判断
             #上涨区间控制
-            if(valuePer - valuePer_L < 0.0025):    #上涨，区间必须大于0.25%,最大幅度0.5%
+            if(abs(valuePer - valuePer_L) < 0.0025):    #上涨，区间必须大于0.25%,最大幅度0.5%
                 return strReturn
 
             #超限判断
@@ -85,10 +87,18 @@ class myListener_Fixed():
                             strSuggest = "预期盈利逾" + str(round((valuePer - valuePer_M) * 100, 1)) + "%，建议止盈."
                     else:
                         strSuggest = "预期盈利，建议止盈."
+
+                    #趋势提醒
+                    nTrend = myData.iif(valuePer > valuePer_L, 1, -1)
+                    self.vecTrend.append(nTrend)
+                    if(nTrend > 0):
+                        strSuggest2 = "短期上涨."
+                    else:
+                        strSuggest2 = "短期下跌."
                     if(self.monitorValueMax < valuePer): self.monitorValueMax = valuePer    #更新最大值处理
         else: 
             #下跌区间控制
-            if(valuePer - valuePer_L > 0.0025):    #下跌，区间必须大于0.25%,最大幅度0.5%
+            if(abs(valuePer - valuePer_L) < 0.0025):    #下跌，区间必须大于0.25%,最大幅度0.5%
                 return strReturn 
 
             #超限判断
@@ -114,12 +124,21 @@ class myListener_Fixed():
                             strSuggest = "预期亏损逾" + str(round((valuePer - valuePer_M) * 100, 1)) + "%，建议止损."
                     else:
                         strSuggest = "预期亏损，建议止损."
+
+                    #趋势提醒
+                    nTrend = myData.iif(valuePer > valuePer_L, 1, -1)
+                    self.vecTrend.append(nTrend)
+                    if(nTrend > 0):
+                        strSuggest2 = "短期上涨."
+                    else:
+                        strSuggest2 = "短期下跌."
                     if(self.monitorValueMin < valuePer): self.monitorValueMin = valuePer    #更新最小值处理
         if(strReturn == ""): return  strReturn
 
         #详情信息
         self.lastValue = round((value + self.poundage + 1) * self.monitorValue_Base, 2)     #实际价格               
         strReturn += "\n" + strSufixPre + "交易量价: " +  str(round(self.tradeNum, 0)) + "股, " + str(self.monitorValue_Base) + "元.\n" + strSufixPre + "交易时间: " + self.tradeTime + "."
+        strReturn += "\n" + strSufixPre + strSuggest2
         strReturn += "\n" + strSufixPre + strSuggest
         return strReturn
                 

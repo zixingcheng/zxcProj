@@ -274,11 +274,12 @@ class Quote_Datas:
         #文件头写入 
         if(file == ""): file = self.dir + self.fileName + ".csv"
         if(len(self.datas) <= 1):
-            myIO.Save_File(file, pData.csvHead(), False, True) 
+            myIO.Save_File(file, pData.csvHead(), True, True) 
 
         #文件追加数据内容
         if(pData == None): pData = self.data
-        with open(file, 'a+') as f:
+         
+        with open(file, 'a+', 'utf-8') as f:
             f.write(pData.toCSVString())    
     #保存数据(分段-合并)
     def saveData_stream_Trans(self, strDir = ""):
@@ -290,7 +291,7 @@ class Quote_Datas:
             path = strDir + self.fileName + ".csv"
             pDt_csv = myIO_xlsx.DtTable()
             pDt_csv.dataFieldType = ['datetime', 'float', 'float', 'float']             #数据字段类型集
-            pDt_csv.Load_csv(path)
+            pDt_csv.Load_csv(path, isUtf = True)
         
             #组装数据
             nRows = len(pDt_csv.dataMat)
