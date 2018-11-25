@@ -261,7 +261,7 @@ class myRoot_Usrs():
         #提取字段信息 
         #dtUser = myIO_xlsx.loadDataTable(self.Path_SetUser, 0, 1)            #用户信息
         dtUser = myIO_xlsx.DtTable() 
-        dtUser.Load_csv(self.Path_SetUser, 1, 0)
+        dtUser.Load_csv(self.Path_SetUser, 1, 0, isUtf = True)
          
         if(len(dtUser.dataMat) < 1 or len(dtUser.dataField) < 1): return
         lstFields_ind = dtUser.Get_Index_Fields(self.lstFields)
@@ -312,7 +312,7 @@ class myRoot_Usrs():
 
         # 保存
         # dtUser.Save(self.Dir_Setting, "UserInfo", 0, 0, True, "用户信息表")
-        dtUser.Save_csv(self.Dir_Setting, "UserInfo", False, 0, 0)
+        dtUser.Save_csv(self.Dir_Setting, "UserInfo", True, 0, 0)
         
 
     #查找 
