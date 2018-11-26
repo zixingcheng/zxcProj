@@ -214,6 +214,13 @@ class myRoots_Prj():
             prjRoot.creatIntance(self.usrID, self.usrName)
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
+            
+            prjMsg = myRoot_Prj()
+            prjMsg._Init("消息处理", "myRobot_Msg", "myRobot_Msg", "zxcRobot_Msg", True, False, True, False, False)
+            prjMsg.creatIntance(self.usrID, self.usrName)
+            prjMsg.prjClass.Done("@@zxcRobot_Msg", "")          #自启动
+            self.prjRoots[prjMsg.prjName] = prjMsg
+            self.prjCmds[prjMsg.cmdStr.lower()] = prjMsg.prjName
 
             prjLog = myRoot_Prj()
             prjLog._Init("消息日志", "myRobot_Log", "myRobot_Log", "zxcRobot_Log", True, False, True, False, False)

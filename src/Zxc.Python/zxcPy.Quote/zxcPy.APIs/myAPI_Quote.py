@@ -25,7 +25,9 @@ from myGlobal import gol
 class myAPI_Quote_Set(myWeb.myAPI): 
     #strSet @股票 ** +/-
     def get(self, strName, bAdd = True, usrName_Nick = ''):
+        strTag = "股票设置："+ strName +"\n      "
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
+        pMsg['text'] =  strTag + "操作失败！" 
         if(strName == ""): return pMsg
 
         #解析参数
@@ -44,19 +46,22 @@ class myAPI_Quote_Set(myWeb.myAPI):
                             pSet.isEnable = len(pSet.msgUsers_wx) > 0
                             pSets._Save()
                             pSource.params = pSource._getDefault_Param()
-                            pMsg['text'] = "已添加(" + usrName_Nick + ")" 
+                            pMsg['text'] = strTag + " 已添加推送用户(" + usrName_Nick + ")" 
                             print(pSource.params)
                             bResult = True 
+                        else:
+                            pMsg['text'] =  strTag + " 已存在推送用户(" + usrName_Nick + ")" 
                     else:
                         if(usrName_Nick != "" and usrName_Nick in pSet.msgUsers_wx):
                             pSet.msgUsers_wx.remove(usrName_Nick)
                             pSet.isEnable = len(pSet.msgUsers_wx) > 0
                             pSets._Save()
                             pSource.params = pSource._getDefault_Param()
-                            pMsg['text'] = "已移除(" + usrName_Nick + ")" 
+                            pMsg['text'] =  strTag + " 已移除推送用户(" + usrName_Nick + ")" 
                             print(pSource.params)
                             bResult = True 
-
+                        else:
+                            pMsg['text'] =  strTag + " 不存在用户(" + usrName_Nick + ")" 
         pMsg['result'] = bResult 
         return pMsg
 

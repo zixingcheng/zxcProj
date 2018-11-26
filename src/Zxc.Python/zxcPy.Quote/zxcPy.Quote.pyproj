@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{f001c86f-593e-40cb-8491-9e93c8630403}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>zxcPy.Quotation\myQuote_Source.py</StartupFile>
+    <StartupFile>myQuote_API.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

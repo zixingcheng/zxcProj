@@ -60,7 +60,7 @@ class myRobot_Robot(myRobot.myRobot):
         msg = ast.literal_eval(body) 
  
         #key超过次数
-        if(msg['intent']['code'] == 4000):
+        if(msg['intent']['code'] == 5000):
             self.apiKey_ind += 1
             if(self.apiKey_ind >= len(self.apiKey_ind)):
                 return "累了，不想说话。。。"
