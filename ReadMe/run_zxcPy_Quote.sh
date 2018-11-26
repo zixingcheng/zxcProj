@@ -11,7 +11,7 @@ file_Quote=$dirPath_srcPy/zxcPy.Quote/zxcPy.Quotation/myQuote_Source.py
 
 count_Quote=`ps -ef |grep $file_Quote |grep -v "grep" |wc -l`
 if [ 0 == $count_Quote ];then
-	nohup python $file_Quote  > $logfile_Quote 2>&1 &
+	nohup python $file_Quote  >  /dev/null 2>&1 &
 echo $count_Quote
 fi
 
