@@ -43,10 +43,12 @@ class myRobot_Updata():
         strText = "zxcRobot（" + self.version + "） --"
 
         #判断是否已经发送
+        bFirst = False
         strVer = myIO.getContent(self.Dir_Base + "/Log/Updata.log", True)
         if(strVer != self.version):
             strText += "已启动."
             strText += "\n更新内容：\n" + self.verText
+            bFirst = True
             myIO.Save_File(self.Dir_Base + "/Log/Updata.log", self.version)
         else:
             strText += "已重启."
@@ -61,6 +63,10 @@ class myRobot_Updata():
         msg["usrName"] = ""
         msg["groupName"] = "测试群"
         self.usrMMsg.OnHandleMsg(msg) 
+
+        if(bFirst):
+            msg["groupName"] = "茶"
+            self.usrMMsg.OnHandleMsg(msg) 
         
 myUpdata = myRobot_Updata()     # 机器人功能--更新消息类 
 #主启动程序
