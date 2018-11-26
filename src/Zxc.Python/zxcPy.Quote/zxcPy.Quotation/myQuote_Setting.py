@@ -39,13 +39,16 @@ class myQuote_Settings():
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.Dir_Base = os.path.abspath(os.path.join(strDir, ".."))  
         self.Dir_Setting = self.Dir_Base + "/Setting"
-        self.Path_SetQuote = self.Dir_Setting + "/Setting_Quote.xls"
+        self.Path_SetQuote = self.Dir_Setting + "/Setting_Quote.csv"
         self.lstFields = ["代码","名称","类型","国家","是否指数","有效性","消息发送用户_wx","涨跌监测","整点播报","备注"]
         self._Init()
     #初始参数信息等   
     def _Init(self):            
         #提取字段信息 
-        dtSetting = myIO_xlsx.loadDataTable(self.Path_SetQuote, 0, 1)            #监听设置信息
+        #dtSetting = myIO_xlsx.loadDataTable(self.Path_SetQuote, 0, 1)            #监听设置信息
+        dtSetting = myIO_xlsx.DtTable() 
+        dtSetting.Load_csv(self.Path_SetQuote, 1, 0, isUtf = True)
+
         if(len(dtSetting.dataMat) < 1 or len(dtSetting.dataField) < 1): return
         lstFields_ind = dtSetting.Get_Index_Fields(self.lstFields)
 
@@ -90,7 +93,8 @@ class myQuote_Settings():
             dtSetting.dataMat.append(pValues)
 
         # 保存
-        dtSetting.Save(self.Dir_Setting, "Setting_Quote", 0, 0, True, "监听设置表", -1, -1, False)
+        # dtSetting.Save(self.Dir_Setting, "Setting_Quote", 0, 0, True, "监听设置表", -1, -1, False)
+        dtUser.Save_csv(self.Dir_Setting, "Setting_Quote", True, 0, 0)
 
     #查找 
     def _Find(self, setName, setTag = ''):

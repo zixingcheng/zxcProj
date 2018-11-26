@@ -165,7 +165,7 @@ class DtTable:
 
         #保存该csv文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".csv"
-        myIO.Save_File(strPath, strLines, isUtf)
+        myIO.Save_File(strPath, strLines, isUtf, False)
         return True     #保存数据 
     def Save_csv_append(self, file, pValues = [], isUtf = False, col_start = 0, symbol = ",", col_end = -1, bSave_AsStr = True):   
         # 写入字段

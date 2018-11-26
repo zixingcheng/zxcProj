@@ -36,13 +36,16 @@ class myRoot_GroupsInfo():
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.Dir_Base = os.path.abspath(os.path.join(strDir, "../.."))  
         self.Dir_Setting = self.Dir_Base + "/Setting"
-        self.Path_SetUser = self.Dir_Setting + "/UserInfo_Group.xls"
+        self.Path_SetUser = self.Dir_Setting + "/UserInfo_Group.csv"
         self.lstFields = ["ID","群组名","来源平台","描述","注册时间","最后登录时间"]
         if(userID != "" and usrName != ""):
             self._Init() 
     def _Init(self):            
         #提取字段信息 
-        dtGroup = myIO_xlsx.loadDataTable(self.Path_SetUser, 0, 1)            #用户信息
+        #dtGroup = myIO_xlsx.loadDataTable(self.Path_SetUser, 0, 1)            #用户信息
+        dtGroup = myIO_xlsx.DtTable() 
+        dtGroup.Load_csv(self.Path_SetUser, 1, 0, isUtf = True)
+         
         if(len(dtGroup.dataMat) < 1 or len(dtGroup.dataField) < 1): return
         lstFields_ind = dtGroup.Get_Index_Fields(self.lstFields)
 

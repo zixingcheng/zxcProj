@@ -235,6 +235,8 @@ def Save_File(path, text, isUtf = True, isNoBoom = True):
     path = checkPath(path)
     if(isUtf):
         pFile = codecs.open(path, 'w', 'utf-8')
+        if(isNoBoom == False):
+            pFile.write(u'\ufeff')
     else:
         pFile = codecs.open(path, 'w')
     pFile.close()

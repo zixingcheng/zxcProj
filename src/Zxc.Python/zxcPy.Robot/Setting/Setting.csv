@@ -1,0 +1,4 @@
+﻿功能名称,文件名,类名,启动命令,是否启用,统一启用,一对一有效,群有效,群同时有效,群列表,平台列表
+复读机,myRobot_Repeater,myRobot_Repeater,Repeater,TRUE,TRUE,TRUE,TRUE,FALSE,测试群,
+聊天机器人,myRobot_Robot,myRobot_Robot,ChatRobot,TRUE,TRUE,TRUE,TRUE,FALSE,测试群,
+账单管家,myRobot_Bill,myRobot_Bill,BillManager,TRUE,FALSE,FALSE,TRUE,FALSE,测试群、茶,
