@@ -461,6 +461,9 @@ class myRoot_Usrs():
 #主启动程序
 if __name__ == "__main__":
     pUsers = myRoot_Usrs( "@@zxcPy", "zxcPy", "测试")
+    pUsers._Save()
+    exit(0)
+
     print(pUsers.Add({'usrName': "Test",'usrName_Nick': "测试",'usrID': "@@1" ,'usrType': "wx"}, True))
     print(pUsers.Add({'usrName': "Test3",'usrName_Nick': "测试3",'usrID': "@@3" }))
     print(pUsers.Del("", "", "测试3"))

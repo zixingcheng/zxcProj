@@ -155,13 +155,14 @@ class DtTable:
                 strLines += symbol + self.dataField[j]
 
         #循环所有格子组装数据 
+        strEnt = myData.iif(isUtf, "\r\n", "\n")
         for i in range(row_start, nRows):
             strLine = ""
             pValues = self.dataMat[i] 
             for j in range(col_start, nCols):
                 strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr) 
                 strLine += symbol + strVaulue
-            strLines += "\n" + strLine[len(symbol):]
+            strLines += strEnt + strLine[len(symbol):]
 
         #保存该csv文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".csv"

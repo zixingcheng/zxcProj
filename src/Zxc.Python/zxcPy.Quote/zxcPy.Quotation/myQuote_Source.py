@@ -105,7 +105,7 @@ class Quote_Source:
             return True
         elif(self.timeIntervals == 0 and self.endTime < tNow):
             self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 13:00:00")      #起始时间
-            self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 15:06:00")        #结束时间
+            self.endTime = self.endTime2                                                #结束时间
             self.timeIntervals += 1
             if(self.datasNow != None): 
                 self.datasNow.saveData()                    #保存数据（第一时段结束）  
@@ -128,11 +128,12 @@ class Quote_Source:
         self.dtDay = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")                 #当前天
         self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 9:26:30")      #起始时间
         self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:30")       #结束时间
+        self.endTime2 = myData_Trans.Tran_ToDatetime(self.dtDay + " 15:06:00")      #结束时间0收盘
         self.timeIntervals = 0
 
         #时间段监测
         tNow = datetime.datetime.now()
-        return (self.startTime < tNow and tNow < self.endTime)
+        return (self.startTime < tNow and tNow < self.endTime2)
 
 #行情监听线程
 class Quote_Thread(threading.Thread):
@@ -144,8 +145,8 @@ class Quote_Thread(threading.Thread):
 
     def run(self):
         if(self.source.setTime() == False):
-            myDebug.Print('StockQuote stoped.\n         --not stock time.')
-            time.sleep(1)
+            myDebug.Print('StockQuote stoped.\n         --not stock time..')
+            time.sleep(2)
             return 
 
         myDebug.Print('StockQuote run')
@@ -204,6 +205,7 @@ if __name__ == "__main__":
     thread.setDaemon(True)
     thread.start()
     mainloop(thread)
+    time.sleep(1)
     myDebug.Print("Quote thread exited...")
 
     #退出

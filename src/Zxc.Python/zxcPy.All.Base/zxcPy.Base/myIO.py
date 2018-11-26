@@ -129,7 +129,7 @@ def getContents(path, noBOM = False, isUtf = True):
     if (os.path.exists(path) == False):
         return ""
     if(isUtf):
-        f = codecs.open(path, 'r', 'utf-8')  
+        f = codecs.open(path, 'r', 'utf-8') 
     else:
         f = codecs.open(path, 'r')  
     lists = f.readlines()
@@ -235,16 +235,15 @@ def Save_File(path, text, isUtf = True, isNoBoom = True):
     path = checkPath(path)
     if(isUtf):
         pFile = codecs.open(path, 'w', 'utf-8')
-        if(isNoBoom == False):
-            pFile.write(u'\ufeff')
     else:
         pFile = codecs.open(path, 'w')
+        
+    text = Trans_NoBOM(text) 
+    if(isNoBoom == False):
+        text = u'\ufeff' + text
+    pFile.write(text)
     pFile.close()
         
-    if(isNoBoom):
-        text = Trans_NoBOM(text) 
-    with open(path, 'a+') as f:
-        f.write(text)
     
 
 # 定义要创建的目录
