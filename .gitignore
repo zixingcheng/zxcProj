@@ -283,8 +283,10 @@ __pycache__/
 /src/Zxc.Python/zxcPy.Weixin/Data
 /src/Zxc.Python/zxcPy.Quote/Data
 /src/Zxc.Python/zxcPy.Quote/Setting
+*/src/Zxc.Python/zxcPy.Quote/Setting/Setting_Quote.csv
 /src/Zxc.Python/zxcPy.Robot/Data
 /src/Zxc.Python/zxcPy.Robot/Setting
+*/src/Zxc.Python/zxcPy.Robot/Setting/Setting_User.csv
 /src/Zxc.Python/zxcPy.Robot/Log
 
 
