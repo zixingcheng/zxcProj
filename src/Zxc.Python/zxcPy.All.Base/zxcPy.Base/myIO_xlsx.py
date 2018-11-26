@@ -14,7 +14,7 @@ import xlrd, xlwt
 import myEnum, myData, myIO, myData_Trans
   
 #定义数据结构枚举
-myFiledype = myEnum.enum('string', 'float', 'int', 'datetime')
+myFiledype = myEnum.enum('string', 'float', 'int', 'bool', 'datetime')
 
 #自定义表结构
 class DtTable:
@@ -75,8 +75,7 @@ class DtTable:
 
         #提取字段信息   
         if(True):
-            self.dataField  = lstLines[row_field].strip().split(strsplit)
-            nFields = len(self.dataField )
+            self.dataField  = lstLines[row_field].strip().split(strsplit) 
 
         #提取内容
         self.dataMat = []
@@ -84,27 +83,38 @@ class DtTable:
         
         #循环提取所有行
         for i in range(row_start, len(lstLines)):
-            pValues = lstLines[i].strip().split(strsplit)
-            if(len(pValues) < 1): continue
-            while(len(pValues) < self._Cloumns()):
-                pValues.append("")
+            pTemps = lstLines[i].strip().split(strsplit)
+            if(len(pTemps) < 1): continue
+             
+            #其他全部为默认类型
+            pValues = self.loadDt_Row(i, col_start, False, pTemps)
             self.dataMat.append(pValues)
         return True
     #载入文件数据行
-    def loadDt_Row(self, ind_row, col_start = 0, isField = False):         
+    def loadDt_Row(self, ind_row, col_start = 0, isField = False, csvLines = None):         
         pTypes = self.dataFieldType
         nFields = len(pTypes)
         pValues = []        
-        rows = self.sheet.row_values(ind_row)      # 获取整行内容,列内容: pSheet.col_values(i)
-        for j in range(col_start, self.sheet.ncols): 
-            if(nFields > j and isField == False):
+        if(csvLines == None):
+            rows = self.sheet.row_values(ind_row)       # 获取整行内容,列内容: pSheet.col_values(i)
+            cols = self.sheet.ncols
+        else:
+            rows = csvLines                             # csv行数据
+            cols = len(self.dataField )
+        
+        # 转换数据类型
+        cols_row = len(rows)
+        for j in range(col_start, cols): 
+            if(nFields > j and cols_row > j and isField == False):
                 if(pTypes[j] == myFiledype.float): 
                     pValues.append(float(rows[j]))
                     continue
                 elif(pTypes[j] == myFiledype.datetime): 
                     pValues.append(myData_Trans.Tran_ToDatetime(rows[j]))
                     continue
-            
+                elif(pTypes[j] == myFiledype.bool): 
+                    pValues.append(myData_Trans.To_Bool(rows[j]))
+                    continue
             #其他全部为默认类型
             pValues.append(rows[j]) 
         return pValues

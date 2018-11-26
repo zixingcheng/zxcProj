@@ -47,6 +47,7 @@ class myQuote_Settings():
         #提取字段信息 
         #dtSetting = myIO_xlsx.loadDataTable(self.Path_SetQuote, 0, 1)            #监听设置信息
         dtSetting = myIO_xlsx.DtTable() 
+        dtSetting.dataFieldType = ["","","","","bool","bool","","bool","bool",""]
         dtSetting.Load_csv(self.Path_SetQuote, 1, 0, isUtf = True)
 
         if(len(dtSetting.dataMat) < 1 or len(dtSetting.dataField) < 1): return

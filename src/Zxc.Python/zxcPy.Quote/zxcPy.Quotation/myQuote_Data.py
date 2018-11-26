@@ -277,7 +277,7 @@ class Quote_Datas:
         #文件头写入 
         if(file == ""): file = self.dir + self.fileName + ".csv"
         if(len(self.datas) <= 1): 
-            myIO.Save_File(file, pData.csvHead(), True, True)
+            myIO.Save_File(file, pData.csvHead(), True, False)
 
         #文件追加数据内容
         if(pData == None): pData = self.data

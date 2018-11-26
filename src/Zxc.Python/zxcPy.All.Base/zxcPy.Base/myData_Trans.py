@@ -21,6 +21,16 @@ def Is_Numberic(value):
     else:
         return False 
 
+    
+#字符串转bool
+def To_Bool(strData):
+    if(type(strData) == str):
+        if(strData.lower() == "true"):
+            return True
+    else:
+        nValue = To_Int(strData, 0)
+        if(nValue == 1): return True
+    return False
 
 #字符串转float
 def To_Float(strData, default = 0):

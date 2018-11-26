@@ -168,11 +168,13 @@ class myRoots_Prj():
     def _Init(self):            
         #dtSetting = myIO_xlsx.loadDataTable(self.Dir_Setting + "Setting.csv", 0, 1)            #外部参数设置 
         #dtSetting_user = myIO_xlsx.loadDataTable(self.Dir_Setting + "Setting_User.csv", 0, 1)   #外部参数设置-权限用户 
-        dtSetting = myIO_xlsx.DtTable() 
+        dtSetting = myIO_xlsx.DtTable()  
+        dtSetting.dataFieldType = ["","","","","bool","bool","bool","bool","bool","",""]
         dtSetting.Load_csv(self.Dir_Setting + "Setting.csv", 1, 0, isUtf = True)
         dtSetting_user = myIO_xlsx.DtTable() 
+        dtSetting_user.dataFieldType = ["","bool","",""]
         dtSetting_user.Load_csv(self.Dir_Setting + "Setting_User.csv", 1, 0, isUtf = True)
-        
+
         #提取字段信息 
         lstFields = ["功能名称","文件名","类名","启动命令","统一启用","是否启用","一对一有效","群有效","群同时有效","群列表","平台列表"]
         lstFields_ind = dtSetting.Get_Index_Fields(lstFields)
