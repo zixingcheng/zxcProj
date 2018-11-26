@@ -141,12 +141,13 @@ class Quote_Thread(threading.Thread):
         self.source = source
         self.interval = intervalSecs
         self.threadRunning = False
+        self.stopped = False
         threading.Thread.__init__(self)
 
     def run(self):
         if(self.source.setTime() == False):
             myDebug.Print('StockQuote stoped.\n         --not stock time..')
-            time.sleep(2)
+            self.stop()
             return 
 
         myDebug.Print('StockQuote run')
@@ -166,17 +167,18 @@ class Quote_Thread(threading.Thread):
 
     def stop(self):
         myDebug.Print('StockQuote stop')
-        self.threadRunning = False;
+        self.threadRunning = False
+        self.stopped = True
+        time.sleep(2)
 
           
-is_exit = False
 def mainloop(thread):
-    global is_exit
     try:
-        while is_exit:
+        while thread.stopped == False:
             time.sleep(1)
     except:
         thread.stop()
+    is_exit = True
 
 #主启动程序
 if __name__ == "__main__":
