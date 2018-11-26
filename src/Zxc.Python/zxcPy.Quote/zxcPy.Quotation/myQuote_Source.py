@@ -128,7 +128,7 @@ class Quote_Source:
         self.dtDay = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")                 #当前天
         self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 9:26:30")      #起始时间
         self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:30")       #结束时间
-        self.endTime2 = myData_Trans.Tran_ToDatetime(self.dtDay + " 15:16:00")      #结束时间--收盘
+        self.endTime2 = myData_Trans.Tran_ToDatetime(self.dtDay + " 19:16:00")      #结束时间--收盘
         self.timeIntervals = 0
 
         #时间段监测
@@ -170,8 +170,8 @@ class Quote_Thread(threading.Thread):
         self.threadRunning = False
         self.stopped = True
         time.sleep(2)
-
-          
+  
+        
 def mainloop(thread):
     try:
         while thread.stopped == False:
@@ -179,6 +179,26 @@ def mainloop(thread):
     except:
         thread.stop()
     is_exit = True
+def mainSource():
+    #初始全局行情对象
+    from myGlobal import gol 
+    gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
+    if(gol._Get_Setting('quoteSource', None)== None):
+        #示例数据监控(暂只支持单源，多源需要调整完善)
+        import mySource_Sina_Stock
+        pQuote = mySource_Sina_Stock.Source_Sina_Stock() 
+
+        #添加监听对象
+        import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor
+        pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
+        pQuote.addListener(myListener_Hourly.Quote_Listener_Hourly())
+        pQuote.addListener(myListener_Rise_Fall_asInt.Quote_Listener_Rise_Fall_asInt())
+        #for x in pSets.setUsers:
+        #    pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
+
+        gol._Set_Value('quoteSource', pQuote)    #实例 行情对象
+        print() 
+
 
 #主启动程序
 if __name__ == "__main__":
@@ -188,18 +208,9 @@ if __name__ == "__main__":
 
 
     #示例数据监控(暂只支持单源，多源需要调整完善)
-    import mySource_Sina_Stock
-    pQuote = mySource_Sina_Stock.Source_Sina_Stock() 
-
-    #添加监听对象
-    import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor
-    pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
-    pQuote.addListener(myListener_Hourly.Quote_Listener_Hourly())
-    pQuote.addListener(myListener_Rise_Fall_asInt.Quote_Listener_Rise_Fall_asInt())
+    mainSource() 
+    pQuote = gol._Get_Value('quoteSource')
     pSets = gol._Get_Value('setsQuote')
-
-    #for x in pSets.setUsers:
-    #    pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
 
 
     #线程执行   

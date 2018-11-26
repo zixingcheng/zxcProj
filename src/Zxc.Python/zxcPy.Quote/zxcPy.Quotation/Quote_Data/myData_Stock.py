@@ -131,7 +131,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
     #转换为值组
     def toValueList(self):
         dtNow = self.getTime(False)
-        if(len(self.dataList) > 1 and self.dataList[0] == dtNow):
+        if(len(self.dataList) > 1 and self.dataList[0] == dtNow and type(self.dataList[4]) != str):
            return self.dataList
         self.dataList = [] 
         self.dataList.append(dtNow)                                      #时间
