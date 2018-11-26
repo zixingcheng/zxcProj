@@ -182,7 +182,7 @@ def Tran_ToStr(lstV = [], symbol = ','):
     strV = ""
     for x in lstV:
         strV += symbol + str(x)
-    if(len(strV) > 0): strV = strV[1:]
+    if(len(lstV) > 0): strV = strV[1:]
     return strV
     
 #字符串变为转义字符（"转为\"）
@@ -211,8 +211,10 @@ if __name__ == '__main__':
     #print(aa)                     
     #print(Is_Numberic('-0.11'))
     #aa=To_Int("100")
-    #print(aa) 
-
+    #print(aa)
+    lstV = "".split("、")
+    lstV.append('sdfsdf')
+    strV = Tran_ToStr(lstV, "、")
 
     arr = To_Bytes_By_Float(106.509)
     value = To_Float_By_Bytes(arr)

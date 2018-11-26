@@ -179,6 +179,18 @@ def mainloop(thread):
     except:
         thread.stop()
     is_exit = True
+def mainStart():
+    #线程执行   
+    pQuote = gol._Get_Value('quoteSource')
+    if(pQuote == None):
+        pQuote = mainSource()
+        
+    thrdQuote = gol._Get_Value('quoteSourceThread', None)
+    if(pQuote != None and (thrdQuote == None or thrdQuote.threadRunning == False)):
+        thrdQuote = Quote_Thread(pQuote)
+        thrdQuote.setDaemon(True)
+        thrdQuote.start()
+        gol._Set_Value('quoteSourceThread', thrdQuote)
 def mainSource():
     #初始全局行情对象
     from myGlobal import gol 
@@ -197,7 +209,7 @@ def mainSource():
         #    pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
 
         gol._Set_Value('quoteSource', pQuote)    #实例 行情对象
-        print() 
+        return pQuote
 
 
 #主启动程序

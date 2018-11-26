@@ -21,6 +21,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="myQuote_API.py" />
+    <Compile Include="zxcPy.APIs\myAPI_Quote.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Data.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Listener.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Source.py" />
@@ -41,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="zxcPy.APIs\" />
     <Folder Include="Setting\" />
     <Folder Include="zxcPy.Quotation\" />
     <Folder Include="zxcPy.Quotation\Quote_Data\" />

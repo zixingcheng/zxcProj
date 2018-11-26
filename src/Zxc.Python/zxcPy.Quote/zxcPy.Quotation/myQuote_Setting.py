@@ -31,6 +31,7 @@ class myQuote_Setting():
 #监听--设置对象集
 class myQuote_Settings():
     def __init__(self): 
+        self.sets = []              #设置集(不排序)
         self.setList = {}           #设置集(按名称索引)
         self.setList_Tag = {}       #设置集--(按Tag索引)
         self.setUsers = []          #设置用户信息集
@@ -67,7 +68,8 @@ class myQuote_Settings():
             pSet.isEnable_Hourly = myData.iif(dtRow[lstFields_ind["整点播报"]] == True, True, False)
             
             pSet.mark = dtRow[lstFields_ind["备注"]] 
-            pSet.msgUsers_wx = str(dtRow[lstFields_ind["消息发送用户_wx"]]).split('、')
+            strUsers = str(dtRow[lstFields_ind["消息发送用户_wx"]])
+            pSet.msgUsers_wx = myData.iif(strUsers == "", [], strUsers.split('、'))
             self._Index(pSet)               #索引设置信息
 
             #用户信息--未完善
@@ -77,25 +79,26 @@ class myQuote_Settings():
         dtSetting = myIO_xlsx.DtTable()     #监听设置信息表
         dtSetting.dataName = "dataName"
         dtSetting.dataField = self.lstFields
-        dtSetting.dataFieldType = ['string', 'string', 'string', 'string', 'bool', 'string', 'string']
+        dtSetting.dataFieldType = ["","","","","bool","bool","","bool","bool",""]
        
         # 组装行数据
-        keys = self.setList.keys()
-        for x in keys:
-            pSet = self.setList[x]
+        for pSet in self.sets:
             pValues = []
             pValues.append(pSet.setTag)
             pValues.append(pSet.setName)
             pValues.append(pSet.setType)
             pValues.append(pSet.setArea)
+            pValues.append(pSet.isIndex)
             pValues.append(pSet.isEnable)
-            pValues.append(myData_Trans.Tran_ToStr(pSet.msgUsers_wx))
+            pValues.append(myData_Trans.Tran_ToStr(pSet.msgUsers_wx, "、"))
+            pValues.append(pSet.isEnable_RFasInt)
+            pValues.append(pSet.isEnable_Hourly)
             pValues.append(pSet.mark)
             dtSetting.dataMat.append(pValues)
 
         # 保存
         # dtSetting.Save(self.Dir_Setting, "Setting_Quote", 0, 0, True, "监听设置表", -1, -1, False)
-        dtUser.Save_csv(self.Dir_Setting, "Setting_Quote", True, 0, 0)
+        dtSetting.Save_csv(self.Dir_Setting, "Setting_Quote", True, 0, 0)
 
     #查找 
     def _Find(self, setName, setTag = ''):
@@ -109,6 +112,7 @@ class myQuote_Settings():
         return pSet  
     #设置索引
     def _Index(self, pSet): 
+        self.sets.append(pSet)
         self.setList[pSet.setName] = pSet
                 
         #用户集--(按标识索引)
