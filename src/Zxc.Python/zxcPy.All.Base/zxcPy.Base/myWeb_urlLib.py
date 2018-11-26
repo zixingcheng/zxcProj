@@ -8,6 +8,7 @@ Created on  张斌 2016-09-02 16:30:00
     @依赖库： urllib
 """
 from requests import get, put, post, delete
+import json
 import urllib,urllib.request
 import http.cookiejar
 import myDebug;
@@ -39,13 +40,16 @@ class myWeb:
         self.Referer =self.Host + "/" + Path
         
     #定义Post方法
-    def Do_Post(self, Path , strPostData, strTag = "", bUseHeaders = True, bInitCookie = False):
+    def Do_Post(self, Path , strPostData, strTag = "", bUseHeaders = True, bInitCookie = False, useJson = False):
         self.__set_param__(Path)    #更新属性
-        
-        #urlencode转换，并强制为UTF8
         if(self.canPrint):
             myDebug.Debug("请求" + strTag + "页面：" + self.Referer)
-        postdata = urllib.parse.urlencode(strPostData) 
+        
+        #urlencode转换，并强制为UTF8
+        if(useJson):
+            postdata = json.dumps(strPostData) 
+        else:
+            postdata = urllib.parse.urlencode(strPostData) 
         postdata = postdata.encode(encoding='UTF8')
 
         
@@ -53,7 +57,9 @@ class myWeb:
         header = ""
         if(bUseHeaders == True):
             user_agent = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET4.0C; .NET4.0E)'
-            header = {'User-Agent': user_agent}        
+            header = {'User-Agent': user_agent}   
+            if(useJson):    
+                header['content-type'] =  'application/json'
 
             
         #Cookie初始(强制)
@@ -66,14 +72,10 @@ class myWeb:
             if(self.canPrint):
                 myDebug.Debug("    页面Cookie重置ok") 
             
-        #构造Requset
-        request= urllib.request.Request( 
-                   url = self.Referer, 
-                   data = postdata, 
-                   headers = header)
+        #构造Requset 
+        request= urllib.request.Request(url = self.Referer, data = postdata, headers = header)
             
         #请求响应 
-        #response = urllib.request.urlopen(request) 
         if(self.canPrint):
             myDebug.Debug("    页面请求中。。。") 
         response = self.opener.open(request)         
@@ -95,7 +97,6 @@ class myWeb:
         else:
             if(self.canPrint):
                 myDebug.Debug("    请求出错。")
-        print("") 
         return page
     
     #定义rest API方法Get方法
@@ -140,6 +141,37 @@ class myWeb:
  
 #主启动程序 
 if __name__ == "__main__":
+    pWeb = myWeb("http://openapi.tuling123.com/openapi/")
+    req = {
+        "perception":
+        {
+            "inputText":
+            {
+                "text": '天气'
+            },
+
+            "selfInfo":
+            {
+                "location":
+                {
+                    "city": "上海",
+                    "province": "上海",
+                    "street": "文汇路"
+                }
+            }
+        },
+
+        "userInfo": 
+        {
+            "apiKey": "de79dec1dc6b41f59ed3e4c743b1f089",
+            "userId": "OnlyUseAlphabet"
+        }
+    }
+
+    aa = pWeb.Do_Post("api/v2", req, "", useJson = True)
+    bb = aa.decode(encoding = "utf8")
+    print(bb)
+    
     pWeb = myWeb("http://hq.sinajs.cn/")
     aa = pWeb.Do_Post("list=sh600006,sh510050", "",)
     bb = aa.decode(encoding = "gbk")
