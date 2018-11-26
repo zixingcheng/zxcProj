@@ -232,7 +232,11 @@ def Trans_NoBOM(strBom):
 
 #保存文件信息
 def Save_File(path, text, isUtf = True, isNoBoom = True):
+    #文件夹初始
     path = checkPath(path)
+    strDir, strName = getPath_ByFile(path)
+    mkdir(strDir, False, False)
+
     if(isUtf):
         pFile = codecs.open(path, 'w', 'utf-8')
     else:
