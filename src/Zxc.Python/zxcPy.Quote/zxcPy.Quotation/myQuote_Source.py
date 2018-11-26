@@ -6,7 +6,7 @@ Created on  张斌 2018-05-03 14:58:00
 
     监听--源基类 
 """
-import sys, os, time, datetime,  mySystem 
+import sys, os, time, datetime, mySystem 
 import threading
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类

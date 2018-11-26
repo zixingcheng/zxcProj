@@ -237,12 +237,12 @@ def Save_File(path, text, isUtf = True, isNoBoom = True):
         pFile = codecs.open(path, 'w', 'utf-8')
     else:
         pFile = codecs.open(path, 'w')
+    pFile.close()
         
     if(isNoBoom):
-        text = Trans_NoBOM(text)
-
-    pFile.write(text)
-    pFile.close()
+        text = Trans_NoBOM(text) 
+    with open(path, 'a+') as f:
+        f.write(text)
     
 
 # 定义要创建的目录

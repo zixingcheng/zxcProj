@@ -181,7 +181,10 @@ class Quote_Datas:
         self.manageTrades = gol._Get_Setting('manageBills_Stock', None)    #使用交易管理器
 
         #保存基础数据
-        self.dir = "./Data/" + self.name + "/"
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        Dir_Base = os.path.abspath(os.path.join(strDir, ".."))   
+
+        self.dir = Dir_Base + "/Data/" + self.name + "/"
         self.fileName = myData_Trans.Tran_ToDatetime_str(pData.getTime(), "%Y-%m-%d")
         myIO.mkdir(self.dir) 
         if(self.loadData()):                            #加载已存数据
@@ -273,13 +276,12 @@ class Quote_Datas:
     def saveData_stream(self, file = "", pData = None):
         #文件头写入 
         if(file == ""): file = self.dir + self.fileName + ".csv"
-        if(len(self.datas) <= 1):
-            myIO.Save_File(file, pData.csvHead(), True, True) 
+        if(len(self.datas) <= 1): 
+            myIO.Save_File(file, pData.csvHead(), True, True)
 
         #文件追加数据内容
         if(pData == None): pData = self.data
-         
-        with open(file, 'a+', 'utf-8') as f:
+        with open(file, 'a+') as f:
             f.write(pData.toCSVString())    
     #保存数据(分段-合并)
     def saveData_stream_Trans(self, strDir = ""):
