@@ -40,28 +40,29 @@ class myAPI_Quote_Set(myWeb.myAPI):
                 pSet = myQuote_Setting._Find(strName, strName)
                 bAdd = myData_Trans.To_Bool(bAdd)
                 if(pSet != None):
+                    usrName = usrName_Nick.replace("@*", "")
                     if(bAdd):
                         if(usrName_Nick != "" and (usrName_Nick in pSet.msgUsers_wx) == False):
                             pSet.msgUsers_wx.append(usrName_Nick)
                             pSet.isEnable = len(pSet.msgUsers_wx) > 0
                             pSets._Save()
                             pSource.params = pSource._getDefault_Param()
-                            pMsg['text'] = strTag + " 已添加推送用户(" + usrName_Nick + ")" 
+                            pMsg['text'] = strTag + " 已添加推送用户(" + usrName + ")" 
                             print(pSource.params)
                             bResult = True 
                         else:
-                            pMsg['text'] =  strTag + " 已存在推送用户(" + usrName_Nick + ")" 
+                            pMsg['text'] =  strTag + " 已存在推送用户(" + usrName + ")" 
                     else:
                         if(usrName_Nick != "" and usrName_Nick in pSet.msgUsers_wx):
                             pSet.msgUsers_wx.remove(usrName_Nick)
                             pSet.isEnable = len(pSet.msgUsers_wx) > 0
                             pSets._Save()
                             pSource.params = pSource._getDefault_Param()
-                            pMsg['text'] =  strTag + " 已移除推送用户(" + usrName_Nick + ")" 
+                            pMsg['text'] =  strTag + " 已移除推送用户(" + usrName + ")" 
                             print(pSource.params)
                             bResult = True 
                         else:
-                            pMsg['text'] =  strTag + " 不存在用户(" + usrName_Nick + ")" 
+                            pMsg['text'] =  strTag + " 不存在用户(" + usrName + ")" 
         pMsg['result'] = bResult 
         return pMsg
 

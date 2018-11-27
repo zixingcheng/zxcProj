@@ -42,8 +42,8 @@ class myRobot_Msg(myRobot.myRobot):
     #消息处理接口-Text
     def _Done_Text(self, Text, msgID = "", usrInfo = {}):
         #提取命令内容
-        if(Text.count("@") != 1): return ""
-        cmds = Text.strip()[1:].split(" ")
+        if(Text.count("@*") != 1): return ""
+        cmds = Text.strip()[2:].split(" ")
         cmd = cmds[0].strip()
         nNum = len(cmds)
         myDebug.Print(Text.strip())
@@ -52,7 +52,7 @@ class myRobot_Msg(myRobot.myRobot):
         strReturn = ""
         if(cmd == "帮助"):
             return self._Title_Helper()
-        elif(cmd == "*"):
+        elif(cmd == ""):
             #机器人
             return self.myRobot._Done(Text, msgID, "TEXT", usrInfo)
         elif(cmd == "股票"):
@@ -101,8 +101,9 @@ class myRobot_Msg(myRobot.myRobot):
         return "自动处理所有通知消息..."
     def _Title_Helper(self): 
         strReturn = "消息命令提示："
-        strReturn += self.perfix + "@帮助：输出所有命令说明"
+        strReturn += self.perfix + "@*帮助：输出所有命令说明"
         strReturn += self.perfix + "@*：机器人聊天，可咨询问题" 
+        strReturn += self.perfix + "@*股票：股票设置，推送用户设置"  
         strReturn += "\n命令参数以空格区分，如：\"@* 光山天气\""
         return strReturn
         
@@ -125,12 +126,12 @@ if __name__ == "__main__":
         usrInfo["groupName"] = "" 
 
     #回撤请求
-    myDebug.Debug(pRobot_Msg.Done("@帮助", usrNameNick='茶叶一主号')['msg']) 
+    myDebug.Debug(pRobot_Msg.Done("@*帮助", usrNameNick='茶叶一主号')['msg']) 
     myDebug.Debug(pRobot_Msg.Done("@* 光山天气")['msg']) 
     myDebug.Debug(pRobot_Msg.Done("@* 附近商场")['msg']) 
     
-    myDebug.Debug(pRobot_Msg.Done("@股票 广联达 +", usrNameNick='茶叶一主号')['msg']) 
-    myDebug.Debug(pRobot_Msg.Done("@股票 广联达 -", usrNameNick='茶叶一主号')['msg']) 
+    myDebug.Debug(pRobot_Msg.Done("@*股票 广联达 +", usrNameNick='茶叶一主号')['msg']) 
+    myDebug.Debug(pRobot_Msg.Done("@*股票 广联达 -", usrNameNick='茶叶一主号')['msg']) 
 
     pRobot_Msg.Done("@@zxcRobot_Msg")
     print()
