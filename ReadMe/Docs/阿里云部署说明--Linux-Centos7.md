@@ -400,7 +400,7 @@ git 更新脚本：
 
 启动脚本
 	sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh	(Robot+Weixin)
-	sh /root/Public/UpLoad/Temp/ReadMe/run_zxcPy_Quote.sh		(Qoute)
+	sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh		(Qoute)
 	 
 
 单个启动：
@@ -411,7 +411,8 @@ git 更新脚本：
 	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Robot/myRobot_API.py
 
 	#启动行情监测 
-	python /root/Public/myPrjs/zxcProj/src/zxcPy.Quote/zxcPy.Quotation/myQuote_Source.py
+	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Quote/zxcPy.Quotation/myQuote_Source.py
+	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Quote/myQuote_API.py
 
 #### 查看进程python：
 

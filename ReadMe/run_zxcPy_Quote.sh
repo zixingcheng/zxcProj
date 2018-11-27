@@ -6,7 +6,7 @@ dirPath_srcPy=/root/Public/myPrjs/zxcProj/src/Zxc.Python
 
 
 #启动行情监测
-logfile_Quote=$dirPath/Logs/myQuote_Source.log
+logfile_Quote=$dirPath/Logs/myQuote_API.log
 file_Quote=$dirPath_srcPy/zxcPy.Quote/myQuote_API.py
 
 count_Quote=`ps -ef |grep $file_Quote |grep -v "grep" |wc -l`
