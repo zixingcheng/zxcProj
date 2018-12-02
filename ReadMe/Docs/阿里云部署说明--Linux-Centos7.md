@@ -381,7 +381,8 @@ crontabs软件包是用来安装、卸装、或列举用来驱动 cron 守护进
 ### 自写定时任务 
 
 	每周一到周五 的9-15点 的每5分钟 时执行命令（启动脚本-行情监测）。
-	*/1 9-15 * * 1-5 sh /root/Public/UpLoad/Temp/ReadMe/run_zxcPy_Quote.sh
+	25-59/2 9-15 * * 1-5 sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
+	*/3 10-15 * * 1-5 sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
 
 	每天 的8-23点 的每2分钟 时执行命令（启动脚本-机器人、微信）。
 	*/5 8-23 * * * sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh 

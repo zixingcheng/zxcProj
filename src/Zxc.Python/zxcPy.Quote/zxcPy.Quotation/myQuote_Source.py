@@ -155,7 +155,7 @@ class Quote_Thread(threading.Thread):
         while self.threadRunning:
             try:
                 #发生错误时继续
-                self.source.query()
+                self.source.query() 
 
                 #判断结束
                 if(self.source._Stoped()):
@@ -170,6 +170,14 @@ class Quote_Thread(threading.Thread):
         self.threadRunning = False
         self.stopped = True
         time.sleep(2)
+        
+        #退出 
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        strDir_Base = os.path.abspath(os.path.join(strDir, ".."))  
+        strPath = strDir_Base + "/myQuote_API.lock"
+        gol._Run_UnLock(strPath)
+        os._exit()
+        exit(0)
   
         
 def mainloop(thread):
