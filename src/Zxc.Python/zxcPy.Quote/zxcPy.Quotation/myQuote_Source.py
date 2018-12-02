@@ -28,6 +28,7 @@ class Quote_Source:
         self.listeners = []
         self.interval_M = 1       #分钟级间隔
         self._initSetting()       #初始设置
+        self.isClosed = False     #是否关闭
         self.setTime()            #设置(时效) 
     def _initSetting(self):
         #初始根目录信息
@@ -166,7 +167,7 @@ class Quote_Thread(threading.Thread):
         self.stop()
 
     def stop(self):
-        myDebug.Print('StockQuote stop')
+        myDebug.Print('StockQuote stop\n')
         self.threadRunning = False
         self.stopped = True
         time.sleep(2)
@@ -176,7 +177,6 @@ class Quote_Thread(threading.Thread):
         strDir_Base = os.path.abspath(os.path.join(strDir, ".."))  
         strPath = strDir_Base + "/myQuote_API.lock"
         gol._Run_UnLock(strPath)
-        os._exit()
         exit(0)
   
         
@@ -195,6 +195,7 @@ def mainStart():
         
     thrdQuote = gol._Get_Value('quoteSourceThread', None)
     if(pQuote != None and (thrdQuote == None or thrdQuote.threadRunning == False)):
+        myDebug.Print("Quote thread start...")
         thrdQuote = Quote_Thread(pQuote)
         thrdQuote.setDaemon(True)
         thrdQuote.start()
@@ -220,12 +221,12 @@ def mainSource():
         return pQuote
 
 
+
 #主启动程序
 if __name__ == "__main__":
     #单例运行检测
     if(gol._Run_Lock(__file__) == False):
        exit(0)
-
 
     #示例数据监控(暂只支持单源，多源需要调整完善)
     mainSource() 

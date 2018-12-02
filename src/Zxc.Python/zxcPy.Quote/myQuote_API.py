@@ -16,6 +16,7 @@ import myWeb
 from myGlobal import gol  
 
 
+
 #主程序启动
 if __name__ == '__main__': 
     gol._Init()             #先必须在主模块初始化（只在Main模块需要一次即可）

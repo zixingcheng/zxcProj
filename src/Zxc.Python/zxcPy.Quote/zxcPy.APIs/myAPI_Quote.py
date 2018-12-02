@@ -6,7 +6,7 @@ Created on  张斌 2018-11-26 15:58:00
 
     Rest API --行情操作
 """
-import os, copy, ast 
+import os, copy, ast, time, threading 
 import mySystem 
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
@@ -76,16 +76,31 @@ def init_Quote():
 #集中添加所有API
 def add_APIs(pWeb):  
     #初始行情对象
-    init_Quote()
+    #init_Quote()
     
     # 创建Web API
     pWeb.add_API(myAPI_Quote_Set, '/zxcAPI/robot/quote/set/<strName>/<bAdd>/<usrName_Nick>')
 
 
+    
+#行数监测线程 
+def thrd_Moniter_API_Quote():
+    time.sleep(10)                  #延时等待
+    pSource = init_Quote()
+    while(pSource.isClosed == False):
+        time.sleep(120)             #延时等待
+        myQuote_Source.mainStart()  #检查启动行情进程
+
+#启动监测线程
+m_thrdAPI_Quote = threading.Thread(target = thrd_Moniter_API_Quote)
+m_thrdAPI_Quote.start()
+
+
+
 #主程序启动
 if __name__ == '__main__':  
     #初始行情对象
-    init_Quote()
+    #init_Quote()
 
     #注册平台, 取token
     pQuote_Set = myAPI_Quote_Set()
