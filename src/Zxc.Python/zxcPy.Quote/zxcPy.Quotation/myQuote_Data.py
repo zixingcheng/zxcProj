@@ -75,11 +75,47 @@ class Quote_Data:
 #数据对象--统计 
 class Quote_Data_Static():
     def __init__(self): 
-        self.seconds = 0                #时间间隔       
-        self.last = 0                   #结束     
+        self.seconds = 0                #时间间隔    
+        self.dtTime = datetime.datetime.now()           
+        self.start = 0                  #开盘              
+        self.last = 0                   #收盘     
         self.high = 0                   #最高       
-        self.low = 0                    #最低     
-        self.average = 0                #均值  
+        self.low = 0                    #最低    
+        self.average = 0                #均值    
+        self.tradeVolume = 0            #成交量 
+        self.tradeTurnover = 0          #成交额 
+        
+    #序列化--csv列头
+    @staticmethod
+    def csvHead():
+        head = "时间,间隔,开盘,收盘,最高,最低,平均,成交量,成交额"
+        return head
+    #序列化--csv行信息
+    def toCSVString(self):
+        return '\n' + myData_Trans.Tran_ToDatetime_str(self.dtTime) \
+            + ',' + str(self.seconds)  \
+            + ',' + str(self.start)  \
+            + ',' + str(self.last)  \
+            + ',' + str(self.high)  \
+            + ',' + str(self.low)  \
+            + ',' + str(self.average)  \
+            + ',' + str(self.tradeVolume)  \
+            + ',' + str(self.tradeTurnover) 
+
+    #由值组转换
+    def fromValueList(self, lstValue): 
+        self.dtTime = lstValue[0]
+        if(type(self.dtTime) != datetime.datetime):
+            self.dtTime =  myData_Trans.Tran_ToDatetime(str(self.dtTime))
+
+        self.seconds = lstValue[1]
+        self.start = lstValue[2]
+        self.last = lstValue[3]
+        self.high = lstValue[4]
+        self.low = lstValue[5]
+        self.average = lstValue[6]
+        self.tradeVolume = lstValue[7]
+        self.tradeTurnover = lstValue[8] 
 
 #数据对象--统计 
 class Quote_Data_CKD():
@@ -172,6 +208,7 @@ class Quote_Datas:
         self.interval_M = interval                      #分钟级间隔
         self.datas = {}                                 #原始数据
         self.datas_CKDs_M = self.newData_CKDs(pData)    #统计数据--分钟级
+        self.datas_Stics_D = [Quote_Data_Static()]      #统计数据--天
         self.data = pData                               #当前数据对象
         self.setting = myQuote_Setting._Find(pData.name)#配置项
         self.autoSave = True
@@ -179,6 +216,7 @@ class Quote_Datas:
         self.timeM = -1
         self.stoped = False 
         self.manageTrades = gol._Get_Setting('manageBills_Stock', None)    #使用交易管理器
+        gol._Set_Value('datas_Stics_D_' + pData.id, self.datas_Stics_D)    #全局统计信息
 
         #保存基础数据
         strDir, strName = myIO.getPath_ByFile(__file__)
@@ -208,6 +246,11 @@ class Quote_Datas:
     #设置统计信息 
     def setData_CKDs(self, pData):
         self.datas_CKDs_M.setData(pData) 
+        self.setData_Statics(pData)
+                
+    #其他统计接口
+    def setData_Statics(self, pData):
+        pass 
         
     #初始统计对象 
     def newData_CKDs(self, pData):
@@ -241,6 +284,19 @@ class Quote_Datas:
                 self.datas_CKDs_M = self.newData_CKDs(pData)            #统计数据--分钟级
             self.setData(pData)                                         #设置数据(不允许保存)
         self.autoSave = bCanSave                                        #恢复自动保存
+
+        #提取历史数据 
+        strPath = strDir + "History.csv"
+        pDt_csv = myIO_xlsx.DtTable()
+        pDt_csv.dataFieldType = ['datetime', 'int', 'float', 'float', 'float', 'float', 'float', 'float', 'float']
+        pDt_csv.Load_csv(strPath, isUtf = True)
+
+        pDtNow = datetime.datetime.now()
+        for x in range(0, len(pDt_csv.dataMat)):
+            pData_S = Quote_Data_Static()
+            pData_S.fromValueList(pDt_csv.dataMat[x])
+            if((pData_S.dtTime - pDtNow).total_seconds() / 3600 > 6):
+                self.datas_Stics_D.append(pData_S)
         return bInited
     #提取用户买入信息
     def queryTrade(self, usrName):
@@ -272,6 +328,16 @@ class Quote_Datas:
         pDt.Save(strDir, self.fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = self.name, row_end = -1, col_end = -1, bSave_AsStr = False) 
         if(bClearBuffer): 
             os.remove(strDir + self.fileName + ".csv")
+            
+        #保存历史数据 
+        strPath = strDir + "History.csv"
+        myIO.Save_File(strPath, self.datas_Stics_D[0].csvHead(), True, False)
+        
+        #文件追加数据内容
+        with open(strPath, 'a+') as f:
+            for x in self.datas_Stics_D: 
+                f.write(x.toCSVString()) 
+
     #保存数据(分段)--单个数据追加
     def saveData_stream(self, file = "", pData = None):
         #文件头写入 

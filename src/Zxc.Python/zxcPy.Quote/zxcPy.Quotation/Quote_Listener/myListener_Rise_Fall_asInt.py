@@ -10,8 +10,10 @@ import sys, os, math, copy, mySystem
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/zxcPy.Quotation')
+mySystem.Append_Us("../Quote_Source", False, __file__)
 mySystem.Append_Us("", False)    
-import myData, myQuote_Data, myQuote_Listener  
+import myData, myQuote_Data, myQuote_Listener 
+from myGlobal import gol  
     
 
 #行情监听--涨跌幅整数位
@@ -33,16 +35,21 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
 
         #通知处理
         strMsg = self.DoRecvQuote(dValue_N, key, quoteDatas.datas_CKDs_M.data, quoteDatas.setting.isIndex)
-        self.OnHandleMsg(quoteDatas, strMsg)
+        if(strMsg != ""):
+            self.OnHandleMsg(quoteDatas, strMsg)
     def DoRecvQuote(self, dValue_N, key, data, bIndex): 
         strTag_suffix = ""
         value = self.values.get(key, None)
         nTim_M = -1
         if(value == None):
+            #提取当前统计对象
+            pDatas_S = gol._Get_Value('datas_Stics_D_' + data.id, None)    #全局统计信息
+            pData_S = pDatas_S[0]
+            
             #实例值对象
             value = copy.deepcopy(self.data)
-            value['max'] = dValue_N
-            value['min'] = dValue_N
+            value['max'] = pData_S.high / pData_S.start / 100
+            value['min'] = pData_S.low / pData_S.start / 100
             value['time'] = data.getTime()
             self.values[key] = value
             strTag_suffix = "."
@@ -64,10 +71,12 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             #涨跌幅突破标识
             if(value['max'] < dValue_N):
                 value['max'] = dValue_N
-                if(dValue_N > 0): strTag_suffix = ", 涨幅新高."
+                if(dValue_N > 0): 
+                    strTag_suffix = ", 涨幅新高" + self.CheckDays_MaxMin(dValue_N, data.id) + "."
             if(value['min'] > dValue_N):
                 value['min'] = dValue_N
-                if(dValue_N < 0): strTag_suffix = ", 跌幅加深."
+                if(dValue_N < 0):
+                    strTag_suffix = ", 跌幅新低" + self.CheckDays_MaxMin(dValue_N, data.id, False) + "."
                 
             #时间标识
             strTag_M = ""  
@@ -87,11 +96,15 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             if(dValue_N >= 0 and dValue >= 0):
                 nTimes2 = int(value['max'] / self.deltaV)
                 if(strTag_suffix == "" and abs(nTimes2) > 1): 
-                    strTag_suffix = ", 涨幅回落."
+                    dDelta2 = value['max'] - dValue_N
+                    strDelta2 = str(round(dDelta2 * 100, 2)) + "%"
+                    strTag_suffix = ", 涨幅回落 " + strDelta2 + "."
             else:
                 nTimes2 = int(value['min'] / self.deltaV)
                 if(strTag_suffix == "" and abs(nTimes2) > 1): 
-                    strTag_suffix = ", 跌幅收窄."
+                    dDelta2 = dValue_N - value['min']
+                    strDelta2 = str(round(dDelta2 * 100, 2)) + "%"
+                    strTag_suffix = ", 跌幅收窄 " + strDelta2 + "."
                 
             #涨跌反转标识    
             strTag0 = myData.iif(dValue_N >=0, "涨", "跌")
@@ -107,6 +120,23 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
                 strMsg += "\n" + strTag + strTag_suffix
             return strMsg
         return ""
+    #检查最大最小N天
+    def CheckDays_MaxMin(self, dValue, key, bMax = True):
+        pDatas_S = gol._Get_Value('datas_Stics_D_' + key, None)    #全局统计信息
+        if(pDatas_S == None): return ""
+        nDay = 0
+        if(bMax):
+            for x in range(1, len(pDatas_S)):
+                if(dValue < pDatas_S[x].high):
+                    nDay = x
+                    break
+        else:
+            for x in range(1, len(pDatas_S)):
+                if(dValue > pDatas_S[x].low):
+                    nDay = x
+                    break
+        if(nDay == 0): return ""
+        return "(" + str(nDay) + "天)" 
 
     #功能是否可用
     def IsEnable(self, quoteDatas):
@@ -116,11 +146,11 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
 
 #主启动程序--测试
 if __name__ == "__main__":
-    pListener = Quote_Listener_Rise_Fall_asInt()
+    #pListener = Quote_Listener_Rise_Fall_asInt()
     #pListener.deltaV = 0.01
 
     #测试
-    key = '建设银行'
+    #key = '建设银行'
     #pListener.DoRecvQuote(0.032, key)
     #pListener.DoRecvQuote(0.041, key)
     #pListener.DoRecvQuote(0.0453, key)
@@ -133,5 +163,19 @@ if __name__ == "__main__":
     #pListener.DoRecvQuote(-0.012, key)
     #pListener.DoRecvQuote(0.0, key)
     #pListener.DoRecvQuote(0.051, key)
+    
+    import time
+    import mySource_Sina_Stock
+    import myListener_Printer, myListener_Hourly
 
+    #示例数据监控(暂只支持单源，多源需要调整完善)
+    pQuote = mySource_Sina_Stock.Source_Sina_Stock('sh601939')
+    pQuote.addListener(Quote_Listener_Rise_Fall_asInt())
+    pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
+    
+    #查询数据
+    while True:
+        pQuote.query()
+        time.sleep(3)
+         
     print()

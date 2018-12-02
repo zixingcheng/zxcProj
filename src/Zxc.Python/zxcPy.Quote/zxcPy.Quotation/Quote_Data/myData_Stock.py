@@ -286,6 +286,20 @@ class Datas_Stock(myQuote_Data.Quote_Datas):
         return Data_CKDs_Stock(pData, self.interval_M)
     
     #其他统计接口
+    def setData_Statics(self, pData):
+        datas = pData.toValueList() 
+        pData_S = self.datas_Stics_D[0]
+        pData_S.start = pData.priceOpen
+         
+        pData_S.last = datas[1] 
+        pData_S.high = datas[2] 
+        pData_S.low = datas[3] 
+        pData_S.tradeVolume = datas[6] 
+        pData_S.tradeTurnover = datas[7] 
+        pData_S.average = pData_S.tradeTurnover / pData_S.tradeVolume  
+
+
+    #其他统计接口
     def dataStatics(self, minute = 5):
         #统计指定时间内数据
         dNow = self.datas_CKDs_M.data.lastPrice
