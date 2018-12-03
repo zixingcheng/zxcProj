@@ -290,6 +290,7 @@ class Datas_Stock(myQuote_Data.Quote_Datas):
         datas = pData.toValueList() 
         pData_S = self.datas_Stics_D[0]
         pData_S.start = pData.priceOpen
+        pData_S.base = pData.priceBase
          
         pData_S.last = datas[1] 
         pData_S.high = datas[2] 

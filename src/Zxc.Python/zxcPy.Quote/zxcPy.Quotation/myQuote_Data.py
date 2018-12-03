@@ -76,7 +76,8 @@ class Quote_Data:
 class Quote_Data_Static():
     def __init__(self): 
         self.seconds = 0                #时间间隔    
-        self.dtTime = datetime.datetime.now()           
+        self.dtTime = datetime.datetime.now()         
+        self.base = 0                   #基价(前收盘价)            
         self.start = 0                  #开盘              
         self.last = 0                   #收盘     
         self.high = 0                   #最高       
@@ -88,12 +89,13 @@ class Quote_Data_Static():
     #序列化--csv列头
     @staticmethod
     def csvHead():
-        head = "时间,间隔,开盘,收盘,最高,最低,平均,成交量,成交额"
+        head = "时间,间隔,基价,开盘,收盘,最高,最低,平均,成交量,成交额"
         return head
     #序列化--csv行信息
     def toCSVString(self):
         return '\n' + myData_Trans.Tran_ToDatetime_str(self.dtTime) \
             + ',' + str(self.seconds)  \
+            + ',' + str(self.base)  \
             + ',' + str(self.start)  \
             + ',' + str(self.last)  \
             + ',' + str(self.high)  \
@@ -109,13 +111,14 @@ class Quote_Data_Static():
             self.dtTime =  myData_Trans.Tran_ToDatetime(str(self.dtTime))
 
         self.seconds = lstValue[1]
-        self.start = lstValue[2]
-        self.last = lstValue[3]
-        self.high = lstValue[4]
-        self.low = lstValue[5]
-        self.average = lstValue[6]
-        self.tradeVolume = lstValue[7]
-        self.tradeTurnover = lstValue[8] 
+        self.base = lstValue[2]
+        self.start = lstValue[3]
+        self.last = lstValue[4]
+        self.high = lstValue[5]
+        self.low = lstValue[6]
+        self.average = lstValue[7]
+        self.tradeVolume = lstValue[8]
+        self.tradeTurnover = lstValue[9] 
 
 #数据对象--统计 
 class Quote_Data_CKD():
@@ -288,7 +291,7 @@ class Quote_Datas:
         #提取历史数据 
         strPath = strDir + "History.csv"
         pDt_csv = myIO_xlsx.DtTable()
-        pDt_csv.dataFieldType = ['datetime', 'int', 'float', 'float', 'float', 'float', 'float', 'float', 'float']
+        pDt_csv.dataFieldType = ['datetime', 'int', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float']
         pDt_csv.Load_csv(strPath, isUtf = True)
 
         pDtNow = datetime.datetime.now()

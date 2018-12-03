@@ -48,8 +48,8 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             
             #实例值对象
             value = copy.deepcopy(self.data)
-            value['max'] = pData_S.high / pData_S.start / 100
-            value['min'] = pData_S.low / pData_S.start / 100
+            value['max'] = pData_S.high / pData_S.base - 1
+            value['min'] = pData_S.low / pData_S.base - 1
             value['time'] = data.getTime()
             self.values[key] = value
             strTag_suffix = "."
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     import myListener_Printer, myListener_Hourly
 
     #示例数据监控(暂只支持单源，多源需要调整完善)
-    pQuote = mySource_Sina_Stock.Source_Sina_Stock('sh601939')
+    pQuote = mySource_Sina_Stock.Source_Sina_Stock('sh601069')
     pQuote.addListener(Quote_Listener_Rise_Fall_asInt())
     pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
     
