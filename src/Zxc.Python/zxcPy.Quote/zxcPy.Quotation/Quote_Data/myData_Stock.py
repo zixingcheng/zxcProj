@@ -234,47 +234,43 @@ class Data_Stock(myQuote_Data.Quote_Data):
         myDebug.Debug(self.toString())
 
 #行情数据对象--统计 
-class Data_CKD_Stock(myQuote_Data.Quote_Data_CKD):
+class Datas_M_Stock(myQuote_Data.Quote_Data_Statics_M):
     def __init__(self, tagTime, data = Data_Stock(), lastCKD = None, interval_M = -1): 
         super().__init__(tagTime, data, lastCKD, interval_M)
-        self.Valume = 0         #当前成交量
-        self.Turnover = 0       #当前成交额   
-        self.Price = 0          #成交均价  
-        self.Rise_Fall = 0      #当前涨跌幅
-
-        if(lastCKD == None):
-            datas = data.toValueList()
-            self.Valume_pre = datas[6]         #前一统计成交量_S
-            self.Turnover_pre = datas[7]       #前一统计成交额_S
-        else:
-            self.Valume_pre = lastCKD.Valume_pre + lastCKD.Valume        #前一统计成交量_S
-            self.Turnover_pre = lastCKD.Turnover_pre + lastCKD.Turnover  #前一统计成交额_S
-            self.Price = lastCKD.Price
-        self.setData(data)                     #设置数据
 
     #其他统计接口
     def setData_Statics(self, pData):
         datas = pData.toValueList()
-        self.last = datas[1]
-        self.Valume = datas[6] - self.Valume_pre
-        self.Turnover = datas[7] - self.Turnover_pre
-        self.Rise_Fall = pData.priceRiseFall  #涨跌幅
-        if(self.Valume > 0):
-            self.Price = self.Turnover / self.Valume
-        elif(self.Valume < 0):
-            a =0
+        self.dataS.tradeTurnover_End = datas[7] 
+        self.dataS.tradeVolume_End = datas[6]  
        
 #数据对象--统计集 
-class Data_CKDs_Stock(myQuote_Data.Quote_Data_CKDs):
+class Datas_D_Stock(myQuote_Data.Quote_Data_Statics_D):
     #依次：时间标签，初始值，统计间隔
-    def __init__(self, data = Data_Stock(), interval_M = -1): 
-        super().__init__(data, interval_M)
+    def __init__(self, data = Data_Stock(), interval_M = -1, bSetData = True): 
+        super().__init__(data, interval_M, bSetData)
         
     #初始统计对象 
-    def newDataCKD(self, tagTime, data):
-        pCDK = Data_CKD_Stock(tagTime, data, self.CKD, self.interval_M)
-        self.CKDs[tagTime] = pCDK
-        return pCDK
+    def newData_S(self, tagTime, data):
+        pData_S = Datas_M_Stock(tagTime, data, self.dataS_Min_Now, self.interval_M)  
+        return pData_S
+
+    #同步信息统计--天
+    def sameDataS_Day(self, pData):
+        datas = pData.toValueList()  
+        self.dataS_Day.dtTime = pData.getTime()
+        self.dataS_Day.start = pData.priceOpen
+        self.dataS_Day.base = pData.priceBase
+         
+        self.dataS_Day.last = datas[1] 
+        self.dataS_Day.high = datas[2] 
+        self.dataS_Day.low = datas[3] 
+        self.dataS_Day.tradeVolume = datas[6] 
+        self.dataS_Day.tradeTurnover = datas[7] 
+        self.dataS_Day.tradeVolume_End = datas[6] 
+        self.dataS_Day.tradeTurnover_End = datas[7] 
+        self.dataS_Day.average = self.dataS_Day.tradeTurnover / self.dataS_Day.tradeVolume  
+         
 
 #行情数据对象集
 class Datas_Stock(myQuote_Data.Quote_Datas):
@@ -282,24 +278,9 @@ class Datas_Stock(myQuote_Data.Quote_Datas):
         super().__init__(pData, interval)
         
     #初始统计对象 
-    def newData_CKDs(self, pData):
-        return Data_CKDs_Stock(pData, self.interval_M)
+    def newData_S(self, pData):
+        return Datas_D_Stock(pData, self.interval_M, False)
     
-    #其他统计接口
-    def setData_Statics(self, pData):
-        datas = pData.toValueList() 
-        pData_S = self.datas_Stics_D[0]
-        pData_S.start = pData.priceOpen
-        pData_S.base = pData.priceBase
-         
-        pData_S.last = datas[1] 
-        pData_S.high = datas[2] 
-        pData_S.low = datas[3] 
-        pData_S.tradeVolume = datas[6] 
-        pData_S.tradeTurnover = datas[7] 
-        pData_S.average = pData_S.tradeTurnover / pData_S.tradeVolume  
-
-
     #其他统计接口
     def dataStatics(self, minute = 5):
         #统计指定时间内数据

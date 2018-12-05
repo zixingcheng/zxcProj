@@ -27,6 +27,7 @@ class Quote_Source:
         self.datasNow = None
         self.listeners = []
         self.interval_M = 1       #分钟级间隔
+
         self._initSetting()       #初始设置
         self.isClosed = False     #是否关闭
         self.setTime()            #设置(时效) 

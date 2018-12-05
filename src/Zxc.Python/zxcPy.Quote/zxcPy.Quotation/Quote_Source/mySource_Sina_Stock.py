@@ -96,11 +96,12 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
 if __name__ == "__main__":
     # sh000001,sh601939,sh601288,sh600919,sh600718
     # sz399001,sz399006,sz300523,sz300512,sz300144,sz300036,sz002410,sz002024
-    stockids = 'sh601288'
+    stockids = 'hk002379'
+    stockids = 'sh600060'
     s = Source_Sina_Stock(stockids)
     
     while True:
-        s.query()
+        s.query() 
         time.sleep(3)
 
 
