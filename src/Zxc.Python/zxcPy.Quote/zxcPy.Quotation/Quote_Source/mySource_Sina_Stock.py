@@ -81,8 +81,12 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
             
             #设置数据
             qd.value = myData_Trans.To_Float(qd.lastPrice)
-            pDatas = self.setData(qd)
-            if(pDatas != None): nResult += 1
+            try:
+                pDatas = self.setData(qd)
+                if(pDatas != None): nResult += 1
+            except Exception as e:
+                #Error(e)
+                pass
         if(nResult > 0): print("")
             
     #生成数据对象

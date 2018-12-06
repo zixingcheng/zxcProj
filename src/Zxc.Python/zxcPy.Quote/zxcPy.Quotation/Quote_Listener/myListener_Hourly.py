@@ -30,7 +30,7 @@ class Quote_Listener_Hourly(myQuote_Listener.Quote_Listener):
         dtNow = quoteDatas.data.getTime()
         if(dtNow.minute == 0 or dtNow.minute == 30):
             #提取值
-            dValue_N = quoteDatas.datas_CKDs_M.CKD.Rise_Fall    #当前值
+            dValue_N = quoteDatas.datasS_M.dataS_Min_Now.dataS.getRise_Fall(0)  #当前涨跌幅
             key = quoteDatas.name
 
             #判断是否已经记录

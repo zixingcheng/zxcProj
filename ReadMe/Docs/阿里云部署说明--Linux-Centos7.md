@@ -380,6 +380,10 @@ crontabs软件包是用来安装、卸装、或列举用来驱动 cron 守护进
 
 ### 自写定时任务 
 
+	每周一，周四 00点 时执行命令（重启动）。
+	00 0 * * 1,4 reboot 
+	
+	
 	每周一到周五 的9-15点 的每5分钟 时执行命令（启动脚本-行情监测）。
 	25-59/2 9-15 * * 1-5 sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
 	*/3 10-15 * * 1-5 sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
@@ -392,6 +396,7 @@ crontabs软件包是用来安装、卸装、或列举用来驱动 cron 守护进
 	
 	命令： crontab -e
 	*/1 8-23 * * * python /root/Public/UpLoad/Temp/hello.py
+
 
 ### 脚本启动
 

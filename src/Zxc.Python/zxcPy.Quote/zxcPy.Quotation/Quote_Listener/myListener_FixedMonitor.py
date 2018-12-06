@@ -23,7 +23,7 @@ class myListener_Fixed():
         self.monitorType = 1                #正数为超过，负数为低于
         self.monitorValueMax = -9999        #监测到的最大值
         self.monitorValueMin = 9999         #监测到的最小值
-        self.poundage = 0.005               #手续费修正值 
+        self.poundage = 0.0018              #手续费修正值(万三，实际双向为0.16%，考虑最小交易手续费，默认为0.18%)
         self.tradeNum = nNum                #交易数量
         self.tradeTime = time               #交易时间
         self.lastValue = -9999              #上次监控价格
@@ -136,8 +136,10 @@ class myListener_Fixed():
         if(strReturn == ""): return  strReturn
 
         #详情信息
-        self.lastValue = round((value + self.poundage + 1) * self.monitorValue_Base, 2)     #实际价格               
-        strReturn += "\n" + strSufixPre + "交易量价: " +  str(round(self.tradeNum, 0)) + "股, " + str(self.monitorValue_Base) + "元.\n" + strSufixPre + "交易时间: " + self.tradeTime + "."
+        self.lastValue = round((value + self.poundage + 1) * self.monitorValue_Base, 2)     #实际价格   
+        if(self.tradeNum > 0):
+            strReturn += "\n" + strSufixPre + "交易量价: " +  str(round(self.tradeNum, 0)) + "股, " + str(self.monitorValue_Base) + "元.\n" + strSufixPre + "交易时间: " + self.tradeTime + "."
+        strReturn += "\n交易建议：" 
         strReturn += "\n" + strSufixPre + strSuggest2
         strReturn += "\n" + strSufixPre + strSuggest
         return strReturn
@@ -188,7 +190,7 @@ class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
         if(self.IsEnable(quoteDatas)== False): return
         
         #提取值
-        dValue_N = quoteDatas.datas_CKDs_M.data.value       #当前价格
+        dValue_N = quoteDatas.datasS_M.data.value       #当前价格
         key = quoteDatas.name
 
         #处理
@@ -232,8 +234,8 @@ if __name__ == "__main__":
     #pListener._addMonitor(key, myListener_Fixed(11.8, 11.5, 1000, "2018-08-19"))
     #pListener._addMonitor(key, myListener_Fixed(10.8, 0.03, 1000, "2018-08-19"))
     #pListener._addMonitor(key, myListener_Fixed(11.8, -0.04, 1000, "2018-08-19"))
-    pListener._addMonitor(key, myListener_Fixed(5.36, -0.01, 1000, "2018-08-19"))
-    pListener._addMonitor(key, myListener_Fixed(5.33, 0.01, 1000, "2018-08-19"))
+    pListener._addMonitor(key, myListener_Fixed(5.36, -0.04, 0, "2018-08-19"))
+    pListener._addMonitor(key, myListener_Fixed(5.33, 0.06, 0, "2018-08-19"))
 
     #查询数据
     while True:

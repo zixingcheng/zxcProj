@@ -174,8 +174,29 @@ class Quote_Data_Static():
         #self.tradeVolume_End = pData_S.tradeVolume_End 
         self.tradeTurnover = self.tradeTurnover_End - self.tradeTurnover_Start
         self.tradeVolume = self.tradeVolume_End - self.tradeVolume_Start
-        self.average = self.tradeTurnover / self.tradeVolume
+        if(self.tradeVolume != 0):
+            self.average = self.tradeTurnover / self.tradeVolume
+        else:
+            self.average = self.last
         return True
+    #提取涨跌幅（）
+    def getRise_Fall(self, nType = 0): 
+        dValue = 0
+        if(nType == 0):
+            dValue = self.last
+        elif(nType == 1):
+            dValue = self.high
+        elif(nType == 2):
+            dValue = self.low
+        else:
+            dValue = self.average
+
+        #计算 
+        if(self.base != 0):
+           dRise_Fall = dValue / self.base - 1
+        else:
+            dRise_Fall = 0
+        return dRise_Fall
 
 #数据对象--统计 
 class Quote_Data_Statics_M():
@@ -223,7 +244,10 @@ class Quote_Data_Statics_M():
 
         #更新统计信息
         self.setData_Statics(pData)
-        self.dataS.setData_Static(pData.value, self.dataS_Last.dataS)  
+        if(self.dataS_Last != None):
+            self.dataS.setData_Static(pData.value, self.dataS_Last.dataS)  
+        else:
+            self.dataS.setData_Static(pData.value, None)  
 
         #记录值
         self.setValues(time, pData.toValueList()) 

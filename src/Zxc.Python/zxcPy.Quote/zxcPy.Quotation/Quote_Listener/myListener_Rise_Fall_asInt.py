@@ -30,11 +30,11 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
         if(self.IsEnable(quoteDatas)== False): return
         
         #提取值
-        dValue_N = quoteDatas.datas_CKDs_M.CKD.Rise_Fall    #当前涨跌幅
+        dValue_N = quoteDatas.datasS_M.dataS_Min_Now.dataS.getRise_Fall(0)  #当前涨跌幅
         key = quoteDatas.name
 
         #通知处理
-        strMsg = self.DoRecvQuote(dValue_N, key, quoteDatas.datas_CKDs_M.data, quoteDatas.setting.isIndex)
+        strMsg = self.DoRecvQuote(dValue_N, key, quoteDatas.datasS_M.data, quoteDatas.setting.isIndex)
         if(strMsg != ""):
             self.OnHandleMsg(quoteDatas, strMsg)
     def DoRecvQuote(self, dValue_N, key, data, bIndex): 
@@ -43,7 +43,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
         nTim_M = -1
         if(value == None):
             #提取当前统计对象
-            pDatas_S = gol._Get_Value('datas_Stics_D_' + data.id, None)    #全局统计信息
+            pDatas_S = gol._Get_Value('datas_Stics_D_' + data.id, None)     #全局统计信息
             pData_S = pDatas_S[0]
             
             #实例值对象
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     import myListener_Printer, myListener_Hourly
 
     #示例数据监控(暂只支持单源，多源需要调整完善)
-    pQuote = mySource_Sina_Stock.Source_Sina_Stock('sh601069')
+    pQuote = mySource_Sina_Stock.Source_Sina_Stock('sh600060')
     pQuote.addListener(Quote_Listener_Rise_Fall_asInt())
     pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
     
