@@ -178,6 +178,8 @@ class Quote_Data_Static():
             self.average = self.tradeTurnover / self.tradeVolume
         else:
             self.average = self.last
+        if(self.tradeVolume < 0 or self.tradeVolume < 0):
+            aa = 0
         return True
     #提取涨跌幅（）
     def getRise_Fall(self, nType = 0): 
@@ -267,6 +269,7 @@ class Quote_Data_Statics_D():
         self.interval_M = interval_M            #分钟级间隔 
         self.name = data.name                   #标识名
         self.data = data
+        self.pathData = ""
         
         #初始统计信息 
         if(self.dataS_Day != None):
@@ -299,6 +302,8 @@ class Quote_Data_Statics_D():
         if(self.dataS_Min_Now == None or self.dataS_Min_Now.checkTimeRange(time, pData) == False):
             #过时间段，重新生成统计对象
             pData_S = self.newData_S(pData.getTime(True), pData)
+            self.saveData_stream("", self.dataS_Min_Now)    #保存统计数据
+
             self.dataS_Min_Now = pData_S
             self.datasS_Min.append(self.dataS_Min_Now)  
         else:
@@ -312,6 +317,7 @@ class Quote_Data_Statics_D():
     #载入数据
     def loadData(self, strPath = ""):
         #提取分钟数据 
+        if(strPath == ""): strPath = self.pathData 
         pDt_csv = myIO_xlsx.DtTable()
         pDt_csv.dataFieldType = Quote_Data_Static().csvFiled_Type()
         pDt_csv.Load_csv(strPath, isUtf = True)
@@ -328,12 +334,26 @@ class Quote_Data_Statics_D():
     #保存数据
     def saveData(self, strPath = ""):
         #保存历史数据  
+        if(strPath == ""): strPath = self.pathData 
         myIO.Save_File(strPath, self.dataS_Min_Now.dataS.csvHead(), True, False)
         
         #文件追加数据内容
         with open(strPath, 'a+') as f:
             for x in self.datasS_Min: 
                 f.write(x.dataS.toCSVString()) 
+        return True 
+    #保存数据(分段)--单个数据追加
+    def saveData_stream(self, strPath = "", pData_S = None): 
+        #保存历史数据  
+        if(pData_S == None): return False
+        if(strPath == ""): strPath = self.pathData 
+        if(len(self.datasS_Min) < 5): 
+            self.saveData(strPath)
+            return 
+        
+        #文件追加数据内容
+        with open(strPath, 'a+') as f:
+            f.write(pData_S.dataS.toCSVString()) 
         return True 
 
 
@@ -411,7 +431,8 @@ class Quote_Datas:
 
         #载入当天分钟数据集
         self.datasS_M = self.newData_S(self.data)       #只初始
-        self.datasS_M.loadData(self.dir + self.fileName + "_M.csv")
+        self.datasS_M.pathData = self.dir + self.fileName + "_M.csv"
+        self.datasS_M.loadData("")
         return True
     #提取用户买入信息
     def queryTrade(self, usrName):
@@ -437,7 +458,7 @@ class Quote_Datas:
                 f.write(x.toCSVString()) 
                 
         #保存当天分钟数据集
-        self.datasS_M.saveData(self.dir + self.fileName + "_M.csv")
+        self.datasS_M.saveData()
 
     #保存数据(分段)--单个数据追加
     def saveData_stream(self, file = "", pData = None):
@@ -447,7 +468,7 @@ class Quote_Datas:
 
         #文件头写入 
         if(file == ""): file = self.dir + self.fileName + ".csv"
-        if(len(self.datas) <= 1): 
+        if(len(self.datasS_M.datasS_Min) <= 1): 
             myIO.Save_File(file, pData.csvHead(), True, False)
 
         #文件追加数据内容

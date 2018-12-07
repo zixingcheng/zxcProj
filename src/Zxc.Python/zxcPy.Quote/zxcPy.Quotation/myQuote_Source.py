@@ -106,7 +106,7 @@ class Quote_Source:
                 self.timeIntervals += 1
             return True
         elif(self.timeIntervals == 0 and self.endTime < tNow):
-            self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 13:00:00")      #起始时间
+            self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 13:00:00")     #起始时间
             self.endTime = self.endTime2                                                #结束时间
             self.timeIntervals += 1
             if(self.datasNow != None): 

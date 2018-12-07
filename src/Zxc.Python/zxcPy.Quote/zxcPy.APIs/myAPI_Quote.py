@@ -88,6 +88,7 @@ def thrd_Moniter_API_Quote():
     time.sleep(10)                  #延时等待
     pSource = init_Quote()
     while(pSource.isClosed == False):
+        myDebug.Debug(myData_Trans.Tran_ToDatetime_str())
         time.sleep(120)             #延时等待
         myQuote_Source.mainStart()  #检查启动行情进程
 
