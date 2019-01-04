@@ -58,10 +58,11 @@ class myData_Trade():
         pBills = self.billManager._Find("Stock_" + self.usrID, True)    
 
         #装载账单记录
+        nInd = 0
         for dtRow in dtDB.dataMat:
             #区分类型，部分类型屏蔽
             strType = dtRow[lstFields_ind["交易类别"]] 
-            if(strType.count('买入') == 1):
+            if(strType.count('买入') == 1 or strType.count('配售缴款') == 1):
                 strType = '买入'
             elif(strType.count('卖出') == 1):
                 strType = '卖出'
@@ -84,14 +85,23 @@ class myData_Trade():
             bill.tradeNum = int(dtRow[lstFields_ind["成交数量"]])
             bill.tradeMoney = float(dtRow[lstFields_ind["成交金额"]])
             bill.tradePoundage = float(dtRow[lstFields_ind["费用合计"]]) 
-            bill.tradeTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["交收日期"]], "%Y%m%d")
-              
-            if(bill.usrBillType == "卖出" and bill.tradeTarget == "宋城演艺"):
+            bill.tradeTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["交收日期"]], "%Y%m%d") + datetime.timedelta(minutes=nInd)
+            nInd = nInd + 1
+
+            #部分特殊类型名称转换
+            if(bill.usrBillType == "卖出"):
+                if(bill.tradeTarget.count("转债") == 1):
+                    bill.tradeTarget = bill.tradeTarget.replace("转债", "发债")
+            if(bill.tradeTarget.count("发债") == 1): bill.tradeTypeTarget = "可转债"
+
+            #@@Test  
+            if(bill.usrBillType == "卖出" and bill.tradeTarget == "航电发债"):
                 aa =1
+
             #添加账单信息
-            pBills._Add(bill)
+            strReturn = pBills._Add(bill)
+            myDebug.Print(strReturn)
     
-         
 
 #主启动程序
 if __name__ == "__main__":

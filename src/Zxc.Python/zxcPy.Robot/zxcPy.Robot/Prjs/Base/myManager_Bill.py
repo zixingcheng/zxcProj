@@ -214,11 +214,11 @@ class myObj_Bill():
         if(not self.usrBillType in myBileType): return False
         if(not self.tradeType in myTradeType): return False 
         return True
-    def IsSame(self, bill, days = 3): 
+    def IsSame(self, bill, seconds = 1): 
         if(bill.usrBillType == self.usrBillType and bill.tradeType == self.tradeType):
             if(bill.tradeTarget == self.tradeTarget and self.tradeParty == bill.tradeParty):
-                nDays = myData.iif(bill.tradeTime > self.tradeTime, (bill.tradeTime - self.tradeTime).days, (self.tradeTime - bill.tradeTime).days)
-                if(nDays < days):         #n天内算相同
+                nSeconds = myData.iif(bill.tradeTime > self.tradeTime, (bill.tradeTime - self.tradeTime).seconds, (self.tradeTime - bill.tradeTime).seconds)
+                if(nSeconds < seconds):         #n天内算相同
                     if(self.isDel == bill.isDel):
                         if(self.remark != "" and self.remark == bill.remark):   #remark相同则默认相同(慎用)
                             return True 
@@ -340,17 +340,19 @@ class myObj_Bills():
                     dSum -= x.tradeNum
                 elif(x.tradeNum_Stock < bill.tradeNum):           #小于，单一不够，拆分卖出
                     bill_New = copy.copy(bill)
-                    bill_New.tradeNum = bill.tradeNum - x.tradeNum_Stock                        #拆分不够部分为新记录
-                    bill_New.tradeMoney = bill.tradeMoney * (bill_New.tradeNum / bill.tradeNum) #拆分总价
-                    bill_New.tradePoundage = bill.tradePoundage * (bill_New.tradeNum / bill.tradeNum) #拆分手续费
-                    bill_New.remark += "@@" + str(bill.tradeID)                                 #调整remark，避免无法插入
-                    bill.tradeNum = bill.tradeNum - bill_New.tradeNum                           #修改原始数量为当前卖出数量
-                    bill.tradeMoney = bill.tradeMoney - bill_New.tradeMoney                     #修改原始总价
-                    bill.tradePoundage = bill.tradePoundage - bill_New.tradePoundage            #修改手续费
+                    bill_New.tradeNum = bill.tradeNum - x.tradeNum_Stock                #拆分不够部分为新记录
+                    nRatio = bill_New.tradeNum / bill.tradeNum
+                    bill_New.tradeMoney = bill.tradeMoney * nRatio                      #拆分总价
+                    bill_New.tradePoundage = bill.tradePoundage * nRatio                #拆分手续费
+                    bill_New.remark += "@@" + str(bill.tradeID)                         #调整remark，避免无法插入
+                    bill_New.tradeTime = bill_New.tradeTime + datetime.timedelta(minutes=100)
+                    bill.tradeNum = bill.tradeNum - bill_New.tradeNum                   #修改原始数量为当前卖出数量
+                    bill.tradeMoney = bill.tradeMoney - bill_New.tradeMoney             #修改原始总价
+                    bill.tradePoundage = bill.tradePoundage - bill_New.tradePoundage    #修改手续费
 
                     x.tradeID_Relation = myData.iif(x.tradeID_Relation == "", str(bill.tradeID), str(x.tradeID_Relation) + "、" + str(bill.tradeID))
                     bill.tradeID_Relation = str(x.tradeID)
-                    bill.tradeProfit = bill.tradeMoney - bill.tradePoundage - (x.tradeMoney + x.tradePoundage) * (1 - x.tradeNum_Stock / x.tradeNum)  
+                    bill.tradeProfit = bill.tradeMoney - bill.tradePoundage - (x.tradeMoney + x.tradePoundage) 
                     bill.tradeProfit = round(bill.tradeProfit, 2)
                     x.tradeNum_Stock = 0  
                     self._Add(bill_New, False)              #添加拆分项
