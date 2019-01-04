@@ -45,7 +45,7 @@ class myObj_Bill():
         self.tradeTarget = ""       #交易内容
         self.tradePrice = 0         #交易单价
         self.tradeNum = 1           #交易数量
-        self.tradeNum_Stock = 1     #交易数量(当前库存，买入有效)
+        self.tradeNum_Stock = 0    #交易数量(当前库存，买入有效)
         self.tradeMoney = 0         #交易金额
         self.tradePoundage = 0      #交易手续费
         self.tradeProfit = 0        #交易收益
@@ -294,6 +294,12 @@ class myObj_Bills():
         #添加(记录索引)
         bill.tradeID = self._Get_ID()
         self.usrDB[bill.tradeID] = bill 
+        if(bill.recordTime == "" or bill.recordTime == None):
+            bill.recordTime = datetime.datetime.now()
+          
+        #校正存量
+        if(bill.usrBillType == myBileType.买入):
+            bill.tradeNum_Stock = bill.tradeNum
 
         #取ID号(usrTime排序)
         bAppend = True
@@ -329,20 +335,22 @@ class myObj_Bills():
                     x.tradeNum_Stock = x.tradeNum_Stock - bill.tradeNum   
                     x.tradeID_Relation = myData.iif(x.tradeID_Relation == "", str(bill.tradeID), str(x.tradeID_Relation) + "、" + str(bill.tradeID))
                     bill.tradeID_Relation = str(x.tradeID)
-                    bill.tradeProfit = bill.tradeMoney - x.tradeMoney * (1 - x.tradeNum_Stock / x.tradeNum)  
+                    bill.tradeProfit = bill.tradeMoney - bill.tradePoundage - (x.tradeMoney + x.tradePoundage) * (1 - x.tradeNum_Stock / x.tradeNum)  
                     bill.tradeProfit = round(bill.tradeProfit, 2)
                     dSum -= x.tradeNum
                 elif(x.tradeNum_Stock < bill.tradeNum):           #小于，单一不够，拆分卖出
                     bill_New = copy.copy(bill)
                     bill_New.tradeNum = bill.tradeNum - x.tradeNum_Stock                        #拆分不够部分为新记录
                     bill_New.tradeMoney = bill.tradeMoney * (bill_New.tradeNum / bill.tradeNum) #拆分总价
+                    bill_New.tradePoundage = bill.tradePoundage * (bill_New.tradeNum / bill.tradeNum) #拆分手续费
                     bill_New.remark += "@@" + str(bill.tradeID)                                 #调整remark，避免无法插入
                     bill.tradeNum = bill.tradeNum - bill_New.tradeNum                           #修改原始数量为当前卖出数量
                     bill.tradeMoney = bill.tradeMoney - bill_New.tradeMoney                     #修改原始总价
+                    bill.tradePoundage = bill.tradePoundage - bill_New.tradePoundage            #修改手续费
 
                     x.tradeID_Relation = myData.iif(x.tradeID_Relation == "", str(bill.tradeID), str(x.tradeID_Relation) + "、" + str(bill.tradeID))
                     bill.tradeID_Relation = str(x.tradeID)
-                    bill.tradeProfit = bill.tradeMoney - x.tradeMoney * (x.tradeNum_Stock / x.tradeNum)  
+                    bill.tradeProfit = bill.tradeMoney - bill.tradePoundage - (x.tradeMoney + x.tradePoundage) * (1 - x.tradeNum_Stock / x.tradeNum)  
                     bill.tradeProfit = round(bill.tradeProfit, 2)
                     x.tradeNum_Stock = 0  
                     self._Add(bill_New, False)              #添加拆分项
@@ -350,10 +358,10 @@ class myObj_Bills():
                     bill = bill_New 
 
         #保存--排序
-        if(bAppend == False):
+        if(bAppend == False or len(self.usrDB) == 1):
             self.Save_DB()
         else:
-            self.dtDB.Save_csv_append(self.pathData, bill.ToList())   
+            self.dtDB.Save_csv_append(self.pathData, bill.ToList(), True, row_end = len(self.usrDB)-1 )   
         return "添加成功，账单信息如下：\n" + bill.ToString(4)
      
     def Query(self, startTime = '', endTime = '', nMonth = 1, tradeParty = '', usrBillType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = "", exceptDeault = False, exceptBillTypes = [], exceptTradeTypes = [], bNoRelation = False): 

@@ -178,10 +178,10 @@ class DtTable:
         strPath = strDir + "/" + fileName + ".csv"
         myIO.Save_File(strPath, strLines, isUtf, False)
         return True     #保存数据 
-    def Save_csv_append(self, file, pValues = [], isUtf = False, col_start = 0, symbol = ",", col_end = -1, bSave_AsStr = True):   
+    def Save_csv_append(self, file, pValues = [], isUtf = False, col_start = 0, symbol = ",", row_end = -1, col_end = -1, bSave_AsStr = True):   
         # 写入字段
         strLines = ""
-        nRows = self._Rows(-1)
+        nRows = self._Rows(row_end)
         nCols = self._Cloumns(col_end) 
         if(nRows == 0):
             for j in range(col_start, nCols):
