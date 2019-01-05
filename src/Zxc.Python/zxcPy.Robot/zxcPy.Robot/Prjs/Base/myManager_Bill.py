@@ -16,7 +16,7 @@ import myEnum, myIO, myIO_xlsx, myData, myData_Trans, myDebug
 
 
 #定义账单类型枚举
-myBileType = myEnum.enum('买入', '卖出', '受赠', '赠予', '分红')
+myBileType = myEnum.enum('买入', '卖出', '受赠', '赠予', '分红', '转账')
 #myTradeType = myEnum.enum('购物', '买菜', '买衣服', '投资', '红包', '投资回笼')
 myTradeType = myEnum.enum('投资', '居家', '日用品', '衣服', '餐饮', '交通', '烟酒', '零食', '通讯', '娱乐', '旅游', '人际', '水费', '电费', '燃气', '取暖', '房租', '医疗', '教育', '健身', '美容', '装修')
 myTradeType_居家_蔬菜 = ['蔬菜', '菜']
@@ -25,7 +25,7 @@ myTradeType_居家_海鲜 = ["螃蟹", "小龙虾", "虾", "花蛤", "竹蛏"]
 myTradeType_居家_调料 = ['油', '盐', '调料']
 myTradeType_居家_主食 = ['米', '面粉', '面条']
 myTradeType_居家 = [] + myTradeType_居家_蔬菜 + myTradeType_居家_肉类 + myTradeType_居家_海鲜 + myTradeType_居家_调料 + myTradeType_居家_主食
-myTradeType_投资 = ['定期', '股票', '基金', '可转债', '理财']
+myTradeType_投资 = ['活期', '定期', '股票', '基金', '可转债', '国债逆回购', '理财', '转入', '转出']
 myTradeType_双向 = ['投资']
 
 
@@ -129,7 +129,7 @@ class myObj_Bill():
             elif(tradeTarget in myTradeType_居家_主食):
                 self.tradeTypeTarget = "主食"
 
-        elif(tradeType.count("分红") == 1):
+        elif(tradeType.count("分红") == 1 or tradeType.count("利息") == 1):
             self.usrBillType = myBileType.分红
             self.tradeType = myTradeType.投资 
             self.tradeTypeTarget = tradeTarget.replace("分红", "")
@@ -217,7 +217,8 @@ class myObj_Bill():
     def IsSame(self, bill, seconds = 1): 
         if(bill.usrBillType == self.usrBillType and bill.tradeType == self.tradeType):
             if(bill.tradeTarget == self.tradeTarget and self.tradeParty == bill.tradeParty):
-                nSeconds = myData.iif(bill.tradeTime > self.tradeTime, (bill.tradeTime - self.tradeTime).seconds, (self.tradeTime - bill.tradeTime).seconds)
+                timeDelta = myData.iif(bill.tradeTime > self.tradeTime, bill.tradeTime - self.tradeTime, self.tradeTime - bill.tradeTime)
+                nSeconds = timeDelta.days * 3600 * 24 + timeDelta.seconds
                 if(nSeconds < seconds):         #n天内算相同
                     if(self.isDel == bill.isDel):
                         if(self.remark != "" and self.remark == bill.remark):   #remark相同则默认相同(慎用)
@@ -298,23 +299,25 @@ class myObj_Bills():
             bill.recordTime = datetime.datetime.now()
           
         #校正存量
+        bAppend = True
         if(bill.usrBillType == myBileType.买入):
             bill.tradeNum_Stock = bill.tradeNum
-
+            
         #取ID号(usrTime排序)
-        bAppend = True
         nID = self._Find_ind(bill.tradeTime)
         if(nID < len(self.indLst)):             #索引最后一个序号
             bAppend = False 
         self.indLst.insert(nID, bill.tradeID)   #记录索引
 
+
         #关联编号处理(投资卖出) 
         if(bCheck and bill.usrBillType == myBileType.卖出 and bill.tradeType in myTradeType_双向):
             bills_Last = []
+            startTime = self._Trans_Time_moth(bill.tradeTime, 36) 
             if(bill.tradeID_Relation != ""):
                 bill_Last = self._Find(int(bill.tradeID_Relation))
                 if(bill_Last != None and bill_Last.tradeNum_Stock < bill.tradeNum):             #数量不足查询剩余
-                    lstValues = self.Query("", bill.tradeTime, 36, bill.tradeParty, myBileType.买入, bill.tradeTarget, bill.tradeType, bill.tradeTypeTarget)
+                    lstValues = self.Query(startTime, bill.tradeTime, 0, bill.tradeParty, myBileType.买入, bill.tradeTarget, bill.tradeType, bill.tradeTypeTarget)
                     bills_Last = sorted(lstValues[0], key=lambda myObj_Bill: myObj_Bill.tradePrice, reverse=True)   # sort by usrMoney
                 
                 #移除相同
@@ -323,13 +326,14 @@ class myObj_Bills():
                 if(bill_Last.tradeNum_Stock > 0):
                     bills_Last.insert(0, bill_Last)         #查询项置首
             else:
-                lstValues = self.Query("", bill.tradeTime, 36, bill.tradeParty, myBileType.买入, bill.tradeTarget, bill.tradeType, bill.tradeTypeTarget)
+                lstValues = self.Query(startTime, bill.tradeTime, 36, bill.tradeParty, myBileType.买入, bill.tradeTarget, bill.tradeType, bill.tradeTypeTarget)
                 bills_Last = sorted(lstValues[0], key=lambda myObj_Bill: myObj_Bill.tradePrice, reverse=True)   # sort by usrMoney
 
             #循环处置
             dSum = bill.tradeNum
             for x in bills_Last:
                 if(dSum <= 0): break
+                if(x.tradeNum_Stock <= 0): continue
                 bAppend = False
                 if(x.tradeNum_Stock >= bill.tradeNum):            #相等，一对一
                     x.tradeNum_Stock = x.tradeNum_Stock - bill.tradeNum   
@@ -345,7 +349,7 @@ class myObj_Bills():
                     bill_New.tradeMoney = bill.tradeMoney * nRatio                      #拆分总价
                     bill_New.tradePoundage = bill.tradePoundage * nRatio                #拆分手续费
                     bill_New.remark += "@@" + str(bill.tradeID)                         #调整remark，避免无法插入
-                    bill_New.tradeTime = bill_New.tradeTime + datetime.timedelta(minutes=100)
+                    bill_New.tradeTime = bill_New.tradeTime + datetime.timedelta(seconds=1)
                     bill.tradeNum = bill.tradeNum - bill_New.tradeNum                   #修改原始数量为当前卖出数量
                     bill.tradeMoney = bill.tradeMoney - bill_New.tradeMoney             #修改原始总价
                     bill.tradePoundage = bill.tradePoundage - bill_New.tradePoundage    #修改手续费
@@ -358,6 +362,10 @@ class myObj_Bills():
                     self._Add(bill_New, False)              #添加拆分项
                     dSum -= bill.tradeNum
                     bill = bill_New 
+            if(dSum > 0):
+                self.usrDB.pop(bill.tradeID)                #删除记录
+                self.indLst.pop(nID)                        #删除索引记录
+                return "账单信息无该项买入记录，无法登记。"
 
         #保存--排序
         if(bAppend == False or len(self.usrDB) == 1):
@@ -395,6 +403,8 @@ class myObj_Bills():
         return lstBill, startTime, endTime 
     def Static(self, startTime = '', endTime = '', nMonth = 1, tradeParty = '', usrBillType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = ""): 
         if(tradeType != ""):
+            if(type(startTime) == str and startTime != ""): startTime = myData_Trans.Tran_ToDatetime(startTime, "%Y-%m-%d")
+            if(type(endTime) == str and endTime != ""): endTime = myData_Trans.Tran_ToDatetime(endTime, "%Y-%m-%d")
             lstBill, startTime, endTime  = self.Query(startTime, endTime, nMonth, tradeParty, usrBillType, tradeTarget, tradeType, tradeTypeTarget)
         else:
             #单独查询投资所有
@@ -426,6 +436,8 @@ class myObj_Bills():
             lstCount_TypeTarget[x.tradeTarget] = dSum                           #子类累加
             lstCount_Type["SUM"] = lstCount_Type.get("SUM", 0) + x.tradeMoney   #金额累加
             lstCount_Bill["SUM"] = lstCount_Bill.get("SUM", 0) + x.tradeMoney   #金额累加-账单类型
+            lstCount_Type["SUM_Poundage"] = lstCount_Type.get("SUM_Poundage", 0) + x.tradePoundage   #金额累加-手续费 
+            lstCount_Bill["SUM_Poundage"] = lstCount_Bill.get("SUM_Poundage", 0) + x.tradePoundage   #金额累加-手续费-账单类型
 
             #投资卖出，需找到买入
             if(x.usrBillType == myBileType.卖出 and x.tradeType == myTradeType.投资):
@@ -442,28 +454,35 @@ class myObj_Bills():
                             if(xx.tradeID == bill.tradeID):
                                 bExist = True
                                 break
-                        if(bExist == False): lstBill.append(bill)
+                        if(bExist == False): 
+                            lstBill.append(bill)
 
         #累加（自下向上）
+        dSum_In_投资总计 = 0
         dSum_In_投资 = lstCount[myBileType.买入][myTradeType.投资].get("SUM", 0)       
         dSum_Out_投资 = lstCount[myBileType.卖出][myTradeType.投资].get("SUM", 0) 
         dSum_收益 = lstCount[myBileType.卖出].get("SUM_Profit", 0)
         dSum_红包 = lstCount[myBileType.受赠][myTradeType.人际].get("SUM", 0)
-        dSum_In = lstCount[myBileType.卖出].get("SUM", 0) + lstCount[myBileType.受赠].get("SUM", 0) + lstCount[myBileType.分红].get("SUM", 0) - dSum_Out_投资 + dSum_收益
-        dSum_Out = lstCount[myBileType.买入].get("SUM", 0) + lstCount[myBileType.赠予].get("SUM", 0) + lstCount[myBileType.分红].get("SUM", 0) - dSum_In_投资
-
+        dSum_消费 = lstCount[myBileType.买入].get("SUM", 0) - dSum_In_投资
+        dSum_收入 = lstCount[myBileType.卖出].get("SUM", 0) - dSum_Out_投资 
+        dSum_In = dSum_收入 + lstCount[myBileType.受赠].get("SUM", 0) + lstCount[myBileType.分红].get("SUM", 0) + dSum_收益
+        dSum_Out = dSum_消费 + lstCount[myBileType.赠予].get("SUM", 0)  
+        dSum_ALL = dSum_In - dSum_Out + lstCount[myBileType.转账].get("SUM", 0)
         
         #输出信息
         strPerfix = "\n" + " " * 4
         strOut = "账单统计(" + self.usrID + ")："
-        strOut += "\n" + "总资产：" + str(round(dSum_In - dSum_Out, 2)) + "元"
+        strOut += "\n" + "总资产：" + str(round(dSum_ALL, 2)) + "元"
         if(dSum_红包 > 0):
             strOut += strPerfix + "红包收入：" + str(round(dSum_红包, 2)) + "元"
         if(dSum_Out_投资 > 0):
+            dSum_手续费 = lstCount[myBileType.买入].get("SUM_Poundage", 0) + lstCount[myBileType.卖出].get("SUM_Poundage", 0)
+            dSum_In_投资总计 = dSum_In_投资 - dSum_Out_投资 + dSum_收益 + dSum_手续费
             strOut += strPerfix + "投资收益：" + str(round(dSum_收益, 2)) + "元"
+            strOut += strPerfix + "    " + "手续费：" + str(round(dSum_手续费, 2)) + "元"
             strOut += strPerfix + "    " + "投资累计：" + str(round(dSum_In_投资, 2)) + "元" 
-            strOut += strPerfix + "    " + "投资回笼：" + str(round(dSum_Out_投资 - dSum_收益, 2)) + "元"
-            strOut += strPerfix + "    " + "投资总计：" + str(round(dSum_In_投资 - dSum_Out_投资 + dSum_收益, 2)) + "元"
+            strOut += strPerfix + "    " + "回笼累计：" + str(round(dSum_Out_投资 - myData.iif(dSum_收益 < 0,0, dSum_收益), 2)) + "元"
+            strOut += strPerfix + "    " + "投资总计：" + str(round(dSum_In_投资总计, 2)) + "元"
         if(dSum_Out > 0):
             strOut += strPerfix + "消费总计：" + str(round(dSum_Out, 2)) + "元"
             #消费细分：
@@ -481,8 +500,22 @@ class myObj_Bills():
                         dSum_C = lst消费类型[x].get("SUM", 0)
                         if(dSum_C > 0):  
                             strOut += strPerfix + "    " * 2 + x +"：" + str(round(dSum_C, 2)) + "元"
-        #当前账目余额
-        strOut += strPerfix + "现金总计：" + str(round(dSum_In - dSum_Out - (dSum_In_投资 - dSum_Out_投资 + dSum_收益), 2)) + "元"
+
+        #特殊指定类型处理
+        if(usrBillType != "" and tradeType != ""):
+            pLst = lstCount[usrBillType][tradeType]
+            for x in pLst.keys():
+                if(x.count("SUM") == 1): continue
+                strOut += strPerfix + x + "总计：" + str(round(pLst['SUM'], 2)) + "元"
+                strOut += strPerfix + "    " + "手续费" +"：" + str(round(pLst['SUM_Poundage'], 2)) + "元"
+
+                #循环组装所有
+                keys = pLst[x].keys()
+                for xx in keys:
+                    strOut += strPerfix + "    " + xx +"：" + str(round(pLst[x][xx], 2)) + "元"
+        else:
+            #当前账目余额
+            strOut += strPerfix + "现金总计：" + str(round(dSum_ALL - dSum_In_投资总计, 2)) + "元"
                  
         if(usrBillType != ""): strOut += "\n账单类型：" + usrBillType    
         if(tradeTarget != ""): strOut += "\n交易品名：" + tradeTarget          

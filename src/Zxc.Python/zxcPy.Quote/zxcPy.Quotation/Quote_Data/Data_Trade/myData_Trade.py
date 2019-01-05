@@ -59,48 +59,77 @@ class myData_Trade():
 
         #装载账单记录
         nInd = 0
-        for dtRow in dtDB.dataMat:
-            #区分类型，部分类型屏蔽
-            strType = dtRow[lstFields_ind["交易类别"]] 
-            if(strType.count('买入') == 1 or strType.count('配售缴款') == 1):
-                strType = '买入'
-            elif(strType.count('卖出') == 1):
-                strType = '卖出'
-            elif(strType.count('利息归本') == 1):
-                strType = '分红'
-            else:
-                continue
+        for nTimes in range(0,1):   
+            for dtRow in dtDB.dataMat:
+                #解析有效数据内容
+                bill = myManager_Bill.myObj_Bill()
+                bill.usrID = self.usrID
+                bill.recorder = self.usrID
 
-            #解析有效数据内容
-            bill = myManager_Bill.myObj_Bill()
-            bill.usrID = self.usrID
-            bill.usrBillType = strType
-            bill.recorder = self.usrID
+                bill.tradeParty = dtRow[lstFields_ind["交易市场"]] 
+                bill.tradeType = "投资"
+                bill.tradeTypeTarget = "股票"
+                bill.tradeTarget = dtRow[lstFields_ind["证券名称"]] 
+                bill.tradePrice = float(dtRow[lstFields_ind["成交价格"]])
+                bill.tradeNum = int(dtRow[lstFields_ind["成交数量"]])
+                bill.tradeMoney = float(dtRow[lstFields_ind["成交金额"]])
+                bill.tradePoundage = float(dtRow[lstFields_ind["费用合计"]]) 
+                bill.tradeTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["交收日期"]], "%Y%m%d") + datetime.timedelta(minutes=nInd)
+                nInd = nInd + 1
+            
+                #区分类型，部分类型屏蔽
+                strType = dtRow[lstFields_ind["交易类别"]] 
+                if(strType.count('买入') == 1 or strType.count('配售缴款') == 1):
+                    bill.usrBillType = '买入'
+                elif(strType.count('卖出') == 1):
+                    bill.usrBillType = '卖出'
+                elif(strType.count('银行转证券') == 1):
+                    bill.usrBillType = '转账'
+                    bill.tradeTypeTarget = "转入"
+                    bill.tradeTarget = "现金"
+                    bill.tradeParty = "券商"
+                    bill.tradeMoney = float(dtRow[lstFields_ind["资金发生数"]])
+                elif(strType.count('证券转银行') == 1):
+                    bill.usrBillType = '转账'
+                    bill.tradeTypeTarget = "转出"
+                    bill.tradeTarget = "现金"
+                    bill.tradeParty = "券商"
+                    bill.tradeMoney = abs(float(dtRow[lstFields_ind["资金发生数"]]))
+                elif(strType.count('融券回购') == 1):
+                    bill.usrBillType = '买入'
+                    bill.tradeTypeTarget = "国债逆回购"
+                elif(strType.count('融券购回') == 1):
+                    bill.usrBillType = '卖出'
+                    bill.tradeTypeTarget = "国债逆回购"
+                    bill.tradeMoney = float(dtRow[lstFields_ind["资金发生数"]])
+                elif(strType.count('利息归本') == 1 or strType.count('利息税代扣') == 1):
+                    bill.usrBillType = '分红'
+                    bill.tradeTypeTarget = "活期"
+                    bill.tradeTarget = "利息"
+                    bill.tradeParty = "券商"
+                    bill.tradeMoney = float(dtRow[lstFields_ind["资金发生数"]])
+                elif(strType.count('红利入账') == 1):
+                    bill.usrBillType = '分红'
+                    if(bill.tradeNum != 0):
+                        pass  #价格变动。。
+                    bill.tradeMoney = float(dtRow[lstFields_ind["资金发生数"]])
+                else:
+                    continue
 
-            bill.tradeParty = dtRow[lstFields_ind["交易市场"]] 
-            bill.tradeType = "投资"
-            bill.tradeTypeTarget = "股票"
-            bill.tradeTarget = dtRow[lstFields_ind["证券名称"]] 
-            bill.tradePrice = float(dtRow[lstFields_ind["成交价格"]])
-            bill.tradeNum = int(dtRow[lstFields_ind["成交数量"]])
-            bill.tradeMoney = float(dtRow[lstFields_ind["成交金额"]])
-            bill.tradePoundage = float(dtRow[lstFields_ind["费用合计"]]) 
-            bill.tradeTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["交收日期"]], "%Y%m%d") + datetime.timedelta(minutes=nInd)
-            nInd = nInd + 1
+                #部分特殊类型名称转换
+                if(bill.usrBillType == "卖出"):
+                    if(bill.tradeTarget.count("转债") == 1):
+                        bill.tradeTarget = bill.tradeTarget.replace("转债", "发债")
+                if(bill.tradeTarget.count("发债") == 1): bill.tradeTypeTarget = "可转债"
+                if(bill.tradeTarget.count("发债") == 1): bill.tradeTypeTarget = "可转债"
 
-            #部分特殊类型名称转换
-            if(bill.usrBillType == "卖出"):
-                if(bill.tradeTarget.count("转债") == 1):
-                    bill.tradeTarget = bill.tradeTarget.replace("转债", "发债")
-            if(bill.tradeTarget.count("发债") == 1): bill.tradeTypeTarget = "可转债"
+                #@@Test  
+                if(bill.usrBillType == "卖出" and bill.tradeTarget.count("五粮")==1):
+                    aa =1
 
-            #@@Test  
-            if(bill.usrBillType == "卖出" and bill.tradeTarget == "航电发债"):
-                aa =1
-
-            #添加账单信息
-            strReturn = pBills._Add(bill)
-            myDebug.Print(strReturn)
+                #添加账单信息
+                strReturn = pBills._Add(bill)
+                myDebug.Print(strReturn)
     
 
 #主启动程序
@@ -109,49 +138,15 @@ if __name__ == "__main__":
     pTrade = myData_Trade("张斌")
     pTrade._Init_Trades()
 
+    #查询统计
+    pBills = pTrade.billManager["Stock_张斌"]
+    
+    myDebug.Debug(pBills.Static("2007-1-1", "2018-12-31", 0, "", "", "", "", ""))
+    myDebug.Debug(pBills.Static("2007-1-1", "2018-12-31", 0, "", "转账", "", "投资", ""))
+
+
     exit()
 
-
-    pBills = pManager['Test']
-
-    pBills.Add("门口超市", 10.2, "购物")
-    pBills.Add("门口超市", 20.4, "买菜", "2018-8-20")
-    pBills.Add("西边菜市场", 10.4, "买菜","2018-8-22")
-    pBills.Add("西边菜市场", 10.4, "买菜", "2018-8-23")
-    pBills.Add("西边菜市场", 10.4, "买菜", "2018-8-16")
-    
-    pBills.Add("股票", 1000, "投资", "2018-5-16")
-    pBill = pBills.Query("股票", "投资", "", "", 4)
-    pBills.Add(str(pBill[0][0].id), 1200, "投资回笼","2018-8-16")
-    pBills.Add("老豆", 100, "红包", "2018-8-18")
-    pBills.Add("老豆", 100, "红包", "2018-1-18")
-
-    #查询统计测试
-    myDebug.Debug(pBills.Static())
-    myDebug.Debug(pBills.Static("", "", "", "", 3))
-    myDebug.Debug(pBills.Static("", "", "", "", 6))
-    myDebug.Debug(pBills.Static("", "", "", "", 12))
-    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 1), "", 12))
-
-    myDebug.Debug(pBills.Static("", "红包", pBills._Trans_Time_year("", 1), "", 12))
-    myDebug.Debug(pBills.Static("老豆", "红包", pBills._Trans_Time_year("", 1), "", 12))
-    print()
-
-
-    #复杂统计
-    pBills = pManager['多多']
-    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 1), "", 0))
-    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 2), "", 0))
-    myDebug.Debug(pBills.Static("", "", pBills._Trans_Time_year("", 3), "", 0))
-
-    myDebug.Debug(pBills.Static_max("", "红包", False, 10, pBills._Trans_Time_year("", 3), "", 0))
-    print()
-    myDebug.Debug(pBills.Static_max("", "红包", True, 10, pBills._Trans_Time_year("", 3), "", 0))
-    print()
-    myDebug.Debug(pBills.Static_max("爸爸", "红包", True, 10, pBills._Trans_Time_year("", 3), "", 0))
-    
-
-    exit()
 
 
     
