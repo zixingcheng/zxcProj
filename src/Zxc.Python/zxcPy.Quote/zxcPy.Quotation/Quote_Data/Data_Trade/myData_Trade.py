@@ -74,13 +74,17 @@ class myData_Trade():
                 bill.tradeNum = int(dtRow[lstFields_ind["成交数量"]])
                 bill.tradeMoney = float(dtRow[lstFields_ind["成交金额"]])
                 bill.tradePoundage = float(dtRow[lstFields_ind["费用合计"]]) 
-                bill.tradeTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["交收日期"]], "%Y%m%d") + datetime.timedelta(minutes=nInd)
+                bill.tradeTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["交收日期"]], "%Y%m%d") + datetime.timedelta(seconds=nInd*10)
                 nInd = nInd + 1
             
                 #区分类型，部分类型屏蔽
                 strType = dtRow[lstFields_ind["交易类别"]] 
-                if(strType.count('买入') == 1 or strType.count('配售缴款') == 1):
+                if(strType.count('买入') == 1 or strType.count('配售缴款')):
                     bill.usrBillType = '买入'
+                elif(strType.count('配股入帐') == 1):
+                    bill.usrBillType = '买入'
+                    bill.tradePrice = bill.tradeMoney / bill.tradeNum
+                    bill.tradePoundage = 0
                 elif(strType.count('卖出') == 1):
                     bill.usrBillType = '卖出'
                 elif(strType.count('银行转证券') == 1):
@@ -143,7 +147,6 @@ if __name__ == "__main__":
     
     myDebug.Debug(pBills.Static("2007-1-1", "2018-12-31", 0, "", "", "", "", ""))
     myDebug.Debug(pBills.Static("2007-1-1", "2018-12-31", 0, "", "转账", "", "投资", ""))
-
 
     exit()
 
