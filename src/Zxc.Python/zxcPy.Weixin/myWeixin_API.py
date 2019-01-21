@@ -54,7 +54,7 @@ if __name__ == '__main__':
         exit()
 
     # 创建新线程
-    pWeb = myWeb.myWeb("127.0.0.1", 8666)
+    pWeb = myWeb.myWeb("0.0.0.0", 8666)
     pWeb.add_API(myWeb.myAPI, '/test')
     pWeb.add_API(myWeb.myAPI_p, '/test1/<param>')
     if(useCmdMMap):

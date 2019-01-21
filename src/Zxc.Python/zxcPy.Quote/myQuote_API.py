@@ -27,7 +27,7 @@ if __name__ == '__main__':
     
     # 创建新线程
     import myAPI_Quote      #回重启导致多次输出信息，调整为不输出打印信息
-    pWeb = myWeb.myWeb("127.0.0.1", 8669)
+    pWeb = myWeb.myWeb("0.0.0.0", 8669)
     pWeb.add_API(myWeb.myAPI, '/test')
 
     # 添加Robot接口并启动API
