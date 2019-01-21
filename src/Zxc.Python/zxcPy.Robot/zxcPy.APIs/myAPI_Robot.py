@@ -8,6 +8,7 @@ Created on  张斌 2018-07-04 15:58:00
 """
 import os, copy, ast 
 import mySystem 
+from flask import jsonify, request, make_response
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../zxcPy.APIs", False, __file__)
@@ -16,7 +17,7 @@ mySystem.Append_Us("../zxcPy.Robot/Prjs", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Reply", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myDebug, myRobot_Reply, myRobot_Reply_MQ, myManager_Msg
+import myIO, myWeb, myDebug, myRobot_Reply, myRobot_Reply_MQ, myManager_Msg
 from myGlobal import gol   
 
 
@@ -70,6 +71,20 @@ def add_APIs(pWeb):
     # 创建Web API
     pWeb.add_API(myAPI_Robot_RegistPlat, '/zxcAPI/robot/regist/Plat/<usrName>/<usrID>/<PlatName>')
     pWeb.add_API(myAPI_Robot_Reply, '/zxcAPI/robot/reply/<msgInfo>')
+    
+
+    # 显示登录二维码图片
+    @pWeb.app.route('/zxcAPI/robot/wechat/login', methods=['GET'])
+    def login_WeChat():
+        strDir, strName = myIO.getPath_ByFile(__file__)    
+        strDirBase = os.path.abspath(os.path.join(strDir, "../..")) + "/zxcPy.Weixin/Data/Pic/"
+        if request.method == 'GET':
+            image_data = open(os.path.join(strDirBase, "QR.png"), "rb").read()
+            response = make_response(image_data)
+            response.headers['Content-Type'] = 'image/png'
+            return response
+        else:
+            pass
 
 
 #主程序启动

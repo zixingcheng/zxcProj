@@ -80,52 +80,145 @@ class myPyWin(object):
 if __name__ ==  "__main__":
     # 启动程序，记事本只能开一个
     app = myPyWin()
-    app.run("notepad.exe")
 
     #定位记事本窗口
-    window_name = u"无标题 - 记事本"
-    app.connect(window_name)
-
-
-    #打开帮助并关闭 
-    app.menu_click(window_name, u"帮助->关于记事本")
-    app.click(u'关于记事本', u'确定')
-     
-
-    #输入文本，通过Spy++ 获取controller，即窗口类名
     controller = "Edit"
-    content = u"johnny"
-    window_name_new = content + ".txt"
-    app.input(window_name, controller, content)
+    bTest_notepad = False
+    if(bTest_notepad):
+        app.run("notepad.exe")
+        window_name = u"无标题 - 记事本"
+        app.connect(window_name)
+
+
+        #打开帮助并关闭 
+        app.menu_click(window_name, u"帮助->关于记事本")
+        app.click(u'关于记事本', u'确定')
      
-    # Ctrl + a 全选
-    app.input(window_name,controller, "^a")
 
-    # 选择复制
-    app.right_click(window_name,controller, 3)
+        #输入文本，通过Spy++ 获取controller，即窗口类名
+        content = u"johnny"
+        window_name_new = content + ".txt"
+        app.input(window_name, controller, content)
+     
+        # Ctrl + a 全选
+        app.input(window_name,controller, "^a")
 
-    #选择粘贴
-    app.right_click(window_name,controller, 4)
-    k = PyKeyboard()
-    k.press_key(k.enter_key)
+        # 选择复制
+        app.right_click(window_name,controller, 3)
 
-    # Ctrl + v 粘贴
-    app.input(window_name,controller, "^v")
+        #选择粘贴
+        app.right_click(window_name,controller, 4)
+        k = PyKeyboard()
+        k.press_key(k.enter_key)
 
-    # Ctrl + s 保存
-    app.input(window_name,controller, "^s")
+        # Ctrl + v 粘贴
+        app.input(window_name,controller, "^v")
 
-    # 输入文件名
-    strDir, strName = myIO.getPath_ByFile(__file__)
-    path = strDir + "\\" + content + ".txt"
-    app.input(u"另存为", controller, path)
+        # Ctrl + s 保存
+        app.input(window_name,controller, "^s")
 
-    # 保存
-    app.click(u"另存为","Button")
-    try:
-        app.click(u"确认另存为","Button")
-        os.remove(path)
-    except:
-        pass
-    finally:
-        app.close(window_name_new)
+        # 输入文件名
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        path = strDir + "\\" + content + ".txt"
+        app.input(u"另存为", controller, path)
+
+        # 保存
+        app.click(u"另存为","Button")
+        try:
+            app.click(u"确认另存为","Button")
+            os.remove(path)
+        except:
+            pass
+        finally:
+            app.close(window_name_new)
+    
+            
+    #app.run("D:\\Program Files (x86)\\WXWork\\WXWork.exe")
+    #app.connect("D:\\Program Files (x86)\\国泰君安证券新富易\\bin\\RichEZ.exe")
+    #app.run("D:/Program Files (x86)/国泰君安证券新富易/bin/oRichEZ.exe")
+    
+    
+    bTest_gtja = True
+    if(bTest_gtja): 
+        app.run(u"D:\\Program Files (x86)\\国泰君安证券新富易\\bin\\RichEZ.exe")
+        app.app.connect(path = u"D:\\Program Files (x86)\\国泰君安证券新富易\\bin\\RichEZ.exe")
+        window_name = u"国泰君安证券|富易登录"
+        #app.connect(window_name)
+        
+        #app.input(window_name, "Edit", "10309023") 
+        
+        #app.input(window_name, "Edit3", "10309023")
+        pyK = PyKeyboard()
+        #pyK.press_key('1')
+        #pyK.press_key('3')
+        #pyK.press_key('2')
+        #pyK.press_key('9')
+        #pyK.press_key('1')
+        #pyK.press_key('6')
+
+        # 定位当日成交查询
+        window_name = u"富易 - 张斌"
+
+        app.app[window_name].type_keys("{F6}")
+        time.sleep(2)
+
+        #app.click(window_name,"刷新(&F)")
+        #time.sleep(8)
+        app.click(window_name,"导出")
+        time.sleep(2)
+        
+        # 输入文件名
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        path = strDir + "\\" + window_name + ".xls"
+        app.input(u"另存为", controller, path)
+
+        # 保存
+        app.click(u"另存为","Button")
+        try:
+            app.click(u"确认另存为","Button")
+            os.remove(path)
+        except:
+            pass
+        finally:
+            app.close(window_name_new)
+
+        #app.click(window_name , u"Button)")
+        #app.click(window_name , u"Button)")
+        #pyK.press_key(pyK.function_keys[6]) # Tap F5
+        #aa = app.app[u'富易 - 张斌']['舒心'].Click()
+
+        #app.input(window_name, "TFyPassEdit", "132916")
+        #app.click(u"TFyPassEdit","TFyPassEdit")
+        
+        #app.click(window_name, u"登 录")
+        
+        #app.app.window_(title_re = u'富易 - 张斌').window_(title_re = u'ToolBar').window_(title_re = u'设置').Click()
+
+        pg = app.app[u'富易 - 张斌'][u'ToolBar']
+        pg.print_control_identifiers()
+        #aa = app.app[u'富易 - 张斌']['Button20'].print_control_identifiers()
+
+        #aa = app.app[u'富易 - 张斌']['重置成本'].Click()
+        #aa = app.app[u'富易 - 张斌']['Button32'].Click()
+        #aa = app.app[u'富易 - 张斌'].window_(handle = 0X00210D04).Click()
+         
+        #app.menu_click(window_name, u"TChildMenuBox->新股申购")
+        
+        #aa = pg.GetButton(0)
+        
+
+        bb =0
+        
+        # app.app[u'富易 - 张斌']['ToolBar'].ToolbarButton.Click()
+
+        #app.click(window_name + "->ToolBar", u"其它(&O)")
+        #app.click(window_name , u"Button3)")
+        #app.click(window_name , u"Button4)")
+        #app.click(window_name , u"Button5)")
+        #app.click(window_name , u"Button6)")
+        #app.click(window_name , u"Button7)")
+        
+        #打开帮助并关闭 
+        #app.menu_click(window_name, u"设置")
+        #app.click(u'关于记事本', u'确定')
+        

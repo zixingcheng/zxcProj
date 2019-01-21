@@ -31,7 +31,7 @@ if __name__ == '__main__':
     import myAPI_Robot      #回重启导致多次输出信息，调整为不输出打印信息
     pWeb = myWeb.myWeb("127.0.0.1", 8668)
     pWeb.add_API(myWeb.myAPI, '/test')
-
+    
     # 添加Robot接口并启动API
     myAPI_Robot.add_APIs(pWeb)
     pWeb.run()

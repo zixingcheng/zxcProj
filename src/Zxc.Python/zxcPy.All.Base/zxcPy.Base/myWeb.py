@@ -9,7 +9,7 @@ Created on  张斌 2018-04-04 11:00:00
 """
 import sys, string
 from flask import Flask
-from flask import jsonify
+from flask import jsonify, request
 from flask_restful import reqparse, Api, Resource
 import mySystem, myThread 
 import logging
