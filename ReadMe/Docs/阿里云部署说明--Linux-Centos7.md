@@ -428,4 +428,24 @@ git 更新脚本：
 
 	kill -9  进程号
 
+	
 
+## 防火墙设置
+	原因：因为centos7默认的防火墙是firewalld防火墙，不是使用iptables，因此需要先关闭firewalld服务，或者干脆使用默认的firewalld防火墙。
+
+操作步骤：
+
+	关闭防火墙
+	1.systemctl stop firewalld 
+	2.systemctl mask firewalld
+
+	--在使用iptables服务,开放443端口(HTTPS)	
+	3.iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+	--保存上述规则
+	4.service iptables save
+
+	--开启服务
+	5.systemctl restart iptables.service
+	
+	
