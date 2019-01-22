@@ -19,9 +19,14 @@ namespace zxcCore.Weixin.MP
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseIISIntegration()
+
                 //如果不配置下面这条信息，会导致无法直接访问//当然不用下面这个可以用Nginx来配置
                 .UseUrls("http://*:80")
                 .UseStartup<Startup>()
+                .UseApplicationInsights()
                 .Build();
     }
 }
