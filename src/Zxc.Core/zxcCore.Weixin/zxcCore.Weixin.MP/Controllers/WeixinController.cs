@@ -31,9 +31,13 @@ namespace zxcCore.Weixin.MP.Controllers
 
     public partial class WeixinController : Controller
     {
-        public static readonly string Token = Config.SenparcWeixinSetting.Token;//与微信公众账号后台的Token设置保持一致，区分大小写。
-        public static readonly string EncodingAESKey = Config.SenparcWeixinSetting.EncodingAESKey;//与微信公众账号后台的EncodingAESKey设置保持一致，区分大小写。
-        public static readonly string AppId = Config.SenparcWeixinSetting.WeixinAppId;//与微信公众账号后台的AppId设置保持一致，区分大小写。
+        //public static readonly string Token = Config.SenparcWeixinSetting.Token;//与微信公众账号后台的Token设置保持一致，区分大小写。
+        //public static readonly string EncodingAESKey = Config.SenparcWeixinSetting.EncodingAESKey;//与微信公众账号后台的EncodingAESKey设置保持一致，区分大小写。
+        //public static readonly string AppId = Config.SenparcWeixinSetting.WeixinAppId;//与微信公众账号后台的AppId设置保持一致，区分大小写。
+
+        public static readonly string Token = "ZxcSoftWeixin";
+        public static readonly string EncodingAESKey = "nBJIR8ZjSqwhuxvXw6yEf0BlzQJExEhIYPjdZBoLGSY";
+        public static readonly string AppId = "wx9866201507a19c19";
 
         readonly Func<string> _getRandomFileName = () => SystemTime.Now.ToString("yyyyMMdd-HHmmss") + Guid.NewGuid().ToString("n").Substring(0, 6);
         SenparcWeixinSetting _senparcWeixinSetting;
