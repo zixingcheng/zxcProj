@@ -15,6 +15,12 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "zxcPy.Quote", "..\..\src\Zx
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "zxcPy.Robot", "..\..\src\Zxc.Python\zxcPy.Robot\zxcPy.Robot.pyproj", "{0E89E814-5D61-43F4-9065-03483BB5BA80}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "zxcPy.BlockChain", "..\..\src\Zxc.Python\zxcPy.BlockChain\zxcPy.BlockChain.pyproj", "{0E26315D-574B-4C9B-9BF4-4F8E89BCCF00}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zxcCore", "zxcCore", "{F702FECD-4E18-40C6-9133-3D0CA7021713}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.Weixin.MP", "..\..\src\Zxc.Core\zxcCore.Weixin\zxcCore.Weixin.MP\zxcCore.Weixin.MP.csproj", "{77685113-0582-44B8-98B0-FEF9BA5D33F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +37,12 @@ Global
 		{F001C86F-593E-40CB-8491-9E93C8630403}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E89E814-5D61-43F4-9065-03483BB5BA80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E89E814-5D61-43F4-9065-03483BB5BA80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E26315D-574B-4C9B-9BF4-4F8E89BCCF00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E26315D-574B-4C9B-9BF4-4F8E89BCCF00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77685113-0582-44B8-98B0-FEF9BA5D33F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77685113-0582-44B8-98B0-FEF9BA5D33F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77685113-0582-44B8-98B0-FEF9BA5D33F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77685113-0582-44B8-98B0-FEF9BA5D33F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,6 +53,8 @@ Global
 		{15A0A06F-3917-46FD-B1D4-F3A7530A0A94} = {7C123EBC-286C-4B4E-9BA6-D9F0CCD5FD5E}
 		{F001C86F-593E-40CB-8491-9E93C8630403} = {7C123EBC-286C-4B4E-9BA6-D9F0CCD5FD5E}
 		{0E89E814-5D61-43F4-9065-03483BB5BA80} = {7C123EBC-286C-4B4E-9BA6-D9F0CCD5FD5E}
+		{0E26315D-574B-4C9B-9BF4-4F8E89BCCF00} = {7C123EBC-286C-4B4E-9BA6-D9F0CCD5FD5E}
+		{77685113-0582-44B8-98B0-FEF9BA5D33F9} = {F702FECD-4E18-40C6-9133-3D0CA7021713}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C9C7E36-0E45-4E37-B3DD-31393C8EBF16}
