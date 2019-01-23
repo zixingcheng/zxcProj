@@ -310,6 +310,7 @@ class Quote_Data_Statics_D():
         else:
             #更新统计信息
             self.dataS_Min_Now.setData(pData)
+        self.data = pData
         self.sameDataS_Day(pData); 
     #其他统计接口
     def dataStatics(self, minute = 5):

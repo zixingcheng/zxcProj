@@ -80,7 +80,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
                 
             #时间标识
             strTag_M = ""  
-            if(nTim_M >= 0 and nTim_M <99): strTag_M = str(nTim_M) + "分钟"
+            if(nTim_M >= 0 and nTim_M < 99): strTag_M = str(nTim_M) + "分钟"
             if(strTag_M == ""): strTag_M = "区间"
 
             #计算涨跌返回对应说明标识
