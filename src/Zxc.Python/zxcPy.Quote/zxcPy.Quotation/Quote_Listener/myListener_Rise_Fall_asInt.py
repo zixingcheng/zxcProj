@@ -52,7 +52,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             value['min'] = pData_S.low / pData_S.base - 1
             value['time'] = data.getTime()
             self.values[key] = value
-            strTag_suffix = "."
+            strTag_suffix = ""
         else:
             dtTime = data.getTime() - value['time']
             nTim_M = math.ceil(dtTime.seconds / 60)

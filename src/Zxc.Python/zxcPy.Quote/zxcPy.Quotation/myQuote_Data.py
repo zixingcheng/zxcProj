@@ -12,7 +12,7 @@ import sys, os, time, datetime, copy, mySystem
 mySystem.m_strFloders.append('/Quote_Data')
 mySystem.m_strFloders.append('/Quote_Listener')
 mySystem.Append_Us("", False) 
-import myData_Trans, myDebug, myIO, myIO_xlsx, myQuote_Setting
+import myData, myData_Trans, myDebug, myIO, myIO_xlsx, myQuote_Setting
 from myGlobal import gol 
 
 
@@ -102,7 +102,7 @@ class Quote_Data_Static():
             self.tradeVolume_Start = pData_L.tradeVolume_End
             self.tradeTurnover_Start = pData_L.tradeTurnover_End
     def Init(self, dValue = 0):            
-        self.base = dValue           
+        #self.base = dValue           
         self.start = dValue   
         self.last = dValue 
         self.high = dValue
@@ -164,22 +164,20 @@ class Quote_Data_Static():
             self.low = dValue
         self.last = dValue
              
-        if(pData_S == None): return True
-        if(pData_S.high > self.high):
-            self.high = pData_S.high
-        if(pData_S.low < self.low):
-            self.low = pData_S.low
+        if(pData_S != None): 
+            if(pData_S.high > self.high):
+                self.high = pData_S.high
+            if(pData_S.low < self.low):
+                self.low = pData_S.low
+            #self.tradeTurnover_End = pData_S.tradeTurnover_End 
+            #self.tradeVolume_End = pData_S.tradeVolume_End 
 
-        #self.tradeTurnover_End = pData_S.tradeTurnover_End 
-        #self.tradeVolume_End = pData_S.tradeVolume_End 
         self.tradeTurnover = self.tradeTurnover_End - self.tradeTurnover_Start
         self.tradeVolume = self.tradeVolume_End - self.tradeVolume_Start
         if(self.tradeVolume != 0):
             self.average = self.tradeTurnover / self.tradeVolume
         else:
-            self.average = self.last
-        if(self.tradeVolume < 0 or self.tradeVolume < 0):
-            aa = 0
+            self.average = self.last 
         return True
     #提取涨跌幅（）
     def getRise_Fall(self, nType = 0): 
@@ -221,6 +219,9 @@ class Quote_Data_Statics_M():
             datas = data.toValueList()
             self.dataS.base = data.priceBase        #基价，前一收盘
             self.dataS.start = data.priceOpen       #开盘价
+            self.dataS.high = datas[2]              #最高价
+            self.dataS.low = datas[3]               #最低价
+            self.dataS.average = myData.iif(datas[6] == 0, 0, datas[7] / datas[6])
         self.setData(data) 
     #清空
     def Clear(self, pData):
