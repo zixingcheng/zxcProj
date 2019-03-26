@@ -1,0 +1,119 @@
+﻿<!-- extend from base layout -->
+<!doctype html>
+{% extends "billBase.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
+
+{% block content %}
+
+  <h1>账单信息 </h1>
+  
+  {% from "billBase.html" import render_field %}
+  <form action="" method="post" name="billAdd">
+    {{ form.hidden_tag() }}
+	<table>
+		{{ render_field(form.tradeParty, size=20) }} 
+		{{ render_field(form.tradeTarget, size=20) }} 
+		{{ render_field(form.billType, size=20) }} 
+		
+		{{ render_field(form.tradeType, size=20) }} 
+		{{ render_field(form.tradeType2, size=20) }} 
+		{{ render_field(form.tradeType3, size=20) }} 
+		
+		{{ render_field(form.tradeMoney, size=20) }} 
+		{{ render_field(form.tradeNum, size=20) }} 
+		{{ render_field(form.tradePrice, size=20) }} 
+		{{ render_field(form.tradePoundage, size=20) }} 
+		{{ render_field(form.tradeTime, size=20) }} 
+	</table>   
+	<p><input type="submit" id="btn" value="添加账单"></p>
+	
+	<input type="text" id="urlstr"  style="width:200px;" onkeypress="getKey();"/>
+    <span type=text name="link" list="city_list" id=result3>?</span>
+	地址:<input type="text" id="result"  onkeypress="getKey();" name="link" list="city_list"/> 
+	<datalist id="city_list">
+	<option label="xian">西安</option>
+	<option label="beijing">北京</option>
+	<option label="shanghai">上海</option>
+	</datalist>
+	
+	
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!--Get请求-->
+
+<script type="text/javascript">
+
+    var data={
+        'name':'kikay',
+        'age':18
+    }
+	
+    var dataBillTypes=JSON.parse("{}", null);  
+    var dataBillTypes1=JSON.parse("{}", null);    
+    var dataBillTypes2=JSON.parse("{}", null);       
+	$(document).ready(function () {
+		<!--动态获取配置信息-->
+		$.get('/billTypes', {}, function(data){   
+			dataBillTypes = JSON.parse(data, null);  
+			<!--alert(JSON.stringify(dataBillTypes)); --> 
+			<!--alert("The jsonObject value is " +JSON.stringify(dataBillTypes["卖出"]) + ";" );-->
+			<!--alert("The jsonObject value is " +JSON.stringify(dataBillTypes.买入.居家.蔬菜 ) + ";" );	-->		
+		});		
+		
+		<!--账单类型更改，切换交易分类--> 
+		document.getElementById('billType').addEventListener('change',function(){ 
+			<!--遍历Json串获取类型-->
+			var objSelect = document.getElementById('tradeType')  
+			$("#tradeType option:not(:first)").remove();
+			dataBillTypes1 = dataBillTypes[this.value]
+			for(var item in dataBillTypes1){  
+				var new_opt = new Option(item, item);
+				objSelect.options.add(new_opt);
+            };
+		},false);
+		
+		<!--交易分类更改，切换交易小类-->
+		document.getElementById('tradeType').addEventListener('change',function(){
+			<!--遍历Json串获取类型-->
+			var objSelect = document.getElementById('tradeType2');
+			$("#tradeType2 option:not(:first)").remove();
+			dataBillTypes2 = dataBillTypes1[this.value]
+			for(var item in dataBillTypes2){   
+				var new_opt = new Option(item, item);
+				objSelect.options.add(new_opt);
+            };
+		},false); 
+	
+	
+		<!--绑定下拉辅助输入列表-->
+		$("#tradeTarget").attr("list",'city_list'); 
+		$("#tradeTarget").attr("autocomplete",'off');  
+		$("#tradeTarget").on('keypress',function () {
+			if(event.keyCode==13){	
+				alert('click enter'); 
+			};    
+		}); 
+		$("#tradeTarget").on('propertychange input',function () {  
+			<!--动态查询，辅助输入-->
+			var objList = document.getElementById('city_list');
+				objList.appendChild(new Option("shanghai", this.value + "-上海")); 
+				objList.appendChild(new Option("shanghai2", this.value + "-上海2")); 
+				objList.appendChild(new Option("shanghai3", this.value + "-上海3"));  
+		}); 
+		$("#tradeParty").attr("autocomplete",'off');  
+	});
+	
+	
+	function getKey()
+	{
+		if(event.keyCode==13){	
+			alert('click enter'); 
+		}   
+	};
+			
+	<!--动态更新分类-->
+	window.onload = function () {	
+	};
+
+	   
+</script>
+  </form>
+{% endblock %}

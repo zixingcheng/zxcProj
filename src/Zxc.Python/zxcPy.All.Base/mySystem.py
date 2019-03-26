@@ -18,7 +18,11 @@ def Append_Us(path = "", bPrint = False, file = None):
     #获取文件路径信息
     rootDir = path.strip()
     if(rootDir == "") :
-        rootDir = sys.path[0]
+        #rootDir = sys.path[0]  #调整为按site-packages判断的方式获取python根目录
+        for x in sys.path:
+            if x.count('lib\\site-packages') == 1:
+                rootDir = x
+                break 
 
     #定义系统文件夹myPy_Libs、GModel_Py_Base
     strFloders = m_strFloders   
