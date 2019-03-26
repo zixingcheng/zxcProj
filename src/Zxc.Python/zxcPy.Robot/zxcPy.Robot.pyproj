@@ -39,6 +39,7 @@
     <Compile Include="zxcPy.Robot\Roots\myRoot_Usr.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_Prj.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot.py" />
+    <Compile Include="zxcPy.Webs\myWeb_Order.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.5" />
@@ -54,6 +55,7 @@
     <Folder Include="zxcPy.Robot\Reply\" />
     <Folder Include="zxcPy.Robot\Roots\" />
     <Folder Include="zxcPy.Robot\Prjs\" />
+    <Folder Include="zxcPy.Webs\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\DB_Bill\多多.csv" />

@@ -40,27 +40,23 @@ class myWeb_Config():
 
 #Web接口类
 class myWeb(myThread.myThread): 
-    def __init__(self, hostIP = "0.0.0.0", nPort = 5000, bDebug = True):
+    def __init__(self, hostIP = "0.0.0.0", nPort = 5000, bDebug = True, webFolder = './'):
         super().__init__("", 0) # 必须调用
         self.host = hostIP
         self.port = nPort
-        self.debug = bDebug
-        
-        #初始根目录信息
-        strDir, strName = myIO.getPath_ByFile(__file__)
-        self.Dir_Base = os.path.abspath(os.path.join(strDir, ".."))   
-
+        self.debug = bDebug 
+        self.baseDir = webFolder
 
         #创建app，并使用RestApi方式
         #Flask初始化参数尽量使用你的包名，这个初始化方式是官方推荐的，官方解释：http://flask.pocoo.org/docs/0.12/api/#flask.Flask
-        self.app = Flask(__name__)   
-        
+        self.app = Flask(__name__, template_folder=webFolder + "templates", static_folder=webFolder + "statics")   
+
         #初始Api
         self.api = Api(self.app)  
         
         # Get the config from object of DecConfig
         # 使用 onfig.from_object() 而不使用 app.config['DEBUG'] 是因为这样可以加载 class DevConfig 的配置变量集合，而不需要一项一项的添加和修改。
-        # self.app.config.from_object(myWeb_Config.DevConfig)
+        self.app.config.from_object(myWeb_Config.DevConfig)
 
         # 创建bootstrap
         # from flask_bootstrap import Bootstrap
