@@ -15,7 +15,8 @@ from wtforms import BooleanField,IntegerField,DecimalField,StringField,TextAreaF
 from wtforms.validators import DataRequired,ValidationError,Email,Regexp,EqualTo,Required,NumberRange,Length
 
 mySystem.Append_Us("", False)  
-import myIO, myWeb, myDebug, myData_Json
+mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
+import myIO, myWeb, myDebug, myData_Json, myRoot_Usr
 from myGlobal import gol
 
 
@@ -59,6 +60,48 @@ def add_Webs(pWeb):
         form = orderAddForm()                       #生成form实例，给render_template渲染使用 
         form.orderType = orderType
         if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
-            return redirect('/orderBase')           #如果数据符合要求，重定向到主页
+            #添加订单 
+            usrAdd(form)                            #添加用户
+            return "订单已成功添加."                #如果数据符合要求，重定向到主页
         return render_template('orderAdd.html', title = 'Order Add', form = form, orderType = orderType)     #如果数据不符合要求，则再次读取orderAdd.html页面
+    
+    #添加页面--用户信息查询
+    @pWeb.app.route('/usrInfoQuery')
+    def usrInfoQuery(): 
+        name=request.args.get('name', "")
+        phone=request.args.get('phone', "") 
+        pUsers = gol._Get_Setting('sysUsers', None)     #实例 用户对象集
+        users = pUsers._Find_ByRealInfo(name, phone)
+
+        jsonUsers = myData_Json.Json_Object()
+        lstUsers = []
+        lstPhones = []
+        lstAddress = []
+        for x in users:
+            lstUsers.append(x.usrName_Full)
+            lstPhones = lstPhones + x.usrPhones
+            lstAddress = lstAddress + x.usrAddresss
+        jsonUsers["usrName_Fulls"] = lstUsers
+        jsonUsers["usrPhones"] = lstPhones
+        jsonUsers["usrAddresss"] = lstAddress
+        return jsonUsers.ToString() 
+
+    def _Find(self, usrName, usrPhone): 
+        text = myIO.getContent(pWeb.baseDir + "/Setting/OrderSets-"+ nameType +".json", True, False)
+        #jsonSets = myData_Json.Json_Object()
+        #jsonSets.Trans_FromStr(text) 
+        #return jsonSets.ToString()
+        return text
+
+    #用户信息更新
+    def usrAdd(form):
+        usrInfos = {}
+        usrInfos["usrName_Full"] = form.usrName_Full
+        usrInfos["usrName"] = form.orderUsrName
+        usrInfos["usrID"] = form.usrID 
+        usrInfos["usrPhone"] = form.orderUsrPhone
+        usrInfos["usrAddress"] = form.orderAddress
+        
+        pUsers = gol._Get_Setting('sysUsers', None)     #实例 用户对象集
+        pUsers.Add(usrInfos, True)  
 

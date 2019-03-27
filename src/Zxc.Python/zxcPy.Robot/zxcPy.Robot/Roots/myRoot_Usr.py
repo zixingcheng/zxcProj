@@ -372,6 +372,24 @@ class myRoot_Usrs():
         return self.usrList_Name.get(usrName, None)
     def _Find_ByName_Nick(self, usrName_Nick): 
         return self.usrList_Name_Nick.get(usrName_Nick, None)
+    def _Find_ByRealInfo(self, usrName, usrPhone): 
+        users = []
+        if(usrName == ""): usrName = "   "
+        if(usrPhone == ""): usrPhone = "   "
+        
+        length = len(usrName)
+        lengthP = len(usrPhone)
+        for x in self.usrList:
+            pUser = self.usrList[x]
+            if(pUser.usrName_Full[0: length] == usrName):   #等长匹配
+                users.append(pUser)
+                continue
+            
+            for xx in pUser.usrPhones:
+                if(xx[0: lengthP] == usrPhone):             #等长匹配
+                    users.append(pUser)
+                    break 
+        return users
 
     # 添加用户
     def _Add(self, pUser): 
@@ -436,17 +454,19 @@ class myRoot_Usrs():
         usrID = msgInfo.get("usrID", "")
         usrType = msgInfo.get("usrType", "")
         if(usrName == None): return False
-
+         
         # 新用户
         pUser = self._Find(usrID, usrName, usrName_Nick, "", usrType, True)
         if(pUser.usrLoaded and canUpdata == False): return True
 
         # 信息更新
+        usrName_Full = msgInfo.get("usrName_Full", "")  
         usrPhone = msgInfo.get("usrPhone", "")  
         usrAddress = msgInfo.get("usrAddress", "")  
         usrTag = msgInfo.get("usrTag", "")  
         pUser.usrRamak = msgInfo.get("usrRamak", "")  
         pUser.usrNotes = msgInfo.get("usrNotes", "") 
+        if(usrName_Full != ""): pUser.usrName_Full = usrName_Full
         if(usrType != ""): pUser.usrPlat = usrType
         if(usrPhone != ""):
             if(not usrPhone in pUser.usrPhones):
