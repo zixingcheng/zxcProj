@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     import myRobot_Updata   #更新说明
     import myAPI_Robot, myWeb_Order      #会重启导致多次输出信息，调整为不输出打印信息
-    pWeb = myWeb.myWeb("0.0.0.0", 8668, webFolder = myRobot_Updata.myUpdata.Dir_Base + "\\zxcPy.Webs\\" )
+    pWeb = myWeb.myWeb("0.0.0.0", 8668, webFolder = myRobot_Updata.myUpdata.Dir_Base + "/zxcPy.Webs/" )
     pWeb.add_API(myWeb.myAPI, '/test') 
 
     # 添加Robot接口并启动API、Webs
