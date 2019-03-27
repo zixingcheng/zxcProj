@@ -28,10 +28,13 @@
 		{{ render_field(form.orderUsrPhone, size=20) }} 
 		{{ render_field(form.orderAddress, size=20) }}  
 	</table>   
-	<p style="margin-left:110px"><input type="submit" id="btn" value="取消订单"><input style="margin-left:10px" type="submit" id="btn" value="确认订单"></p> 
+	<p style="margin-left:110px"><input type="button" id="btnC" value="取消订单"><input style="margin-left:10px" type="submit" id="btn" value="确认订单"></p> 
 	
 	<datalist id="lstTypes"></datalist>
 	<datalist id="lstTargets"></datalist> 
+	<datalist id="lstUsers"></datalist> 
+	<datalist id="lstPhones"></datalist> 
+	<datalist id="lstAddress"></datalist> 
 		
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 	<!--Get请求-->
@@ -45,6 +48,7 @@
 		var tradeNum=1.0;
 		var tradeRebate=0.0;
 		var tradeMoney=0.0;
+		var dataUserInfos=JSON.parse("{}", null);  
 		var dataOrderSets=JSON.parse("{}", null);  
 		var dataTargets=null;
 		var dataTarget=null;
@@ -81,11 +85,80 @@
 				setTotal();
 			},false);  
 		
+			<!--订单商品选择，更新相关设置-->
+			$("#orderUsrName").on('input propertychange change',function () { 
+				if(!('usrName_Fulls' in dataUserInfos)) 
+					setUserInfo(this.value, ''); 
+				else{
+					var exist = false
+					var items = dataUserInfos['usrName_Fulls'];
+					for(var item in items){   
+						if(item == this.value) 
+							exist = true;
+					}; 
+					if( exist) setUserInfo(this.value, ''); 
+				};
+			});  
+			$("#orderUsrPhone").on('input propertychange change',function () {  
+				if(this.value.length > 2){
+					if(!('usrPhones' in dataUserInfos)) 
+						setUserInfo("", this.value); 
+					else{
+						var exist = false
+						var items = dataUserInfos['usrPhones'];
+						for(var item in items){   
+							if(item == this.value) 
+								exist = true;
+						}; 
+						if( exist) setUserInfo("", this.value); 
+					};
+				};
+			});  
+			
+			<!--动态查询用户信息-->
+			function setUserInfo(usrName, usrPhone)	{			
+				$.get('/usrInfoQuery',  {name: usrName, phone: usrPhone}, function(data){   
+					var jsonUserInfos = JSON.parse(data, null);  
+					var change = false;   
+					
+					<!--更新匹配用户信息--> 
+					var items = jsonUserInfos['usrName_Fulls'] ;
+					if(items != false){
+						$("#lstUsers").empty();
+						var objUsers = document.getElementById('lstUsers');  
+						for(var item in items){   
+							objUsers.appendChild(new Option(items[item], items[item]));   
+						};  
+						change = true;
+					} 
+					 
+					var items = jsonUserInfos['usrPhones'] ;
+					if(items != false){
+						$("#lstPhones").empty();
+						var objPhones = document.getElementById('lstPhones');   
+						for(var item in items){   
+							objPhones.appendChild(new Option(items[item], items[item]));   
+						}; 
+						change = true;
+					}
+					 
+					if(change){
+						$("#lstAddress").empty();
+						var objAddrs = document.getElementById('lstAddress');  
+						var items = jsonUserInfos['usrAddresss'] 
+						for(var item in items){   
+							objAddrs.appendChild(new Option(items[item], items[item]));   
+						}; 
+						dataUserInfos = jsonUserInfos
+					} 
+				});	
+			}; 
+			
 			<!--控件调整，绑定下拉辅助输入列表-->
 			$("#orderTargetType").attr("list",'lstTypes'); 
 			$("#orderTargetType").attr("autocomplete",'off');  
 			$("#orderTarget").attr("list",'lstTargets'); 
-			$("#orderTarget").attr("autocomplete",'off');
+			$("#orderTarget").attr("autocomplete",'off'); 
 			
 			$("#orderPrice").attr("readonly",'readonly'); 
 			$("#orderNum").attr("readonly",'readonly'); 
@@ -93,8 +166,12 @@
 			$("#orderRebate").attr("autocomplete",'off'); 
 			$("#orderMoney").attr("readonly",'readonly');   
 			$("#orderMoney").attr("autocomplete",'off');   
-			$("#orderUsrName").attr("autocomplete",'off');   
+			
+			$("#orderUsrName").attr("list",'lstUsers'); 
+			$("#orderUsrName").attr("autocomplete",'off');  
+			$("#orderUsrPhone").attr("list",'lstPhones');  
 			$("#orderUsrPhone").attr("autocomplete",'off');  
+			$("#orderAddress").attr("list",'lstAddress'); 
 			$("#orderAddress").attr("autocomplete",'off');   
 			
 			<!--数量增减-->
@@ -131,6 +208,7 @@
 					setTotal();
 				}
 			});
+			
 			function setTotal()	{
 				tradeMoney = tradeNum * dataTarget.价格 - tradeRebate;
 				$("#orderMoney").val("￥" + tradeMoney.toFixed(2).toString()); 
