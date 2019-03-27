@@ -4,20 +4,20 @@
 
 {% block content %} 
   {% from "orderBase.html" import render_field %}
-  <form action="" method="post" name="billAdd" style="margin-left:10px;margin-top:10px" >
-	<h1>订单信息 </h1>
+  <form action="" method="post" name="billAdd" style="margin-left:10px;margin-top:10px" > 
+	<h1 style="margin-left:80px">订单信息 </h1>
     {{ form.hidden_tag() }} 
 	<table>
 		{{ render_field(form.orderTargetType, size=20) }} 
 		{{ render_field(form.orderTarget, size=20) }} 
 		
 		{{ render_field(form.orderPrice, size=20) }}  
-		<tr>
+		<tr style="text-align: center;">
 		  <td> {{ form.orderNum.label }}：</td>
 		  <td> {{ form.orderNum }} </td>
 		  <td> <input class="min" name="" type="button" value="-" /><input class="add" name="" type="button" value="+" /></td> 
 		</tr>
-		<tr>
+		<tr style="text-align: center;">
 		  <td> {{ form.orderRebate.label }}：</td>
 		  <td> {{ form.orderRebate }} </td>
 		  <td> <input class="min2" name="" type="button" value="-" /><input class="add2" name="" type="button" value="+" /></td> 
@@ -28,7 +28,7 @@
 		{{ render_field(form.orderUsrPhone, size=20) }} 
 		{{ render_field(form.orderAddress, size=20) }}  
 	</table>   
-	<p><input type="submit" id="btn" value="确认订单"></p> 
+	<p style="margin-left:110px"><input type="submit" id="btn" value="取消订单"><input style="margin-left:10px" type="submit" id="btn" value="确认订单"></p> 
 	
 	<datalist id="lstTypes"></datalist>
 	<datalist id="lstTargets"></datalist> 

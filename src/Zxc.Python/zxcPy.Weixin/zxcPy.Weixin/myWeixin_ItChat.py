@@ -24,11 +24,11 @@ from myGlobal import gol
 class myWeixin_ItChat(myThread.myThread):
     def __init__(self, Tag = "zxcWeixin", useCmdMMap = True):
         super().__init__("", 0) # 必须调用
-        self.usrTag = Tag       #类实例标识
-        self.usrName = ""       #类实例用户名
+        self.usrTag = Tag       # 类实例标识
+        self.usrName = ""       # 类实例用户名
         self.wxReply = myReply_Factory.myWx_Reply(Tag)     #回复消息处理工厂对象类
         self.usrDefault = {'UserName' : ""}
-        self.Init()             #文件初始
+        self.Init()             # 文件初始
         self.ind = 0
         self.max = 5
         #self.cmdWeixin = None

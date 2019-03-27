@@ -12,23 +12,26 @@ import sys, os, copy, datetime, uuid, mySystem
 mySystem.Append_Us("", False)    
 import myIO, myIO_xlsx, myData_Trans, myRoot_Prj
 from myGlobal import gol   
+gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
 
 #用户对象
 class myRoot_Usr():
     def __init__(self, usrID, usrName, nameNick = "", plat = ""): 
         self.usrID_sys = str(uuid.uuid1())   #用户ID--系统ID(唯一)
-        self.usrID = ""                 #用户ID
+        self.usrID = ""                 #用户ID-其他平台标识
         self.usrName = usrName          #用户名
         self.usrName_Full = ""          #用户姓名
         self.usrName_Nick = nameNick    #用户名--昵称
         self.usrRelations = []          #用户关联姓名集
-        self.usrPlats = []              #用户类型(来源平台集)
-        self.usrTag = ""        #标签
-        self.usrRamak = ""      #备注
-        self.usrPhone = ""      #电话号码
-        self.usrNotes = ""      #描述信息
-        self.usrInd = -1        #用户集中的序号
+        self.usrRelationID_sys = []     #关联用户系统ID集合(关联用户表示同一人，作合并处理)
+        self.usrPhones = []             #用户电话(可能多个)
+        self.usrAddresss = []           #用户地址(可能多个)
+        self.usrTags = []               #用户标签(可能多个)
+        self.usrPlat = ""               #用户类型(来源平台集)
+        self.usrRamak = ""              #备注  
+        self.usrNotes = ""              #描述信息
+        self.usrInd = -1                #用户集中的序号
         self.usrTime_Regist = datetime.datetime.now()          #注册时间
         self.usrTime_Logined_Last = datetime.datetime.now()    #最后登录时间（请求）
         self.usrLoaded = False  
@@ -38,10 +41,8 @@ class myRoot_Usr():
     def _Init(self, usrID, usrName, nameNick = "", plat = ""): 
         if(nameNick != ""): self.usrName_Nick = nameNick
         if(usrName != ""): self.usrName = usrName
-        if(usrID != ""): self.usrID = usrID
-        if(plat != ""): 
-            if(plat in self.usrPlats == False):
-                self.usrPlats.append(plat)
+        if(usrID != ""): self.usrID = usrID 
+        if(plat != ""):  self.usrPlats = plat 
         self.usrPrj = myRoot_UsrPrj(self.usrID, self.usrName, self.usrName_Nick)       #当前功能管理对象 
         return True 
         
@@ -253,7 +254,7 @@ class myRoot_Usrs():
         self.Dir_Base = os.path.abspath(os.path.join(strDir, "../.."))  
         self.Dir_Setting = self.Dir_Base + "/Setting"
         self.Path_SetUser = self.Dir_Setting + "/UserInfo.csv"
-        self.lstFields = ["ID","用户名","用户昵称","用户ID","用户姓名","来源平台","电话","标签","备注","描述","注册时间","最后登录时间"]
+        self.lstFields = ["ID","RelationIDs","用户名","用户昵称","用户ID","来源平台","用户姓名","电话","标签","地址","备注","描述","注册时间","最后登录时间"]
         if(userID != "" and usrName != "" and nickName != ""):
             self._Init()
     #初始参数信息等   
@@ -270,15 +271,17 @@ class myRoot_Usrs():
         for dtRow in dtUser.dataMat:
             pUser = myRoot_Usr("", dtRow[lstFields_ind["用户名"]])
             pUser.usrID_sys = dtRow[lstFields_ind["ID"]]
+            pUser.usrRelationID_sys = dtRow[lstFields_ind["RelationIDs"]].split('、')
             pUser.usrName_Nick = dtRow[lstFields_ind["用户昵称"]]
             pUser.usrID = dtRow[lstFields_ind["用户ID"]]
             pUser.usrName_Full = dtRow[lstFields_ind["用户姓名"]]
             if(pUser.usrName_Full != ""):
                 pUser.usrRelations.append(pUser.usrName_Full)
 
-            pUser.usrPlats = dtRow[lstFields_ind["来源平台"]].split('、')
-            pUser.usrPhone = dtRow[lstFields_ind["电话"]]
-            pUser.usrTag = dtRow[lstFields_ind["标签"]]
+            pUser.usrPlat = dtRow[lstFields_ind["来源平台"]]
+            pUser.usrPhones = dtRow[lstFields_ind["电话"]].split('、')
+            pUser.usrTags = dtRow[lstFields_ind["标签"]].split('、')
+            pUser.usrAddresss = dtRow[lstFields_ind["地址"]].split('、')
             pUser.usrRamak = dtRow[lstFields_ind["备注"]]
             pUser.usrNotes = dtRow[lstFields_ind["描述"]]
             pUser.usrTime_Regist = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["注册时间"]])
@@ -289,7 +292,7 @@ class myRoot_Usrs():
         dtUser = myIO_xlsx.DtTable()    #用户信息表
         dtUser.dataName = "dataName"
         dtUser.dataField = self.lstFields
-        dtUser.dataFieldType = ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'datetime', 'datetime']
+        dtUser.dataFieldType = ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'datetime', 'datetime']
        
         # 组装行数据
         keys = self.usrList.keys()
@@ -297,13 +300,15 @@ class myRoot_Usrs():
             pUser = self.usrList[x]
             pValues = []
             pValues.append(pUser.usrID_sys)
+            pValues.append('、'.join(pUser.usrRelationID_sys))
             pValues.append(pUser.usrName)
             pValues.append(pUser.usrName_Nick)
             pValues.append(pUser.usrID) 
+            pValues.append(pUser.usrPlat)
             pValues.append(pUser.usrName_Full) 
-            pValues.append(myData_Trans.Tran_ToStr(pUser.usrPlats))
-            pValues.append(pUser.usrPhone)
-            pValues.append(pUser.usrTag)
+            pValues.append('、'.join(pUser.usrPhones))
+            pValues.append('、'.join(pUser.usrTags))
+            pValues.append('、'.join(pUser.usrAddresss))
             pValues.append(pUser.usrRamak)
             pValues.append(pUser.usrNotes)
             pValues.append(pUser.usrTime_Regist.strftime("%Y-%m-%d %H:%M:%S"))
@@ -437,14 +442,22 @@ class myRoot_Usrs():
         if(pUser.usrLoaded and canUpdata == False): return True
 
         # 信息更新
-        pUser.usrPhone = msgInfo.get("usrPhone", "")  
-        pUser.usrTag = msgInfo.get("usrTag", "")  
+        usrPhone = msgInfo.get("usrPhone", "")  
+        usrAddress = msgInfo.get("usrAddress", "")  
+        usrTag = msgInfo.get("usrTag", "")  
         pUser.usrRamak = msgInfo.get("usrRamak", "")  
         pUser.usrNotes = msgInfo.get("usrNotes", "") 
-        if(usrType != ""):
-            if(not usrType in pUser.usrPlats):
-                pUser.usrPlats.append(usrType)
-        return True
+        if(usrType != ""): pUser.usrPlat = usrType
+        if(usrPhone != ""):
+            if(not usrPhone in pUser.usrPhones):
+                pUser.usrPhones.append(usrPhone)
+        if(usrAddress != ""):
+            if(not usrAddress in pUser.usrAddresss):
+                pUser.usrAddresss.append(usrAddress)
+        if(usrTag != ""):
+            if(not usrTag in pUser.usrTags):
+                pUser.usrTags.append(usrTag) 
+        return self.Check_RelationID_sys(pUser)
     # 删除用户
     def Del(self, usrID, usrName, usrName_Nick): 
         usrName = usrName.strip().lower()
@@ -457,17 +470,24 @@ class myRoot_Usrs():
         self.usrList_usrID_sys.pop(pUser.usrID_sys)
         return True
     
+    # 用户关联关系校正
+    def Check_RelationID_sys(self, pUser): 
+        return True
+    
+#初始全局用户管理  
+gol._Set_Setting('sysUsers', myRoot_Usrs( "@@zxcPy", "zxcPy", "zxcPy_sys"))    #实例 用户对象集
+
 
 #主启动程序
 if __name__ == "__main__":
-    pUsers = myRoot_Usrs( "@@zxcPy", "zxcPy", "测试")
+    pUsers = myRoot_Usrs( "@@zxcPy", "zxcPy", "zxcPy_sys")
     pUsers._Save()
     exit(0)
 
     print(pUsers.Add({'usrName': "Test",'usrName_Nick': "测试",'usrID': "@@1" ,'usrType': "wx"}, True))
     print(pUsers.Add({'usrName': "Test3",'usrName_Nick': "测试3",'usrID': "@@3" }))
     print(pUsers.Del("", "", "测试3"))
-    print(pUsers.Add({'usrName': "Test_001",'usrName_Nick': "茶叶一主号",'usrID': "-" ,'usrType': "wx"}, True))
+    print(pUsers.Add({'usrName': "Test_001",'usrName_Nick': "茶叶一主号",'usrID': "-" ,'usrType': "wxMP"}, True))
 
     pUser = pUsers._Find("", "", "茶叶一主号")
 
