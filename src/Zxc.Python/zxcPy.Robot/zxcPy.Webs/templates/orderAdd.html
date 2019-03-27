@@ -2,12 +2,10 @@
 <!doctype html>
 {% extends "orderBase.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
 
-{% block content %}
-
-  <h1>订单信息 </h1>
-  
+{% block content %} 
   {% from "orderBase.html" import render_field %}
-  <form action="" method="post" name="billAdd">
+  <form action="" method="post" name="billAdd" style="margin-left:10px;margin-top:10px" >
+	<h1>订单信息 </h1>
     {{ form.hidden_tag() }} 
 	<table>
 		{{ render_field(form.orderTargetType, size=20) }} 
@@ -30,8 +28,7 @@
 		{{ render_field(form.orderUsrPhone, size=20) }} 
 		{{ render_field(form.orderAddress, size=20) }}  
 	</table>   
-	<p><input type="submit" id="btn" value="确认订单"></p>
-	</meta>
+	<p><input type="submit" id="btn" value="确认订单"></p> 
 	
 	<datalist id="lstTypes"></datalist>
 	<datalist id="lstTargets"></datalist> 
@@ -80,7 +77,7 @@
 				dataTarget = dataTargets[this.value] 
 				$("#orderPrice").val("￥" + dataTarget.价格.toFixed(2).toString() + "  / " + dataTarget.单位); 
 				$("#orderNum").val(tradeNum.toString() + " " + dataTarget.单位);
-				$("#orderRebate").val("￥" + tradeNum.toFixed(2).toString());
+				$("#orderRebate").val("￥" + tradeRebate.toFixed(2).toString());
 				setTotal();
 			},false);  
 		
@@ -105,7 +102,7 @@
 				tradeNum = tradeNum + 1;
 				if(dataTarget != null)
 				{
-					$("#orderNum").val(tradeNum.toString() + " " + dataTarget.单位);
+					$("#orderNum").val(tradeNum.toFixed(dataTarget.单位精度) + " " + dataTarget.单位);
 					setTotal();
 				}
 			}); 
@@ -113,8 +110,8 @@
 				if(tradeNum>0)
 				{
 					tradeNum = tradeNum - 1;
-					$("#orderNum").val(toDecimal(tradeNum).toString() + " " + dataTarget.单位);
-					setTotal();
+					$("#orderNum").val(tradeNum.toFixed(dataTarget.单位精度) + " " + dataTarget.单位);
+					setTotal(); 
 				}
 			});
 			
@@ -122,15 +119,15 @@
 				tradeRebate = tradeRebate + 1;
 				if(dataTarget != null)
 				{
-					$("#orderRebate").val("￥" + tradeNum.toFixed(2).toString());
+					$("#orderRebate").val("￥" + tradeRebate.toFixed(2).toString());
 					setTotal();
 				}
 			}); 
 			$(".min2").click(function() {
-				if(tradeRebate>0)
+				if(tradeRebate>-10000)
 				{
 					tradeRebate = tradeRebate - 1;
-					$("#orderRebate").val("￥" + tradeNum.toFixed(2).toString());
+					$("#orderRebate").val("￥" + tradeRebate.toFixed(2).toString());
 					setTotal();
 				}
 			});
@@ -152,5 +149,6 @@
 		window.onload = function () {	
 		}; 
 	</script>
+	
   </form>
 {% endblock %}
