@@ -66,13 +66,17 @@ class Quote_Source:
         for listener in self.listeners : 
             listener.OnRecvQuote(quoteDatas)
     
-    #查询行情
-    def query(self):pass
+    #查询行情信息(返回n条)
+    def query(self, checkTime = True, nReturn = 0): 
+        if(checkTime):
+            if(self.checkTime() == False): return None
+        pass 
 
     #生成数据对象
-    def newData(self):pass
+    def newData(self): pass
+    def newData_ByInfo(self, dataInfo, checkTime = True): pass
     #生成数据集对象
-    def newDatas(self, data, interval):pass
+    def newDatas(self, data, interval): pass
 
     #生成数据对象
     def setData(self, data, bNotify = True):
@@ -99,7 +103,19 @@ class Quote_Source:
         self.datasNow = pDatas
         return pDatas
     #合法性(时效)
-    def checkTime(self, data):
+    def checkTime(self, data=None):
+        if(data==None):
+            tNow = datetime.datetime.now()
+            if(self.startTime < tNow and tNow < self.endTime): 
+                return True
+            else:
+                if(tNow > self.endTime): 
+                    self.startTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 13:00:00")     #起始时间
+                    self.endTime = self.endTime2                                                #结束时间
+                    if(self.startTime < tNow and tNow < self.endTime):  return True
+            return False
+
+        #时间判断
         tNow = data.datetime_queryed
         if(self.startTime < tNow and tNow < self.endTime):
             if(self.timeIntervals > 0):
@@ -113,7 +129,7 @@ class Quote_Source:
                 self.datasNow.saveData()                    #保存数据（第一时段结束）  
             return self.checkTime(data)
         elif(self.endTime < tNow):
-            if(self.datas.get(data.name,None) == None): #初始数据(当天结束时段后，只有一条数据)
+            if(self.datas.get(data.name,None) == None):     #初始数据(当天结束时段后，只有一条数据)
                 self.timeIntervals += 1
                 return True
             elif(self.timeIntervals > 1):
@@ -166,7 +182,6 @@ class Quote_Thread(threading.Thread):
             except :
                 pass
         self.stop()
-
     def stop(self):
         myDebug.Print('StockQuote stop\n')
         self.threadRunning = False

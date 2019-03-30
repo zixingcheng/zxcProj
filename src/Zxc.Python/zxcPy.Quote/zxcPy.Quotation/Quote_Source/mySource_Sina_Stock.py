@@ -21,7 +21,9 @@ import myQuote_Data, myData_Stock, myQuote_Listener, myQuote_Source
 class Source_Sina_Stock(myQuote_Source.Quote_Source):
     def __init__(self, params = ""):
         myQuote_Source.Quote_Source.__init__(self, params, 'Stock')     #设置类型
-    def query(self):    
+
+    #查询行情
+    def query(self, checkTime = True, nReturn = 0):    
         #新浪Stock接口查询
         host="http://hq.sinajs.cn/list="
         url = host + self.params
@@ -29,14 +31,47 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
         res_data = urllib.request.urlopen(req)
         res = res_data.read().decode(encoding = "gbk")
         
+        #返回组
+        nNum = nReturn
+        lstReturn = []
+
         #解析所有返回数据
         lines = res.split('\n')
         nResult = 0
         for line in lines:
-            if len(line) < 50 :
-                continue
-            stkid = line[13: 19]
-            info = line[21:len(line)-2]
+            qd = self.newData_ByInfo(line, checkTime)  
+            if(qd == None): 
+                continue 
+
+            #测试步进时间
+            #qd.time = myData_Trans.Tran_ToTime_str(None, "%H:%M:%S")
+            #qd.date = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")
+             
+            #数据处理
+            try:
+                if(nReturn <= 0):
+                    pDatas = self.setData(qd)
+                    if(pDatas != None): nResult += 1
+                else:
+                    if(nNum > 0):
+                        lstReturn.append(qd)
+                        nNum= nNum - 1
+            except Exception as e:
+                #Error(e)
+                pass
+        if(nReturn>0): return lstReturn
+        if(nResult > 0): 
+            print("")
+            return True 
+
+    #生成数据对象
+    def newData(self):
+        return myData_Stock.Data_Stock()
+    def newData_ByInfo(self, dataInfo, checkTime = True):    
+        #解析所有返回数据 
+        if len(dataInfo) > 50 : 
+            stkid = dataInfo[13: 19]
+            info = dataInfo[21:len(dataInfo)-2]
             vargs = info.split(',')
             
             qd = self.newData()     
@@ -75,23 +110,16 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
             qd.date = vargs[30]
             qd.time = vargs[31]
 
-            #测试步进时间
-            #qd.time = myData_Trans.Tran_ToTime_str(None, "%H:%M:%S")
-            #qd.date = myData_Trans.Tran_ToTime_str(None, "%Y-%m-%d")
-            
+            #时间检查(是否当天)
+            if(checkTime):
+                if(qd.checkTime() == False): 
+                    return None 
+
             #设置数据
             qd.value = myData_Trans.To_Float(qd.lastPrice)
-            try:
-                pDatas = self.setData(qd)
-                if(pDatas != None): nResult += 1
-            except Exception as e:
-                #Error(e)
-                pass
-        if(nResult > 0): print("")
-            
-    #生成数据对象
-    def newData(self):
-        return myData_Stock.Data_Stock()
+            return qd
+        return None
+
     #生成数据集对象
     def newDatas(self, data, interval):
         return myData_Stock.Datas_Stock(data, interval)
@@ -104,6 +132,10 @@ if __name__ == "__main__":
     stockids = 'sh600060'
     s = Source_Sina_Stock(stockids)
     
+    # 单独查询，不纪录
+    qd = s.query(False, 1) 
+    
+    # 通用查询，并记录
     while True:
         s.query() 
         time.sleep(3)
