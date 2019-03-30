@@ -207,7 +207,7 @@ def Tran_ToStr_FirstLetter(unicodeWord):
     str1 = unicodeWord.encode('gbk')
     try:        
         ord(str1)
-        return str1
+        return unicodeWord
     except:
         asc = str1[0] * 256 + str1[1] - 65536
         if asc >= -20319 and asc <= -20284:
@@ -302,6 +302,7 @@ if __name__ == '__main__':
     print()
 
     #转换汉子首字母
+    print(Tran_ToStr_FirstLetters(u'上证180公司治理指数', True))
     print(Tran_ToStr_FirstLetters(u'广联达', True))
 
     #转换成时间数组

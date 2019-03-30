@@ -86,13 +86,6 @@ def add_Webs(pWeb):
         jsonUsers["usrAddresss"] = lstAddress
         return jsonUsers.ToString() 
 
-    def _Find(self, usrName, usrPhone): 
-        text = myIO.getContent(pWeb.baseDir + "/Setting/OrderSets-"+ nameType +".json", True, False)
-        #jsonSets = myData_Json.Json_Object()
-        #jsonSets.Trans_FromStr(text) 
-        #return jsonSets.ToString()
-        return text
-
     #用户信息更新
     def usrAdd(form):
         usrInfos = {}

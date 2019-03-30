@@ -22,7 +22,7 @@ class myQuote_Setting():
         self.setArea = area         #国家分类
         self.mark = ''              #备注说明
         self.msgUsers_wx = []       #消息发送用户-微信
-        
+
         self.isIndex = False            #是否是指数
         self.isEnable = False           #是否设置有效
         self.isEnable_RFasInt = False   #是否设置有效--涨跌幅监测

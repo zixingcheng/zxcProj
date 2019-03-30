@@ -39,6 +39,7 @@
     <Compile Include="zxcPy.Robot\Roots\myRoot_Usr.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_Prj.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot.py" />
+    <Compile Include="zxcPy.Webs\myWeb_Stock.py" />
     <Compile Include="zxcPy.Webs\myWeb_Order.py" />
   </ItemGroup>
   <ItemGroup>
