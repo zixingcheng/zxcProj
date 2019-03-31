@@ -44,7 +44,7 @@ def add_Webs(pWeb):
     pWeb.add_Web()  
     
     #添加页面--订单商品查询
-    @pWeb.app.route('/orderSets')
+    @pWeb.app.route('/zxcWebs/order/Sets')
     def orderSets(): 
         #载入配置
         nameType=request.args.get('type')
@@ -53,9 +53,10 @@ def add_Webs(pWeb):
         #jsonSets.Trans_FromStr(text) 
         #return jsonSets.ToString()
         return text
+    
 
     #添加页面--订单新增
-    @pWeb.app.route('/orderAdd/<orderType>', methods = ['GET', 'POST'])    
+    @pWeb.app.route('/zxcWebs/order/Add/<orderType>', methods = ['GET', 'POST'])    
     def orderAdd(orderType):
         form = orderAddForm()                       #生成form实例，给render_template渲染使用 
         form.orderType = orderType
@@ -66,7 +67,7 @@ def add_Webs(pWeb):
         return render_template('orderAdd.html', title = 'Order Add', form = form, orderType = orderType)     #如果数据不符合要求，则再次读取orderAdd.html页面
     
     #添加页面--用户信息查询
-    @pWeb.app.route('/usrInfoQuery')
+    @pWeb.app.route('/zxcAPI/robot/user/query')
     def usrInfoQuery(): 
         name=request.args.get('name', "")
         phone=request.args.get('phone', "") 

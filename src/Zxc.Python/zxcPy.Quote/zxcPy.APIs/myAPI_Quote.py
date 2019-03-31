@@ -79,8 +79,8 @@ def add_APIs(pWeb):
     #init_Quote()
     
     # 创建Web API
-    pWeb.add_API(myAPI_Quote_Set, '/zxcAPI/robot/quote/set/<strName>/<bAdd>/<usrName_Nick>')
-
+    pWeb.add_API(myAPI_Quote_Set, '/zxcAPI/robot/stock/quote_set/<strName>/<bAdd>/<usrName_Nick>')
+    
 
     
 #行数监测线程 

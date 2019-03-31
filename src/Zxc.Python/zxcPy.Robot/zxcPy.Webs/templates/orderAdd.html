@@ -54,7 +54,7 @@
 		var dataTarget=null;
 		$(document).ready(function () {
 			<!--动态获取配置信息-->
-			$.get('/orderSets',  {type:'{{orderType}}'}, function(data){   
+			$.get('/zxcWebs/order/Sets',  {type:'{{orderType}}'}, function(data){   
 				dataOrderSets = JSON.parse(data, null);  
 				
 				<!--遍历Json串获取类型--> 
@@ -74,8 +74,7 @@
 				for(var item in dataTargets){  
 					objTargets.appendChild(new Option(item, item));   
 				}; 
-			},false); 
-			
+			},false); 			
 			<!--订单商品选择，更新相关设置-->
 			document.getElementById('orderTarget').addEventListener('change',function(){
 				dataTarget = dataTargets[this.value] 
@@ -93,10 +92,10 @@
 					var exist = false
 					var items = dataUserInfos['usrName_Fulls'];
 					for(var item in items){   
-						if(item == this.value) 
+						if(items[item] == this.value) 
 							exist = true;
 					}; 
-					if( exist) setUserInfo(this.value, ''); 
+					if(!exist) setUserInfo(this.value, ''); 
 				};
 			});  
 			$("#orderUsrPhone").on('input propertychange change',function () {  
@@ -107,17 +106,17 @@
 						var exist = false
 						var items = dataUserInfos['usrPhones'];
 						for(var item in items){   
-							if(item == this.value) 
+							if(items[item] == this.value) 
 								exist = true;
 						}; 
-						if( exist) setUserInfo("", this.value); 
+						if(!exist) setUserInfo("", this.value); 
 					};
 				};
 			});  
 			
 			<!--动态查询用户信息-->
 			function setUserInfo(usrName, usrPhone)	{			
-				$.get('/usrInfoQuery',  {name: usrName, phone: usrPhone}, function(data){   
+				$.get('/zxcAPI/robot/user/query',  {name: usrName, phone: usrPhone}, function(data){   
 					var jsonUserInfos = JSON.parse(data, null);  
 					var change = false;   
 					

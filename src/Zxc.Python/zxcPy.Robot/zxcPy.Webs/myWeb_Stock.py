@@ -30,8 +30,8 @@ class stockQueryForm(FlaskForm):
 
 #集中添加所有Web
 def add_Webs(pWeb):      
-    #添加页面--股票模糊查询
-    @pWeb.app.route('/stockQuery')
+    #添加页面--股票模糊查询 
+    @pWeb.app.route('/zxcAPI/robot/stock/query')
     def stockQuery(): 
         #载入配置
         code_id=request.args.get('code_id', "")
@@ -56,3 +56,11 @@ def add_Webs(pWeb):
         jsonStocks["code_names"] = lstCode_Name
         jsonStocks["code_namesEN"] = lstCode_NameEN
         return jsonStocks.ToString() 
+
+
+    #添加页面--股票选择页面-测试
+    @pWeb.app.route('/zxcWebs/stock/select', methods = ['GET', 'POST'])    
+    def stockSelect():
+        form = stockQueryForm()                     #生成form实例，给render_template渲染使用 
+        return render_template('stockSelect.html', title = 'Stock Query', form = form)      
+    
