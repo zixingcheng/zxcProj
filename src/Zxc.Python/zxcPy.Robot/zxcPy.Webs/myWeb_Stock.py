@@ -27,6 +27,20 @@ class stockQueryForm(FlaskForm):
     stockID = StringField('股票代码', [DataRequired(),Length(min=4, max=8)], render_kw={"placeholder": "请输入股票代码"})  
     stockName = StringField('股票名称', [DataRequired(),Length(min=2, max=6)], render_kw={"placeholder": "请输入股票名称"})
  
+# 股票行情监测设置页面
+class stockQuoteSetForm(FlaskForm):  
+    #商品信息
+    stockID = StringField('股票代码', [DataRequired(),Length(min=4, max=8)], render_kw={"placeholder": "请输入股票代码"})  
+    stockName = StringField('股票名称', [DataRequired(),Length(min=2, max=6)], render_kw={"placeholder": "请输入股票名称/首字母"})
+     
+    monitorUsrID = StringField('微信账户', [DataRequired()], default="") 
+    save = SubmitField('新增监测', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
+    remove = SubmitField('移除监测')    # 移除按钮
+
+    # Checkbox类型，加上default='checked'即默认是选上的
+    monitorRise_Fall = BooleanField('涨跌监测', default='checked',validators=[DataRequired()])
+    monitorHourly = BooleanField('整点播报', default='checked',validators=[DataRequired()]) 
+    
 
 #集中添加所有Web
 def add_Webs(pWeb):      
@@ -64,3 +78,15 @@ def add_Webs(pWeb):
         form = stockQueryForm()                     #生成form实例，给render_template渲染使用 
         return render_template('stockSelect.html', title = 'Stock Query', form = form)      
     
+
+    #添加页面--股票行情监测设置
+    @pWeb.app.route('/zxcWebs/stock/quoteset/<usrID>', methods = ['GET', 'POST'])    
+    def stockQuoteSet(usrID):
+        form = stockQuoteSetForm()                  #生成form实例，给render_template渲染使用  
+        if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
+            #添加订单  
+            if form.save.data:  # 保存按钮被单击 
+                return "已成功新增监测."    
+            elif form.remove.data:  # 移除按钮被单击
+                return "已成功移除监测."  
+        return render_template('stockQuoteSet.html', title = 'Stock QuoteSet', form = form, usrName_Nick = usrID)   

@@ -4,14 +4,21 @@
 
 {% block content %} 
   {% from "base.html" import render_field %}
-  <form action="" method="post" name="stockQuery" style="margin-left:10px;margin-top:10px" > 
-	<h1 style="margin-left:80px">股票查询 </h1>
+  <form action="" method="post" name="stockQuoteSet" style="margin-left:10px;margin-top:10px" > 
+	<h1 style="margin-left:60px">股票监测设置 </h1>
     {{ form.hidden_tag() }} 
 	
 	<table>
 		{{ render_field(form.stockID, size=20) }} 
 		{{ render_field(form.stockName, size=20) }}  
+		
+		{{ render_field(form.monitorRise_Fall, size=20) }} 
+		{{ render_field(form.monitorHourly, size=20) }} 
+		
+		{{ render_field(form.monitorUsrID, size=20) }} 
 	</table>  
+	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p> 
+ 
 	<datalist id="lstStockIDs"></datalist>
 	<datalist id="lstStockNames"></datalist> 
 		 
@@ -69,6 +76,8 @@
 			<!--控件调整，绑定下拉辅助输入列表-->
 			$("#stockID").attr("list",'lstStockIDs'); 
 			$("#stockName").attr("list",'lstStockNames');  
+			$("#monitorUsrID").attr("readonly",'readonly'); 
+			$("#monitorUsrID").val('{{usrName_Nick}}'); 
 		});
 	</script>
 	
