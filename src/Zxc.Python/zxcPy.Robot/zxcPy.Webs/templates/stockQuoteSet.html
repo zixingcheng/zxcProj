@@ -17,10 +17,12 @@
 		
 		{{ render_field(form.monitorUsrID, size=20) }} 
 	</table>  
-	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p> 
- 
+	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p>
+	
+	<td>{{ form.exType|safe }}{{ form.code_id|safe }}{{ form.code_name|safe }}</td>	
 	<datalist id="lstStockIDs"></datalist>
 	<datalist id="lstStockNames"></datalist> 
+	
 		 
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> 
 	<script type="text/javascript"> 
@@ -43,9 +45,12 @@
 					var items_ex = dataStocks['extypes'] ;
 					var items_name = dataStocks['code_names']; 
 					for(var item in items){  
-						if(items_ex[item] + items[item] == codeID || items_name[item] == codeName){
+						if(items_ex[item] + "." + items[item] == codeID || items_name[item] == codeName){
 							if(codeName == "") $("#stockName").val(items_name[item]);
-							if(codeID == "") $("#stockID").val(items_ex[item] + items[item]);
+							if(codeID == "") $("#stockID").val(items_ex[item] + "." + items[item]);			
+							$("#exType").val(items_ex[item]); 				
+							$("#code_id").val(items[item]); 			
+							$("#code_name").val(items_name[item]); 		
 							return;
 						};
 					};  
@@ -65,17 +70,19 @@
 						var objIDs = document.getElementById('lstStockIDs'); 
 						var objNames = document.getElementById('lstStockNames');  
 						for(var item in items){   
-							objIDs.appendChild(new Option(items_name[item], items_ex[item] + items[item]));   
+							objIDs.appendChild(new Option(items_name[item], items_ex[item] + "." + items[item]));   
 							objNames.appendChild(new Option(items_nameEN[item], items_name[item]));   
 						};  
 						dataStocks = jsonStocks;
-					} 
+					};
 				});	 
 			};
 			
 			<!--控件调整，绑定下拉辅助输入列表-->
 			$("#stockID").attr("list",'lstStockIDs'); 
-			$("#stockName").attr("list",'lstStockNames');  
+			$("#stockID").attr("autocomplete",'off'); 
+			$("#stockName").attr("list",'lstStockNames'); 
+			$("#stockName").attr("autocomplete",'off');  
 			$("#monitorUsrID").attr("readonly",'readonly'); 
 			$("#monitorUsrID").val('{{usrName_Nick}}'); 
 		});

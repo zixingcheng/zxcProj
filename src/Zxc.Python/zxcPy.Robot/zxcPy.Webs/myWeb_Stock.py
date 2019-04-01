@@ -6,7 +6,7 @@ Created on  张斌 2019-03-30 15:58:00
 
     pyWeb --股票代码查询
 """ 
-import sys, os, string, mySystem 
+import sys, os, string, mySystem  
 
 #导入模块
 from flask import jsonify, request, flash, render_template, redirect    #导入模块
@@ -17,7 +17,7 @@ from wtforms.validators import DataRequired,ValidationError,Email,Regexp,EqualTo
 mySystem.Append_Us("", False)  
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
 mySystem.Append_Us("../../zxcPy.Quote/zxcPy.Quotation", False, __file__)
-import myIO, myWeb, myDebug, myData_Json, myRoot_Usr, myQuote
+import myIO, myWeb, myWeb_urlLib, myDebug, myData_Json, myRoot_Usr, myQuote
 from myGlobal import gol
 
 
@@ -30,8 +30,8 @@ class stockQueryForm(FlaskForm):
 # 股票行情监测设置页面
 class stockQuoteSetForm(FlaskForm):  
     #商品信息
-    stockID = StringField('股票代码', [DataRequired(),Length(min=4, max=8)], render_kw={"placeholder": "请输入股票代码"})  
-    stockName = StringField('股票名称', [DataRequired(),Length(min=2, max=6)], render_kw={"placeholder": "请输入股票名称/首字母"})
+    stockID = StringField('股票代码', [DataRequired(),Length(min=4, max=10)], render_kw={"placeholder": "请输入股票代码"})  
+    stockName = StringField('股票名称', [DataRequired(),Length(min=2, max=12)], render_kw={"placeholder": "请输入股票名称/首字母"})
      
     monitorUsrID = StringField('微信账户', [DataRequired()], default="") 
     save = SubmitField('新增监测', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
@@ -41,7 +41,11 @@ class stockQuoteSetForm(FlaskForm):
     monitorRise_Fall = BooleanField('涨跌监测', default='checked',validators=[DataRequired()])
     monitorHourly = BooleanField('整点播报', default='checked',validators=[DataRequired()]) 
     
+    exType = StringField('交易所代码', [DataRequired()], render_kw={"style": "display:none;"}) 
+    code_id = StringField('股票代码', [DataRequired()],  render_kw={"style": "display:none;"}) 
+    code_name = StringField('股票名称', [DataRequired()],  render_kw={"style": "display:none;"}) 
 
+    
 #集中添加所有Web
 def add_Webs(pWeb):      
     #添加页面--股票模糊查询 
@@ -80,13 +84,27 @@ def add_Webs(pWeb):
     
 
     #添加页面--股票行情监测设置
-    @pWeb.app.route('/zxcWebs/stock/quoteset/<usrID>', methods = ['GET', 'POST'])    
-    def stockQuoteSet(usrID):
+    @pWeb.app.route('/zxcWebs/stock/quoteset/<usrID>/<plat>', methods = ['GET', 'POST'])    
+    def stockQuoteSet(usrID, plat):
         form = stockQuoteSetForm()                  #生成form实例，给render_template渲染使用  
         if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
             #添加订单  
             if form.save.data:  # 保存按钮被单击 
-                return "已成功新增监测."    
+                editInfo = {}
+                editInfo[form.monitorHourly.label.text] = {'isValid': form.monitorHourly.data, 'msgUsers': { usrID : plat}, 'mark' :""}
+                editInfo[form.monitorRise_Fall.label.text] = {'isValid': form.monitorRise_Fall.data, 'msgUsers': { usrID : plat}, 'mark' :""}
+
+                strPath = 'stock/QuoteSet?extype=' + form.exType.data + "&code_id=" + form.code_id.data + "&code_name=" + "&editInfo=" + str(editInfo)  #+ form.code_name.data
+                strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"
+                    
+                #修改接口执行
+                pWeb = myWeb_urlLib.myWeb(strUrl, bPrint=False)
+                strReturn = pWeb.Do_API_get(strPath, "zxcAPI-py")
+                jsonRes = myData_Json.Trans_ToJson(strReturn)
+
+                #结果处理
+                if(jsonRes['result']):
+                    return jsonRes['text']
             elif form.remove.data:  # 移除按钮被单击
                 return "已成功移除监测."  
-        return render_template('stockQuoteSet.html', title = 'Stock QuoteSet', form = form, usrName_Nick = usrID)   
+        return render_template('stockQuoteSet.html', title = 'Stock QuoteSet', form = form, usrName_Nick = usrID, usrPlat = plat)   

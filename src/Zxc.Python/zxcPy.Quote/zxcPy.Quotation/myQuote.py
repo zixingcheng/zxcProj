@@ -91,7 +91,7 @@ class myStock:
             self._Index(pSet)               #索引设置信息 
             
     #查找 
-    def _Find(self, code_id, code_name = '', code_nameEN = '', exTyep = "", nReturn = 10):
+    def _Find(self, code_id, code_name = '', code_nameEN = '', exType = "", nReturn = 10):
         if(code_nameEN == ""): code_nameEN = myData_Trans.Tran_ToStr_FirstLetters(code_name, True)
         length = len(code_id)
         length_name = len(code_name)
@@ -102,7 +102,7 @@ class myStock:
             if(length > 0):
                 if(x.code_id[0: length] == code_id):   #等长匹配
                     if(len(lstR) < nReturn): 
-                        if(exTyep == "" or exTyep == x.extype):
+                        if(exType == "" or exType == x.extype):
                             lstR.append(x)
                             continue
             

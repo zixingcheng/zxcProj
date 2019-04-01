@@ -57,7 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />
-    <Content Include="Setting\Setting_Quote.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
