@@ -375,7 +375,7 @@ class Quote_Datas:
         self.datasS_M = None                            #统计数据对象--分钟级
         self.data = pData                               #当前数据对象
 
-        self.setting = myQuote_Setting._Find(pData.name)#配置项
+        self.setting = myQuote_Setting._Find("",pData.idTag)    #配置项,以标识为准，避免名称不统一
         self.autoSave = True 
         self.stoped = False 
         self.tagTime = datetime.datetime.now()

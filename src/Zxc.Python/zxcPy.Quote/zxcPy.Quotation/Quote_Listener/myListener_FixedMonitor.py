@@ -211,8 +211,7 @@ class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
 
     #功能是否可用
     def IsEnable(self, quoteDatas):
-        return True
-        return quoteDatas.setting.isEnable_RFasInt
+        return False 
     
 
 

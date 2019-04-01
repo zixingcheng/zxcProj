@@ -6,7 +6,7 @@ Created on  张斌 2016-10-08 10:00:00
 
     自定义数据类型--数据转换操作
 """
-import sys, string, re
+import sys, string, ast, re
 import time, datetime
 from struct import pack, unpack 
  
@@ -176,6 +176,12 @@ def Tran_ToTime_int(Time = None):
     #转换成时间戳
     timestamp = time.mktime(Time)
     return int(timestamp)
+
+
+#转换为字典
+def Tran_ToDict(strDict):
+    value = ast.literal_eval(strDict)
+    return value
 
 #转换为字符串
 def Tran_ToStr(lstV = [], symbol = ','):

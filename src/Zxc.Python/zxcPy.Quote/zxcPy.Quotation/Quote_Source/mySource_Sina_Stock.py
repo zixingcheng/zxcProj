@@ -70,12 +70,13 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
     def newData_ByInfo(self, dataInfo, checkTime = True):    
         #解析所有返回数据 
         if len(dataInfo) > 50 : 
-            stkid = dataInfo[13: 19]
+            stkid = dataInfo[11: 19]
             info = dataInfo[21:len(dataInfo)-2]
             vargs = info.split(',')
             
             qd = self.newData()     
-            qd.id = stkid
+            qd.id = stkid[2:] 
+            qd.idTag = stkid
             qd.rawline = info
             qd.name = vargs[0]
             qd.openPrice = vargs[1]

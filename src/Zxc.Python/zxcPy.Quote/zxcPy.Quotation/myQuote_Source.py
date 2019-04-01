@@ -44,7 +44,7 @@ class Quote_Source:
             lstParam = []
             for x in keys:
                 pSet = pSets._Find(x)
-                if(pSet != None and pSet.isEnable and self.type == pSet.setType):
+                if(pSet != None and pSet.IsEnable() and self.type == pSet.stockInfo.type):
                     lstParam.append(pSet.setTag)
             strParams = myData_Trans.Tran_ToStr(lstParam)
             return strParams
@@ -165,8 +165,8 @@ class Quote_Thread(threading.Thread):
     def run(self):
         if(self.source.setTime() == False):
             myDebug.Print('StockQuote stoped.\n         --not stock time..')
-            self.stop()
-            return 
+            #self.stop()
+            #return 
 
         myDebug.Print('StockQuote run')
         self.threadRunning = True;

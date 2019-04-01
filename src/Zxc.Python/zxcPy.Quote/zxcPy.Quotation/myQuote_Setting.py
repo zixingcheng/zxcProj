@@ -10,91 +10,162 @@ import sys, os, datetime, uuid, mySystem
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)    
-import myIO, myIO_xlsx, myData, myData_Trans
+import myIO, myIO_xlsx, myData, myData_Trans, myQuote
+from myGlobal import gol 
+gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
 
+        
 #监听--设置对象
 class myQuote_Setting():
-    def __init__(self, datasTag, datasName, datasType = "Stock", area = "CN"): 
-        self.setTag = datasTag      #数据标识    
-        self.setName = datasName    #数据名称  
-        self.setType = datasType    #数据类型
-        self.setArea = area         #国家分类
-        self.mark = ''              #备注说明
-        self.msgUsers_wx = []       #消息发送用户-微信
+    def __init__(self, monitorTag): 
+        self.monitorTag = monitorTag    #监测类型标识    
+        self.isValid = False            #设置是否生效
+        self.setStr = ''                #完整设置
+        self.mark = ''                  #备注说明
+        self.msgUsers = {}              #消息发送用户字典(用户名：平台)  
+    #配置字符串
+    def ToString(self): 
+        return ""
 
-        self.isIndex = False            #是否是指数
-        self.isEnable = False           #是否设置有效
-        self.isEnable_RFasInt = False   #是否设置有效--涨跌幅监测
-        self.isEnable_Hourly = False    #是否设置有效--整点播报
-
-#监听--设置对象集
+#监听--设置对象集(统一管理)
 class myQuote_Settings():
+    def __init__(self, exType, code_id, code_name, code_name_En): 
+        self.stockInfos = gol._Get_Value('setsStock', None)
+        self.stockInfo = None           #股票信息
+        self.setTag = ""                #名称标识 
+        self.settings = {}              #各监测对象设置
+        self.Init(exType, code_id, code_name, code_name_En)    
+    #初始股票信息
+    def Init(self, exType, code_id, code_name, code_name_En): 
+        pTocks = self.stockInfos._Find(code_id, code_name, code_name_En, exType)
+        if(len(pTocks) == 1):  
+            self.stockInfo = pTocks[0]      #唯一时有效
+        else:
+            self.stockInfo = None
+            return False
+
+        #更新信息
+        if(self.stockInfo != None):
+            self.setTag = self.stockInfo.extype + self.stockInfo.code_id     
+            self.isIndex = self.stockInfo.IsIndex()
+        return True
+    #是否可用的设置
+    def IsEnable(self):
+        return (len(self._Find_Usrs()) > 0)
+    #查找改设置的所有用户
+    def _Find_Usrs(self):
+        lstUsr = []
+        for x in self.settings:
+            pSetting = self.settings[x]
+            for xx in pSetting.msgUsers:
+                if(not xx in lstUsr):
+                    lstUsr.append(xx)
+        return lstUsr
+
+    #提取配置信息
+    def GetSetting(self, monitorTag): 
+        return self.settings.get(monitorTag, None)
+    #添加股票设置信息
+    def AddSetting(self, pSetting): 
+        if(pSetting != None and pSetting.monitorTag != ""):
+            self.settings[pSetting.monitorTag] = pSetting
+    #移除股票设置信息
+    def RemoveSetting(self, usrID): 
+        for x in self.settings:
+            pSetting = self.settings[x]  
+            pSetting.msgUsers.pop(usrID)
+            if(len(pSetting.msgUsers) == 0):    #无用户移除
+                self.settings.pop(monitorTag)
+        return True
+
+#监听--设置对象集管理
+class myQuote_Sets():
     def __init__(self): 
         self.sets = []              #设置集(不排序)
         self.setList = {}           #设置集(按名称索引)
         self.setList_Tag = {}       #设置集--(按Tag索引)
-        self.setUsers = []          #设置用户信息集
+        self.setUsers = {}          #设置用户信息集
 
         #初始根目录信息
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.Dir_Base = os.path.abspath(os.path.join(strDir, ".."))  
         self.Dir_Setting = self.Dir_Base + "/Setting"
         self.Path_SetQuote = self.Dir_Setting + "/Setting_Quote.csv"
-        self.lstFields = ["代码","名称","类型","国家","是否指数","有效性","消息发送用户_wx","涨跌监测","整点播报","备注"]
+        self.lstFields = ["代码","名称","类型","国家","是否指数","监测类型","是否生效","完整设置","消息发送用户","备注"]   
         self._Init()
     #初始参数信息等   
     def _Init(self):            
-        #提取字段信息 
-        #dtSetting = myIO_xlsx.loadDataTable(self.Path_SetQuote, 0, 1)            #监听设置信息
+        #提取字段信息  
         dtSetting = myIO_xlsx.DtTable() 
-        dtSetting.dataFieldType = ["","","","","bool","bool","","bool","bool",""]
-        dtSetting.Load_csv(self.Path_SetQuote, 1, 0, isUtf = True)
-
+        dtSetting.dataFieldType = ["","","","","bool","","bool","","",""]
+        dtSetting.Load_csv(self.Path_SetQuote, 1, 0, isUtf = True) 
         if(len(dtSetting.dataMat) < 1 or len(dtSetting.dataField) < 1): return
-        lstFields_ind = dtSetting.Get_Index_Fields(self.lstFields)
 
         #转换为功能权限对象集
+        lstFields_ind = dtSetting.Get_Index_Fields(self.lstFields)
         for dtRow in dtSetting.dataMat:
             if(len(dtRow) < len(self.lstFields)): continue
-            pSet = myQuote_Setting("", "")
-            pSet.setTag = dtRow[lstFields_ind["代码"]]
-            pSet.setName = dtRow[lstFields_ind["名称"]]
-            pSet.setType = dtRow[lstFields_ind["类型"]]
-            pSet.setArea = dtRow[lstFields_ind["国家"]]
-            pSet.isIndex = myData.iif(dtRow[lstFields_ind["是否指数"]] == True, True, False)
-            pSet.isEnable = myData.iif(dtRow[lstFields_ind["有效性"]] == True, True, False)
-            pSet.isEnable_RFasInt = myData.iif(dtRow[lstFields_ind["涨跌监测"]] == True, True, False)
-            pSet.isEnable_Hourly = myData.iif(dtRow[lstFields_ind["整点播报"]] == True, True, False)
-            
-            pSet.mark = dtRow[lstFields_ind["备注"]] 
-            strUsers = str(dtRow[lstFields_ind["消息发送用户_wx"]])
-            pSet.msgUsers_wx = myData.iif(strUsers == "", [], strUsers.split('、'))
-            self._Index(pSet)               #索引设置信息
+            strSet = myData_Trans.Tran_ToStr(dtRow, ',')
+            self._Init_BySet_str(strSet)
+    #初始参数信息--设置 
+    def _Init_BySet_str(self, strSet):
+        strSets = strSet.split(',')
+        if(len(strSets) < 10): return False
 
-            #用户信息--未完善
-            self.setUsers = ["Test"]     
+        #初始设置集
+        ids = strSets[0].split('.')
+        pSet = self._Find("", ids[0] + ids[1])
+        if(pSet == None):
+            pSet = myQuote_Settings(ids[0], ids[1], "", "")
+            self._Index(pSet)
 
+        #按类型初始
+        if(pSet):
+            monitorTag = strSets[5]
+            pSetting = pSet.settings.get(monitorTag, None)
+            if(pSetting == None):
+                if(monitorTag == "整点播报" or monitorTag == "涨跌监测"):   #特殊类型处理
+                    pSetting = myQuote_Setting(monitorTag)
+                else:
+                    pSetting = None
+                    return False
+
+            #底层属性提取
+            pSetting.monitorTag = monitorTag
+            pSetting.isValid = myData_Trans.To_Bool(strSets[6])
+            pSetting.setStr = strSets[7]
+            pSetting.mark = strSets[9]
+            pSetting.msgUsers = myData_Trans.Tran_ToDict(strSets[8].replace('，', ','))
+            pSet.AddSetting(pSetting)
+            self._Index_User(pSet)
+            return True
+        return False
+    
+    #保存
     def _Save(self):            
         dtSetting = myIO_xlsx.DtTable()     #监听设置信息表
         dtSetting.dataName = "dataName"
         dtSetting.dataField = self.lstFields
-        dtSetting.dataFieldType = ["","","","","bool","bool","","bool","bool",""]
-       
+        dtSetting.dataFieldType = ["","","","","bool","","bool","","",""]
+        
         # 组装行数据
         for pSet in self.sets:
-            pValues = []
-            pValues.append(pSet.setTag)
-            pValues.append(pSet.setName)
-            pValues.append(pSet.setType)
-            pValues.append(pSet.setArea)
-            pValues.append(pSet.isIndex)
-            pValues.append(pSet.isEnable)
-            pValues.append(myData_Trans.Tran_ToStr(pSet.msgUsers_wx, "、"))
-            pValues.append(pSet.isEnable_RFasInt)
-            pValues.append(pSet.isEnable_Hourly)
-            pValues.append(pSet.mark)
-            dtSetting.dataMat.append(pValues)
+            for x in pSet.settings:
+                pValues = []
+                pValues.append(pSet.stockInfo.extype  + "." + pSet.stockInfo.code_id)
+                pValues.append(pSet.stockInfo.code_name)
+                pValues.append(pSet.stockInfo.type)
+                pValues.append(pSet.stockInfo.area) 
+                pValues.append(pSet.stockInfo.IsIndex())
+
+                pSetting = pSet.settings[x]
+                pValues.append(pSetting.monitorTag)
+                pValues.append(pSetting.isValid)
+                pValues.append(pSetting.setStr)
+                pValues.append(str(pSetting.msgUsers).replace(',', '，'))
+                pValues.append(pSetting.mark)
+                dtSetting.dataMat.append(pValues)
 
         # 保存
         # dtSetting.Save(self.Dir_Setting, "Setting_Quote", 0, 0, True, "监听设置表", -1, -1, False)
@@ -105,37 +176,88 @@ class myQuote_Settings():
         pSet = None
 
         #按名称查找
-        if(pSet == None):
+        if(pSet == None and setName != ""):
             pSet = self.setList.get(setName, None)
         if(pSet == None and setTag != ''):
-            pSet = self.usrList_Tag.get(setTag.lower()) 
+            pSet = self.setList_Tag.get(setTag.lower()) 
         return pSet  
+    #查找用户设置股票集
+    def _Find_Sets(self, usrID):  
+        dictCode = {}
+        listCode = []
+        for pSet in self.sets:
+            if(dictCode.get(pSet.setTag, None) != None):
+                continue
+            for x in pSet.settings:
+                pSetting = pSet.settings[x]
+                if(pSetting.msgUsers != None and pSetting.msgUsers.get(usrID, "") != ""):
+                    dictCode[pSet.setTag] = "True"
+                    listCode.append(pSet.stockInfo)
+                    break
+        return listCode
+    #查找用户集
+    def _Find_Usrs(self):
+        return self.setUsers.keys()
+
     #设置索引
     def _Index(self, pSet): 
+        if(self._Find("", pSet.setTag)!=None):return
         self.sets.append(pSet)
-        self.setList[pSet.setName] = pSet
+        self.setList[pSet.stockInfo.code_name] = pSet
+        self._Index_User(pSet)
                 
         #用户集--(按标识索引)
         if(pSet.setTag != ""):
-            self.setList_Tag[pSet.setTag.lower()] = pSet.setName 
-    # 设置修改
-    def Edit(self, setName, setTag = ''): 
-        pSet = self._Find(setName, setTag)
-        if(pSet != None):
-            pass 
+            self.setList_Tag[pSet.setTag.lower()] = pSet
+    #设置索引--用户
+    def _Index_User(self, pSet): 
+        for x in pSet.settings:
+            pSetting = pSet.settings[x]
+            for xx in pSetting.msgUsers:
+                pUserInfo = self.setUsers.get(xx, {})
+                pLstCode = pUserInfo.get(pSetting.monitorTag, [])
+                if(not pSet.setTag in pLstCode):
+                    pLstCode.append(pSet.setTag)
+                pUserInfo[pSetting.monitorTag] = pLstCode
+                self.setUsers[xx] = pUserInfo
         return True
-    
+
+    # 设置修改
+    def _Edit(self, exType, code_id, code_name, strSets = {}):
+        bResult = True
+        for x in strSets:
+            pSet = strSets[x]
+            strSet = x + "," + str(pSet.get("isValid",False)) + "," + pSet.get("setStr","") + "," + str(pSet.get("msgUsers","")).replace(',', '，') + "," + pSet.get("mark", "")
+            bResult = bResult and self._Init_BySet_str(exType + "." + code_id + "," + code_name + ",,,," + strSet)
+        if(bResult): self._Save()
+        return bResult   
+    # 设置移除
+    def _Remove(self, exType, code_id, code_name, usrID):
+        bResult = True
+        lstSets = self._Find_Sets(usrID)
+        for x in lstSets:
+            pSet = self._Find("", x.extype + x.code_id)
+            if(pSet != None):
+                bResult = bResult and pSet.RemoveSetting(usrID)
+                if(bResult):
+                    pUser = self.setUsers.get(usrID, {})
+                    for xx in pSet.settings:
+                        pUser.pop(xx)
+                    if(len(pUser) == 0): self.setUsers.pop(usrID)
+        if(bResult): self._Save()
+        return bResult    
+
 #初始全局消息管理器
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
-gol._Set_Value('setsQuote', myQuote_Settings())
+gol._Set_Value('setsQuote', myQuote_Sets())
 
 #查找 
-def _Find(setName, setTag = ''):
+def _Find(setName, setTag = '', bCreatAuto = False):
     pSets = gol._Get_Value('setsQuote')
     if(pSets != None):
         pSet = pSets._Find(setName, setTag)
-        if(pSet == None):
+        if(pSet == None and bCreatAuto):
             pSet = myQuote_Setting(setTag, setName)
         return pSet
     return None
@@ -145,6 +267,25 @@ def _Find(setName, setTag = ''):
 if __name__ == "__main__":
     pSets = gol._Get_Value('setsQuote')
 
+    #修改测试
+    editInfo = {}
+    editInfo["整点播报"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号':'wx','@*测试群':'wx'}, 'mark':'测试设置' }
+    editInfo["涨跌监测"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号':'wx','@*测试群':'wx'}, 'mark':'测试设置' }
+    pSets._Edit("sh", "000001", "", editInfo)
+
+    #查找指定用户全部设置
+    lstStock = pSets._Find_Sets("茶叶一主号")
+    print("设置信息：")
+    for x in lstStock:
+        print(x.code_name)
+
+    #移除用户设置()
+    pSets._Remove("sh", "000001", "", '茶叶一主号')
+    print("\n用户信息：")
+    for x in pSets._Find_Usrs():
+        print(x)
+
+    #查找
+    print("查找：")
     pSet = _Find("建设银行")
-    pSets._Save()
-    print()
+    print(pSet)
