@@ -22,6 +22,12 @@
 	  </td>
 	</tr>
 	{% endmacro %}
+	{% macro render_field2(field, size) %}
+	<tr>
+	  <td>{{ field.label }}：</td>
+	  <td>{{ field(**kwargs)|safe }}</td>
+	</tr>
+	{% endmacro %}
   </head>
   <body>                            
     {% with messages = get_flashed_messages() %}   

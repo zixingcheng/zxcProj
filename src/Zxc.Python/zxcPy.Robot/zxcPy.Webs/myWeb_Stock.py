@@ -84,7 +84,7 @@ def add_Webs(pWeb):
     #添加接口--股票设置查询 
     @pWeb.app.route('/zxcWebs/stock/quoteset/query/<usrID>')
     def stockSetQuery(usrID): 
-        #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"
+        #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"    #实际网络地址在阿里云有问题，原因未明
         strUrl = "http://127.0.0.1:8669/zxcAPI/robot"
         strPath = 'stock/QuoteSet/Query?usrID=' + usrID 
              
@@ -105,7 +105,7 @@ def add_Webs(pWeb):
         if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
             #添加订单  
             #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"
-            strUrl = "http://127.0.0.1:8669/zxcAPI/robot"
+            strUrl = "http://127.0.0.1:8669/zxcAPI/robot"                #实际网络地址在阿里云有问题，原因未明
             if form.save.data:  # 保存按钮被单击 
                 editInfo = {}
                 editInfo[form.monitorHourly.label.text] = {'isValid': form.monitorHourly.data, 'msgUsers': { usrID : plat}, 'mark' :""}

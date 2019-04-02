@@ -3,19 +3,19 @@
 {% extends "base.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
 
 {% block content %} 
-  {% from "base.html" import render_field %}
+  {% from "base.html" import render_field2 %}
   <form action="" method="post" name="stockQuoteSet" style="margin-left:10px;margin-top:10px" > 
 	<h1 style="margin-left:60px">股票监测设置 </h1>
     {{ form.hidden_tag() }} 
 	
 	<table>
-		{{ render_field(form.stockID, size=20) }} 
-		{{ render_field(form.stockName, size=20) }}  
+		{{ render_field2(form.stockID, size=20) }} 
+		{{ render_field2(form.stockName, size=20) }}  
 		
-		{{ render_field(form.monitorRise_Fall, size=20) }} 
-		{{ render_field(form.monitorHourly, size=20) }} 
+		{{ render_field2(form.monitorRise_Fall, size=20) }} 
+		{{ render_field2(form.monitorHourly, size=20) }} 
 		
-		{{ render_field(form.monitorUsrID, size=20) }} 
+		{{ render_field2(form.monitorUsrID, size=20) }} 
 	</table>  
 	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p>
 	
@@ -71,7 +71,8 @@
 					};  
 				}; 
 				$("#save").val('新增监测'); 
-				$("#remove").attr("disabled", true); 
+				$("#remove").attr("disabled", true); 		
+				$("#exType").val(""); $("#code_id").val(""); $("#code_name").val(""); 
 				
 				if(codeID == "" & codeName == ""){
 					jsonStocks = dataStocks_set;

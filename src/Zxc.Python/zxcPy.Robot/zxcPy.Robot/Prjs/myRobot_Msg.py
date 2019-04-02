@@ -6,7 +6,8 @@ Created on  张斌 2017-11-17 15:16:00
 
     Weixin网页版消息处理接口（功能库）--机器人类--消息回撤
 """
-import sys, ast, os, time, random, mySystem
+import sys, string, ast, os, time, random, mySystem
+from urllib.parse import quote
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类 
 mySystem.Append_Us("", False) 
@@ -26,7 +27,7 @@ class myRobot_Msg(myRobot.myRobot):
         self.maxTime = -1               #永久有效 
 
         #初始全局操作对象
-        self.webQuote = myWeb_urlLib.myWeb("http://127.0.0.1:8669/zxcAPI/robot", "", False)   
+        #self.webQuote = myWeb_urlLib.myWeb("http://127.0.0.1:8669/zxcAPI/robot", "", False)   
         self.myRobot = myRobot_Robot.myRobot_Robot()
         self.myRobot.isRunning = True
                 
@@ -56,18 +57,11 @@ class myRobot_Msg(myRobot.myRobot):
             #机器人
             return self.myRobot._Done(Text, msgID, "TEXT", usrInfo)
         elif(cmd == "股票"):
-            #机器人
-            bAdd = True
-            if(nNum > 2 and cmds[2] == "-"): bAdd = False
-            usr = myData.iif(usrInfo['groupName'] != "", "@*" + usrInfo['groupName'], usrInfo['usrNameNick'])
-            urlPath = cmds[1] + "/" + str(bAdd) + "/" + usr
-            data = self.webQuote.Do_API_get("quote/set/" + urlPath, "myQuote_API")
-
-            #转换结果Json
-            if(data.count("{") > 0):
-                pJson = myData_Json.Json_Object()
-                pJson.Trans_FromStr(data)
-                strReturn = pJson['text']
+            #发送股票设置界面链接
+            usrPlat = usrInfo.get('usrPlat', 'wx')
+            usrID = myData.iif(usrInfo['groupName'] != "", "@*" + usrInfo['groupName'], usrInfo['usrNameNick'])
+            url = 'http://39.105.196.175:8668/zxcWebs/stock/quoteset/' + usrID + "/" + usrPlat
+            strReturn =  quote(url, safe = string.printable)   # unquote
         return strReturn
 
     #消息撤回通知        
@@ -130,8 +124,7 @@ if __name__ == "__main__":
     myDebug.Debug(pRobot_Msg.Done("@* 光山天气")['msg']) 
     myDebug.Debug(pRobot_Msg.Done("@* 附近商场")['msg']) 
     
-    myDebug.Debug(pRobot_Msg.Done("@*股票 广联达 +", usrNameNick='茶叶一主号')['msg']) 
-    myDebug.Debug(pRobot_Msg.Done("@*股票 广联达 -", usrNameNick='茶叶一主号')['msg']) 
+    myDebug.Debug(pRobot_Msg.Done("@*股票", usrNameNick='茶叶一主号')['msg'])  
 
     pRobot_Msg.Done("@@zxcRobot_Msg")
     print()
