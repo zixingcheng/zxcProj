@@ -56,7 +56,9 @@
     <Folder Include="zxcPy.Test\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\README.md" />
     <Content Include="README.md" />
+    <Content Include="Setting\README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

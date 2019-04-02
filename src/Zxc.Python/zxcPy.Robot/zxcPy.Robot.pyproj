@@ -60,12 +60,12 @@
     <Folder Include="zxcPy.Webs\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\DB_Bill\多多.csv" />
+    <Content Include="Data\README.md" />
     <Content Include="README.md" />
     <Content Include="Docs\Updata.md" />
+    <Content Include="Setting\README.md" />
     <Content Include="Setting\Setting.csv" />
     <Content Include="Setting\Setting_User.csv" />
-    <Content Include="Setting\UserInfo.csv" />
     <Content Include="Setting\UserInfo_Group.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
