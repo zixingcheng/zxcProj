@@ -104,7 +104,8 @@ def add_Webs(pWeb):
         form = stockQuoteSetForm()                  #生成form实例，给render_template渲染使用  
         if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
             #添加订单  
-            strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"
+            #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"
+            strUrl = "http://127.0.0.1:8669/zxcAPI/robot"
             if form.save.data:  # 保存按钮被单击 
                 editInfo = {}
                 editInfo[form.monitorHourly.label.text] = {'isValid': form.monitorHourly.data, 'msgUsers': { usrID : plat}, 'mark' :""}
