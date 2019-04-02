@@ -28,8 +28,9 @@ class Json_Object2:
 class Json_Object:        
     def __init__(self, pDict = OrderedDict()):
         #setattr(self, "_dict_" ,pDict)
-        self._dict_ = pDict        
-        self.Trans_FromStr('{}')
+        self._dict_ = pDict 
+        if(len(pDict) == 0):
+            self.Trans_FromStr('{}')
         
 
     #字符串转Json对象
@@ -208,6 +209,8 @@ if __name__ == "__main__":
     print(pJson["other"])
     li = pJson.GetKeys_Child(pJson["other"])
     st = str(pJson["other2"])
+    ppJons = Json_Object(pJson["other2"])
+    ppJons.ToString()
     
     print("完整Json对象(无序)-测试：")
     print(pJson )

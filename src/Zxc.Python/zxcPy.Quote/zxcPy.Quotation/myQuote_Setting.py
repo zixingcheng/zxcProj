@@ -24,6 +24,9 @@ class myQuote_Setting():
         self.setStr = ''                #完整设置
         self.mark = ''                  #备注说明
         self.msgUsers = {}              #消息发送用户字典(用户名：平台)  
+    #是否为空
+    def IsNull(self): 
+        return len(self.msgUsers) == 0
     #配置字符串
     def ToString(self): 
         return ""
@@ -50,9 +53,12 @@ class myQuote_Settings():
             self.setTag = self.stockInfo.extype + self.stockInfo.code_id     
             self.isIndex = self.stockInfo.IsIndex()
         return True
-    #是否可用的设置
+    #是否可用
     def IsEnable(self):
-        return (len(self._Find_Usrs()) > 0)
+        bNull = True
+        for x in self.settings:
+            bNull = bNull and self.settings[x].IsNull()
+        return not bNull
     #查找改设置的所有用户
     def _Find_Usrs(self):
         lstUsr = []
@@ -72,11 +78,10 @@ class myQuote_Settings():
             self.settings[pSetting.monitorTag] = pSetting
     #移除股票设置信息
     def RemoveSetting(self, usrID): 
-        for x in self.settings:
+        for x in self.settings.keys():
             pSetting = self.settings[x]  
-            pSetting.msgUsers.pop(usrID)
-            if(len(pSetting.msgUsers) == 0):    #无用户移除
-                self.settings.pop(monitorTag)
+            if(usrID in pSetting.msgUsers): 
+                pSetting.msgUsers.pop(usrID)
         return True
 
 #监听--设置对象集管理
@@ -151,7 +156,11 @@ class myQuote_Sets():
         
         # 组装行数据
         for pSet in self.sets:
+            if(not pSet.IsEnable()): continue
             for x in pSet.settings:
+                pSetting = pSet.settings[x]
+                if(pSetting.IsNull()): continue
+
                 pValues = []
                 pValues.append(pSet.stockInfo.extype  + "." + pSet.stockInfo.code_id)
                 pValues.append(pSet.stockInfo.code_name)
@@ -159,7 +168,6 @@ class myQuote_Sets():
                 pValues.append(pSet.stockInfo.area) 
                 pValues.append(pSet.stockInfo.IsIndex())
 
-                pSetting = pSet.settings[x]
                 pValues.append(pSetting.monitorTag)
                 pValues.append(pSetting.isValid)
                 pValues.append(pSetting.setStr)
@@ -210,9 +218,10 @@ class myQuote_Sets():
         if(pSet.setTag != ""):
             self.setList_Tag[pSet.setTag.lower()] = pSet
     #设置索引--用户
-    def _Index_User(self, pSet): 
+    def _Index_User(self, pSet, usrID = ""): 
         for x in pSet.settings:
-            pSetting = pSet.settings[x]
+            pSetting = pSet.settings[x] 
+            #索引所有用户
             for xx in pSetting.msgUsers:
                 pUserInfo = self.setUsers.get(xx, {})
                 pLstCode = pUserInfo.get(pSetting.monitorTag, [])
@@ -220,6 +229,17 @@ class myQuote_Sets():
                     pLstCode.append(pSet.setTag)
                 pUserInfo[pSetting.monitorTag] = pLstCode
                 self.setUsers[xx] = pUserInfo
+        return True
+    #移除索引--用户
+    def _Index_User_remove(self, pSet, usrID = ""): 
+        for x in pSet.settings:
+            pSetting = pSet.settings[x]
+            if(usrID != ""):
+                #索引所有用户
+                pUserInfo = self.setUsers.get(usrID, {})
+                pLstCode = pUserInfo.get(pSetting.monitorTag, [])
+                if(pSet.setTag in pLstCode):
+                    pLstCode.remove(pSet.setTag)
         return True
 
     # 设置修改
@@ -234,18 +254,21 @@ class myQuote_Sets():
     # 设置移除
     def _Remove(self, exType, code_id, code_name, usrID):
         bResult = True
-        lstSets = self._Find_Sets(usrID)
-        for x in lstSets:
-            pSet = self._Find("", x.extype + x.code_id)
-            if(pSet != None):
-                bResult = bResult and pSet.RemoveSetting(usrID)
-                if(bResult):
-                    pUser = self.setUsers.get(usrID, {})
-                    for xx in pSet.settings:
-                        pUser.pop(xx)
-                    if(len(pUser) == 0): self.setUsers.pop(usrID)
+        pSet = self._Find(code_name, exType + code_id)
+        if(pSet != None):
+            bResult = pSet.RemoveSetting(usrID)
+            if(bResult): 
+                self._Index_User_remove(pSet, usrID)
+                self._Refresh(pSet, usrID)
         if(bResult): self._Save()
         return bResult    
+    # 设置更新--移除多余
+    def _Refresh(self, pSet, usrID):
+        #for x in pSet.settings.keys():
+        #    if(len(pSet.settings[x].msgUsers) == 0):
+        #        pSet.settings.pop(x)  #报错
+        pUser = self.setUsers.get(usrID, {})
+
 
 #初始全局消息管理器
 from myGlobal import gol 

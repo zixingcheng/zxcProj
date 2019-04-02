@@ -27,7 +27,15 @@
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> 
 	<script type="text/javascript"> 
 		var dataStocks=JSON.parse("{}", null); 
+		var dataStocks_set=JSON.parse("{}", null); 
+		var jsonStocks = null;
 		$(document).ready(function () {   
+			<!--动态获取配置信息-->
+			$.get('/zxcWebs/stock/quoteset/query/{{usrName_Nick}}',  {}, function(data){   
+				dataStocks_set = JSON.parse(data, null);  
+				updatStocks('', ''); 
+			});		
+				
 			<!--股票信息动态查询-->
 			$("#stockID").on('input propertychange change',function () {
 				if(this.value.length < 2) return; 
@@ -51,14 +59,29 @@
 							$("#exType").val(items_ex[item]); 				
 							$("#code_id").val(items[item]); 			
 							$("#code_name").val(items_name[item]); 		
+							
+							<!--提交按钮状态修改-->
+							if(isSetedStock(items_name[item]))
+							{
+								$("#save").val('更新设置'); 
+								$("#remove").attr("disabled", false); 
+							};
 							return;
 						};
 					};  
 				}; 
-			
-				$.get('/zxcAPI/robot/stock/query',  {code_id: codeID, code_name: codeName}, function(data){   
-					var jsonStocks = JSON.parse(data, null);   
-							
+				$("#save").val('新增监测'); 
+				$("#remove").attr("disabled", true); 
+				
+				if(codeID == "" & codeName == ""){
+					jsonStocks = dataStocks_set;
+				}
+				else{
+					$.get('/zxcAPI/robot/stock/query',  {code_id: codeID, code_name: codeName}, function(data){   
+						jsonStocks = JSON.parse(data, null);  
+					});		 
+				};
+				if(jsonStocks != null){
 					<!--更新匹配用户信息--> 
 					var items = jsonStocks['code_ids'] ;
 					var items_ex = jsonStocks['extypes'] ;
@@ -75,7 +98,18 @@
 						};  
 						dataStocks = jsonStocks;
 					};
-				});	 
+				};	 
+			};
+			<!--检查是否设置过-->
+			function isSetedStock(codeName)	{
+				var isSeted = false;
+				var items_name_set = dataStocks_set['code_names']; 
+				for(var item_set in items_name_set){ 
+					if(items_name_set[item_set] == codeName){
+						isSeted = true; break; 
+					};
+				};
+				return isSeted;
 			};
 			
 			<!--控件调整，绑定下拉辅助输入列表-->
@@ -84,7 +118,7 @@
 			$("#stockName").attr("list",'lstStockNames'); 
 			$("#stockName").attr("autocomplete",'off');  
 			$("#monitorUsrID").attr("readonly",'readonly'); 
-			$("#monitorUsrID").val('{{usrName_Nick}}'); 
+			$("#monitorUsrID").val('{{usrName_Nick}}-{{usrPlat}}'); 
 		});
 	</script>
 	
