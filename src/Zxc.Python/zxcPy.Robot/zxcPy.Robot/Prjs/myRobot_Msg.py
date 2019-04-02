@@ -60,11 +60,15 @@ class myRobot_Msg(myRobot.myRobot):
             #发送股票设置界面链接
             usrPlat = usrInfo.get('usrPlat', 'wx')
             if(usrInfo['usrNameSelf'] != "" and usrInfo['groupName'] != ""):
-                usrID = usrInfo['groupName']
-            else: usrID = usrInfo['usrNameNick']
+                usrID = "@*" + usrInfo['groupName']
+                usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self") 
+            else: 
+                usrID = usrInfo['usrName']
+            usrInfo['groupID'] = ""
+            usrInfo['groupName'] = ""
 
             url = 'http://39.105.196.175:8668/zxcWebs/stock/quoteset/' + usrID + "/" + usrPlat
-            strReturn =  quote(url, safe = string.printable)   # unquote
+            strReturn = quote(url, safe = string.printable)   # unquote
         return strReturn
 
     #消息撤回通知        
@@ -77,7 +81,7 @@ class myRobot_Msg(myRobot.myRobot):
             if(pMsg != None):
                 #组装撤回描述个人消息发送到文件助手
                 if(usrInfo.get('groupName', "") == ""):
-                    usrInfo['to_usrName'] = "Self"          #调整的转发用户名(自己"self")
+                    usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self")
                     strReturn = pMsg.usrFrom + " "    
                 else:
                     #组装随机前缀
