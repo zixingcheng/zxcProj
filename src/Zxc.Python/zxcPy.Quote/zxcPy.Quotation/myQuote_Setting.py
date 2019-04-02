@@ -141,7 +141,9 @@ class myQuote_Sets():
             pSetting.isValid = myData_Trans.To_Bool(strSets[6])
             pSetting.setStr = strSets[7]
             pSetting.mark = strSets[9]
-            pSetting.msgUsers = myData_Trans.Tran_ToDict(strSets[8].replace('，', ','))
+            msgUsers = myData_Trans.Tran_ToDict(strSets[8].replace('，', ','))
+            for x in msgUsers:
+                pSetting.msgUsers[x] = msgUsers[x]
             pSet.AddSetting(pSetting)
             self._Index_User(pSet)
             return True
@@ -292,8 +294,11 @@ if __name__ == "__main__":
 
     #修改测试
     editInfo = {}
-    editInfo["整点播报"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号':'wx','@*测试群':'wx'}, 'mark':'测试设置' }
-    editInfo["涨跌监测"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号':'wx','@*测试群':'wx'}, 'mark':'测试设置' }
+    editInfo["整点播报"] = {'isValid': True, 'setStr': '', 'msgUsers': {'@*测试群':'wx'}, 'mark':'测试设置' }
+    editInfo["涨跌监测"] = {'isValid': True, 'setStr': '', 'msgUsers': {'@*测试群':'wx'}, 'mark':'测试设置' }
+    pSets._Edit("sh", "000001", "", editInfo)
+    editInfo["整点播报"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号':'wx'}, 'mark':'测试设置' }
+    editInfo["涨跌监测"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号':'wx'}, 'mark':'测试设置' }
     pSets._Edit("sh", "000001", "", editInfo)
 
     #查找指定用户全部设置
