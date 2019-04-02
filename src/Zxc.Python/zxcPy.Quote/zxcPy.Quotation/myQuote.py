@@ -51,10 +51,12 @@ class myStock:
     #更新配置信息
     def _init_Updata(self):
         #校检最新 
-        t = os.path.getmtime(self.Path_Stock)
-        t = time.localtime(t)
+        bExist = os.path.exists(self.Path_Stock)
+        if(bExist):
+            t = os.path.getmtime(self.Path_Stock)
+            t = time.localtime(t)
         tNow = time.localtime()
-        if(tNow.tm_year != t.tm_year or tNow.tm_mon != t.tm_mon or tNow.tm_mday != t.tm_mday):
+        if(bExist ==False or tNow.tm_year != t.tm_year or tNow.tm_mon != t.tm_mon or tNow.tm_mday != t.tm_mday):
             #获取最新
             lg = bs.login()  #登陆系统 
             rs = bs.query_all_stock(day="2017-06-30") # 获取全部股票代码
