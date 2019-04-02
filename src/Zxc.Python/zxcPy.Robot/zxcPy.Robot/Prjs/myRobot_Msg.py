@@ -59,7 +59,10 @@ class myRobot_Msg(myRobot.myRobot):
         elif(cmd == "股票"):
             #发送股票设置界面链接
             usrPlat = usrInfo.get('usrPlat', 'wx')
-            usrID = myData.iif(usrInfo['groupName'] != "", "@*" + usrInfo['groupName'], usrInfo['usrNameNick'])
+            if(usrInfo['usrNameSelf'] != "" and usrInfo['groupName'] != ""):
+                usrID = usrInfo['groupName']
+            else: usrID = usrInfo['usrNameNick']
+
             url = 'http://39.105.196.175:8668/zxcWebs/stock/quoteset/' + usrID + "/" + usrPlat
             strReturn =  quote(url, safe = string.printable)   # unquote
         return strReturn

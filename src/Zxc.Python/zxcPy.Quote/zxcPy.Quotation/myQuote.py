@@ -72,6 +72,7 @@ class myStock:
                 pDatas.append(datas[1])
                 data_list.append(pDatas)
             bs.logout()  #登陆系统 
+            self._Init_Default(data_list)
 
             #组合输出结果
             result = pd.DataFrame(data_list, columns=self.setFields)
@@ -91,7 +92,12 @@ class myStock:
             pSet = myStock_Info(dtRow[0], dtRow[1], dtRow[3], dtRow[2],"Stock", "CN")
             pSet.tradeStatus = dtRow[4]
             self._Index(pSet)               #索引设置信息 
-            
+    #初始默认配置
+    def _Init_Default(self,data_list):
+        data_list.append(['sh','510050','50ETF','50ETF','1']) 
+        data_list.append(['sh','512180','建信MSCI','JXMSCI','1']) 
+        data_list.append(['sz','002958','青农商行','QNSH','1']) 
+
     #查找 
     def _Find(self, code_id, code_name = '', code_nameEN = '', exType = "", nReturn = 10):
         if(code_nameEN == ""): code_nameEN = myData_Trans.Tran_ToStr_FirstLetters(code_name, True)

@@ -35,6 +35,7 @@ class Quote_Listener:
         if(strMsg == ""): return False
 
         #通知处理
+        self.pSet = quoteDatas.setting.GetSetting(self.nameAlias)
         for x in self.pSet.msgUsers:
             #生成用户消息
             usrPlat = self.pSet.msgUsers[x]
@@ -64,11 +65,9 @@ class Quote_Listener:
         pass
     #功能是否可用
     def IsEnable(self, quoteDatas):
-        if(self.pSet == None):
-            self.pSet = quoteDatas.setting.GetSetting(self.nameAlias)
         if(self.pSet != None):
             return self.pSet.isValid
-        return False
+        return True
 
 
 #主启动程序
