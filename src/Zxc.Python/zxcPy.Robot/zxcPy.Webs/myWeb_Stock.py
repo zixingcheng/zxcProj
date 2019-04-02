@@ -84,18 +84,20 @@ def add_Webs(pWeb):
     #添加接口--股票设置查询 
     @pWeb.app.route('/zxcWebs/stock/quoteset/query/<usrID>')
     def stockSetQuery(usrID): 
-        strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"
+        #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"
+        strUrl = "http://127.0.0.1:8669/zxcAPI/robot"
         strPath = 'stock/QuoteSet/Query?usrID=' + usrID 
              
         #设置查询接口执行
         pWeb = myWeb_urlLib.myWeb(strUrl, bPrint=False)
         strReturn = pWeb.Do_API_get(strPath, "zxcAPI-py")
+        print("查询结果：\n", strUrl, "--\n", strReturn, "\n")
         jsonRes = myData_Json.Trans_ToJson(strReturn)
 
         #结果处理 
         jsonRetrun = myData_Json.Json_Object(jsonRes['text'])
         return jsonRetrun.ToString() 
-    
+
     #添加页面--股票行情监测设置
     @pWeb.app.route('/zxcWebs/stock/quoteset/<usrID>/<plat>', methods = ['GET', 'POST'])    
     def stockQuoteSet(usrID, plat):
