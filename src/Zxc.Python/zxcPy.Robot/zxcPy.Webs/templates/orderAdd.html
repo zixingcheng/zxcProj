@@ -27,6 +27,7 @@
 		{{ render_field(form.orderUsrName, size=20) }} 
 		{{ render_field(form.orderUsrPhone, size=20) }} 
 		{{ render_field(form.orderAddress, size=20) }}  
+		{{ render_field(form.orderRemark, size=20) }}  
 	</table>   
 	<p style="margin-left:110px"><input type="button" id="btnC" value="取消订单"><input style="margin-left:10px" type="submit" id="btn" value="确认订单"></p> 
 	
@@ -172,6 +173,7 @@
 			$("#orderUsrPhone").attr("autocomplete",'off');  
 			$("#orderAddress").attr("list",'lstAddress'); 
 			$("#orderAddress").attr("autocomplete",'off');   
+			$("#orderRemark").attr("autocomplete",'off');  
 			
 			<!--数量增减-->
 			$(".add").click(function() {  

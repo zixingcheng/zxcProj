@@ -58,18 +58,29 @@ class myRobot_Msg(myRobot.myRobot):
             return self.myRobot._Done(Text, msgID, "TEXT", usrInfo)
         elif(cmd == "股票"):
             #发送股票设置界面链接
-            usrPlat = usrInfo.get('usrPlat', 'wx')
-            if(usrInfo['usrNameSelf'] != "" and usrInfo['groupName'] != ""):
-                usrID = "@*" + usrInfo['groupName']
-                usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self") 
-            else: 
-                usrID = usrInfo['usrName']
-            usrInfo['groupID'] = ""
-            usrInfo['groupName'] = ""
-
+            usrPlat, usrID = self._Done_Check_UserBack(usrInfo) 
             url = 'http://39.105.196.175:8668/zxcWebs/stock/quoteset/' + usrID + "/" + usrPlat
             strReturn = quote(url, safe = string.printable)   # unquote
+        elif(cmd == "订单"):
+            #发送订单相关界面链接
+            usrPlat, usrID = self._Done_Check_UserBack(usrInfo) 
+            orderType = cmds[1].strip()
+            url = 'http://39.105.196.175:8668/zxcWebs/order/Add/' + orderType + "?usrID=" + usrID
+            strReturn = quote(url, safe = string.printable)   # unquote
         return strReturn
+
+    #提取回发用户名，并作相关修正
+    def _Done_Check_UserBack(self, usrInfo = {}):
+        usrPlat = usrInfo.get('usrPlat', 'wx')
+        if(usrInfo['usrNameSelf'] != "" and usrInfo['groupName'] != ""):
+            usrID = "@*" + usrInfo['groupName']
+            usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self") 
+        else: 
+            usrID = usrInfo['usrName']
+        usrInfo['groupID'] = ""
+        usrInfo['groupName'] = ""
+        return usrPlat, usrID
+
 
     #消息撤回通知        
     def _Done_Revoke(self, msg, msgID, msgType, usrInfo = {}):
@@ -104,7 +115,8 @@ class myRobot_Msg(myRobot.myRobot):
         strReturn = "消息命令提示："
         strReturn += self.perfix + "@*帮助：输出所有命令说明"
         strReturn += self.perfix + "@*：机器人聊天，可咨询问题" 
-        strReturn += self.perfix + "@*股票：股票设置，推送用户设置"  
+        strReturn += self.perfix + "@*股票：股票设置，推送用户设置链接"  
+        strReturn += self.perfix + "@*订单：订单设置，推送订单链接" 
         strReturn += "\n命令参数以空格区分，如：\"@* 光山天气\""
         return strReturn
         
@@ -132,6 +144,7 @@ if __name__ == "__main__":
     myDebug.Debug(pRobot_Msg.Done("@* 附近商场")['msg']) 
     
     myDebug.Debug(pRobot_Msg.Done("@*股票", usrNameNick='茶叶一主号')['msg'])  
+    myDebug.Debug(pRobot_Msg.Done("@*订单 茶叶", usrNameNick='茶叶一主号')['msg'])  
 
     pRobot_Msg.Done("@@zxcRobot_Msg")
     print()

@@ -45,7 +45,7 @@ class myObj_Bill():
         self.tradeTarget = ""       #交易内容
         self.tradePrice = 0         #交易单价
         self.tradeNum = 1           #交易数量
-        self.tradeNum_Stock = 0    #交易数量(当前库存，买入有效)
+        self.tradeNum_Stock = 0     #交易数量(当前库存，买入有效)
         self.tradeMoney = 0         #交易金额
         self.tradePoundage = 0      #交易手续费
         self.tradeProfit = 0        #交易收益
@@ -54,7 +54,7 @@ class myObj_Bill():
         self.isDel = False          #是否已删除
         self.remark = ""            #备注
         self.billInfo = None        #属性信息字典 
-    def Init(self, recorder, usrID, tradeParty, tradeMoney, tradeTarget, usrBillType = "", tradeType = "", tradeTypeTarget = "", dateTime = "", remark = "", tradePrice = 0, tradeNum = 0, tradeID_Relation = ""):
+    def Init(self, recorder, usrID, tradeParty, tradeMoney, tradeTarget, usrBillType = "", tradeType = "", tradeTypeTarget = "", dateTime = "", remark = "", tradePrice = 0, tradeNum = 0, tradeID_Relation = "", tradeProfit = 0):
         self.usrID = usrID 
         self.usrBillType = usrBillType
         self.tradeID_Relation = str(tradeID_Relation)
@@ -62,6 +62,7 @@ class myObj_Bill():
         self.tradeNum = tradeNum 
         self.tradePrice = tradePrice 
         self.tradeMoney = tradeMoney 
+        self.tradeProfit = tradeMoney 
         self.tradeTarget = tradeTarget 
         self.tradeType = tradeType 
         self.tradeTypeTarget = tradeTypeTarget 
@@ -77,6 +78,7 @@ class myObj_Bill():
         self.recordTime = tradeInfo.get("recordTime", datetime.datetime.now())
         if(self.recordTime == None): self.recordTime = datetime.datetime.now()
         self.recorder = tradeInfo.get("recorder", "zxcRobot")
+        if(self.recorder == ''): self.recorder = 'zxcRobot'
 
         self.tradeID = tradeInfo.get("tradeID", 0)
         self.tradeID_Relation = tradeInfo.get("tradeID_Relation", "")
@@ -86,7 +88,9 @@ class myObj_Bill():
         tradeTarget = tradeInfo.get("tradeTarget", "")
         self.tradePrice = tradeInfo.get("tradePrice", 0)
         self.tradeNum = tradeInfo.get("tradeNum", 0)
-        self.tradeNum_Stock = self.tradeNum 
+        self.tradeNum_Stock = tradeInfo.get("tradeNum_Stock", 0)
+        if(usrBillType == '买入'):
+            self.tradeNum_Stock = self.tradeNum 
         self.tradeMoney = tradeInfo.get("tradeMoney", 0)
         self.tradePoundage = tradeInfo.get("tradePoundage", 0)
         self.tradeProfit = tradeInfo.get("tradeProfit", 0)
@@ -683,7 +687,11 @@ class myObj_Bills():
         nMonths = dtTime.month 
         if(nYears > 1): nMonths += (nYears -1) * 12
         return self._Trans_Time_moth(dtTime, nMonths)
-
+    
+    #生成信息字典
+    def OnCreat_BillInfo(self): 
+        pBill = myObj_Bill()
+        return pBill.OnCreat_BillInfo()
     #当前数据进行保存   
     def Save_DB(self):  
         #组装行数据
