@@ -118,6 +118,10 @@ class myWeixin_ItChat(myThread.myThread):
         gol._Set_Value('zxcWx_usrName', self.usrName)
         gol._Set_Value('zxcWx_usrName_Alias', self.usrName_Alias)
         myDebug.Print("    --授权微信用户为：" + self.usrName_Alias + self.usrName)
+        if(True):
+            #记录为文件格式，便于其他识别
+            dictUsr = {'UserName': self.usrName, 'NickName': self.usrName_Alias}
+            myIO.Save_File(self.dirData + 'zxcWeixin.cache', str(dictUsr), True, True)
 
         #更新用户信息（回复消息处理工厂对象类）
         self.wxReply._Init(self.usrName, self.usrName_Alias)
