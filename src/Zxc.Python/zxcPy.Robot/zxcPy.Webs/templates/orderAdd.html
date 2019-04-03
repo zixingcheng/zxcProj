@@ -177,7 +177,7 @@
 			
 			<!--数量增减-->
 			$(".add").click(function() {  
-				tradeNum = tradeNum + 1;
+				tradeNum = tradeNum + 0.5;
 				if(dataTarget != null)
 				{
 					$("#orderNum").val(tradeNum.toFixed(dataTarget.单位精度) + " " + dataTarget.单位);
@@ -187,7 +187,7 @@
 			$(".min").click(function() {
 				if(tradeNum>0)
 				{
-					tradeNum = tradeNum - 1;
+					tradeNum = tradeNum - 0.5;
 					$("#orderNum").val(tradeNum.toFixed(dataTarget.单位精度) + " " + dataTarget.单位);
 					setTotal(); 
 				}
