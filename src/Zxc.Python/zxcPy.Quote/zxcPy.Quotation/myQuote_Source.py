@@ -148,10 +148,11 @@ class Quote_Source:
         self.endTime = myData_Trans.Tran_ToDatetime(self.dtDay + " 11:30:30")       #结束时间
         self.endTime2 = myData_Trans.Tran_ToDatetime(self.dtDay + " 15:16:00")      #结束时间--收盘
         self.timeIntervals = 0
-        if(self.dtDay.hour > 15): self.timeIntervals = 1 
 
         #时间段监测
         tNow = datetime.datetime.now()
+        if(tNow.hour > 15): 
+            self.timeIntervals = 1 
         return (self.startTime < tNow and tNow < self.endTime2)
 
 #行情监听线程
@@ -166,8 +167,8 @@ class Quote_Thread(threading.Thread):
     def run(self):
         if(self.source.setTime() == False):
             myDebug.Print('StockQuote stoped.\n         --not stock time..')
-            #self.stop()
-            #return 
+            self.stop()
+            return 
 
         myDebug.Print('StockQuote run')
         self.threadRunning = True;
