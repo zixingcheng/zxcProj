@@ -169,6 +169,8 @@ class strategy_initialize():
         g.is_stock_stop_loss = True
         g.is_stock_stop_profit = False
         g.is_stock_clean = False
+        g.threshold_stock_stop_loss = 0.02      # 默认亏损时止损阈值
+        g.is_stop_loss_threshold_auto = False   # 是否自动计算个股止损阈值
         
         # 配置是否根据大盘历史价格止损
         # 大盘指数前130日内最高价超过最低价2倍，则清仓止损
@@ -204,7 +206,9 @@ class strategy_initialize():
             # 缓存当日个股250天内最大的3日涨幅，避免当日反复获取，每日盘后清空
             g.pct_change = {}
 
-        # 缓存股票持仓后的最高价
+        # 缓存股票持仓价、之后的最高价、平仓价
+        g.open_price = {}
+        g.close_price = {}
         g.last_high = {}
         pass
 
@@ -498,7 +502,14 @@ class strategy_trade():
         if order != None and order.filled > 0:
             # 报单成功并有成交则初始化最高价
             cur_price = self.get_close_price(security, 1, '1m')
+            g.open_price[security] = cur_price
             g.last_high[security] = cur_price
+            if(security in g.close_price):
+                g.close_price.pop(security)
+
+            # 只要有成交，无论全部成交还是部分成交，则统计
+            position = context.portfolio.positions[security]
+            g.trade_stat.watch(security, order.filled, position.avg_cost, position.price)
             return True
         g.is_stock_clean = (len(context.portfolio.positions) ==0)   # 是否已经清仓
         return False
@@ -512,13 +523,14 @@ class strategy_trade():
         if order != None:
             if order.filled > 0:
                 # 只要有成交，无论全部成交还是部分成交，则统计盈亏
-                g.trade_stat.watch(security, order.filled, position.avg_cost, position.price)
-            print("aaaddd")
+                g.trade_stat.watch(security, order.filled, position.avg_cost, position.price, True)
 
+            # 全部成交则删除相关证券的最高价缓存
             if order.status == OrderStatus.held and order.filled == order.amount:
-                # 全部成交则删除相关证券的最高价缓存
                 if security in g.last_high:
+                    g.close_price[security] = position.price
                     g.last_high.pop(security)
+                    g.open_price.pop(security)
                 else:
                     log.warn("last high price of %s not found" %(security))
                 return True
@@ -558,34 +570,66 @@ class strategy_trade():
         # 如果股票涨跌停，创建报单会成功，order_target_value 返回Order，但是报单会取消
         # 部成部撤的报单，聚宽状态是已撤，此时成交量>0，可通过成交量判断是否有成交
         return order_target_value(security, value)
+# 交易信息
+class strategy_trade_info():
+    def __init__(self):
+        self.stock = ""
+        self.open_count = 0
+        self.open_price = 0
+        self.open_date = datetime.datetime.now()
+        self.profit = 0
+        self.close_price = 0
+        self.close_date = datetime.datetime.now() 
 # 交易信息统计
 class strategy_trade_stat():
     def __init__(self):
         self.trade_total_count = 0
         self.trade_success_count = 0
         self.statis = {'win': [], 'loss': []}
+        self.trade_infos = {}
     def reset(self):
         self.trade_total_count = 0
         self.trade_success_count = 0
         self.statis = {'win': [], 'loss': []}
     
-    # 记录交易次数便于统计胜率
     # 卖出成功后针对卖出的量进行盈亏统计
-    def watch(self, stock, sold_amount, avg_cost, cur_price):
-        self.trade_total_count += 1
-        current_value = sold_amount * cur_price
-        cost = sold_amount * avg_cost
-        
-        print('交易次数00: {0}, 盈利次数: {1}'.format(self.trade_total_count, self.trade_success_count))
+    def watch(self, stock, sold_amount, avg_cost, cur_price, bSell = False):
+        # 生成交易信息
+        if(bSell == False):
+            trade_info = strategy_trade_info()
+            trade_info.stock = stock
+            trade_info.open_count = sold_amount
+            trade_info.open_price = cur_price
+            trade_info.open_date = datetime.datetime.now()
 
-        percent = round((current_value - cost) / cost * 100, 2)
-        if current_value > cost:
-            self.trade_success_count += 1
-            win = [stock, percent]
-            self.statis['win'].append(win)
+            # 缓存交易信息
+            stock_infos = self.trade_infos.get(stock, None)
+            if stock_infos == None:
+                stock_infos = []
+                self.trade_infos[stock] = stock_infos
+            stock_infos.insert(0, trade_info)
         else:
-            loss = [stock, percent]
-            self.statis['loss'].append(loss)
+            trade_info = self.trade_infos[stock][0]
+            trade_info.profit = cur_price / trade_info.open_price - 1
+            trade_info.close_price = cur_price
+            trade_info.close_date = datetime.datetime.now() 
+            
+            # 记录交易次数便于统计胜率
+            self.trade_total_count += 1
+            current_value = sold_amount * cur_price
+            cost = sold_amount * avg_cost
+            
+            # 卖出成功后针对卖出的量进行盈亏统计
+            percent = round((current_value - cost) / cost * 100, 2)
+            if current_value > cost:
+                self.trade_success_count += 1
+                win = [stock, percent]
+                self.statis['win'].append(win)
+            else:
+                loss = [stock, percent]
+                self.statis['loss'].append(loss)
+ 
+    # 报告统计信息
     def report(self, context):
         cash = context.portfolio.cash
         totol_value = context.portfolio.portfolio_value
@@ -593,7 +637,6 @@ class strategy_trade_stat():
         log.info("收盘后持仓概况:%s" % str(list(context.portfolio.positions)))
         log.info("仓位概况:%.2f" % position)
         self.print_win_rate(context.current_dt.strftime("%Y-%m-%d"), context.current_dt.strftime("%Y-%m-%d"), context)
-
     # 打印胜率
     def print_win_rate(self, current_date, print_date, context):
         if str(current_date) == str(print_date):
@@ -667,8 +710,62 @@ class strategy_functions():
     def get_close_price(self, security, n, unit='1d'):
         return attribute_history(security, n, unit, ('close'), True)['close'][0]
     
+    # 个股止损
+    def is_need_stop_loss(self, context, data, stock, n = 3):
+        if g.is_stock_clean: return False
+
+        # 未亏损时，忽略止损
+        open_price = g.open_price[stock]    # 开仓价格
+        cur_price = data[stock].close       # 最新收盘价格
+        if(open_price <= cur_price): return False   
+        
+        # 亏损比例小于默认设定值，忽略止损
+        rate_loss = 1 - cur_price /open_price 
+        if(rate_loss <= g.threshold_stock_stop_loss): return False   
+        
+        # 计算个股回撤止损阈值
+        threshold = g.functions.get_stop_loss_threshold(stock, n)
+        if(threshold > g.threshold_stock_stop_loss): 
+            if(rate_loss <= threshold): return False   
+            
+        log.info("==> 个股止损, stock: %s, cur_price: %f, last_high: %f, rate_loss: %f,threshold: %f" 
+            %(stock, cur_price, g.last_high[stock], rate_loss, threshold))
+        return True
+
+    # 个股止盈
+    def is_need_stop_profit(self, context, data, stock, n = 3):
+        if g.is_stock_clean: return False
+
+        # 未亏损时，忽略止损
+        open_price = g.open_price[stock]    # 开仓价格
+        cur_price = data[stock].close       # 最新收盘价格
+        if(open_price <= cur_price): return False   
+        
+        # 统计开仓后高值
+        if g.last_high[stock] < cur_price: 
+            g.last_high[stock] = cur_price
+           
+        
+
+
+            xi = attribute_history(stock, g.period, '1d', 'high', skip_paused=True)
+            ma = xi.max()
+            
+            threshold = g.functions.get_stop_loss_threshold(stock, g.period)
+            #log.debug("个股止损阈值, stock: %s, threshold: %f" %(stock, threshold))
+            if cur_price < g.last_high[stock] * (1 - threshold):
+                log.info("==> 个股止损, stock: %s, cur_price: %f, last_high: %f, threshold: %f" 
+                    %(stock, cur_price, g.last_high[stock], threshold))
+
+                position = context.portfolio.positions[stock]
+                if g.trade.close_position(context, position):
+                    g.day_count = 0
+                    g.riskLevel += 1
+
     # 计算个股回撤止损阈值，即个股在持仓n天内能承受的最大跌幅，返回正值
     def get_stop_loss_threshold(self, security, n = 3):
+        if(g.is_stop_loss_threshold_auto): return g.threshold_stock_stop_loss
+
         # 算法：(个股250天内最大的n日跌幅 + 个股250天内平均的n日跌幅)/2
         pct_change = g.cache_data.get_pct_change(security, 250, n)
         #log.debug("pct of security [%s]: %s", pct)
@@ -688,7 +785,7 @@ class strategy_functions():
                 if maxd < 0:
                     # 此时取最大跌幅
                     return abs(maxd)
-        return 0.099 # 默认配置回测止损阈值最大跌幅为-9.9%，阈值高貌似回撤降低
+        return 0.03     # 默认配置回测止损阈值最大跌幅为-3.0%，阈值高貌似回撤降低
     
     # 计算个股止盈阈值
     # 算法：个股250天内最大的n日涨幅
@@ -804,24 +901,19 @@ class strategy_risk_management():
     # 个股止损
     def do_stop_loss(self, context, data):
         if g.is_stock_clean: return 
-        for stock in list(context.portfolio.positions.keys()):
-            cur_price = data[stock].close
-            xi = attribute_history(stock, 2, '1d', 'high', skip_paused=True)
-            ma = xi.max()
-            if g.last_high[stock] < cur_price:
-                g.last_high[stock] = cur_price
-            
-            threshold = g.functions.get_stop_loss_threshold(stock, g.period)
-            #log.debug("个股止损阈值, stock: %s, threshold: %f" %(stock, threshold))
-            if cur_price < g.last_high[stock] * (1 - threshold):
-                log.info("==> 个股止损, stock: %s, cur_price: %f, last_high: %f, threshold: %f" 
-                    %(stock, cur_price, g.last_high[stock], threshold))
 
-                position = context.portfolio.positions[stock]
-                if g.trade.close_position(context, position):
-                    g.day_count = 0
-                    g.riskLevel += 1
-                    
+        # 循环所有持仓个股，止损
+        for stock in list(context.portfolio.positions.keys()):
+            # 判断个股是否需要止损
+            if (g.functions.is_need_stop_loss(context, data, stock, g.period) == False):
+                continue
+            
+            # 个股止损
+            position = context.portfolio.positions[stock]
+            if g.trade.close_position(context, position):
+                g.day_count = 0
+                g.riskLevel += 1 
+    
     # 个股止盈
     def do_stop_profit(self, context, data):
         for stock in list(context.portfolio.positions.keys()):
