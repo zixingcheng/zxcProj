@@ -53,7 +53,8 @@ class strategy_initialize():
         #g.index8 = '000905.XSHG'  # 中证500指数，表示八，小盘股
         g.index2 = '000016.XSHG'        # 上证50指数
         g.index8 = '399333.XSHE'        # 中小板R指数
-        g.index_growth_rate_20 = 0.01   # 判定调仓的二八指数20日增幅
+        g.index_growth_rate_n = 0.01    # 判定调仓的二八指数n日增幅
+        g.index_growth_rate_period = 20 # 判定调仓的二八指数的天数
             
     ## 重置参数，仅针对需要当日重置的参数
     def reset_param(self):
@@ -134,9 +135,11 @@ class strategy_initialize():
         g.adjust_position_minute = 50
         
         # 买入股票数目
-        g.buy_stock_count = 2
+        g.buy_stock_count = 5
         # 是否可重复买入
         g.filter_holded = False
+        # 卖出后n天不再买入
+        g.holded_gap_period = 3
 
         # 委托类型
         #g.order_style_str = 'by_cap_mean'
@@ -170,7 +173,7 @@ class strategy_initialize():
         g.is_stock_stop_profit = False
         g.is_stock_clean = False
         g.threshold_stock_stop_loss = 0.02      # 默认亏损时止损阈值
-        g.is_stop_loss_threshold_auto = False   # 是否自动计算个股止损阈值
+        g.is_stop_loss_threshold_auto = True    # 是否自动计算个股止损阈值
         
         # 配置是否根据大盘历史价格止损
         # 大盘指数前130日内最高价超过最低价2倍，则清仓止损
@@ -269,7 +272,9 @@ class strategy_check_stocks():
         stock_list = self.filter_st_stock(stock_list)                   # 过滤ST股票
         stock_list = self.filter_delisted_stock(stock_list)             # 过滤具有退市标签的股票
         stock_list = self.filter_limitup_stock(context, stock_list)     # 过滤涨停的股票
-        stock_list = self.filter_limitdown_stock(context, stock_list)   # 过滤跌停的股票         
+        stock_list = self.filter_limitdown_stock(context, stock_list)   # 过滤跌停的股票     
+        
+        stock_list = self.filter_holdedlist_stock(context, stock_list)  # 过滤跌停的股票         
         stock_list = self.rank_stocks(data, stock_list)                 # 股票评分
         
         # 根据20日股票涨幅过滤效果不好，故注释
@@ -297,6 +302,16 @@ class strategy_check_stocks():
         if g.filter_blacklist == False: return stock_list
         blacklist = g.blacklist.get_blacklist()
         return [stock for stock in stock_list if stock not in blacklist]
+    
+    # 过滤调仓期卖出股票
+    def filter_holdedlist_stock(self, context, stock_list):
+        if g.filter_holded: return stock_list
+
+        # 提取调仓期卖出股票
+        trad_infos = g.trade_stat.get_trade_infos(context.current_dt, g.holded_gap_period, True)
+        holdedlist = trad_infos.keys()
+        return [stock for stock in stock_list if stock not in holdedlist]
+
 
     # 过滤停牌股票
     def filter_paused_stock(self, stock_list):
@@ -439,18 +454,18 @@ class strategy_trade():
         log.info("调仓日计数 [%d]" %(g.day_count))
 
         # 回看指数前20天的涨幅
-        gr_index2 = g.functions.get_growth_rate(g.index2)
-        gr_index8 = g.functions.get_growth_rate(g.index8)
+        gr_index2 = g.functions.get_growth_rate(g.index2, g.index_growth_rate_period)
+        gr_index8 = g.functions.get_growth_rate(g.index8, g.index_growth_rate_period)
         log.info("当前%s指数的20日涨幅 [%.2f%%]" %(get_security_info(g.index2).display_name, gr_index2*100))
         log.info("当前%s指数的20日涨幅 [%.2f%%]" %(get_security_info(g.index8).display_name, gr_index8*100))
         
         # 指数低于20日前值则清仓
-        if gr_index2 <= g.index_growth_rate_20 and gr_index8 <= g.index_growth_rate_20:
+        if gr_index2 <= g.index_growth_rate_n and gr_index8 <= g.index_growth_rate_n:
             if(len(context.portfolio.positions.keys()) > 0):
                 log.info("==> 清仓，指数低于20日前值")
             g.trade.clear_position(context)
             g.day_count = 0
-        else: #if  gr_index2 > g.index_growth_rate_20 or ret_index8 > g.index_growth_rate_20:
+        else: #if  gr_index2 > g.index_growth_rate_n or ret_index8 > g.index_growth_rate_n:
             if(g.day_count % g.period == 0):                    # 调仓间隔日
                 log.info("==> 满足条件进行调仓")
                 g.check_stocks.pick_stocks(context, data)       # 选股
@@ -488,8 +503,8 @@ class strategy_trade():
             # 循环标的执行开仓
             for stock in stocks_buy:
                 # @# 已存在标的，处理有些简单
-                #if stock not in stocks_now or context.portfolio.positions[stock].total_amount == 0:
-                if context.portfolio.positions[stock].total_amount == 0:
+                #if context.portfolio.positions[stock].total_amount == 0:
+                if stock not in stocks_now or context.portfolio.positions[stock].total_amount == 0:
                     if self.open_position(context, stock, value):
                         if len(context.portfolio.positions) == g.buy_stock_count:
                             break
@@ -509,7 +524,7 @@ class strategy_trade():
 
             # 只要有成交，无论全部成交还是部分成交，则统计
             position = context.portfolio.positions[security]
-            g.trade_stat.watch(security, order.filled, position.avg_cost, position.price)
+            g.trade_stat.watch(context, security, order.filled, position.avg_cost, position.price)
             return True
         g.is_stock_clean = (len(context.portfolio.positions) ==0)   # 是否已经清仓
         return False
@@ -523,7 +538,7 @@ class strategy_trade():
         if order != None:
             if order.filled > 0:
                 # 只要有成交，无论全部成交还是部分成交，则统计盈亏
-                g.trade_stat.watch(security, order.filled, position.avg_cost, position.price, True)
+                g.trade_stat.watch(context, security, order.filled, position.avg_cost, position.price, True)
 
             # 全部成交则删除相关证券的最高价缓存
             if order.status == OrderStatus.held and order.filled == order.amount:
@@ -593,14 +608,14 @@ class strategy_trade_stat():
         self.statis = {'win': [], 'loss': []}
     
     # 卖出成功后针对卖出的量进行盈亏统计
-    def watch(self, stock, sold_amount, avg_cost, cur_price, bSell = False):
+    def watch(self, context, stock, sold_amount, avg_cost, cur_price, bSell = False):
         # 生成交易信息
         if(bSell == False):
             trade_info = strategy_trade_info()
             trade_info.stock = stock
             trade_info.open_count = sold_amount
             trade_info.open_price = cur_price
-            trade_info.open_date = datetime.datetime.now()
+            trade_info.open_date = context.current_dt
 
             # 缓存交易信息
             stock_infos = self.trade_infos.get(stock, None)
@@ -612,7 +627,7 @@ class strategy_trade_stat():
             trade_info = self.trade_infos[stock][0]
             trade_info.profit = cur_price / trade_info.open_price - 1
             trade_info.close_price = cur_price
-            trade_info.close_date = datetime.datetime.now() 
+            trade_info.close_date = context.current_dt
             
             # 记录交易次数便于统计胜率
             self.trade_total_count += 1
@@ -628,7 +643,28 @@ class strategy_trade_stat():
             else:
                 loss = [stock, percent]
                 self.statis['loss'].append(loss)
- 
+
+    # 提取指定条件的交易记录 
+    def get_trade_infos(self, datetime, day = 0, bSell = False):
+        trade_infos_all = {}
+
+        # 循环所有判断
+        for key in self.trade_infos.keys():
+            trade_infos = self.trade_infos[key]
+            
+            # 提取满足条件记录
+            lstInfos = []
+            for trade_info in trade_infos:
+                if(bSell == False):
+                    if ((datetime - trade_info.open_date).days <= day): 
+                        lstInfos.append(trade_info)
+                else:
+                    if ((datetime - trade_info.close_date).days <= day):
+                        lstInfos.append(trade_info)
+            if(len(lstInfos) > 0):
+                trade_infos_all[key] = lstInfos
+        return trade_infos_all 
+
     # 报告统计信息
     def report(self, context):
         cash = context.portfolio.cash
@@ -696,14 +732,14 @@ class strategy_functions():
     
     # 获取股票n日以来涨幅，根据当前价计算--需要进一步完善
     def get_growth_rate(self, security, n=20):
-        price_20 = self.get_close_price(security, n)         #前20日收盘价
+        price_n = self.get_close_price(security, n)         #前20日收盘价
         price_now = self.get_close_price(security, 1, '1m')  #前一分钟价
     
         # 存在时计算相对n日前的价格涨幅
-        if not isnan(price_20) and not isnan(price_now) and price_20 != 0:
-            return (price_now - price_20) / price_20
+        if not isnan(price_n) and not isnan(price_now) and price_n != 0:
+            return (price_now - price_n) / price_n
         else:
-            log.error("数据非法, security: %s, %d日收盘价: %f, 当前价: %f" %(security, n, price_20, price_now))
+            log.error("数据非法, security: %s, %d日收盘价: %f, 当前价: %f" %(security, n, price_n, price_now))
             return 0
     
     # 获取前n个单位时间当时的收盘价
@@ -764,17 +800,17 @@ class strategy_functions():
 
     # 计算个股回撤止损阈值，即个股在持仓n天内能承受的最大跌幅，返回正值
     def get_stop_loss_threshold(self, security, n = 3):
-        if(g.is_stop_loss_threshold_auto): return g.threshold_stock_stop_loss
+        if(g.is_stop_loss_threshold_auto == False): return g.threshold_stock_stop_loss
 
         # 算法：(个股250天内最大的n日跌幅 + 个股250天内平均的n日跌幅)/2
-        pct_change = g.cache_data.get_pct_change(security, 250, n)
+        pct_change = g.cache_data.get_pct_change(security, 30, n)
         #log.debug("pct of security [%s]: %s", pct)
         maxd = pct_change.min()
         #maxd = pct[pct<0].min()
         avgd = pct_change.mean()
         #avgd = pct[pct<0].mean()
         # maxd和avgd可能为正，表示这段时间内一直在增长，比如新股
-        bstd = (maxd + avgd) / 2
+        bstd = (maxd + avgd) / n
 
         # 数据不足时，计算的bstd为nan
         if not isnan(bstd):
@@ -1013,7 +1049,7 @@ class strategy_log():
 
         log.info("二八指数之二: %s - %s" %(g.index2, get_security_info(g.index2).display_name))
         log.info("二八指数之八: %s - %s" %(g.index8, get_security_info(g.index8).display_name))
-        log.info("判定调仓的二八指数20日增幅: %.1f%%" %(g.index_growth_rate_20*100))
+        log.info("判定调仓的二八指数20日增幅: %.1f%%" %(g.index_growth_rate_n*100))
 
         log.info("是否开启大盘历史高低价格止损: %s" %(g.is_market_stop_loss_by_price))
         if g.is_market_stop_loss_by_price:
