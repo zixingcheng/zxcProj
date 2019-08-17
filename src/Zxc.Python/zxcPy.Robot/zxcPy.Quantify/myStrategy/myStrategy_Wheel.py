@@ -44,7 +44,7 @@ class strategy_initialize():
         # 设定成交量比例
         #set_option('order_volume_ratio', 1)
         # 股票类交易手续费是：买入时佣金万分之三，卖出时佣金万分之三加千分之一印花税, 每笔交易佣金最低扣5块钱
-        #set_order_cost(OrderCost(open_tax=0, close_tax=0.001, open_commission=0.0003, close_commission=0.0003, min_commission=5), type='stock')
+        set_order_cost(OrderCost(open_tax=0, close_tax=0.001, open_commission=0.0003, close_commission=0.0003, min_commission=5), type='stock')
         # True为开启动态复权模式，使用真实价格交易
         set_option('use_real_price', True)
         
@@ -166,7 +166,7 @@ class strategy_initialize():
         #g.max_buy_amount = None
 
         # 配置是否个股止损/止盈
-        g.is_stock_stop_loss = False
+        g.is_stock_stop_loss = True
         g.is_stock_stop_profit = False
         g.is_stock_clean = False
         
@@ -669,7 +669,6 @@ class strategy_functions():
     
     # 计算个股回撤止损阈值，即个股在持仓n天内能承受的最大跌幅，返回正值
     def get_stop_loss_threshold(self, security, n = 3):
-        return 0.02
         # 算法：(个股250天内最大的n日跌幅 + 个股250天内平均的n日跌幅)/2
         pct_change = g.cache_data.get_pct_change(security, 250, n)
         #log.debug("pct of security [%s]: %s", pct)
@@ -784,22 +783,6 @@ class strategy_risk_management():
             
     # 交易止损
     def do_stops_loss(self, context, data): 
-        if g.is_market_stop_loss_by_price:
-            if self.do_stop_loss_by_market_index(context, g.index_4_stop_loss_by_price):
-                return
-
-        if g.is_market_stop_loss_by_3_black_crows:
-            if self.do_stop_loss_by_market_3_black_crows(context, g.index_4_stop_loss_by_3_black_crows, g.dst_drop_minute_count):
-                return
-
-        if g.is_stock_stop_loss:
-            self.do_stop_loss(context, data)
-
-        return
-
-        if g.is_stock_stop_loss == False: return
-        if g.is_stock_clean: return 
-
         # 特殊止损
         self.do_stop_loss_by_market_index(context)          # 大盘历史指数止损
         self.do_stop_loss_by_market_3_black_crows(context)  # 大盘三黑鸦止损
@@ -882,16 +865,18 @@ class strategy_risk_management():
     def do_stop_loss_by_market_3_black_crows(self, context, index="", n=0):
         if g.is_stock_clean: return 
         if g.is_market_stop_loss_by_3_black_crows == False: return
-        if index == "": index = g.index_4_stop_loss_by_3_black_crows
-        if n == 0: n = g.dst_drop_minute_count
         
         # 前日三黑鸦，累计当日每分钟涨幅<0的分钟计数
         # 如果分钟计数超过一定值，则开始进行三黑鸦止损
         # 避免无效三黑鸦乱止损
         if g.is_last_day_3_black_crows:
+            # 默认参数初始
+            if index == "": index = g.index_4_stop_loss_by_3_black_crows
+            if n == 0: n = g.dst_drop_minute_count
+
+            # 获取指数涨幅
             if get_growth_rate(index, 1) < 0:
                 g.cur_drop_minute_count += 1
-
             if g.cur_drop_minute_count >= n:
                 if g.cur_drop_minute_count == n:
                     log.info("==> 超过三黑鸦止损开始")
