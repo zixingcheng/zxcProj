@@ -135,7 +135,7 @@ class strategy_initialize():
         g.adjust_position_minute = 50
         
         # 买入股票数目
-        g.buy_stock_count = 5
+        g.buy_stock_count = 2
         # 是否可重复买入
         g.filter_holded = False
         # 卖出后n天不再买入
@@ -169,11 +169,13 @@ class strategy_initialize():
         #g.max_buy_amount = None
 
         # 配置是否个股止损/止盈
-        g.is_stock_stop_loss = True
-        g.is_stock_stop_profit = False
+        g.is_stock_stop_loss = False
+        g.is_stock_stop_profit = True
         g.is_stock_clean = False
         g.threshold_stock_stop_loss = 0.02      # 默认亏损时止损阈值
-        g.is_stop_loss_threshold_auto = True    # 是否自动计算个股止损阈值
+        g.is_stop_loss_threshold_auto = True    # 是否动态止损，自动计算个股止损阈值
+        g.threshold_stock_stop_profit = 0.06    # 默认盈利时止盈阈值
+        g.is_stop_profit_threshold_auto = True  # 是否动态止盈，自动计算个股止盈阈值
         
         # 配置是否根据大盘历史价格止损
         # 大盘指数前130日内最高价超过最低价2倍，则清仓止损
@@ -463,8 +465,7 @@ class strategy_trade():
         if gr_index2 <= g.index_growth_rate_n and gr_index8 <= g.index_growth_rate_n:
             if(len(context.portfolio.positions.keys()) > 0):
                 log.info("==> 清仓，指数低于20日前值")
-            g.trade.clear_position(context)
-            g.day_count = 0
+            g.trade.clear_position(context) 
         else: #if  gr_index2 > g.index_growth_rate_n or ret_index8 > g.index_growth_rate_n:
             if(g.day_count % g.period == 0):                    # 调仓间隔日
                 log.info("==> 满足条件进行调仓")
@@ -526,7 +527,8 @@ class strategy_trade():
             position = context.portfolio.positions[security]
             g.trade_stat.watch(context, security, order.filled, position.avg_cost, position.price)
             return True
-        g.is_stock_clean = (len(context.portfolio.positions) ==0)   # 是否已经清仓
+
+        self.check_trade_state(context)     #检查更新交易参数状态
         return False
 
     # 平仓，卖出指定持仓
@@ -550,7 +552,7 @@ class strategy_trade():
                     log.warn("last high price of %s not found" %(security))
                 return True
 
-        g.is_stock_clean = (len(context.portfolio.positions) ==0)   # 是否已经清仓
+        self.check_trade_state(context)     #检查更新交易参数状态
         return False
 
     # 清空卖出所有持仓
@@ -560,7 +562,7 @@ class strategy_trade():
             for stock in list(context.portfolio.positions.keys()):
                 position = context.portfolio.positions[stock]
                 self.close_position(context, position)
-        g.is_stock_clean = (len(context.portfolio.positions) ==0)   # 是否已经清仓
+        self.check_trade_state(context)     #检查更新交易参数状态
     
     # 卖出未卖出成功的股票
     def sell_default_open_sell(self, context):
@@ -570,6 +572,7 @@ class strategy_trade():
             for stock in open_sell_securities:
                 self.order_target_value_(stock, 0)
         g.open_sell_securities = [s for s in g.open_sell_securities if s in context.portfolio.positions.keys()]
+        self.check_trade_state(context)     #检查更新交易参数状态
         return
 
     # 自定义下单
@@ -585,6 +588,11 @@ class strategy_trade():
         # 如果股票涨跌停，创建报单会成功，order_target_value 返回Order，但是报单会取消
         # 部成部撤的报单，聚宽状态是已撤，此时成交量>0，可通过成交量判断是否有成交
         return order_target_value(security, value)
+
+    # 检查更新交易参数状态
+    def check_trade_state(self, context):
+        g.is_stock_clean = (len(context.portfolio.positions) ==0)       # 是否已经清仓
+        if((len(context.portfolio.positions) == 0)): g.day_count = 0    # 交易天数清0
 # 交易信息
 class strategy_trade_info():
     def __init__(self):
@@ -771,39 +779,37 @@ class strategy_functions():
     # 个股止盈
     def is_need_stop_profit(self, context, data, stock, n = 3):
         if g.is_stock_clean: return False
-
-        # 未亏损时，忽略止损
+        
+        # 未盈利时，忽略止盈
         open_price = g.open_price[stock]    # 开仓价格
         cur_price = data[stock].close       # 最新收盘价格
-        if(open_price <= cur_price): return False   
-        
+        if(open_price >= cur_price): return False   
+                
         # 统计开仓后高值
         if g.last_high[stock] < cur_price: 
             g.last_high[stock] = cur_price
-           
+        high_price = g.last_high[stock]
         
+        # 最高盈利比例小于默认设定值，忽略止盈
+        rate_profit_high = high_price /open_price - 1
+        if(rate_profit_high <= g.threshold_stock_stop_profit): return False   
 
 
-            xi = attribute_history(stock, g.period, '1d', 'high', skip_paused=True)
-            ma = xi.max()
+        # 计算个股动态回撤止损阈值
+        threshold = g.functions.get_stop_profit_threshold(rate_profit_high, g.threshold_stock_stop_profit)
+        rate_profit = cur_price /open_price - 1
+        if(threshold > rate_profit_high - rate_profit): return False
             
-            threshold = g.functions.get_stop_loss_threshold(stock, g.period)
-            #log.debug("个股止损阈值, stock: %s, threshold: %f" %(stock, threshold))
-            if cur_price < g.last_high[stock] * (1 - threshold):
-                log.info("==> 个股止损, stock: %s, cur_price: %f, last_high: %f, threshold: %f" 
-                    %(stock, cur_price, g.last_high[stock], threshold))
-
-                position = context.portfolio.positions[stock]
-                if g.trade.close_position(context, position):
-                    g.day_count = 0
-                    g.riskLevel += 1
+        log.info("==> 个股止盈, stock: %s, cur_price: %f, last_high: %f, rate_profit_high: %f, rate_profit: %f, threshold: %f" 
+            %(stock, cur_price, g.last_high[stock], rate_profit_high, rate_profit, threshold))
+        return True
 
     # 计算个股回撤止损阈值，即个股在持仓n天内能承受的最大跌幅，返回正值
     def get_stop_loss_threshold(self, security, n = 3):
         if(g.is_stop_loss_threshold_auto == False): return g.threshold_stock_stop_loss
 
         # 算法：(个股250天内最大的n日跌幅 + 个股250天内平均的n日跌幅)/2
-        pct_change = g.cache_data.get_pct_change(security, 30, n)
+        pct_change = g.cache_data.get_pct_change(security, 60, n)
         #log.debug("pct of security [%s]: %s", pct)
         maxd = pct_change.min()
         #maxd = pct[pct<0].min()
@@ -823,18 +829,25 @@ class strategy_functions():
                     return abs(maxd)
         return 0.03     # 默认配置回测止损阈值最大跌幅为-3.0%，阈值高貌似回撤降低
     
-    # 计算个股止盈阈值
-    # 算法：个股250天内最大的n日涨幅
-    # 返回正值
-    def get_stop_profit_threshold(self, security, n = 3):
-        pct_change = g.cache_data.get_pct_change(security, 250, n)
-        maxr = pct_change.max()
-    
-        # 数据不足时，计算的maxr为nan
-        # 理论上maxr可能为负
-        if (not isnan(maxr)) and maxr != 0:
-            return abs(maxr)
-        return 0.30 # 默认配置止盈阈值最大涨幅为20%
+    # 计算个股动态止盈阈值
+    # 算法：超过阈值后回撤最大值为指定值，超过阈值每10%，回撤幅度+1.5%
+    def get_stop_profit_threshold(self, profit,  threshold = 0.06):
+        # 计算阈值差，默认回撤为阈值20%
+        delta = profit - threshold
+        value = threshold * 0.2
+
+        # 分段计算回撤阈值
+        if(delta > 0.1): 
+            value += delta * 0.15   # 差值的0.15倍,未超过阈值10个点以上
+        elif(delta > 0.05): 
+            value += 0.02           # 差值+0.02, 未超过阈值10个点
+        else:
+            value += 0.02           # 差值+0.01, 未超过阈值5个点
+
+        # 校正最新回撤阈值
+        if value < 0.015: value = g.threshold_stock_stop_loss
+        if value > 0.1: value = 0.1 #最大回撤10%
+        return value
 # 公用函数-技术指标
 class strategy_functions_indexes():
     def __init__(self):
@@ -936,6 +949,7 @@ class strategy_risk_management():
 
     # 个股止损
     def do_stop_loss(self, context, data):
+        if g.is_stock_stop_loss == False: return
         if g.is_stock_clean: return 
 
         # 循环所有持仓个股，止损
@@ -947,24 +961,24 @@ class strategy_risk_management():
             # 个股止损
             position = context.portfolio.positions[stock]
             if g.trade.close_position(context, position):
-                g.day_count = 0
-                g.riskLevel += 1 
+                g.riskLevel += 1
     
     # 个股止盈
     def do_stop_profit(self, context, data):
-        for stock in list(context.portfolio.positions.keys()):
-            position = context.portfolio.positions[stock]
-            cur_price = data[stock].close
-            threshold = g.functions.get_stop_profit_threshold(stock, g.period)
-            #log.debug("个股止盈阈值, stock: %s, threshold: %f" %(stock, threshold))
-            if cur_price > position.avg_cost * (1 + threshold):
-                log.info("==> 个股止盈, stock: %s, cur_price: %f, avg_cost: %f, threshold: %f" 
-                    %(stock, cur_price, g.last_high[stock], threshold))
+        if g.is_stock_stop_profit == False: return
+        if g.is_stock_clean: return 
 
-                position = context.portfolio.positions[stock]
-                if g.trade.close_position(context, position):
-                    g.day_count = 0
-    
+        # 循环所有持仓个股，止盈
+        for stock in list(context.portfolio.positions.keys()):
+            # 判断个股是否需要止盈
+            if (g.functions.is_need_stop_profit(context, data, stock, g.period) == False):
+                continue
+            
+            # 个股止盈
+            position = context.portfolio.positions[stock]
+            if g.trade.close_position(context, position):
+                g.riskLevel += 1 
+
     # 大盘历史指数止损
     def do_stop_loss_by_market_index(self, context, index=""):
         if g.is_stock_clean: return 
@@ -985,8 +999,7 @@ class strategy_risk_management():
 
         # 清仓止损
         if g.is_day_stop_loss_by_price:
-            g.trade.clear_position(context)
-            g.day_count = 0
+            g.trade.clear_position(context) 
         return g.is_day_stop_loss_by_price
 
     # 大盘三黑鸦止损
@@ -1010,8 +1023,7 @@ class strategy_risk_management():
                     log.info("==> 超过三黑鸦止损开始")
 
                 # 清仓止损
-                g.trade.clear_position(context)
-                g.day_count = 0
+                g.trade.clear_position(context) 
                 return True
         return False
 
@@ -1121,7 +1133,6 @@ def before_trading_start(context):
         
     # 卖出未卖出成功的股票
     g.trade.sell_default_open_sell(context)
-    g.is_stock_clean = (len(context.portfolio.positions) ==0)   # 是否已经清仓
     pass
 
 # 盘中运行-按分钟回测
