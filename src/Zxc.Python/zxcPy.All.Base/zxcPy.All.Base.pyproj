@@ -1,4 +1,4 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
@@ -12,7 +12,8 @@
     <OutputPath>.</OutputPath>
     <Name>zxcPy_All_Base</Name>
     <RootNamespace>GModel_Py_All_Base</RootNamespace>
-    <InterpreterId>Global|PythonCore|3.5</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,10 +26,13 @@
   <ItemGroup>
     <Compile Include="mySystem.py" />
     <Compile Include="zxcPy.Base\myIO_md.py" />
+    <Compile Include="zxcPy.Base\myIO_docx.py" />
     <Compile Include="zxcPy.Base\myMQ_Rabbit_Recv_Test.py" />
     <Compile Include="zxcPy.Base\myMQ_Rabbit.py" />
     <Compile Include="zxcPy.Base\myManager_Msg.py" />
     <Compile Include="zxcPy.Base\myPyWin.py" />
+    <Compile Include="zxcPy.Base\myAI_Voice.py" />
+    <Compile Include="zxcPy.Base\myVoice - Copy.py" />
     <Compile Include="zxcPy.Base\myVoice.py" />
     <Compile Include="zxcPy.Base\myGlobal.py" />
     <Compile Include="zxcPy.Base\myWeb\forms.py" />
@@ -59,9 +63,6 @@
     <Content Include="zxcPy.Base\myWeb\HTML\test.html" />
     <Content Include="zxcPy.Install\pip_install.bat" />
     <Content Include="zxcPy.Base\myWeb\__pycache__\Config.cpython-35.pyc" />
-    <Content Include="zxcPy.Base\__pycache__\myData.cpython-35.pyc" />
-    <Content Include="zxcPy.Base\__pycache__\myData_Trans.cpython-35.pyc" />
-    <Content Include="zxcPy.Base\__pycache__\myEnum.cpython-35.pyc" />
     <Content Include="zxcPy.Install\阿里云部署说明--Linux-Centos7.md" />
   </ItemGroup>
   <ItemGroup>
@@ -69,11 +70,10 @@
     <Folder Include="zxcPy.Base\myWeb\" />
     <Folder Include="zxcPy.Base\myWeb\HTML\" />
     <Folder Include="zxcPy.Base\myWeb\__pycache__\" />
-    <Folder Include="zxcPy.Base\__pycache__\" />
     <Folder Include="zxcPy.Install\" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|3.5" />
+    <InterpreterReference Include="Global|PythonCore|3.7" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
