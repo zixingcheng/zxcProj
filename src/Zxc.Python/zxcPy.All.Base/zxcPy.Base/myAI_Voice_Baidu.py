@@ -7,16 +7,17 @@ Created on  张斌 2018-07-16 11:00:00
     AI-百度接口操作
 """ 
 import sys, os, datetime
-from aip import AipSpeech
+from aip import AipSpeech, AipOcr
 
 # 加载自定义库
 import myIO, myVoice
 
 # 百度语音识别API配置参数 
-APP_ID = '11547400'                                     # 你的 APPID
-API_KEY = 'HXUjHRdb71ewmGv90LhiUl64'                    # 你的 AK
-SECRET_KEY = 'TDCdErf6vpntoBldAuvKBaxG1NH1KfeC'         # 你的 SK
+APP_ID = '17073439'                                     # 你的 APPID
+API_KEY = 'LDg5YKueHGye7GHYSmlmKxyA'                    # 你的 AK
+SECRET_KEY = '0LrjcVugAtyY0crrXGN9ZXP9u9tHwEfX'         # 你的 SK
 aipSpeech = AipSpeech(APP_ID, API_KEY, SECRET_KEY)
+aipORC = AipOcr(APP_ID, API_KEY, SECRET_KEY)
 
 
 
@@ -69,10 +70,30 @@ def Speech_Recognition(path, silence_thresh=-50, out_debug=False):
     return result_text
 
 
+# 通用文字识别
+def IORC(path, templateSign, classifierId = 0, out_debug=False):
+    # 读取图片文件
+    dtStart = datetime.datetime.now()
+    with open(path, 'rb') as fp: 
+        image = fp.read()
+    try:
+        # 设置可选参数 
+        options = {}
+        options["templateSign"] = templateSign
+        options["classifierId"] = classifierId
+
+        # 带参数调用自定义模板文字识别  
+        result = aipORC.custom(image, options)
+        if(out_debug): print("==> IORC @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
+        return result
+    except KeyError:
+        return ""
+
+
 
 if __name__ == '__main__':
     # 语音合成 
-    dir = "E:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/Voices/"
+    dir = "E:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/"
     #path = Speech_Synthesis('你好，世界！', dir + "auido.mp3") 
     
     # 语音文件播放
@@ -80,8 +101,12 @@ if __name__ == '__main__':
     
     # 将语音转文本STT
     # strText = Speech_Recognition_Standard(dir + "audio.pcm", out_debug=True)
-    strText = Speech_Recognition(dir + "audio.wav", out_debug=True)
-    print("you said: " + strText)
+    # strText = Speech_Recognition(dir + "Voices/audio.wav", out_debug=True)
+    # print("you said: " + strText)
+
+    # ORC识别-自定义模板
+    strText = IORC(dir + "Images/Test.jpg", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
+    print("you image: \n" + str(strText))
 
     print()
     
