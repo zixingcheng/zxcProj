@@ -6,8 +6,11 @@ Created on  张斌 2018-07-16 11:00:00
 
     AI-百度接口操作
 """ 
-import sys, os
+import sys, os, datetime
 from aip import AipSpeech
+
+# 加载自定义库
+import myIO, myVoice
 
 # 百度语音识别API配置参数 
 APP_ID = '11547400'                                     # 你的 APPID
@@ -32,37 +35,53 @@ def Speech_Synthesis(word, path_audio=''):
     return ''
 
 # 将语音转文本STT
-def Speech_Recognition(path):
+def Speech_Recognition_Standard(path, out_debug=False):
     # 读取录音文件
-    with open(path, 'rb') as fp:
+    dtStart = datetime.datetime.now()
+    with open(path, 'rb') as fp: 
         voices = fp.read()
     try:
         # 参数dev_pid：1536普通话(支持简单的英文识别)、1537普通话(纯中文识别)、1737英语、1637粤语、1837四川话、1936普通话远场
+        if(out_debug): print('\n接口调用（在线百度语AI接口，请耐心等待）')
         result = aipSpeech.asr(voices, 'pcm', 16000, {'dev_pid': 1537, })
-        # result = CLIENT.asr(get_file_content(path), 'wav', 16000, {'lan': 'zh', })
-        # print(result)
-        # print(result['result'][0])
-        # print(result)
         result_text = result["result"][0]
-        print("you said: " + result_text)
+
+        if(out_debug): print("==> Speech_Recognition_Standard @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
         return result_text
     except KeyError:
-        print("KeyError")
-        #speaker.Speak("我没有听清楚，请再说一遍...")
-        
+        # print("KeyError")
+        # speaker.Speak("我没有听清楚，请再说一遍...")
+        return ""
+    
+# 将语音转文本STT-
+def Speech_Recognition(path, silence_thresh=-50, out_debug=False):
+    # 自动分割
+    dtStart = datetime.datetime.now()
+    paths = myVoice.split_audio_on_silence(path, silence_thresh=-50,min_silence_len=1000,length_limit=60,keep_silence=0, out_debug=out_debug)
+    if(len(paths) == 0): return ""
+
+    # 语音识别转换
+    result_text = ""
+    if(out_debug): print('\n接口调用，请耐心等待')
+    for x in paths:
+        result_text += Speech_Recognition_Standard(x, out_debug=False) + "\n"
+    if(out_debug): print("==> Speech_Recognition @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
+    return result_text
+
 
 
 if __name__ == '__main__':
     # 语音合成 
     dir = "E:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/Voices/"
-    path = Speech_Synthesis('你好，世界！', dir + "auido.mp3") 
+    #path = Speech_Synthesis('你好，世界！', dir + "auido.mp3") 
     
     # 语音文件播放
     # os.system(path)
     
     # 将语音转文本STT
-    strText = Speech_Recognition(dir + "audio.pcm")
-    print(strText)
+    # strText = Speech_Recognition_Standard(dir + "audio.pcm", out_debug=True)
+    strText = Speech_Recognition(dir + "audio.wav", out_debug=True)
+    print("you said: " + strText)
 
     print()
     

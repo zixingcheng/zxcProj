@@ -9,6 +9,9 @@ Created on  张斌 2018-07-16 11:00:00
 import sys, os, time, datetime, threading
 import speech_recognition as sr
 import wave, pyaudio
+import matplotlib.pyplot as plt
+import scipy.signal as signal
+import numpy as np
 from pydub import AudioSegment
 from pydub.silence import detect_nonsilent
 from pydub.silence import split_on_silence
@@ -21,6 +24,98 @@ global m_thrdSay
 m_words =[]
 
 
+
+# 音频播放
+def Play_Audio_Wav(filepath):
+    #wav文件读取 
+    f = wave.open(filepath,'rb')
+    params = f.getparams()
+    nchannels, sampwidth, framerate, nframes = params[:4]
+
+    #instantiate PyAudio 
+    p = pyaudio.PyAudio() 
+    chunk = 1024    #define stream chunk  
+
+    #打开声音输出流
+    stream = p.open(format = p.get_format_from_width(sampwidth),
+                    channels = nchannels,
+                    rate = framerate, 
+                    output = True) 
+ 
+    #写声音输出流到声卡进行播放
+    data = f.readframes(chunk) 
+    i=1
+    while True:
+        data = f.readframes(chunk)
+        if data == b'': break
+        stream.write(data)   
+    f.close()
+    stream.stop_stream()    #stop stream 
+    stream.close() 
+    p.terminate()           #close PyAudio 
+# 录音，Use SpeechRecognition to record 使用语音识别包录制音频
+def Record_Audio(path, rate=16000):
+    r = sr.Recognizer()
+    with sr.Microphone(sample_rate=rate) as source:
+        print("please say something")
+        audio = r.listen(source)
+ 
+    with open(path, "wb") as f:
+        f.write(audio.get_wav_data())
+    print("录音完成！")
+
+
+# 计算过零率
+def calZeroCrossingRate(wave_data) :
+    # 自定义函数，计算数值的符号。
+    def sgn(data):
+        if data >= 0 :
+             return 1
+        else :
+            return 0
+
+    zeroCrossingRate = []
+    sum = 0
+    for i in range(len(wave_data)) :
+        if i % 256 == 0:
+            continue
+        sum = sum + np.abs(sgn(wave_data[i]) - sgn(wave_data[i - 1]))
+        if (i + 1) % 256 == 0 :
+            zeroCrossingRate.append(float(sum) / 255)
+            sum = 0
+        elif i == len(wave_data) - 1 :
+            zeroCrossingRate.append(float(sum) / 255)
+    return zeroCrossingRate
+# 读取音频文件数据组
+def Get_Data_wav(path, normalization = False):
+    # 打开音频文件，读取信息
+    f = wave.open(path, 'rb')
+    params = f.getparams()
+    nchannels, sampwidth, framerate, nframes = params[:4]
+
+    bufData = f.readframes(nframes)     #读取音频，字符串格式 
+    f.close()
+    if(normalization == False): return bufData
+
+    # 归一化处理
+    waveData = np.frombuffer(bufData, dtype='i2',offset=0)      # 将字符串转化为int
+    waveData = waveData * 1.0 / (max(abs(waveData)))            # wave幅值归一化
+    #waveData = np.reshape(waveData,[nframes,nchannels]).T      # 多通道处理
+    return waveData, [nchannels, sampwidth, framerate, nframes]
+# 绘制波形
+def Show_Draw_wav(path):
+    # 提取归一化数据
+    waveData, infos = Get_Data_wav(path, normalization = True)
+        
+    # 绘制波形
+    time = np.arange(0, infos[3]) * (1.0 / infos[2])
+    plt.plot(time,waveData)
+    plt.xlabel("Time(s)")
+    plt.ylabel("Amplitude")
+    plt.title("Single channel wavedata")
+    plt.grid('on')#标尺，on：有，off:无。
+    plt.show()
+    
 
 # 语音分割--保持原有录音长度，可以默认开始时间
 '''
@@ -35,7 +130,7 @@ m_words =[]
         out_debug：是否输出调试信息
         save_path：保存路径
 ''' 
-def split_audio_on_silence(path, silence_thresh=-50, min_silence_len=1000, length_limit=60, keep_silence=0, abandon_chunk_len=500, joint_silence_len=1000, out_debug=True, save_path=''):
+def split_audio_on_silence(path, silence_thresh=-50, min_silence_len=1000, length_limit=60, keep_silence=0, abandon_chunk_len=500, joint_silence_len=1000, out_debug=False, save_path=''):
     # 按句子停顿，拆分成长度不大于1分钟录音片段
     if(out_debug): print('开始拆分(如果录音较长，请耐心等待)\n',' *'*30) 
     dtStart = datetime.datetime.now()
@@ -51,7 +146,7 @@ def split_audio_on_silence(path, silence_thresh=-50, min_silence_len=1000, lengt
 
     # 时间过短的相邻段合并，单段不超过设定秒
     chunks_adjust = []
-    if(len(chunks) >= 0):
+    if(len(chunks) > 1):
         length_limit = 60 * 1000
         temp = AudioSegment.empty()
         silence = AudioSegment.silent(duration = joint_silence_len)  
@@ -66,8 +161,12 @@ def split_audio_on_silence(path, silence_thresh=-50, min_silence_len=1000, lengt
         else:
             chunks_adjust.append(temp)
         if(out_debug): print('合并后段数：',len(chunks_adjust))
+    else:       # 直接返回
+        if(out_debug): print('唯一段，小于限制长度，无需分割。')
+        return [path]       
 
     # 保存所有分段
+    paths = []
     if(True):
         # 保存前处理一下路径文件名
         if(save_path == ''): 
@@ -83,11 +182,12 @@ def split_audio_on_silence(path, silence_thresh=-50, min_silence_len=1000, lengt
             save_name = '%s_%04d.%s'%(namef, i, namec)      # 生成保存路径
             new.export(save_name, format=namec)             # 保存文件
             if(out_debug): print('%04d'%i, len(new), os.path.basename(path))
+            paths.append(save_name)
         if(out_debug): print('保存完毕')
-        print("==> split audio on silence end @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
-        return True
-    print("==> split audio on silence failed @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
-    return False
+        if(out_debug): print("==> split audio on silence end @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
+        return paths
+    if(out_debug): print("==> split audio on silence failed @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
+    return paths
 # 语音分割--保持原有录音长度，可以默认开始时间
 '''
     将声音文件按正常语句停顿拆分，并限定单句最长时间，返回结果为列表形式
@@ -155,47 +255,7 @@ def Trans_Mp3_To_Wav(mp3_file, wav_file="", rate=16000):
     return wav_file
 
 
-# 音频播放
-def Play_Audio_Wav(filepath):
-    #wav文件读取 
-    f = wave.open(filepath,'rb')
-    params = f.getparams()
-    nchannels, sampwidth, framerate, nframes = params[:4]
-
-    #instantiate PyAudio 
-    p = pyaudio.PyAudio() 
-    chunk = 1024    #define stream chunk  
-
-    #打开声音输出流
-    stream = p.open(format = p.get_format_from_width(sampwidth),
-                    channels = nchannels,
-                    rate = framerate, 
-                    output = True) 
- 
-    #写声音输出流到声卡进行播放
-    data = f.readframes(chunk) 
-    i=1
-    while True:
-        data = f.readframes(chunk)
-        if data == b'': break
-        stream.write(data)   
-    f.close()
-    stream.stop_stream()    #stop stream 
-    stream.close() 
-    p.terminate()           #close PyAudio 
-# 录音，Use SpeechRecognition to record 使用语音识别包录制音频
-def Record_Audio(path, rate=16000):
-    r = sr.Recognizer()
-    with sr.Microphone(sample_rate=rate) as source:
-        print("please say something")
-        audio = r.listen(source)
- 
-    with open(path, "wb") as f:
-        f.write(audio.get_wav_data())
-    print("录音完成！")
-
-
-#文字转语音输出
+# 文字转语音输出
 def Speech(word, times = 1, path = ''):
     # 路径设置
     if(path == ''): 
@@ -213,7 +273,7 @@ def Speech(word, times = 1, path = ''):
             time.sleep(len(word) / 4)       # 按文字长度延时，非准确方式
     return True
  
-#文字转语音输出（线程）
+# 文字转语音输出（线程）
 def Speech_words():
     for x in m_words:
         Speech(x, 1)
@@ -226,31 +286,42 @@ def Speech_thrd(word, times = 1):
         m_words.append(word)
     if(m_thrdSay.isAlive() == False):
         m_thrdSay.start()
+        
+# 将语音转文本STT-
+def Speech_Recognition(path, silence_thresh=-50, out_debug=False):
+    return myAI_Voice_Baidu.Speech_Recognition(path, silence_thresh=silence_thresh, out_debug=out_debug)
 
 
 
 if __name__ == '__main__':
     # 语音分割--限长
-    # path = "E:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/Voices/audio.wav"
+    dir = "E:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/Voices/"
+    path = dir + "audio.wav"
     # split_audio_on_silence(path, silence_thresh=-50,min_silence_len=1000,length_limit=60,keep_silence=0)
 
     # 语音播放、录音
     # Play_Audio_Wav(path)
     # Record_Audio("Temps/Voices/myvoices.wav")
+    # Show_Draw_wav(path)
 
     # 语音格式转换
-    # Trans_Wav_To_Pcm("E:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/Voices/audio.mp3")
-    # Trans_Mp3_To_Wav("E:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/Voices/audio2.mp3")
+    # Trans_Wav_To_Pcm(dir + "audio.mp3")
+    # Trans_Mp3_To_Wav(dir + "audio2.mp3")
 
     # 语音识别
     #listen("Temps/Voices/audio.pcm")
 
     # 语音合成
-    for x in range(0, 10):
+    for x in range(0, 0):
         # Speech_thrd(str(x) + '.建设银行，大幅上涨，涨幅5%！', 1)
         Speech(str(x) + '.建设银行，大幅上涨，涨幅5%！', 1)
         print(x)
         time.sleep(5)
     print("end...")
-    #Say('你好，hello world！', 2)
+    
+    # 将语音转文本STT
+    strText = Speech_Recognition(dir + "audio.wav", out_debug=True)
+    print("you said: " + strText)
+
+    print()
     
