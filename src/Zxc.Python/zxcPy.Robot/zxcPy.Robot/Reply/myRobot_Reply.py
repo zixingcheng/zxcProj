@@ -122,7 +122,11 @@ class myRobot_Reply():
             nMax = myData.iif(nLen > 15, 40, 32)
 
             #尾部标签
-            strTag = "  --zxcRobot  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
+            msgTag = msg.get('msgTag', "")
+            if(msgTag == ""):
+                strTag = "  --zxcRobot  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
+            else:
+                strTag = "  --zxcRobot(" + msgTag + ")  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
             strTag = (nMax - len(strTag)) * " " + strTag
             msg["msg"] = strMsg + "\n" + strTag
 
