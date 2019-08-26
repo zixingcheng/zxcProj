@@ -11,8 +11,9 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>Global|PythonCore|3.5</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
     <Name>zxcPy_Quote</Name>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -22,6 +23,20 @@
   <ItemGroup>
     <Compile Include="myRobot_API.py" />
     <Compile Include="zxcPy.APIs\myAPI_Robot.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel28 - Copy.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel28.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel_Check_Stocks.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel_Initialize.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel_Risk_Management.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel_Trade.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\Temp\myStrategy_Wheel.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\Temp\myStrategy_Wheel_Check_Stocks_BlackList.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\Temp\myStrategy_Wheel_Log.py" />
+    <Compile Include="zxcPy.Quantify\myStrategy\Temp\myStrategy_Wheel_Trade_Stat.py" />
+    <Compile Include="zxcPy.Quantify\Test_JQData\myTest_JQData.py" />
+    <Compile Include="zxcPy.Quantify\Test_JQData\myTest_JQData_API.py" />
+    <Compile Include="zxcPy.Quantify\Test_JQData\myTest_JQData_API_Factor.py" />
     <Compile Include="zxcPy.Robot\Prjs\Base\myManager_Bill.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Msg.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Note.py" />
@@ -39,6 +54,7 @@
     <Compile Include="zxcPy.Robot\Roots\myRoot_Usr.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_Prj.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot.py" />
+    <Compile Include="zxcPy.VoiceAI\myVoiceAI.py" />
     <Compile Include="zxcPy.Webs\myWeb_User.py" />
     <Compile Include="zxcPy.Webs\myWeb_Stock.py" />
     <Compile Include="zxcPy.Webs\myWeb_Order.py" />
@@ -49,11 +65,17 @@
     <Folder Include="Docs\" />
     <Folder Include="Setting\" />
     <Folder Include="zxcPy.APIs\" />
+    <Folder Include="zxcPy.Quantify\" />
+    <Folder Include="zxcPy.Quantify\myStrategy\" />
+    <Folder Include="zxcPy.Quantify\myStrategy\Temp\" />
+    <Folder Include="zxcPy.Quantify\Test_JQData\" />
     <Folder Include="zxcPy.Robot\" />
     <Folder Include="zxcPy.Robot\Prjs\Base\" />
     <Folder Include="zxcPy.Robot\Reply\" />
     <Folder Include="zxcPy.Robot\Roots\" />
     <Folder Include="zxcPy.Robot\Prjs\" />
+    <Folder Include="zxcPy.Test\" />
+    <Folder Include="zxcPy.VoiceAI\" />
     <Folder Include="zxcPy.Webs\" />
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +86,9 @@
     <Content Include="Setting\Setting.csv" />
     <Content Include="Setting\Setting_User.csv" />
     <Content Include="Setting\UserInfo_Group.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.7" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

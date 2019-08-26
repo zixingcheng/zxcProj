@@ -25,14 +25,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="mySystem.py" />
+    <Compile Include="zxcPy.Base\myAI_Voice_Baidu.py" />
     <Compile Include="zxcPy.Base\myIO_md.py" />
     <Compile Include="zxcPy.Base\myIO_docx.py" />
     <Compile Include="zxcPy.Base\myMQ_Rabbit_Recv_Test.py" />
     <Compile Include="zxcPy.Base\myMQ_Rabbit.py" />
     <Compile Include="zxcPy.Base\myManager_Msg.py" />
     <Compile Include="zxcPy.Base\myPyWin.py" />
-    <Compile Include="zxcPy.Base\myAI_Voice.py" />
-    <Compile Include="zxcPy.Base\myVoice - Copy.py" />
     <Compile Include="zxcPy.Base\myVoice.py" />
     <Compile Include="zxcPy.Base\myGlobal.py" />
     <Compile Include="zxcPy.Base\myWeb\forms.py" />
