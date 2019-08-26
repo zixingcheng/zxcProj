@@ -50,7 +50,7 @@ class myAPI_Robot_Reply(myWeb.myAPI):
         
         #消息处理(应为异步处理)
         msg = ast.literal_eval(msgInfo) 
-        pReutrn = ms_Reply.Done_ByMsg(msg, True) 
+        pReutrn = ms_Reply.OnHandleMsg(msg, True) 
         myDebug.Debug("API-->>", pReutrn)
         try:
             return pReutrn
