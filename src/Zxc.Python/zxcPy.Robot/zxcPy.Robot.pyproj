@@ -39,6 +39,9 @@
     <Compile Include="zxcPy.Robot\Roots\myRoot_Usr.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_Prj.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot.py" />
+    <Compile Include="zxcPy.Webs\myWeb_User.py" />
+    <Compile Include="zxcPy.Webs\myWeb_Stock.py" />
+    <Compile Include="zxcPy.Webs\myWeb_Order.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.5" />
@@ -54,14 +57,15 @@
     <Folder Include="zxcPy.Robot\Reply\" />
     <Folder Include="zxcPy.Robot\Roots\" />
     <Folder Include="zxcPy.Robot\Prjs\" />
+    <Folder Include="zxcPy.Webs\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\DB_Bill\多多.csv" />
+    <Content Include="Data\README.md" />
     <Content Include="README.md" />
     <Content Include="Docs\Updata.md" />
+    <Content Include="Setting\README.md" />
     <Content Include="Setting\Setting.csv" />
     <Content Include="Setting\Setting_User.csv" />
-    <Content Include="Setting\UserInfo.csv" />
     <Content Include="Setting\UserInfo_Group.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

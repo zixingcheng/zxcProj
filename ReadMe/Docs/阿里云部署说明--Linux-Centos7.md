@@ -7,7 +7,7 @@
 ### rabbitmq镜像
 
 	https://oneinstack.com/docs/rabbitmq-image-guide/
-	按操作打开远程访问，可以正常访问rabbitmq即可。
+	按操作打开远程访问，可以正常访问rabbitmq即可。 
 	
 
 ### 图形界面

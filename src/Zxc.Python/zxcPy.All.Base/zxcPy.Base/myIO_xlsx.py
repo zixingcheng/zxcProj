@@ -201,8 +201,12 @@ class DtTable:
                 strLine += symbol + strVaulue
         
         #文件追加数据内容
-        with open(file, 'a+') as f:
-            f.write("\n" + strLine)    
+        if(isUtf):
+            with open(file, 'a+',encoding="utf-8") as f:
+                f.write("\n" + strLine)    
+        else: 
+            with open(file, 'a+') as f:
+                f.write("\n" + strLine)    
         return True 
     #保存数据测试
     def Save_Test(self, strPath, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = "", row_end = -1, col_end = -1):  

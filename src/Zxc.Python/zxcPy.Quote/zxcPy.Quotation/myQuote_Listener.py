@@ -20,9 +20,11 @@ gol._Init()     #先必须在主模块初始化（只在Main模块需要一次�
         
 #行情监听
 class Quote_Listener:
-    def __init__(self, name):
+    def __init__(self, name = "", nameAlias = ""):
         self.name = name
+        self.nameAlias = nameAlias
         self.pMMsg = gol._Get_Setting('manageMsgs')
+        self.pSet = None
     def getName(self):
         return self.name  
     def OnUpdataSet(self, quoteDatas):pass 
@@ -33,12 +35,13 @@ class Quote_Listener:
         if(strMsg == ""): return False
 
         #通知处理
-        pSet = quoteDatas.setting
-        for x in pSet.msgUsers_wx:
+        self.pSet = quoteDatas.setting.GetSetting(self.nameAlias)
+        for x in self.pSet.msgUsers:
             #生成用户消息
-            msg = self.OnCreatMsgInfo(x, strMsg, quoteDatas.data.time)
+            usrPlat = self.pSet.msgUsers[x]
+            msg = self.OnCreatMsgInfo(x, strMsg, quoteDatas.data.time, plat=usrPlat)
             if(self.pMMsg != None):
-                self.pMMsg.OnHandleMsg(msg, "", True, nSleep)   #推送至消息处理器处理(使用消息校正)
+                self.pMMsg.OnHandleMsg(msg, usrPlat, True, nSleep)   #推送至消息处理器处理(使用消息校正)
         return True
     #创建新消息
     def OnCreatMsgInfo(self, to_user, text, time = '', type = "TEXT", plat = 'wx'):
@@ -62,6 +65,8 @@ class Quote_Listener:
         pass
     #功能是否可用
     def IsEnable(self, quoteDatas):
+        if(self.pSet != None):
+            return self.pSet.isValid
         return True
 
 

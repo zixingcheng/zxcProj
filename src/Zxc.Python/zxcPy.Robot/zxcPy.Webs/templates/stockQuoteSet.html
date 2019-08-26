@@ -1,0 +1,127 @@
+﻿<!-- extend from base layout -->
+<!doctype html>
+{% extends "base.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
+
+{% block content %} 
+  {% from "base.html" import render_field2 %}
+  <form action="" method="post" name="stockQuoteSet" style="margin-left:10px;margin-top:10px" > 
+	<h1 style="margin-left:60px">股票监测设置 </h1>
+    {{ form.hidden_tag() }} 
+	
+	<table>
+		{{ render_field2(form.stockID, size=20) }} 
+		{{ render_field2(form.stockName, size=20) }}  
+		
+		{{ render_field2(form.monitorRise_Fall, size=20) }} 
+		{{ render_field2(form.monitorHourly, size=20) }} 
+		
+		{{ render_field2(form.monitorUsrID, size=20) }} 
+	</table>  
+	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p>
+	
+	<td>{{ form.exType|safe }}{{ form.code_id|safe }}{{ form.code_name|safe }}</td>	
+	<datalist id="lstStockIDs"></datalist>
+	<datalist id="lstStockNames"></datalist> 
+	
+		 
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> 
+	<script type="text/javascript"> 
+		var dataStocks=JSON.parse("{}", null); 
+		var dataStocks_set=JSON.parse("{}", null); 
+		var jsonStocks = null;
+		$(document).ready(function () {   
+			<!--动态获取配置信息-->
+			$.get('/zxcWebs/stock/quoteset/query/{{usrName_Nick}}',  {}, function(data){   
+				dataStocks_set = JSON.parse(data, null);  
+				updatStocks('', ''); 
+			});		
+				
+			<!--股票信息动态查询-->
+			$("#stockID").on('input propertychange change',function () {
+				if(this.value.length < 2) return; 
+				updatStocks(this.value, '');
+			});  
+			$("#stockName").on('input propertychange change',function () {   
+				updatStocks('', this.value);
+			});  
+			
+			<!--动态查询股票信息-->
+			function updatStocks(codeID, codeName)	{		
+				if(('code_ids' in dataStocks)) {
+					var exist = false
+					var items = dataStocks['code_ids'];
+					var items_ex = dataStocks['extypes'] ;
+					var items_name = dataStocks['code_names']; 
+					for(var item in items){  
+						if(items_ex[item] + "." + items[item] == codeID || items_name[item] == codeName){
+							if(codeName == "") $("#stockName").val(items_name[item]);
+							if(codeID == "") $("#stockID").val(items_ex[item] + "." + items[item]);			
+							$("#exType").val(items_ex[item]); 				
+							$("#code_id").val(items[item]); 			
+							$("#code_name").val(items_name[item]); 		
+							
+							<!--提交按钮状态修改-->
+							if(isSetedStock(items_name[item]))
+							{
+								$("#save").val('更新设置'); 
+								$("#remove").attr("disabled", false); 
+							};
+							return;
+						};
+					};  
+				}; 
+				$("#save").val('新增监测'); 
+				$("#remove").attr("disabled", true); 		
+				$("#exType").val(""); $("#code_id").val(""); $("#code_name").val(""); 
+				
+				if(codeID == "" & codeName == ""){
+					jsonStocks = dataStocks_set;
+				}
+				else{
+					$.get('/zxcAPI/robot/stock/query',  {code_id: codeID, code_name: codeName}, function(data){   
+						jsonStocks = JSON.parse(data, null);  
+					});		 
+				};
+				if(jsonStocks != null){
+					<!--更新匹配用户信息--> 
+					var items = jsonStocks['code_ids'] ;
+					var items_ex = jsonStocks['extypes'] ;
+					var items_name = jsonStocks['code_names'] ;
+					var items_nameEN = jsonStocks['code_namesEN'] ;
+					if(items != false){
+						$("#lstStockIDs").empty();
+						$("#lstStockNames").empty();
+						var objIDs = document.getElementById('lstStockIDs'); 
+						var objNames = document.getElementById('lstStockNames');  
+						for(var item in items){   
+							objIDs.appendChild(new Option(items_name[item], items_ex[item] + "." + items[item]));   
+							objNames.appendChild(new Option(items_nameEN[item], items_name[item]));   
+						};  
+						dataStocks = jsonStocks;
+					};
+				};	 
+			};
+			<!--检查是否设置过-->
+			function isSetedStock(codeName)	{
+				var isSeted = false;
+				var items_name_set = dataStocks_set['code_names']; 
+				for(var item_set in items_name_set){ 
+					if(items_name_set[item_set] == codeName){
+						isSeted = true; break; 
+					};
+				};
+				return isSeted;
+			};
+			
+			<!--控件调整，绑定下拉辅助输入列表-->
+			$("#stockID").attr("list",'lstStockIDs'); 
+			$("#stockID").attr("autocomplete",'off'); 
+			$("#stockName").attr("list",'lstStockNames'); 
+			$("#stockName").attr("autocomplete",'off');  
+			$("#monitorUsrID").attr("readonly",'readonly'); 
+			$("#monitorUsrID").val('{{usrName_Nick}}-{{usrPlat}}'); 
+		});
+	</script>
+	
+  </form>
+{% endblock %}

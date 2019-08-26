@@ -1,0 +1,37 @@
+﻿<html>
+  <head>
+    {% if title %}
+    <title>{{title}} - elife</title>
+    {% else %}
+    <title>elife</title>
+    {% endif %}
+	
+	{% macro render_field(field, size) %}
+	<tr>
+	  <td>{{ field.label }}：</td>
+	  <td>{{ field(**kwargs)|safe }}</td>
+	  <td>{% if field.errors %} 
+		{% for error in field.errors %}
+		  <li><span style="color: red;">[{{ error }}]</span></li> 
+		{% endfor %} 
+		{% else %} 
+		{% endif %}
+	  </td>
+	</tr>
+	{% endmacro %}
+  </head>
+  <body>       
+    <hr>                                    
+    {% with messages = get_flashed_messages() %}   
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+        <li>{{ message }} </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+    <hr>     
+  </body>
+</html>

@@ -26,6 +26,7 @@
     <Compile Include="zxcPy.Quotation\myQuote_Listener.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Source.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Setting.py" />
+    <Compile Include="zxcPy.Quotation\myQuote.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myData_Trade.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\myData_Stock.py" />
@@ -55,8 +56,9 @@
     <Folder Include="zxcPy.Test\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\README.md" />
     <Content Include="README.md" />
-    <Content Include="Setting\Setting_Quote.csv" />
+    <Content Include="Setting\README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

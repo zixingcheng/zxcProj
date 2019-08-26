@@ -17,7 +17,7 @@ import myData_Trans, myQuote_Data, myQuote_Listener
 #行情监听--整点播报
 class Quote_Listener_Hourly(myQuote_Listener.Quote_Listener):
     def __init__(self):
-        myQuote_Listener.Quote_Listener.__init__(self, 'Hourly')
+        myQuote_Listener.Quote_Listener.__init__(self, 'Hourly', "整点播报")
         self.values = {}
 
     #处理接收信息
@@ -48,9 +48,6 @@ class Quote_Listener_Hourly(myQuote_Listener.Quote_Listener):
                 strMsg += "\n整点播报: " + strTime + "."
         #通知处理
         self.OnHandleMsg(quoteDatas, strMsg)
-
-    #功能是否可用
-    def IsEnable(self, quoteDatas):
-        return quoteDatas.setting.isEnable_Hourly
+        
     
 

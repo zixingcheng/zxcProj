@@ -4,7 +4,7 @@ Created on  张斌 2018-05-03 14:58:00
     @author: zhang bin
     @email:  zhangbin@gsafety.com
 
-    监听--类 涨跌幅整数倍
+    监听--类 涨跌监测-涨跌幅整数倍
 """
 import sys, os, math, copy, mySystem 
 
@@ -20,6 +20,7 @@ from myGlobal import gol
 class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
     def __init__(self):
         myQuote_Listener.Quote_Listener.__init__(self, 'Rise_Fall_asInt')
+        self.nameAlias = "涨跌监测"
         self.values = {}
         self.data = {'max':-0.1, 'min':0.1, 'now':0}        #值结构
         self.deltaV = 0.5 / 100;
@@ -137,10 +138,6 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
                     break
         if(nDay == 0): return ""
         return "(" + str(nDay) + "天)" 
-
-    #功能是否可用
-    def IsEnable(self, quoteDatas):
-        return quoteDatas.setting.isEnable_RFasInt
     
 
 

@@ -24,11 +24,11 @@ from myGlobal import gol
 class myWeixin_ItChat(myThread.myThread):
     def __init__(self, Tag = "zxcWeixin", useCmdMMap = True):
         super().__init__("", 0) # 必须调用
-        self.usrTag = Tag       #类实例标识
-        self.usrName = ""       #类实例用户名
+        self.usrTag = Tag       # 类实例标识
+        self.usrName = ""       # 类实例用户名
         self.wxReply = myReply_Factory.myWx_Reply(Tag)     #回复消息处理工厂对象类
         self.usrDefault = {'UserName' : ""}
-        self.Init()             #文件初始
+        self.Init()             # 文件初始
         self.ind = 0
         self.max = 5
         #self.cmdWeixin = None
@@ -118,6 +118,10 @@ class myWeixin_ItChat(myThread.myThread):
         gol._Set_Value('zxcWx_usrName', self.usrName)
         gol._Set_Value('zxcWx_usrName_Alias', self.usrName_Alias)
         myDebug.Print("    --授权微信用户为：" + self.usrName_Alias + self.usrName)
+        if(True):
+            #记录为文件格式，便于其他识别
+            dictUsr = {'UserName': self.usrName, 'NickName': self.usrName_Alias}
+            myIO.Save_File(self.dirData + 'zxcWeixin.cache', str(dictUsr), True, True)
 
         #更新用户信息（回复消息处理工厂对象类）
         self.wxReply._Init(self.usrName, self.usrName_Alias)

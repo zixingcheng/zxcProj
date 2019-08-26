@@ -36,6 +36,7 @@
     <Compile Include="zxcPy.Base\myVoice.py" />
     <Compile Include="zxcPy.Base\myGlobal.py" />
     <Compile Include="zxcPy.Base\myWeb\forms.py" />
+    <Compile Include="zxcPy.Base\myWeb\myManager_Bill.py" />
     <Compile Include="zxcPy.Base\myWeb\views.py" />
     <Compile Include="zxcPy.Base\myWeb\models.py" />
     <Compile Include="zxcPy.Base\myWeb_urlLib.py" />
@@ -61,6 +62,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="zxcPy.Base\myWeb\HTML\test.html" />
+    <Content Include="zxcPy.Base\myWeb\Setting\BillTypes.json" />
+    <Content Include="zxcPy.Base\myWeb\static\JS\ajaxIndex.js" />
+    <Content Include="zxcPy.Base\myWeb\static\JS\jquery-1.11.3.min.js" />
+    <Content Include="zxcPy.Base\myWeb\static\JS\jquery-3.3.1.min.js" />
+    <Content Include="zxcPy.Base\myWeb\templates\ajaxIndex.html" />
+    <Content Include="zxcPy.Base\myWeb\templates\base.html" />
+    <Content Include="zxcPy.Base\myWeb\templates\billAdd.html" />
+    <Content Include="zxcPy.Base\myWeb\templates\billBase.html" />
+    <Content Include="zxcPy.Base\myWeb\templates\index.html" />
+    <Content Include="zxcPy.Base\myWeb\templates\login.html" />
     <Content Include="zxcPy.Install\pip_install.bat" />
     <Content Include="zxcPy.Base\myWeb\__pycache__\Config.cpython-35.pyc" />
     <Content Include="zxcPy.Install\阿里云部署说明--Linux-Centos7.md" />
@@ -69,6 +80,10 @@
     <Folder Include="zxcPy.Base\" />
     <Folder Include="zxcPy.Base\myWeb\" />
     <Folder Include="zxcPy.Base\myWeb\HTML\" />
+    <Folder Include="zxcPy.Base\myWeb\Setting\" />
+    <Folder Include="zxcPy.Base\myWeb\static\" />
+    <Folder Include="zxcPy.Base\myWeb\static\JS\" />
+    <Folder Include="zxcPy.Base\myWeb\templates\" />
     <Folder Include="zxcPy.Base\myWeb\__pycache__\" />
     <Folder Include="zxcPy.Install\" />
   </ItemGroup>

@@ -6,7 +6,8 @@ Created on  张斌 2017-11-17 15:16:00
 
     Weixin网页版消息处理接口（功能库）--机器人类--消息回撤
 """
-import sys, ast, os, time, random, mySystem
+import sys, string, ast, os, time, random, mySystem
+from urllib.parse import quote
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类 
 mySystem.Append_Us("", False) 
@@ -26,7 +27,7 @@ class myRobot_Msg(myRobot.myRobot):
         self.maxTime = -1               #永久有效 
 
         #初始全局操作对象
-        self.webQuote = myWeb_urlLib.myWeb("http://127.0.0.1:8669/zxcAPI/robot", "", False)   
+        #self.webQuote = myWeb_urlLib.myWeb("http://127.0.0.1:8669/zxcAPI/robot", "", False)   
         self.myRobot = myRobot_Robot.myRobot_Robot()
         self.myRobot.isRunning = True
                 
@@ -56,19 +57,30 @@ class myRobot_Msg(myRobot.myRobot):
             #机器人
             return self.myRobot._Done(Text, msgID, "TEXT", usrInfo)
         elif(cmd == "股票"):
-            #机器人
-            bAdd = True
-            if(nNum > 2 and cmds[2] == "-"): bAdd = False
-            usr = myData.iif(usrInfo['groupName'] != "", "@*" + usrInfo['groupName'], usrInfo['usrNameNick'])
-            urlPath = cmds[1] + "/" + str(bAdd) + "/" + usr
-            data = self.webQuote.Do_API_get("quote/set/" + urlPath, "myQuote_API")
-
-            #转换结果Json
-            if(data.count("{") > 0):
-                pJson = myData_Json.Json_Object()
-                pJson.Trans_FromStr(data)
-                strReturn = pJson['text']
+            #发送股票设置界面链接
+            usrPlat, usrID = self._Done_Check_UserBack(usrInfo) 
+            url = 'http://39.105.196.175:8668/zxcWebs/stock/quoteset/' + usrID + "/" + usrPlat
+            strReturn = quote(url, safe = string.printable)   # unquote
+        elif(cmd == "订单"):
+            #发送订单相关界面链接
+            usrPlat, usrID = self._Done_Check_UserBack(usrInfo) 
+            orderType = cmds[1].strip()
+            url = 'http://39.105.196.175:8668/zxcWebs/order/Add/' + orderType + "?usrID=" + usrID
+            strReturn = quote(url, safe = string.printable)   # unquote
         return strReturn
+
+    #提取回发用户名，并作相关修正
+    def _Done_Check_UserBack(self, usrInfo = {}):
+        usrPlat = usrInfo.get('usrPlat', 'wx')
+        if(usrInfo['usrNameSelf'] != "" and usrInfo['groupName'] != ""):
+            usrID = "@*" + usrInfo['groupName']
+            usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self") 
+        else: 
+            usrID = usrInfo['usrName']
+        usrInfo['groupID'] = ""
+        usrInfo['groupName'] = ""
+        return usrPlat, usrID
+
 
     #消息撤回通知        
     def _Done_Revoke(self, msg, msgID, msgType, usrInfo = {}):
@@ -80,7 +92,7 @@ class myRobot_Msg(myRobot.myRobot):
             if(pMsg != None):
                 #组装撤回描述个人消息发送到文件助手
                 if(usrInfo.get('groupName', "") == ""):
-                    usrInfo['to_usrName'] = "Self"          #调整的转发用户名(自己"self")
+                    usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self")
                     strReturn = pMsg.usrFrom + " "    
                 else:
                     #组装随机前缀
@@ -103,7 +115,8 @@ class myRobot_Msg(myRobot.myRobot):
         strReturn = "消息命令提示："
         strReturn += self.perfix + "@*帮助：输出所有命令说明"
         strReturn += self.perfix + "@*：机器人聊天，可咨询问题" 
-        strReturn += self.perfix + "@*股票：股票设置，推送用户设置"  
+        strReturn += self.perfix + "@*股票：股票设置，推送用户设置链接"  
+        strReturn += self.perfix + "@*订单：订单设置，推送订单链接" 
         strReturn += "\n命令参数以空格区分，如：\"@* 光山天气\""
         return strReturn
         
@@ -130,8 +143,8 @@ if __name__ == "__main__":
     myDebug.Debug(pRobot_Msg.Done("@* 光山天气")['msg']) 
     myDebug.Debug(pRobot_Msg.Done("@* 附近商场")['msg']) 
     
-    myDebug.Debug(pRobot_Msg.Done("@*股票 广联达 +", usrNameNick='茶叶一主号')['msg']) 
-    myDebug.Debug(pRobot_Msg.Done("@*股票 广联达 -", usrNameNick='茶叶一主号')['msg']) 
+    myDebug.Debug(pRobot_Msg.Done("@*股票", usrNameNick='茶叶一主号')['msg'])  
+    myDebug.Debug(pRobot_Msg.Done("@*订单 茶叶", usrNameNick='茶叶一主号')['msg'])  
 
     pRobot_Msg.Done("@@zxcRobot_Msg")
     print()

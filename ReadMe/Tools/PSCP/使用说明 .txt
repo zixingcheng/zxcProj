@@ -1,0 +1,1 @@
+pscp.exe属于Putty的重要组件工具之一，同时也可以单独使用，可以通过pscp.exe实现本地windows下的文件下载、上传到linux上，有需要的赶快下载吧！

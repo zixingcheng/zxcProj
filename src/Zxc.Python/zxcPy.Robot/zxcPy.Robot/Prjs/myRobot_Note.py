@@ -50,7 +50,7 @@ class myRobot_Note(myRobot.myRobot):
             if(pMsg != None):
                 #组装撤回描述个人消息发送到文件助手
                 if(usrInfo.get('groupName', "") == ""):
-                    usrInfo['to_usrName'] = "Self"          #调整的转发用户名(自己"self")
+                    usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self")
                     strReturn = pMsg.usrFrom + " "    
                 else:
                     #组装随机前缀

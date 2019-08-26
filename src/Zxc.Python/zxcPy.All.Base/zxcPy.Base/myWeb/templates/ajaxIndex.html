@@ -1,0 +1,93 @@
+﻿<!--ajaxIndex.html-->
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajaxIndex</title>
+	
+
+	<!-- 插入jquery -->  
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script type=text/javascript>
+		var $SCRIPT_ROOT = {{request.script_root|tojson|safe}}; 
+	</script>
+	
+	<script type="text/javascript">
+		  
+	window.onload = function () {
+		document.getElementById('tradeType2').addEventListener('change',function(){
+			alert("当前选项是:"+this.value);
+		},false);
+	};
+	
+	function getKey()
+	{
+		if(event.keyCode==13){
+			alert('click enter');
+		 
+			var objSelect = document.getElementById('tradeType2') 
+			var new_opt = new Option("你好", "Hello") 
+			objSelect.options.add(new_opt)
+		}   
+	};
+	
+	function myAlert(){
+		alert("谢谢支持000");
+			$.get('/ajax', {name:" Hello。。"}, function(data){
+				alert(data);
+				$('#result2').text(data);
+			});
+		var temp = $('#namevalue').val();//获取值
+		alert(temp);  
+	};
+	
+	
+	$(document).ready(function () {
+		$('#btn').on('click',function () {
+			//此时使用的是post方式，get方式直接换成get就行
+			alert("hello");
+			$.get('/ajax', {name:$('#namevalue').val()}, function(data){
+				$('#result2').text(data);
+			});
+		});
+		
+		$('#calculate').on('click',function () {
+			//此时使用的是post方式，get方式直接换成get就行
+			alert("hello2222");
+			alert($('input[name="a"]').val());
+			alert($('input[name="b"]').val());
+			
+			$.get('/add', {a: $('input[name="a"]').val(), b: $('input[name="b"]').val()}, function(data){	 
+				$('#result').text(data.result); 
+			});
+		});
+	});
+	
+	</script> 
+	
+</head>
+<body>
+	<input type="text" id="urlstr"  style="width:200px;" onkeypress="getKey();"/>
+    <input type="text" id="namevalue" value="aaaa" ><br/>
+    <button id="btn">send</button>
+	<input onclick="myAlert()" type="button" value="点击我，弹出警告框" />
+	<input onclick="alert('谢谢支持')" type="button" value="点击我，弹出警告框" />
+	
+	
+    结果:<span type=text id="result2"></span>
+	<p>
+    <input type=text size=5 name=a> +
+    <input type=text size=5 name=b> =
+    <span type=text id=result>?</span>
+</p>
+<button id="calculate">计算</button>
+
+{{ form.tradeParty(**kwargs)|safe }}
+
+<select id="tradeType" name="tradeType"><option selected value="None">无</option></select>
+<select id="tradeType2" name="tradeType2"><option selected value="None">无</option></select>
+
+
+</body>
+</html>

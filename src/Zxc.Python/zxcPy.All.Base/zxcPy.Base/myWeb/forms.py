@@ -14,7 +14,6 @@ from wtforms.validators import DataRequired,ValidationError
 from models import Admin                        #从models导入模型（表）
 
 #定义登录表单，并且需要在视图函数（views.py）中实例化
-
 class LoginForm(FlaskForm):
     account = StringField(
         # 标签
@@ -55,3 +54,45 @@ class LoginForm(FlaskForm):
             "class": "btn btn-primary btn-block btn-flat",
         }
     )
+
+class billAddForm(FlaskForm):
+    account = StringField(
+        # 标签
+        label="账号",
+        # 验证器
+        validators=[
+            DataRequired('请输入用户名')
+        ],
+        description="账号",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "class":"form-control",
+            "placeholder":"请输入账号!",
+            "required":'required'               #表示输入框不能为空，并有提示信息
+        }
+    )
+
+    pwd = PasswordField(
+        # 标签
+        label="密码",
+        # 验证器
+        validators=[
+            DataRequired('请输入密码')
+        ],
+        description="密码",
+
+        # 附加选项(主要是前端样式),会自动在前端判别
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入密码!",
+            "required": 'required'      # 表示输入框不能为空
+        }
+    )
+
+    submit = SubmitField(
+        label="登录",
+        render_kw={
+            "class": "btn btn-primary btn-block btn-flat",
+        }
+    )
+
