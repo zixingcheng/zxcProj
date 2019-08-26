@@ -123,10 +123,8 @@ class myRobot_Reply():
 
             #尾部标签
             msgTag = msg.get('msgTag', "")
-            if(msgTag == ""):
-                strTag = "  --zxcRobot  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
-            else:
-                strTag = "  --zxcRobot(" + msgTag + ")  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
+            strTag = "  --zxcRobot(" + msgTag + ")  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
+            strTag = strTag.replace("()", "")
             strTag = (nMax - len(strTag)) * " " + strTag
             msg["msg"] = strMsg + "\n" + strTag
 
