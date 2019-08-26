@@ -119,15 +119,14 @@ class myRobot_Reply():
             for x in lines:
                 nLength = len(x)
                 if(nLength > nLen): nLen = nLength
-            nMax = myData.iif(nLen > 15, 40, 32)
+            # nMax = myData.iif(nLen > 15, 40, 32)
+            nMax = myData.iif(nLen > 15, 32, 32)
 
             #尾部标签
             msgTag = msg.get('msgTag', "")
             strTag = "  --zxcRobot(" + msgTag + ")  " + myData_Trans.Tran_ToTime_str(None, '%H:%M:%S')
             strTag = strTag.replace("()", "")
             strTag = (nMax - len(strTag)) * " " + strTag
-        if(len(strTag) < 32):
-            strTag = (32 - len(strTag)) * " " + strTag
             msg["msg"] = strMsg + "\n" + strTag
 
             #消息管理器处理消息
