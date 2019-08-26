@@ -44,9 +44,6 @@
     <Compile Include="zxcPy.Webs\myWeb_Order.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|3.5" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Data\DB_Bill\" />
     <Folder Include="Docs\" />

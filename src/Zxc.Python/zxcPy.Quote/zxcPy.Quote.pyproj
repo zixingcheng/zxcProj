@@ -39,9 +39,6 @@
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Sina_Stock.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|3.5" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Data\DB_Trade\" />
     <Folder Include="Data\DB_Trade\Stock_Bills\" />
