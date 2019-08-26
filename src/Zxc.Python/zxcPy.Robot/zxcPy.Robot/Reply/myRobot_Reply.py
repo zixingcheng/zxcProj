@@ -119,8 +119,7 @@ class myRobot_Reply():
             for x in lines:
                 nLength = len(x)
                 if(nLength > nLen): nLen = nLength
-            # nMax = myData.iif(nLen > 15, 40, 32)
-            nMax = myData.iif(nLen > 15, 32, 32)
+            nMax = myData.iif(nLen > 15, 40, 32)
 
             #尾部标签
             msgTag = msg.get('msgTag', "")
