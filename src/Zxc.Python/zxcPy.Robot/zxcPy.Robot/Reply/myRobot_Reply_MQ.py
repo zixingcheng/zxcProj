@@ -61,7 +61,7 @@ class myRobot_Reply_MQ(myRobot_Reply):
 #初始全局消息管理器
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
-if(gol._Get_Setting('robotReply', None)== None):
+if(gol._Get_Setting('robotReply', None) == None):
     gol._Set_Setting('robotReply', myRobot_Reply_MQ(True))    #实例 机器人消息处理工厂类
     print("初始：机器人消息处理工厂类")
 
