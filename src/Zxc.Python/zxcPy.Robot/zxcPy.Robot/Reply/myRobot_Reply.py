@@ -131,7 +131,9 @@ class myRobot_Reply():
 
             #消息管理器处理消息
             self.usrMMsg.OnHandleMsg(msg)
-        
+            return True
+        return None
+
     #运行-开始
     def Start(self):
         self.isRunning = True
