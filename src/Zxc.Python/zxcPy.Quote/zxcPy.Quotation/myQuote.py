@@ -11,14 +11,19 @@ import baostock as bs
 import pandas as pd
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-mySystem.Append_Us("", False)    
+mySystem.Append_Us("/Quote_Source", False, __file__)
+mySystem.Append_Us("", True)    
 import myData_Trans, myDebug, myIO, myIO_xlsx
+import mySource_JQData_API
 
+exInfos = {'XSHG': "上海证券交易所", 'XSHE': "深圳证券交易所"}
 
 #股票信息
 class myStock_Info():
-    def __init__(self, extype, code, code_name, code_name_En, type = "Stock", area = "CN"): 
-        self.extype = extype                #股票交易所代码    
+    def __init__(self, extype, code, code_name, code_name_En, type = "Stock", area = "CN", exName = "", extype2 = ''): 
+        self.extype = extype                #股票交易所代码: 
+        self.extype2 = extype2              #股票交易所代码
+        self.exName = exName                #股票交易所名称       
         self.code_id = code                 #股票代码    
         self.code_name = code_name          #数据名称  
         if(code_name_En == ""): code_name_En = myData_Trans.Tran_ToStr_FirstLetters(code_name, True)
@@ -28,12 +33,24 @@ class myStock_Info():
         self.type = type                    #数据类型
         self.area = area                    #国家分类
         self.isIndex = self.IsIndex()      
+        self.CheckInfo()
+
     #是否是指数
     def IsIndex(self): 
-        if(self.type == "Stock" and self.area == "CN"):
-            if(self.extype == "sh"): return self.code_id[0:3] == "000"
-            if(self.extype == "sz"): return self.code_id[0:3] == "399"
+        if(self.type.lower() == "index"): return True
         return False
+    #信息修正
+    def CheckInfo(self): 
+        if(self.exName == ''):
+            self.exName = exInfos.get(self.extype, '未知')
+        if(self.extype == "XSHE"):
+            self.extype = 'sz'
+            self.area = 'CN'
+        elif(self.extype == "XSHG"):
+            self.extype = 'sh'
+            self.area = 'CN'
+        return True
+
 
 #股票查询
 class myStock:
@@ -42,8 +59,9 @@ class myStock:
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.Dir_Base = os.path.abspath(os.path.join(strDir, ".."))  
         self.Path_Stock = self.Dir_Base + "/Setting/Setting_Stock.csv"
-        self.setFields = ['extype', 'code', 'code_name_En', 'code_name', 'tradeStatus']
+        self.setFields = ['extype', 'code', 'code_name', 'code_name_En', 'type', 'area', 'exName', 'extype2']
 
+        self.quoteSource = gol._Get_Value('quoteSource_API', None)  #数据源操作对象
         self.lstStock = []
         self._init_Updata()         #更新配置信息
         self._Init()                #初始配置信息等
@@ -56,24 +74,36 @@ class myStock:
             t = os.path.getmtime(self.Path_Stock)
             t = time.localtime(t)
         tNow = time.localtime()
-        if(bExist ==False or tNow.tm_year != t.tm_year or tNow.tm_mon != t.tm_mon or tNow.tm_mday != t.tm_mday):
-            #获取最新
-            lg = bs.login()  #登陆系统 
-            rs = bs.query_all_stock(day="2017-06-30") # 获取全部股票代码
+        if(bExist == False or tNow.tm_year != t.tm_year or tNow.tm_mon != t.tm_mon or tNow.tm_mday != t.tm_mday):
+            #获取标的信息 
+            dataSecurities = self.quoteSource.getSecurities(['index', 'stock', 'etf'])
 
-            #添加中文首字母
+            #循环所有
             data_list = []
-            while (rs.error_code == '0') & rs.next():
-                # 获取一条记录，将记录合并在一起
-                datas = rs.get_row_data()
-                pDatas = datas[0].split('.')
-                pDatas.append(myData_Trans.Tran_ToStr_FirstLetters(datas[2], True))
-                pDatas.append(datas[2])
-                pDatas.append(datas[1])
-                data_list.append(pDatas)
-            bs.logout()  #登陆系统 
-            self._Init_Default(data_list)
+            for indexs in dataSecurities.index:
+                data = dataSecurities.loc[indexs]
+                pDatas = data.name.split('.')
+                pDatas.reverse() 
 
+                pDatas.append(data['display_name'])
+                pDatas.append(myData_Trans.Tran_ToStr_FirstLetters(data['display_name'], True))
+                pDatas.append(data['type'])
+                pDatas.append('')
+                pDatas.append(exInfos.get(pDatas[0], '未知'))
+                pDatas.append(pDatas[0])
+                 
+                if(pDatas[0] == "XSHE"):
+                    pDatas[0] = 'sz'
+                    pDatas[5] = 'CN'
+                elif(pDatas[0] == "XSHG"):
+                    pDatas[0] = 'sh'
+                    pDatas[5] = 'CN'
+                data_list.append(pDatas)
+                # pDatas.append(data['name'])
+                # pDatas.append(data['start_date'])
+                # pDatas.append(data['end_date'])
+            self._Init_Default(data_list)
+            
             #组合输出结果
             result = pd.DataFrame(data_list, columns=self.setFields)
             result.to_csv(self.Path_Stock, encoding="utf-8", index=False)
@@ -89,14 +119,14 @@ class myStock:
         #转换为功能权限对象集
         for dtRow in dtSetting.dataMat:
             if(len(dtRow) < len(self.setFields)): continue
-            pSet = myStock_Info(dtRow[0], dtRow[1], dtRow[3], dtRow[2],"Stock", "CN")
-            pSet.tradeStatus = dtRow[4]
+            pSet = myStock_Info(dtRow[0], dtRow[1], dtRow[2], dtRow[3], dtRow[4], dtRow[5], dtRow[6], dtRow[7])
             self._Index(pSet)               #索引设置信息 
     #初始默认配置
     def _Init_Default(self,data_list):
-        data_list.append(['sh','510050','50ETF','50ETF','1']) 
-        data_list.append(['sh','512180','建信MSCI','JXMSCI','1']) 
-        data_list.append(['sz','002958','青农商行','QNSH','1']) 
+        #data_list.append(['sh','510050','50ETF','50ETF','1']) 
+        #data_list.append(['sh','512180','建信MSCI','JXMSCI','1']) 
+        #data_list.append(['sz','002958','青农商行','QNSH','1']) 
+        pass
 
     #查找 
     def _Find(self, code_id, code_name = '', code_nameEN = '', exType = "", nReturn = 10):
