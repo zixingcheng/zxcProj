@@ -17,6 +17,7 @@ import myData_Trans, myDebug, myIO, myIO_xlsx
 import mySource_JQData_API
 
 exInfos = {'XSHG': "上海证券交易所", 'XSHE': "深圳证券交易所"}
+stockTypes = {'stock': "股票", 'index': "指数", 'etf': "ETF基金"}
 
 #股票信息
 class myStock_Info():
@@ -25,7 +26,7 @@ class myStock_Info():
         self.extype2 = extype2              #股票交易所代码
         self.exName = exName                #股票交易所名称       
         self.code_id = code                 #股票代码    
-        self.code_name = code_name          #数据名称  
+        self.code_name = code_name          #股票名称  
         if(code_name_En == ""): code_name_En = myData_Trans.Tran_ToStr_FirstLetters(code_name, True)
         self.code_name_En = code_name_En    #数据名称首字母
         
@@ -50,7 +51,27 @@ class myStock_Info():
             self.extype = 'sh'
             self.area = 'CN'
         return True
+    
+    # 提取板块
+    def getMarketBoard(self): 
+        return ""
+    # 提取标的行业分类
+    def getIndustries(self, name='zjw'): 
+        if(self.IsIndex()): return []
 
+        quoteSource = gol._Get_Value('quoteSource_API', None)  #数据源操作对象
+        security = self.getID()
+        datas = quoteSource.getIndustrys(security)
+        return [datas[security][name]['industry_name']]
+    # 提取标的概念分类
+    def getConcepts(self): 
+        return [] 
+    # 提取编码信息
+    def getID(self, isJQ = True): 
+        if(isJQ):
+            return self.code_id + "." + self.extype2
+        else:
+            return self.extype + self.code_id
 
 #股票查询
 class myStock:
@@ -172,7 +193,7 @@ if __name__ == "__main__":
 
     print("代码查询：")
     for x in pStocks._Find("00002"):
-        print(x)
+        print(x.getIndustries())
         
     print("名称查询：")
     for x in pStocks._Find("", "银行"):

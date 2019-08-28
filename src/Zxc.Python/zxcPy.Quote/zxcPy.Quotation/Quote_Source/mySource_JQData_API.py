@@ -40,9 +40,18 @@ class Source_JQData_API():
         return myData_Stock.Datas_Stock(data, interval)
 
     
-    #提取所有标的信息
+    # 提取所有标的信息
     def getSecurities(self, types=['stock'], data=None):
         return get_all_securities(types, data)
+    # 查询股票所属行业
+    def getIndustrys(self, security, data=None):
+        return get_industry(security, '2019-08-19')
+    # 获取行业板块成分股
+    def getIndustry_Stocks(self, industry_code, data=None):
+        return get_industry_stocks(industry_code, date=None)
+    # 获取概念板块成分股
+    def getConcepts_Stocks(self, concept_code, data=None):
+        return get_concept_stocks(concept_code, date=None)
 
 
 #缓存全局对象

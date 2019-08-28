@@ -11,8 +11,11 @@ from operator import itemgetter, attrgetter
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__)
+mySystem.Append_Us("../../../../zxcPy.Quote/zxcPy.Quotation", False, __file__)
 mySystem.Append_Us("", False) 
 import myEnum, myIO, myIO_xlsx, myData, myData_Trans, myDebug 
+import myQuote
+from myGlobal import gol 
 
 
 #定义交易类型枚举
@@ -31,6 +34,8 @@ class myObj_Trade():
         
         self.targetID = ""          #标的代码
         self.targetName = ""        #标的名称
+        self.targetMarket = ""      #标的所属市场
+        self.targetMarketBoard = "" #标的所属市场板块
         self.targetIndustries = []  #标的行业分类
         self.targetConcepts = []    #标的概念分类
         self.targetPrice = 0        #标的价格-当前
@@ -71,7 +76,7 @@ class myObj_Trade():
         self.recorder = myData.iif(recorder == "", "zxcRobot", recorder)
         
         tradeInfo = self.OnCreat_TradeInfo()
-        self.Init_ByDict(tradeInfo) 
+        return self.Init_ByDict(tradeInfo) 
     def Init_ByDict(self, tradeInfo = {}): 
         self.usrID = tradeInfo.get("usrID", "")
         self.usrOrderType = tradeInfo.get("usrOrderType", "")
@@ -82,6 +87,8 @@ class myObj_Trade():
 
         self.targetID = tradeInfo.get("targetID", 0)
         self.targetName = tradeInfo.get("targetName", "")
+        self.targetMarket = tradeInfo.get("targetMarket", "")
+        self.targetMarketBoard = tradeInfo.get("targetMarketBoard", "")
         self.targetIndustries = tradeInfo.get("targetIndustries", [])
         self.targetConcepts = tradeInfo.get("targetConcepts", [])
         self.targetPrice = tradeInfo.get("targetPrice", 0)
@@ -107,7 +114,7 @@ class myObj_Trade():
         
         self.isDel = tradeInfo.get("isDel", False)
         self.remark = tradeInfo.get("remark", "")
-        self.Init_CheckInfo(self.usrOrderType, self.tradeType, self.tradeType_sub)
+        return self.Init_CheckInfo(self.usrOrderType, self.tradeType, self.tradeType_sub)
     #初始类型信息检查修正
     def Init_CheckInfo(self, usrOrderType, tradeType = "", tradeType_sub = ""): 
         # 基础信息修正
@@ -117,6 +124,21 @@ class myObj_Trade():
         self.tradeType_sub = myData.iif(tradeType == "", "股票", tradeType) 
 
         # 股票信息补全
+        targets = self.targetID.split('.')
+        pStocks = gol._Get_Value('setsStock', None)
+        stocks = pStocks._Find(targets[1], exType = targets[0])
+        if(len(stocks) != 1):
+            stocks = pStocks._Find(self.targetName)
+            if(len(stocks) != 1): return False
+
+        pStock = stocks[0]
+        self.tradeType_sub = myQuote.stockTypes.get(pStock.type.lower(), '股票')
+        self.targetID = pStock.code_id
+        self.targetName = pStock.code_name
+        self.targetMarket = pStock.exName
+        self.targetMarketBoard = pStock.getMarketBoard()
+        self.targetIndustries = pStock.getIndustries()
+        self.targetConcepts = pStock.getConcepts()
         return True
     #生成信息字典
     def OnCreat_TradeInfo(self): 
@@ -128,6 +150,8 @@ class myObj_Trade():
         
         tradeInfo['targetID'] = self.targetID
         tradeInfo['targetName'] = self.targetName
+        tradeInfo['targetMarket'] = self.targetMarket
+        tradeInfo['targetMarketBoard'] = self.targetMarketBoard
         tradeInfo['targetIndustries'] = self.targetIndustries
         tradeInfo['targetConcepts'] = self.targetConcepts
         tradeInfo['targetPrice'] = self.targetPrice
@@ -149,7 +173,7 @@ class myObj_Trade():
         return tradeInfo
     #生成list
     def ToList(self): 
-        lstValue = [self.infoID, self.usrID, self.usrOrderType, self.targetID, self.targetName, self.targetPrice, self.targetPrice_Ex, self.targetPosition, myData_Trans.Tran_ToStr(self.targetIndustries, symbol = '、'), myData_Trans.Tran_ToStr(self.targetConcepts, symbol = '、'), self.tradeType, self.tradeType_sub, self.tradeNum, self.tradeMoney, self.tradePosition, self.tradeProfit, self.tradeProfit_total, self.tradeTime.strftime("%Y-%m-%d %H:%M:%S"), self.isDel, self.recorder, self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.remark]
+        lstValue = [self.infoID, self.usrID, self.usrOrderType, self.targetID, self.targetName, self.targetMarket, self.targetMarketBoard, self.targetPrice, self.targetPrice_Ex, self.targetPosition, myData_Trans.Tran_ToStr(self.targetIndustries, symbol = '、'), myData_Trans.Tran_ToStr(self.targetConcepts, symbol = '、'), self.tradeType, self.tradeType_sub, self.tradeNum, self.tradeMoney, self.tradePosition, self.tradeProfit, self.tradeProfit_total, self.tradeTime.strftime("%Y-%m-%d %H:%M:%S"), self.isDel, self.recorder, self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.remark]
         return lstValue
     #生成提示信息
     def ToTitlestr(self, nSpace = 0, isSimple = False, usrOrderType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = ""): 
@@ -202,7 +226,7 @@ class myObj_Trades():
         dtDB = myIO_xlsx.DtTable()
         dtDB.Load_csv(path, 1, 0, True, 0, ',', isUtf = True)
         
-        lstFields = ["编号","用户名","操作类型","标的代码","标的名称","标的价格","标的价格-期望","标的仓位","标的所属行业","标的所属概念","交易类型","交易子类型","交易数量","交易金额","交易量仓位占比","交易收益","交易收益-总计","交易时间","是否删除","记录人","记录时间","备注"]
+        lstFields = ["编号","用户名","操作类型","标的代码","标的名称","标的所属市场","标的所属市场板块","标的价格","标的价格-期望","标的仓位","标的所属行业","标的所属概念","交易类型","交易子类型","交易数量","交易金额","交易量仓位占比","交易收益","交易收益-总计","交易时间","是否删除","记录人","记录时间","备注"]
         if(dtDB.sheet == None): dtDB.dataField = lstFields
         lstFields_ind = dtDB.Get_Index_Fields(lstFields)
         self.lstFields = lstFields
@@ -222,6 +246,8 @@ class myObj_Trades():
             
             trade.targetID = dtRow[lstFields_ind["标的代码"]]
             trade.targetName = dtRow[lstFields_ind["标的名称"]] 
+            trade.targetMarket = dtRow[lstFields_ind["标的所属市场"]] 
+            trade.targetMarketBoard = dtRow[lstFields_ind["标的所属市场板块"]]  
             trade.targetIndustries = dtRow[lstFields_ind["标的所属行业"]].split("、") 
             trade.targetConcepts = dtRow[lstFields_ind["标的所属概念"]].split("、") 
             trade.targetPrice = float(dtRow[lstFields_ind["标的价格"]]) 
@@ -247,8 +273,9 @@ class myObj_Trades():
     #添加交易记录
     def Add(self, usrID, targetID, targetPrice, tradePosition, usrOrderType = "", tradeType = "", tradeType_sub = "", targetName = "", targetPosition = 0, targetPrice_Ex = 0, tradeNum = 0, tradeMoney = 0, tradeProfit = 0, tradeProfit_total = 0, tradeTime = "", remark = "", recorder = ""): 
        trade = myObj_Trade()
-       trade.Init(usrID, targetID, targetPrice, tradePosition, usrOrderType, tradeType, tradeType_sub, targetName, targetPosition, targetPrice_Ex, tradeNum, tradeMoney, tradeProfit, tradeProfit_total, tradeTime, remark, recorder)
-       return self._Add(trade)
+       if(trade.Init(usrID, targetID, targetPrice, tradePosition, usrOrderType, tradeType, tradeType_sub, targetName, targetPosition, targetPrice_Ex, tradeNum, tradeMoney, tradeProfit, tradeProfit_total, tradeTime, remark, recorder)):
+        return self._Add(trade)
+        return False
     def Add_ByDict(self, tradeInfo = {}): 
        trade = myObj_Trade()
        trade.Init_ByDict(tradeInfo)
@@ -352,7 +379,7 @@ if __name__ == "__main__":
     zxcTrades = myObj_Trades()
 
     # 添加
-    zxcTrades.Add("成功", "sh600060", 6.6, 0, "看涨")
+    print(zxcTrades.Add("成功", "sh.600060", 6.6, 0, "看涨"))
     
 
 
