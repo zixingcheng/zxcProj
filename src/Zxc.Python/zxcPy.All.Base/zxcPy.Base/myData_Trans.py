@@ -14,13 +14,16 @@ from struct import pack, unpack
 #是否为数字
 def Is_Numberic(value):
     #调用正则 
-    pRe = re.compile(r'^[-+]?[\d+](\.\d+)?$')
+    pRe = re.compile(r'[-+]?\d+(\.\d+)?$')
     result = pRe.match(value)
     if(result):
         return True
     else:
         return False 
-
+# 提取数字信息组
+def Get_Numberics(strValue):
+    #测试数据 'hello-42.8I\'m a +32 string 30. .2 4.6'
+    return re.findall(r'[-+]?\d+\.?\d+', strValue)
     
 #字符串转bool
 def To_Bool(strData):

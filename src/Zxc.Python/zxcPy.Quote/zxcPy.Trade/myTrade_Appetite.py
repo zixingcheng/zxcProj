@@ -10,8 +10,7 @@ import sys, os, time, copy, datetime, mySystem
 from operator import itemgetter, attrgetter
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-mySystem.Append_Us("../Prjs", False, __file__)
-mySystem.Append_Us("../../../../zxcPy.Quote/zxcPy.Quotation", False, __file__)
+mySystem.Append_Us("../zxcPy.Quotation", False, __file__)
 mySystem.Append_Us("", False) 
 import myEnum, myIO, myIO_xlsx, myData, myData_Trans, myDebug 
 import myQuote
@@ -21,14 +20,14 @@ from myGlobal import gol
 #定义交易类型枚举
 myOrderType = myEnum.enum('买入', '卖出', '受赠', '赠予', '分红', '转账')
 myTradeType_投资 = ['活期', '定期', '股票', '基金', '可转债', '国债逆回购', '理财', '转入', '转出']
-
+myTradeAppetite = ['看涨', '看跌', '看平']
 
 
 # 交易信息
 class myObj_Trade():
-    def __init__(self): 
-        self.usrID = ""             #用户名
-        self.usrOrderType = ""      #用户操作类型(买入/卖出/看涨/看跌)
+    def __init__(self, usrID = '', tradeInfo = ''): 
+        self.usrID = usrID          #用户名
+        self.usrOrderType = ""      #用户操作类型(买入/卖出/看涨/看跌/看平)
         self.recordTime = None      #记录时间
         self.recorder = None        #记录人
         
@@ -54,6 +53,7 @@ class myObj_Trade():
 
         self.isDel = False          #是否已删除
         self.remark = ""            #备注
+        self.Init_ByInfo(tradeInfo) #按信息解析(简易)
     def Init(self, usrID, targetID, targetPrice, tradePosition, usrOrderType = "", tradeType = "", tradeType_sub = "", targetName = "", targetPosition = 0, targetPrice_Ex = 0, tradeNum = 0, tradeMoney = 0, tradeProfit = 0, tradeProfit_total = 0, tradeTime = "", remark = "", recorder = ""):
         self.usrID = usrID 
         self.usrOrderType = usrOrderType
@@ -77,6 +77,74 @@ class myObj_Trade():
         
         tradeInfo = self.OnCreat_TradeInfo()
         return self.Init_ByDict(tradeInfo) 
+    def Init_ByTrade(self, trade):
+        self.usrID = trade.usrID 
+    def Init_ByInfo(self, tradInfos): 
+        if(tradInfos == ""): return ""
+        
+        # 解析价格-提取数字信息
+        mumberics = myData_Trans.Get_Numberics(tradInfos)
+        tradInfos = tradInfos.replace(" 元", "元").replace(" 元", "元")
+        tradInfos = tradInfos.replace(" 成", "成")
+        tradInfos = tradInfos.replace(" 股", "股")
+        positions = []
+        prices = []
+        stocks = []
+        sums = []
+        for x in mumberics:
+            value = float(x)
+            if(value < 10000):      #小于万元
+                if(value < 10):     #仓位
+                    if(tradInfos.count(str(value) + "成") == 1):
+                        positions.append(value)
+                        continue
+                # 价格，数量
+                if(tradInfos.count(str(value) + "元") == 1):
+                    prices.append(value)
+                elif(tradInfos.count(str(value) + "股") == 1):
+                    sums.append(value)
+            else:
+                stocks.append(str(x))
+        if(len(stocks) != 1): return ""        
+        self.targetID = stocks[0]
+        
+        # 解析操作类型
+        countBuy = tradInfos.count('买')
+        countSell = tradInfos.count('卖')
+        countBullish = tradInfos.count('看涨')
+        countBearish = tradInfos.count('看跌')
+        countPing = tradInfos.count('看平')
+        countWord = countBuy + countSell + countBullish + countBearish + countPing
+        if(countWord == 1):
+            if(countBuy == 1):
+                self.usrOrderType = '买入'
+                if(len(prices) == 1): self.targetPrice = prices[0]
+                if(len(sums) == 1): self.tradeNum = sums[0]
+                if(len(positions) == 1): self.targetPosition = positions[0]
+            elif(countBuy == 1):
+                self.usrOrderType = '卖出'
+                if(len(prices) == 1): self.targetPrice = prices[0]
+                if(len(sums) == 1): self.tradeNum = sums[0]
+                if(len(positions) == 1): self.targetPosition = positions[0]
+            elif(countBullish == 1):
+                self.usrOrderType = '看涨'
+                if(len(prices) == 1): self.targetPrice_Ex = prices[0]
+                if(len(positions) == 1): self.tradePosition = positions[0]
+            elif(countBearish == 1):
+                self.usrOrderType = '看跌'
+                if(len(prices) == 1): self.targetPrice_Ex = prices[0]
+                if(len(positions) == 1): self.tradePosition = positions[0]
+            elif(countPing == 1):
+                self.usrOrderType = '看平'
+                if(len(prices) == 1): self.targetPrice_Ex = prices[0]
+                if(len(positions) == 1): self.tradePosition = positions[0]
+            else:
+                self.isDel = True   #标识无效
+        else:
+            self.isDel = True       #标识无效
+        if(self.isDel == False):
+            self.isDel = not self.Init_CheckInfo(self.usrOrderType, self.tradeType, self.tradeType_sub)
+        pass
     def Init_ByDict(self, tradeInfo = {}): 
         self.usrID = tradeInfo.get("usrID", "")
         self.usrOrderType = tradeInfo.get("usrOrderType", "")
@@ -121,10 +189,11 @@ class myObj_Trade():
         self.usrOrderType = myData.iif(usrOrderType == "" or usrOrderType.count("买") == 1, myOrderType.买入, usrOrderType) 
         self.usrOrderType = myData.iif(usrOrderType == "" or usrOrderType.count("卖") == 1, myOrderType.卖出, usrOrderType) 
         self.tradeType = myData.iif(tradeType == "" or tradeType in myTradeType_投资, "投资", tradeType) 
-        self.tradeType_sub = myData.iif(tradeType == "", "股票", tradeType) 
+        self.tradeType_sub = myData.iif(tradeType_sub == "", "股票", tradeType_sub) 
+        self.tradeTime = myData.iif(self.tradeTime == None, datetime.datetime.now(), self.tradeTime)
 
         # 股票信息补全
-        targets = self.targetID.split('.')
+        targets = myData.iif(self.targetID.count('.') == 0, ("." + self.targetID).split('.'), self.targetID.split('.')) 
         pStocks = gol._Get_Value('setsStock', None)
         stocks = pStocks._Find(targets[1], exType = targets[0])
         if(len(stocks) != 1):
@@ -183,13 +252,17 @@ class myObj_Trade():
             strTrade += strSpace + "用户名: " + self.usrID + "\n"
             strTrade += strSpace + "交易类型: " + self.usrOrderType + "\n"
             strTrade += strSpace + "标的信息: " + self.targetID + "  " + self.targetName + "\n"
-            strTrade += strSpace + "标的价格: " + str(round(self.targetPrice, 2)) + "元 \n"
-            strTrade += strSpace + "交易金额: " + str(round(self.tradeMoney, 2)) + "元 \n" 
+            if(self.usrOrderType not in myTradeAppetite):
+                strTrade += strSpace + "交易金额: " + str(round(self.tradeMoney, 2)) + "元 \n" 
+                strTrade += strSpace + "交易价格: " + str(round(self.targetPrice, 2)) + "元 \n"
+            else: 
+                strTrade += strSpace + "预期价格: " + str(round(self.targetPrice, 2)) + "元 \n"
             strTrade += strSpace + "账单时间: " + myData_Trans.Tran_ToDatetime_str(self.tradeTime, "%Y-%m-%d") + "\n"
             strTrade += strSpace + "备注: " + self.remark 
         else:
             strTrade = self.tradeParty
-            strTrade += "，" + str(round(self.tradeMoney, 2)) + "元" 
+            if(trade.usrOrderType not in myTradeAppetite):
+                strTrade += "，" + str(round(self.tradeMoney, 2)) + "元" 
             if(usrTradeType == ""): strTrade += "，" + self.usrTradeType
             if(tradeTarget == ""): strTrade += "，" + self.tradeTarget
             if(tradeType == ""): strTrade += "，" + self.tradeType
@@ -198,17 +271,18 @@ class myObj_Trade():
             strTrade += "，" + myData_Trans.Tran_ToDatetime_str(self.tradeTime, "%Y-%m-%d") 
         return strTrade
     #是否相同
-    def IsSame(self, trade, mseconds = 1000): 
-        if(trade.usrOrderType == self.usrOrderType and trade.tradeType == self.tradeType):
-            if(trade.targetID == self.targetID):
-                timeDelta = myData.iif(trade.tradeTime > self.tradeTime, trade.tradeTime - self.tradeTime, self.tradeTime - trade.tradeTime)
-                nMiniSeconds = (timeDelta.days * 3600 * 24 + timeDelta.seconds) * 1000 + timeDelta.microseconds
-                if((datetime.datetime.now() - trade.recordTime).days < 1):         #一天内算相同
-                    return True
+    def IsSame(self, trade, days = 1): 
+        if(trade.tradeType == self.tradeType and trade.tradeType_sub == self.tradeType_sub):
+            if(trade.targetID == self.targetID and trade.usrID == self.usrID):
+                if((datetime.datetime.now() - trade.recordTime).days < days):         #一天内算相同
+                    if(trade.usrOrderType in myTradeAppetite):
+                        return True
+                    else:
+                        return trade.usrOrderType == self.usrOrderType
         return False
 # 交易信息对象集
 class myObj_Trades():
-    def __init__(self, usrID = "zxcTradeInfos", dir = ""):  
+    def __init__(self, usrID = "zxcStockAppetites", dir = ""):  
         self.usrID = usrID      #当前账单归属用户
         self.usrDB = {}         #当前账包信息集 
         self.dir = dir
@@ -216,8 +290,8 @@ class myObj_Trades():
         #初始根目录信息
         if(self.dir == ""):
             strDir, strName = myIO.getPath_ByFile(__file__)
-            self.dirBase = os.path.abspath(os.path.join(strDir, "../../.."))  
-            self.dir = self.dirBase + "/Data/DB_Trade/"
+            self.dirBase = os.path.abspath(os.path.join(strDir, ".."))  
+            self.dir = self.dirBase + "/Data/DB_Trade/Stock_Appetites/"
             myIO.mkdir(self.dir, False)
         self._Init_DB(self.dir + usrID + ".csv"  )    #初始参数信息等 
     #初始信息库   
@@ -241,7 +315,7 @@ class myObj_Trades():
             trade.recordTime = myData_Trans.Tran_ToDatetime(dtRow[lstFields_ind["记录时间"]])
             trade.recorder = dtRow[lstFields_ind["记录人"]]    
 
-            trade.usrID = dtRow[lstFields_ind["编号"]]
+            trade.usrID = dtRow[lstFields_ind["用户名"]]
             trade.usrOrderType = dtRow[lstFields_ind["操作类型"]]
             
             trade.targetID = dtRow[lstFields_ind["标的代码"]]
@@ -276,6 +350,17 @@ class myObj_Trades():
        if(trade.Init(usrID, targetID, targetPrice, tradePosition, usrOrderType, tradeType, tradeType_sub, targetName, targetPosition, targetPrice_Ex, tradeNum, tradeMoney, tradeProfit, tradeProfit_total, tradeTime, remark, recorder)):
         return self._Add(trade)
         return False
+    def Add_ForSimply(self, usrID, tradInfos): 
+        # 解析生成交易信息
+        trade = myObj_Trade(usrID, tradInfos)
+        if(trade.isDel): return ""
+
+        # 存在相同处理
+        key = self._Check(trade)
+        if(key != ""):
+            trade = self.usrDB[key]
+            trade.Init_ByInfo(tradInfos)
+        return self._Add(trade)
     def Add_ByDict(self, tradeInfo = {}): 
        trade = myObj_Trade()
        trade.Init_ByDict(tradeInfo)
@@ -283,7 +368,9 @@ class myObj_Trades():
     def _Add(self, trade, bCheck = True): 
         if(trade.usrID == "" or trade.targetID == ""):
             return "用户名或标的信息输入不全。"
-        if(self._Check(trade) == False): return "信息已经存在。"
+        if(self._Check(trade, True) != ""): 
+            self.Save_DB()
+            return "信息已经存在，已修改信息如下：\n" + trade.ToTitlestr(4)
         
         #添加(记录索引)
         trade.infoID = self._Get_ID()
@@ -306,7 +393,7 @@ class myObj_Trades():
             self.Save_DB()
         else:
             self.dtDB.Save_csv_append(self.pathData, trade.ToList(), True, row_end = len(self.usrDB)-1 )   
-        return "添加成功，账单信息如下：\n" + trade.ToTitlestr(4)
+        return "添加成功，信息如下：\n" + trade.ToTitlestr(4)
      
     #查询
     #def Query(self, startTime = '', endTime = '', nMonth = 1, tradeParty = '', usrTradeType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = "", exceptDeault = False, exceptTradeTypes = [], exceptTradeTypes = [], bNoRelation = False):
@@ -333,13 +420,16 @@ class myObj_Trades():
         return len(self.usrDB) + 1
 
     #检查是否已经存在   
-    def _Check(self, trade): 
+    def _Check(self, trade, updata = False): 
         keys = self.usrDB.keys()
         for x in keys:
             tradeTemp = self.usrDB[x]
             if(trade.IsSame(tradeTemp, 1000)): 
-                return False
-        return True
+                # 修改
+                if(updata):
+                    self.usrDB[x] = trade
+                return x
+        return "" 
     #时间转换为月初
     def _Trans_Time_moth(self, dtTime = '', nMonth = 1): 
         if(type(dtTime) != datetime.datetime): dtTime = datetime.datetime.now() 
@@ -370,17 +460,23 @@ class myObj_Trades():
 
         #保存
         self.dtDB.Save_csv(self.dir, self.usrID, True, 0, 0)
+        
+#初始全局交易管理器
+gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
+gol._Set_Value('tradeAppetit', myObj_Trades())
 
 
 
 #主启动程序
 if __name__ == "__main__":
     #测试交易记录
-    zxcTrades = myObj_Trades()
+    zxcTrades = gol._Get_Value('tradeAppetit')
 
     # 添加
-    print(zxcTrades.Add("成功", "sh.600060", 6.6, 0, "看涨"))
+    print(zxcTrades.Add_ForSimply("成功", "看涨 600060 目标价格 10.99元"))
+    print(zxcTrades.Add("成功", "sh.600060", 6.6, 0, "看跌"))
+    print(zxcTrades.Add("成功", "sh.600060", 6.6, 0, "看平"))
     
 
-
     print()
+

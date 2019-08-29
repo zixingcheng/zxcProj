@@ -37,7 +37,6 @@
     <Compile Include="zxcPy.Quantify\Test_JQData\myTest_JQData.py" />
     <Compile Include="zxcPy.Quantify\Test_JQData\myTest_JQData_API.py" />
     <Compile Include="zxcPy.Quantify\Test_JQData\myTest_JQData_API_Factor.py" />
-    <Compile Include="zxcPy.Robot\Prjs\Base\mySotck_Trader.py" />
     <Compile Include="zxcPy.Robot\Prjs\Base\myManager_Bill.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Msg.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_Note.py" />

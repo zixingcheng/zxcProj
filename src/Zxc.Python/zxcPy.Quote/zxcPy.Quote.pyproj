@@ -39,11 +39,13 @@
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Qtimg_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Sina_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_JQData_API.py" />
+    <Compile Include="zxcPy.Trade\myTrade_Appetite.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Data\DB_Trade\" />
     <Folder Include="Data\DB_Trade\Stock_Bills\" />
+    <Folder Include="zxcPy.Trade\" />
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="Setting\" />
     <Folder Include="zxcPy.Quotation\" />
