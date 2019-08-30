@@ -17,7 +17,7 @@ from pydub.silence import detect_nonsilent
 from pydub.silence import split_on_silence
 
 # 加载自定义库
-import myIO, myAI_Voice_Baidu
+import myIO, myAI_Baidu
 
 # 全局参数
 global m_thrdSay 

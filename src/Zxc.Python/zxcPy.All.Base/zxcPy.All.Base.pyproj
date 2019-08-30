@@ -25,7 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="mySystem.py" />
-    <Compile Include="zxcPy.Base\myAI_Voice_Baidu.py" />
+    <Compile Include="zxcPy.Base\myAI_Baidu.py" />
     <Compile Include="zxcPy.Base\myIO_md.py" />
     <Compile Include="zxcPy.Base\myIO_docx.py" />
     <Compile Include="zxcPy.Base\myMQ_Rabbit_Recv_Test.py" />

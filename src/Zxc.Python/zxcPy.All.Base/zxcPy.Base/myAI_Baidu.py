@@ -10,7 +10,7 @@ import sys, os, datetime
 from aip import AipSpeech, AipOcr
 
 # 加载自定义库
-import myIO, myVoice
+import myIO, myData_Trans, myVoice
 
 # 百度语音识别API配置参数 
 APP_ID = '17073439'                                     # 你的 APPID
@@ -71,9 +71,30 @@ def Speech_Recognition(path, silence_thresh=-50, out_debug=False):
 
 
 # 通用文字识别
+def ORC(path, templateSign, options = {}, out_debug=False):
+    # 读取图片文件
+    dtStart = datetime.datetime.now()
+    dicResult = {'words': [], 'wordText': ""}
+    with open(path, 'rb') as fp: 
+        image = fp.read()
+    try: 
+        # 带参数调用通用文字识别  
+        result = aipORC.basicGeneral(image, options)
+        if(out_debug): print("==> ORC @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
+
+        # 转换为易识别结果
+        words = []
+        for x in result['words_result']: 
+            words.append(x['words'])
+        dicResult = {'words': words, 'wordText': myData_Trans.Tran_ToStr(words, "\n")}
+        return dicResult
+    except KeyError:
+        return dicResult
+# 通用文字识别
 def IORC(path, templateSign, classifierId = 0, out_debug=False):
     # 读取图片文件
     dtStart = datetime.datetime.now()
+    dicResult = {}
     with open(path, 'rb') as fp: 
         image = fp.read()
     try:
@@ -82,12 +103,21 @@ def IORC(path, templateSign, classifierId = 0, out_debug=False):
         options["templateSign"] = templateSign
         options["classifierId"] = classifierId
 
+
         # 带参数调用自定义模板文字识别  
         result = aipORC.custom(image, options)
         if(out_debug): print("==> IORC @ %s, 耗时 %s 秒" % (os.path.basename(path), str((datetime.datetime.now() - dtStart).seconds)))
-        return result
+
+        # 转换为易识别结果
+        for x in result['data']['ret']: 
+            values= {}
+            values['word'] = x['word'] 
+            values['location'] = x['location']
+            values['probability'] = x['probability']
+            dicResult[x['word_name']] = values
+        return dicResult
     except KeyError:
-        return ""
+        return dicResult
 
 
 
@@ -105,7 +135,8 @@ if __name__ == '__main__':
     # print("you said: " + strText)
 
     # ORC识别-自定义模板
-    strText = IORC(dir + "Images/Test.jpg", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
+    strText = ORC(dir + "Images/Test.jpg", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
+    strText = IORC(dir + "Images/Test.png", "18ed022a1b51ef96b130bd4226b89f64", out_debug=True)
     print("you image: \n" + str(strText))
 
     print()
