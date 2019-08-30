@@ -168,8 +168,8 @@ class myRoot_UsrPrj():
         #无可用功能执行后台功能
         if(self.prjDo == None): 
             usrInfo = self.get_UserInfo(usrPlat, pUser, pGroup, nameSelf)
-            pReturns = self.Done_Back(Text, msgID, msgType, usrInfo)    #处理后台功能 
-            return pReturns                                             #None表示无命令，忽略 
+            pReturns = self.Done_Back(Text, msgID, msgType, usrInfo, pGroup)    #处理后台功能 
+            return pReturns                                                     #None表示无命令，忽略 
             
         #调用处理命令对象
         pReturn = None
@@ -197,7 +197,7 @@ class myRoot_UsrPrj():
             if(usrPlat != ""): pReturn['usrPlat'] = usrPlat
             
         #处理后台功能 
-        pReturns = self.Done_Back(Text, msgID, msgType, usrInfo) 
+        pReturns = self.Done_Back(Text, msgID, msgType, usrInfo, pGroup) 
         pReturns.append(pReturn)
 
 		#命令有效性检查，失效则初始状态
@@ -208,15 +208,21 @@ class myRoot_UsrPrj():
             self.prjInfo.Close() 
             self.prjDo = None
         return pReturns
-    def Done_Back(self, Text, msgID, msgType = "TEXT", usrInfo = {}):         
+    def Done_Back(self, Text, msgID, msgType = "TEXT", usrInfo = {}, pGroup = None):         
         #处理后台功能 
         pReturns = []
         for x in self.prjDos:
             prjClass = self.prjDos[x]
             if(prjClass.isBackUse or prjClass.isSingleUse == False):
-                pReturn = prjClass.Done_ByDict(Text, msgID, msgType, usrInfo)
-                if(pReturn != None and pReturn != ""):
-                    pReturns.append(pReturn)
+                #后台程序有效性检查
+                prjDo = self.prjDos.get(prjClass.prjName, None) 
+                if(prjDo._Check() and prjDo.isSingleUse): 
+                    #是否注册用户
+                    prjInfo = self.prjInfos[prjClass.prjName]
+                    if(prjInfo.IsRegist_user(self.usrName, self.nickName, pGroup)): 
+                        pReturn = prjClass.Done_ByDict(Text, msgID, msgType, usrInfo)
+                        if(pReturn != None and pReturn != ""):
+                            pReturns.append(pReturn)
         return pReturns
     #处理封装返回用户信息
     def get_UserInfo(self, usrPlat = "", pUser = None, pGroup = None, nameSelf = ""):

@@ -20,7 +20,7 @@ from myGlobal import gol
 class myRobot_Msg(myRobot.myRobot):
     def __init__(self, usrID = "", usrName = ""):
         super().__init__(usrID, usrName)
-        self.doTitle = "Robot_Note"     #说明 
+        self.doTitle = "Robot_Msg"     #说明 
         self.prjName = "消息处理"       #功能名
         self.doCmd = "@@zxcRobot_Msg"   #启动命令 
         self.isBackUse = True           #后台运行
@@ -70,7 +70,7 @@ class myRobot_Msg(myRobot.myRobot):
         return strReturn
         
     def _Title_User_Opened(self): 
-        return "自动处理所有通知消息..."
+        return "自动处理所有消息..."
     def _Title_Helper(self): 
         strReturn = "消息命令提示："
         strReturn += self.perfix + "@*帮助：输出所有命令说明"

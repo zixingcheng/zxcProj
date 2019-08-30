@@ -39,12 +39,12 @@ class myRoot_Prj():
         self.rootUsers_up = myRoot_Usr.myRoot_Usrs("", "")              #提升权限用户集
         self.usrGroups = myRoot_GroupInfo.myRoot_GroupsInfo("", "")     #可启用群集
         self.usrGroups_sys = gol._Get_Value('rootRobot_usrGroups_sys')  #所有可用群集
-        self.PlatsEnable = []          #平台列表
+        self.PlatsEnable = []           #平台列表
         self.registedUsrs = []          #当前授权功能开启用户
         self.registedGroups = []        #当前授权功能开启的群
         self.startUser = ""             #功能开启用户
-        self.isNoOwner = False    #功能处理对启用者无效
-        #self.infoLogs = {}              #日志消息
+        self.isNoOwner = False          #功能处理对启用者无效
+        #self.infoLogs = {}             #日志消息
     def _Init(self, prjName, fileName, className, cmdStr, isEnable, isEnable_All, isEnable_one, isEnable_group, isEnable_groupAll): 
         self.prjName = prjName
         self.fileName = fileName
@@ -207,34 +207,46 @@ class myRoots_Prj():
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
 
+            #启动后台功能
+            if(prjRoot.isRunBack and prjRoot.isEnable):
+                prjRoot.prjClass.Done("@@" + prjRoot.cmdStr, "")          #自启动
+
         #增加默认隐藏功能 
         if(True): 	 
             prjRoot = myRoot_Prj()
+            #_Init(self, prjName, fileName, className, cmdStr, isEnable, isEnable_All, isEnable_one, isEnable_group, isEnable_groupAll): 
             prjRoot._Init("权限提升", "myRobot_Root", "myRobot_Root", "zxcRobot_Root", True, False, True, False, False)
             prjRoot.creatIntance(self.usrID, self.usrName)
             self.prjRoots[prjRoot.prjName] = prjRoot
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
-            
-            prjMsg = myRoot_Prj()
-            prjMsg._Init("消息处理", "myRobot_Msg", "myRobot_Msg", "zxcRobot_Msg", True, False, True, False, False)
-            prjMsg.creatIntance(self.usrID, self.usrName)
-            prjMsg.prjClass.Done("@@zxcRobot_Msg", "")          #自启动
-            self.prjRoots[prjMsg.prjName] = prjMsg
-            self.prjCmds[prjMsg.cmdStr.lower()] = prjMsg.prjName
 
             prjLog = myRoot_Prj()
-            prjLog._Init("消息日志", "myRobot_Log", "myRobot_Log", "zxcRobot_Log", True, False, True, False, False)
+            prjLog._Init("消息日志", "myRobot_Log", "myRobot_Log", "zxcRobot_Log", True, False, True, True, False)
             prjLog.creatIntance(self.usrID, self.usrName)
             prjLog.prjClass.Done("@@zxcRobot_Log", "")          #自启动
             self.prjRoots[prjLog.prjName] = prjLog
             self.prjCmds[prjLog.cmdStr.lower()] = prjLog.prjName
         
-            prjRevoke = myRoot_Prj()
-            prjRevoke._Init("通知消息", "myRobot_Note", "myRobot_Note", "zxcRobot_Note", True, False, True, False, False)
-            prjRevoke.creatIntance(self.usrID, self.usrName)
-            prjRevoke.prjClass.Done("@@zxcRobot_Note", "")      #自启动
-            self.prjRoots[prjRevoke.prjName] = prjRevoke
-            self.prjCmds[prjRevoke.cmdStr.lower()] = prjRevoke.prjName
+            #prjRevoke = myRoot_Prj()
+            #prjRevoke._Init("通知消息", "myRobot_Note", "myRobot_Note", "zxcRobot_Note", True, False, True, True, False)
+            #prjRevoke.creatIntance(self.usrID, self.usrName)
+            #prjRevoke.prjClass.Done("@@zxcRobot_Note", "")      #自启动
+            #self.prjRoots[prjRevoke.prjName] = prjRevoke
+            #self.prjCmds[prjRevoke.cmdStr.lower()] = prjRevoke.prjName
+            
+            #prjMsg = myRoot_Prj()
+            #prjMsg._Init("消息处理", "myRobot_Msg", "myRobot_Msg", "zxcRobot_Msg", True, True, True, True, False)
+            #prjMsg.creatIntance(self.usrID, self.usrName)
+            #prjMsg.prjClass.Done("@@zxcRobot_Msg", "")          #自启动
+            #self.prjRoots[prjMsg.prjName] = prjMsg
+            #self.prjCmds[prjMsg.cmdStr.lower()] = prjMsg.prjName
+
+            #prjStockAppetite = myRoot_Prj()
+            #prjStockAppetite._Init("股票偏好", "myRobot_StockAppetite", "myRobot_StockAppetite", "zxcRobot_StockAppetite", True, False, False, True, False)
+            #prjStockAppetite.creatIntance(self.usrID, self.usrName)
+            #prjStockAppetite.prjClass.Done("@@zxcRobot_StockAppetite", "")          #自启动
+            #self.prjRoots[prjStockAppetite.prjName] = prjStockAppetite
+            #self.prjCmds[prjStockAppetite.cmdStr.lower()] = prjStockAppetite.prjName
 
         #用户权限设置
         if(True): 	 

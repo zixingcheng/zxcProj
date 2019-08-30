@@ -49,7 +49,7 @@ class myMsgs():
     def Add(self, msg, msgID = '', msgType = myMsgType.TEXT, usrFrom = '', usrPlat = ''):
         if(msg == ""): return False
         pMsg = myMsg(msg, msgID, msgType, usrFrom, usrPlat)
-        return self._Add(pMsg)
+        return self._Add(pMsg, True)
     def _Add(self, msg, bSave = False):
         if(msg == None): return False
         self.usrMsgs.append(msg)
@@ -124,7 +124,7 @@ class myManager_Msg():
             usrName = myData.iif(nameSelf == "", usrInfo.get('usrName', ""), nameSelf)
             usrPlat = usrInfo.get('usrPlat', "")
             pMsg = myMsg(msg, msgID, msgType, usrName, usrPlat)
-            pMsgs._Add(pMsg) 
+            pMsgs._Add(pMsg, True) 
         return True
     def _Log(self, msg = {}):
         return self.Log_ByDict(msg.get('msg', ""), msg.get('msgID', ""), msg.get('msgType', ""), msg)
@@ -151,7 +151,6 @@ class myManager_Msg():
 
         #创建新消息集
         if(pMsgs == None and bCreatAuto):
-            if(usrID == ""): return pMsgs 
             pMsgs = myMsgs(usrID, usrName, usrNameNick, self.dirLog)
             self.msgLogs[usrID] = pMsgs
             if(usrName != ""): self.msgInd_Name[usrName] = usrID

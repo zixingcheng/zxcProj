@@ -35,6 +35,7 @@ class myRobot_StockAppetite(myRobot.myRobot):
             strReturn = self._Done_Text(Text, msgID, usrInfo)
         elif(msgType == "PICTURE") :
             strReturn = self._Done_Image(Text, msgID, usrInfo)
+            pass
         return strReturn 
     
     #消息处理接口-Text

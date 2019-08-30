@@ -71,7 +71,7 @@ class myRobot_Reply():
         #按消息类型进一步处理('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
         if(msgType == myManager_Msg.myMsgType.TEXT):
             msgText = msgText 
-        elif(msgType == myManager_Msg.myMsgType.IMAGE):
+        elif(msgType == myManager_Msg.myMsgType.PICTURE):
             #图片文件进行解析
             msgText = msgText 
 
@@ -285,7 +285,7 @@ if __name__ == "__main__":
         msg["usrNameNick"] = ""     
         msg["usrPlat"] = usrPlat
         msg["msg"] = "@@ChatRobot" 
-
+            
         #启动自己功能
         myDebug.Debug(pWxReply.Done_ByMsg(msg, True))
         time.sleep(0.1) 
@@ -300,6 +300,14 @@ if __name__ == "__main__":
     pWxReply.Done(usrID, usrName, nickName, '@@ChatRobot', msgID, msgType, usrPlat) 
     print()
     print()
+    
+    #股票偏好机器人
+    msg["usrName"] = "茶叶一主号"     
+    msg["groupName"] = "测试群" 
+    msg["msgType"] = "PICTURE" 
+    msg["msg"] = "E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test2.jpg" 
+    myDebug.Debug(pWxReply.Done_ByMsg(msg, True))  
+
     
     #非单例交互测试 
     myDebug.Print("Change model")
