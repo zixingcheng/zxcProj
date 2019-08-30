@@ -71,6 +71,9 @@ class myRobot_Reply():
         #按消息类型进一步处理('TEXT', 'IMAGE', 'VOICE', 'VIDEO')
         if(msgType == myManager_Msg.myMsgType.TEXT):
             msgText = msgText 
+        elif(msgType == myManager_Msg.myMsgType.IMAGE):
+            #图片文件进行解析
+            msgText = msgText 
 
         #调用 
         msgRs = self.Done(usrID, usrName, usrNameNick, msgText, msgID, msgType, plat, groupID, groupName, nameSelf)

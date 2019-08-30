@@ -136,8 +136,12 @@ if __name__ == '__main__':
 
     # ORC识别-自定义模板
     strText = ORC(dir + "Images/Test.jpg", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
-    strText = IORC(dir + "Images/Test.png", "18ed022a1b51ef96b130bd4226b89f64", out_debug=True)
     print("you image: \n" + str(strText))
-
+    
+    strText = ORC(dir + "Images/Test.png", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
+    strText = IORC(dir + "Images/Test.png", "18ed022a1b51ef96b130bd4226b89f64", out_debug=True)
+    
+    strText = ORC(dir + "Images/Test2.jpg", "c0f24215c88dcee9c9f5111238b31c96", out_debug=True)
+    strText = IORC(dir + "Images/Test2.jpg", "c0f24215c88dcee9c9f5111238b31c96", out_debug=True)
     print()
     

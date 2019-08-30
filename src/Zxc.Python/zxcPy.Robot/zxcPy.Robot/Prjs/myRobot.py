@@ -115,6 +115,17 @@ class myRobot():
     def _Done(self, Text, msgID = "", msgType = "TEXT", usrInfo = {}):
         self.strText_L = Text 
         return Text
+    #提取回发用户名，并作相关修正
+    def _Done_Check_UserBack(self, usrInfo = {}):
+        usrPlat = usrInfo.get('usrPlat', 'wx')
+        if(usrInfo['usrNameSelf'] != "" and usrInfo['groupName'] != ""):
+            usrID = "@*" + usrInfo['groupName']
+            usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self") 
+        else: 
+            usrID = usrInfo['usrName']
+        usrInfo['groupID'] = ""
+        usrInfo['groupName'] = ""
+        return usrPlat, usrID
     #创建返回消息
     def _Return(self, Text, usrInfo):
         self.msg = self.usrMMsg.OnCreatMsg()

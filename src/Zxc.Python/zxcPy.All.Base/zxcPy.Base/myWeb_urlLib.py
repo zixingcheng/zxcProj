@@ -140,7 +140,7 @@ class myWeb:
  
  
 #主启动程序 
-if __name__ == "__main__":
+if __name__ == "__main__":            
     pWeb = myWeb("http://openapi.tuling123.com/openapi/")
     req = {
         "perception":

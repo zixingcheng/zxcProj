@@ -68,47 +68,7 @@ class myRobot_Msg(myRobot.myRobot):
             url = 'http://39.105.196.175:8668/zxcWebs/order/Add/' + orderType + "?usrID=" + usrID
             strReturn = quote(url, safe = string.printable)   # unquote
         return strReturn
-
-    #提取回发用户名，并作相关修正
-    def _Done_Check_UserBack(self, usrInfo = {}):
-        usrPlat = usrInfo.get('usrPlat', 'wx')
-        if(usrInfo['usrNameSelf'] != "" and usrInfo['groupName'] != ""):
-            usrID = "@*" + usrInfo['groupName']
-            usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self") 
-        else: 
-            usrID = usrInfo['usrName']
-        usrInfo['groupID'] = ""
-        usrInfo['groupName'] = ""
-        return usrPlat, usrID
-
-
-    #消息撤回通知        
-    def _Done_Revoke(self, msg, msgID, msgType, usrInfo = {}):
-        strReturn = ""
-        pMsgs = self.usrMMsg._Find_Log_ByDict(usrInfo, False)
-        if(pMsgs != None): 
-            msgID_old = msg.get('old_msg_id', "")
-            pMsg = pMsgs.Find(msgID_old)
-            if(pMsg != None):
-                #组装撤回描述个人消息发送到文件助手
-                if(usrInfo.get('groupName', "") == ""):
-                    usrInfo['to_usrName'] = "self"          #调整的转发用户名(自己"self")
-                    strReturn = pMsg.usrFrom + " "    
-                else:
-                    #组装随机前缀
-                    indPrefix = random.randint(0, len(self.perfixRevoke) - 1)
-                    strPrefix = self.perfixRevoke[indPrefix]
-                    strReturn = strPrefix + " @" + pMsg.usrFrom + " "
-                strReturn += "撤回了条消息。\n"
-
-                #按消息内容组装 
-                msgType_old = pMsg.msgType.upper()
-                if(msgType_old == "TEXT"):
-                    strReturn += "消息内容：\"" + pMsg.msg + "\""
-                elif(msgType_old == "SHARING"):
-                    strReturn += "分享链接：\"" + pMsg.msgUrl + "\""
-        return strReturn  
-    
+        
     def _Title_User_Opened(self): 
         return "自动处理所有通知消息..."
     def _Title_Helper(self): 

@@ -152,6 +152,15 @@ def Cut_str(text = "", segTag_S = "(", segTag_E = ")", offset = 0):
     strCut = iif(ind_S != ind_E, text[ind_S + len(segTag_S): ind_E], "")
     return ind_S, ind_E, strCut
      
+#匹配指定字符集
+def Matching_strs(Text, usrWords = {}):
+    for x in usrWords.keys():
+        num = int(usrWords[x])
+        if(Text.count(x) != num):
+            return False
+    return True
+
+
 
 if __name__ == '__main__':
     pp = Interval("(-∞,∞)")
@@ -166,3 +175,6 @@ if __name__ == '__main__':
 
     ind_S, ind_E, strV = Cut_str("<<summary>>创建模型对象(返回模型uid)</summary><param name=\"1<11\">111</param>", "<", ">", 30)
     print(ind_S, ind_E, strV)
+
+
+    print(Matching_strs("你哎好aa！a", {'哎':1, "aa": 2}))

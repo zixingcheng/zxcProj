@@ -6,11 +6,11 @@ Created on  张斌 2018-08-12 19:16:00
 
     Python的Weixin网页版消息处理接口(文本消息)--调整为调用Robot消息接口方法 
 """
-import sys, ast, re, mySystem   
+import sys, os, ast, re, mySystem   
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类  
 mySystem.Append_Us("", False) 
-import myWeb, myWeb_urlLib, myManager_Msg, myDebug, myData
+import myWeb, myWeb_urlLib, myManager_Msg, myDebug, myData, myIO
 from myGlobal import gol 
 
 
@@ -25,6 +25,10 @@ class myWx_Reply():
         self.routeReply = "reply/"                      #消息处理接口路由名
         self.usrMMsg = gol._Get_Setting('manageMsgs')   #消息管理对象
         self.useMQ = bUseMQ
+        
+        #初始本地路径
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        self.dirBase = os.path.abspath(os.path.join(strDir, ".."))   
     def _Init(self, usrID, usrName, nickName = ""): 
         self.usrID = usrID
         self.usrName = usrName
@@ -75,7 +79,7 @@ class myWx_Reply():
         
         #按消息类型进一步修正处理('PICTURE', 'VOICE', 'VIDEO')
         if(msgType == myManager_Msg.myMsgType.PICTURE):
-            strText = msg.fileName
+            strText = self.dirBase + "/Data/Pic/Temps/" + msg.fileName
 
         #消息测试 
         #msgR = {}
