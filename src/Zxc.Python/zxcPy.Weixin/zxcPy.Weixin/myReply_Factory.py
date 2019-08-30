@@ -72,7 +72,10 @@ class myWx_Reply():
 
         #Note信息(增加Note标识及提取信息)
         noteMsg = self.get_NoteTag(msgType, msg)
-
+        
+        #按消息类型进一步修正处理('PICTURE', 'VOICE', 'VIDEO')
+        if(msgType == myManager_Msg.myMsgType.PICTURE):
+            strText = msg.fileName
 
         #消息测试 
         #msgR = {}

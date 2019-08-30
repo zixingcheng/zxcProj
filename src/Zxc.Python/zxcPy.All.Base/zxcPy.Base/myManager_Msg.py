@@ -11,7 +11,7 @@ import myEnum, myData, myData_Trans, myDebug, myIO, myWeb_urlLib, myMQ_Rabbit #,
 
 
 #定义消息类型枚举
-myMsgType = myEnum.enum('TEXT', 'IMAGE', 'VOICE', 'VIDEO', 'NOTE')
+myMsgType = myEnum.enum('TEXT', 'PICTURE', 'VOICE', 'VIDEO', 'NOTE')
 myMsgPlat = myEnum.enum('robot', 'wx')
 
 #自定义消息对象
