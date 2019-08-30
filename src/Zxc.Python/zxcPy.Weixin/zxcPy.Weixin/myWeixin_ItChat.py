@@ -55,6 +55,7 @@ class myWeixin_ItChat(myThread.myThread):
         if(pathPicDir == ""): pathPicDir = self.dirData
         self.dirPic = pathPicDir + "Pic/"
         myIO.mkdir(self.dirPic, False)
+        myIO.mkdir(self.dirPic + "Temps", False, True)
 
     #初始消息通讯缓存    
     def Init_MsgCache(self, useCmdMMap = True):
@@ -311,9 +312,13 @@ class myWeixin_ItChat(myThread.myThread):
         #注册普通文本消息回复(一对一)
         if self.Auto_RreplyText != self.funStatus_RText:
             #注册普通文本消息回复                 
-            @itchat.msg_register([NOTE, TEXT], isFriendChat=True)
+            @itchat.msg_register([NOTE, TEXT, PICTURE], isFriendChat=True)
             def Reply_Text(msg): 
-                if self.Auto_RreplyText: 
+                #图片缓存
+                if(msg['MsgType'] == 3): 
+                    msg.download(self.dirPic + "Temps/" + msg.fileName)
+
+                if self.Auto_RreplyText:  
                     #提取回复消息内容
                     myDebug.Debug("消息接收::", msg['Content'])
                     return self.Get_Msg_Back(msg)               #格式化提取(兼容API方式，消息队列无返回)
@@ -322,50 +327,54 @@ class myWeixin_ItChat(myThread.myThread):
         #注册普通文本消息回复(群消息)    
         if self.Auto_RreplyText_G != self.funStatus_RText_G:
             #注册普通文本消息回复                 
-            @itchat.msg_register([NOTE, TEXT, FRIENDS], isGroupChat=True)
+            @itchat.msg_register([NOTE, TEXT, PICTURE, FRIENDS], isGroupChat=True)
             def Reply_Text_Group(msg): 
+                #图片缓存
+                if(msg['MsgType'] == 3): 
+                    msg.download(self.dirPic + "Temps/" + msg.fileName)
+
                 if self.Auto_RreplyText_G: 
                     #提取回复消息内容
                     return self.Get_Msg_Back(msg, True)         #格式化提取(兼容API方式，消息队列无返回)
             self.funStatus_RText_G = self.Auto_RreplyText_G
-       
+
         # 收到note通知类消息，判断是不是撤回并进行相应操作
-        @itchat.msg_register([NOTE], isMpChat=True)
-        def send_msg_helper(msg):
-            def Reply_Text_Group(msg): 
-                if self.Auto_RreplyText_G: 
-                    #提取回复消息内容
-                    return self.Get_Msg_Back(msg, True, True)   #格式化提取(兼容API方式，消息队列无返回)
-
-            global face_bug
-            if re.search(r"\<\!\[CDATA\[.*撤回了一条消息\]\]\>", msg['Content']) is not None:
-                # 获取消息的id
-                old_msg_id = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)
-                old_msg = msg_dict.get(old_msg_id, {})
-                if len(old_msg_id) < 11:
-                    itchat.send_file(rev_tmp_dir + face_bug, toUserName='filehelper')
-                    os.remove(rev_tmp_dir + face_bug)
-                else:
-                    msg_body = "告诉你一个秘密~" + "\n" \
-                               + old_msg.get('msg_from') + " 撤回了 " + old_msg.get("msg_type") + " 消息" + "\n" \
-                               + old_msg.get('msg_time_rec') + "\n" \
-                               + "撤回了什么 ⇣" + "\n" \
-                               + r"" + old_msg.get('msg_content')
-                    # 如果是分享存在链接
-                    if old_msg['msg_type'] == "Sharing": msg_body += "\n就是这个链接➣ " + old_msg.get('msg_share_url')
-
-                    # 将撤回消息发送到文件助手
-                    itchat.send(msg_body, toUserName='filehelper')
-                    # 有文件的话也要将文件发送回去
-                    if old_msg["msg_type"] == "Picture" \
-                            or old_msg["msg_type"] == "Recording" \
-                            or old_msg["msg_type"] == "Video" \
-                            or old_msg["msg_type"] == "Attachment":
-                        file = '@fil@%s' % (rev_tmp_dir + old_msg['msg_content'])
-                        itchat.send(msg=file, toUserName='filehelper')
-                        os.remove(rev_tmp_dir + old_msg['msg_content'])
-                    # 删除字典旧消息
-                    msg_dict.pop(old_msg_id)
+        #@itchat.msg_register([NOTE], isMpChat=True)
+        #def send_msg_helper(msg):
+        #    def Reply_Text_Group(msg): 
+        #        if self.Auto_RreplyText_G: 
+        #            #提取回复消息内容
+        #            return self.Get_Msg_Back(msg, True, True)   #格式化提取(兼容API方式，消息队列无返回)
+        #
+        #    global face_bug
+        #    if re.search(r"\<\!\[CDATA\[.*撤回了一条消息\]\]\>", msg['Content']) is not None:
+        #        # 获取消息的id
+        #        old_msg_id = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)
+        #        old_msg = msg_dict.get(old_msg_id, {})
+        #        if len(old_msg_id) < 11:
+        #            itchat.send_file(rev_tmp_dir + face_bug, toUserName='filehelper')
+        #            os.remove(rev_tmp_dir + face_bug)
+        #        else:
+        #            msg_body = "告诉你一个秘密~" + "\n" \
+        #                       + old_msg.get('msg_from') + " 撤回了 " + old_msg.get("msg_type") + " 消息" + "\n" \
+        #                       + old_msg.get('msg_time_rec') + "\n" \
+        #                       + "撤回了什么 ⇣" + "\n" \
+        #                       + r"" + old_msg.get('msg_content')
+        #            # 如果是分享存在链接
+        #            if old_msg['msg_type'] == "Sharing": msg_body += "\n就是这个链接➣ " + old_msg.get('msg_share_url')
+        #
+        #            # 将撤回消息发送到文件助手
+        #            itchat.send(msg_body, toUserName='filehelper')
+        #            # 有文件的话也要将文件发送回去
+        #            if old_msg["msg_type"] == "Picture" \
+        #                    or old_msg["msg_type"] == "Recording" \
+        #                    or old_msg["msg_type"] == "Video" \
+        #                    or old_msg["msg_type"] == "Attachment":
+        #                file = '@fil@%s' % (rev_tmp_dir + old_msg['msg_content'])
+        #                itchat.send(msg=file, toUserName='filehelper')
+        #                os.remove(rev_tmp_dir + old_msg['msg_content'])
+        #            # 删除字典旧消息
+        #            msg_dict.pop(old_msg_id)
     #命令监测--共享内存方式 
     def Run_Monitor_Cmd_ByMMP(self):     
         if(self.managerMMap == None): 

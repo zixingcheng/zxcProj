@@ -83,9 +83,9 @@ class myWx_Reply():
         #return msgR
         
         #调用 
-        return self.Done(usrID, usrName, nickName, strText, msgID, msgType, msgTime, idGroup, nameGroup, nameSelf, noteMsg)         
+        return self.Done(usrID, usrName, nickName, strText, msgID, msgType, msgTime, idGroup, nameGroup, nameSelf, noteMsg, msg)         
     #按命令处理返回消息(按标识内容处理)
-    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgType = "TEXT", msgTime = 0, idGroup = "", nameGroup = '', nameSelf = '', noteMsg = None):
+    def Done(self, usrID, usrName, usrNameNick, strText, msgID = "", msgType = "TEXT", msgTime = 0, idGroup = "", nameGroup = '', nameSelf = '', noteMsg = None, srcMsg = None):
         #组装请求参数字典
         # {'msg': '@@Repeater', 'usrName': '墨紫_0', 'usrNameNick': '墨紫', 'groupID': '', 'usrPlat': 'wx', 'msgType': 'TEXT', 'usrID': 'zxc_0', 'msgID': ''}
         msg = self.usrMMsg.OnCreatMsg()
