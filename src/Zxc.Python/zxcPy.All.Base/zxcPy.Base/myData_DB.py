@@ -17,108 +17,6 @@ from myGlobal import gol
 
 
 
-# 简易库表-行数据
-class myData_Row():
-    def __init__(self, dictRow = {}): 
-        self.dictRow = dictRow      #用户名 
-        self.Init_ByInfo(tradeInfo) #按信息解析(简易)
-    #初始类型信息检查修正
-    def Init_CheckInfo(self, usrOrderType, tradeType = "", tradeType_sub = ""): 
-        # 基础信息修正
-        self.usrOrderType = myData.iif(usrOrderType == "" or usrOrderType.count("买") == 1, myOrderType.买入, usrOrderType) 
-        self.usrOrderType = myData.iif(usrOrderType == "" or usrOrderType.count("卖") == 1, myOrderType.卖出, usrOrderType) 
-        self.tradeType = myData.iif(tradeType == "" or tradeType in myTradeType_投资, "投资", tradeType) 
-        self.tradeType_sub = myData.iif(tradeType_sub == "", "股票", tradeType_sub) 
-        self.tradeTime = myData.iif(self.tradeTime == None, datetime.datetime.now(), self.tradeTime)
-
-        # 股票信息补全
-        targets = myData.iif(self.targetID.count('.') == 0, ("." + self.targetID).split('.'), self.targetID.split('.')) 
-        pStocks = gol._Get_Value('setsStock', None)
-        stocks = pStocks._Find(targets[1], exType = targets[0])
-        if(len(stocks) != 1):
-            stocks = pStocks._Find(self.targetName)
-            if(len(stocks) != 1): return False
-
-        pStock = stocks[0]
-        self.tradeType_sub = myQuote.stockTypes.get(pStock.type.lower(), '股票')
-        self.targetID = pStock.code_id
-        self.targetName = pStock.code_name
-        self.targetMarket = pStock.exName
-        self.targetMarketBoard = pStock.getMarketBoard()
-        self.targetIndustries = pStock.getIndustries()
-        self.targetConcepts = pStock.getConcepts()
-        return True
-    #生成信息字典
-    def OnCreat_TradeInfo(self): 
-        tradeInfo = {}
-        tradeInfo['usrID'] = self.usrID
-        tradeInfo['usrOrderType'] = self.usrOrderType
-        tradeInfo['recordTime'] = self.recordTime
-        tradeInfo['recorder'] = self.recorder
-        
-        tradeInfo['targetID'] = self.targetID
-        tradeInfo['targetName'] = self.targetName
-        tradeInfo['targetMarket'] = self.targetMarket
-        tradeInfo['targetMarketBoard'] = self.targetMarketBoard
-        tradeInfo['targetIndustries'] = self.targetIndustries
-        tradeInfo['targetConcepts'] = self.targetConcepts
-        tradeInfo['targetPrice'] = self.targetPrice
-        tradeInfo['targetPrice_Ex'] = self.targetPrice_Ex
-        tradeInfo['targetPosition'] = self.targetPosition
-
-        tradeInfo['infoID'] = self.infoID
-        tradeInfo['tradeType'] = self.tradeType 
-        tradeInfo['tradeType_sub'] = self.tradeType_sub 
-        tradeInfo['tradeNum'] = self.tradeNum
-        tradeInfo['tradeMoney'] = self.tradeMoney
-        tradeInfo['tradePosition'] = self.tradePosition
-        tradeInfo['tradeProfit'] = self.tradeProfit
-        tradeInfo['tradeProfit_total'] = self.tradeProfit_total
-
-        tradeInfo['tradeTime'] = self.tradeTime
-        tradeInfo['isDel'] = self.isDel
-        tradeInfo['remark'] = self.remark
-        return tradeInfo
-    #生成list
-    def ToList(self): 
-        lstValue = [self.infoID, self.usrID, self.usrOrderType, self.targetID, self.targetName, self.targetMarket, self.targetMarketBoard, self.targetPrice, self.targetPrice_Ex, self.targetPosition, myData_Trans.Tran_ToStr(self.targetIndustries, symbol = '、'), myData_Trans.Tran_ToStr(self.targetConcepts, symbol = '、'), self.tradeType, self.tradeType_sub, self.tradeNum, self.tradeMoney, self.tradePosition, self.tradeProfit, self.tradeProfit_total, self.tradeTime.strftime("%Y-%m-%d %H:%M:%S"), self.isDel, self.recorder, self.recordTime.strftime('%Y-%m-%d %H:%M:%S'), self.remark]
-        return lstValue
-    #生成提示信息
-    def ToTitlestr(self, nSpace = 0, isSimple = False, usrOrderType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = ""): 
-        if(isSimple == False):
-            strSpace = " " * nSpace
-            strTrade = strSpace + "编号: " + str(self.infoID) + "\n"
-            strTrade += strSpace + "用户名: " + self.usrID + "\n"
-            strTrade += strSpace + "交易类型: " + self.usrOrderType + "\n"
-            strTrade += strSpace + "标的信息: " + self.targetID + "  " + self.targetName + "\n"
-            if(self.usrOrderType not in myTradeAppetite):
-                strTrade += strSpace + "交易金额: " + str(round(self.tradeMoney, 2)) + "元 \n" 
-                strTrade += strSpace + "交易价格: " + str(round(self.targetPrice, 2)) + "元 \n"
-            else: 
-                strTrade += strSpace + "预期价格: " + str(round(self.targetPrice, 2)) + "元 \n"
-            strTrade += strSpace + "账单时间: " + myData_Trans.Tran_ToDatetime_str(self.tradeTime, "%Y-%m-%d") + "\n"
-            strTrade += strSpace + "备注: " + self.remark 
-        else:
-            strTrade = self.tradeParty
-            if(trade.usrOrderType not in myTradeAppetite):
-                strTrade += "，" + str(round(self.tradeMoney, 2)) + "元" 
-            if(usrTradeType == ""): strTrade += "，" + self.usrTradeType
-            if(tradeTarget == ""): strTrade += "，" + self.tradeTarget
-            if(tradeType == ""): strTrade += "，" + self.tradeType
-            if(tradeTypeTarget == ""): strTrade += "，" + self.tradeTypeTarget
-            strTrade += "，" + str(self.infoID) 
-            strTrade += "，" + myData_Trans.Tran_ToDatetime_str(self.tradeTime, "%Y-%m-%d") 
-        return strTrade
-    #是否相同
-    def IsSame(self, trade, days = 1): 
-        if(trade.tradeType == self.tradeType and trade.tradeType_sub == self.tradeType_sub):
-            if(trade.targetID == self.targetID and trade.usrID == self.usrID):
-                if((datetime.datetime.now() - trade.recordTime).days < days):         #一天内算相同
-                    if(trade.usrOrderType in myTradeAppetite):
-                        return True
-                    else:
-                        return trade.usrOrderType == self.usrOrderType
-        return False
 # 简易库表
 class myData_Table():
     def __init__(self, nameDB = "zxcDB", dir = ""):  
@@ -202,8 +100,14 @@ class myData_Table():
     # 总字段数
     def _FieldsCount(self): 
         return len(self.fields)
+
     
-    
+    #生成信息字典
+    def OnCreat_RowInfo(self): 
+        rowInfo = {}
+        for x in self.fields:
+            rowInfo[x] = ""
+        return rowInfo
     # 添加行数据
     def Add_Row_BySimply(self, strInfo, updata = False):
         lines = strInfo.replace('\r\n', '').replace('\n', '').split(',')
@@ -219,10 +123,10 @@ class myData_Table():
         id = self._Check(rowInfo, updata)
         if(id != ""): 
             if(updata == False):
-                return "信息已经存在：" + str(rowInfo) + "。"
+                return "信息已经存在：" + self._Trans_ToStr_Title(rowInfo) + "。"
             else:
                 self.Save_DB()
-                return "信息已经存在，已修改信息如下：\n" + trade.ToTitlestr(4) 
+                return "信息已经存在，已修改信息如下：\n" + self._Trans_ToStr_Title(rowInfo) 
 
         # 索引数据
         if(self._Index(rowInfo)):
@@ -235,8 +139,7 @@ class myData_Table():
         
             #保存--排序
             if(self.Save_DB(bAppend, True)):
-                return "添加成功，信息如下：\n" + str(rowInfo)
-
+                return "添加成功，信息如下：\n" + self._Trans_ToStr_Title(rowInfo) 
     # 总行数
     def _RowsCount(self): 
         return len(self.rows)
@@ -280,19 +183,52 @@ class myData_Table():
         if(ind != None): return "唯一索引已存在！"
         inds[value] = ind 
         return ""
-            
-    # 提取与指定数据相同项--继承需重写
-    def _Find_ByRowInfo(self, rowInfo): 
-        return self._Find(0)
+    
+
+    # 提取与指定筛选条件相同项--继承需重写
+    def _Find_ByFliters(self, fliters): 
+        # 依次筛选
+        data = self.rows
+        for x in fliters:
+            data = self._Find_ByFliter(x, fliters[x], data)
+        return data
+    # 提取与指定筛选条件相同项--继承需重写
+    def _Find_ByFliter(self, field, fliter, data = None): 
+        # 解析条件
+        if(data == None): data = self.rows
+        txts = fliter.strip().split(' ')
+        if(len(txts) < 2): return data
+
+        # 解析运算符及运算值
+        strIF = txts[0]
+        value = txts[1]
+        type = self.fields[field]['type']
+        if(type == 'float' or type == 'int'):
+            if(myData_Trans.Is_Numberic(str(value))):
+                value = float(value)
+
+        # 按条件组织
+        if(strIF == "=="):
+            return {k: v for k, v in data.items() if v[field] == value }
+        if(strIF == "!="):
+            return {k: v for k, v in data.items() if v[field] != value }
+        elif(strIF == ">"):
+            return {k: v for k, v in data.items() if v[field] > value }
+        elif(strIF == ">="):
+            return {k: v for k, v in data.items() if v[field] >= value }
+        elif(strIF == "<"):
+            return {k: v for k, v in data.items() if v[field] < value }
+        elif(strIF == "<="):
+            return {k: v for k, v in data.items() if v[field] <= value }
+        return data 
     # 提取当前编号行数据
     def _Find(self, id): 
         return self.rows.get(id, None)
+
     # 提取当前编号(最大编号+1)        
     def _Get_ID(self):
         if(self._RowsCount() == 0): return 1
         return list(self.rows.keys())[-1] + 1
-
-    
     # 检查是否已经存在   
     def _Check(self, rowInfo, updata = False): 
         keys = self.rows.keys()
@@ -356,15 +292,22 @@ class myData_Table():
         elif(type(value) == datetime.datetime):
             strVaulue = myData_Trans.Tran_ToDatetime_str(value)
         return strVaulue
-
     
-    #生成行数据信息
-    def To_str(self, rowInfos): 
+    #生成list
+    def _Trans_ToList(self, rowInfos): 
         #循环所有列
-        strLine = str(rowInfos.get("ID", ""))
+        lisValue = [rowInfos.get("ID", "")]
         for x in self.fields:
-            strLine += "," + self._Trans_Value_str(rowInfos.get(x, ""), True) 
-        return strLine
+            lisValue.append(self._Trans_Value_str(rowInfos.get(x, ""), True))
+        return lisValue
+    #生成字符串信息
+    def _Trans_ToStr(self, rowInfos, nSpace = 0, isSimple = False, bTitle = False): 
+        return myData_Trans.Tran_ToStr(self._Trans_ToList(rowInfos), ',')
+    #生成字符串信息
+    def _Trans_ToStr_Title(self, rowInfos, nSpace = 0, isSimple = False): 
+        return str(rowInfos)
+
+
     #当前数据进行保存   
     def Save_DB(self, isAppend = False, isUtf = True):   
         #保存该csv文件,有同名文件时直接覆盖
@@ -381,7 +324,7 @@ class myData_Table():
         strEnt = myData.iif(isUtf, "\r\n", "\n")
         if(isAppend == False or self._RowsCount() == 1):
             for x in self.rows:
-                strLines += strEnt + self.To_str(self.rows[x])
+                strLines += strEnt + self._Trans_ToStr(self.rows[x])
             myIO.Save_File(strPath, strLines, isUtf, False)
         else:
             #文件追加数据内容
@@ -396,7 +339,6 @@ class myData_Table():
 
 
 
-
 #主启动程序
 if __name__ == "__main__":
     #测试库表操作
@@ -408,6 +350,9 @@ if __name__ == "__main__":
     print(pDB.Add_Row({'字段1': 'value2', '字段2': 'value3'}))
     print(pDB.Add_Row({'字段1': 'value2', '字段2': 'value3'}))
     
+    # 自定义筛选
+    print(pDB._Find_ByFliter("字段1", '== value2'))
+
 
     print()
 
