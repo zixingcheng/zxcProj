@@ -221,7 +221,7 @@ class myRoots_Prj():
             self.prjCmds[prjRoot.cmdStr.lower()] = prjRoot.prjName
 
             prjLog = myRoot_Prj()
-            prjLog._Init("消息日志", "myRobot_Log", "myRobot_Log", "zxcRobot_Log", True, False, True, True, False)
+            prjLog._Init("消息日志", "myRobot_Log", "myRobot_Log", "zxcRobot_Log", True, True, True, True, False)
             prjLog.creatIntance(self.usrID, self.usrName)
             prjLog.prjClass.Done("@@zxcRobot_Log", "")          #自启动
             self.prjRoots[prjLog.prjName] = prjLog
