@@ -8,6 +8,7 @@ Created on  张斌 2019-08-30 15:16:00
 """
 import sys, string, ast, os, time, random, mySystem
 from urllib.parse import quote
+from decimal import Decimal
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类 
 mySystem.Append_Us("", False) 
@@ -72,8 +73,59 @@ class myRobot_StockAppetite(myRobot.myRobot):
 
         #按文字内容组合定义图片类型
         num = txtInfo['wordText'].count('资产分析')
-        print(txtInfo['wordText'])
-        if(num >= 1):
+        if(num >= 1):            
+            # 使用文字匹配方式解析
+            year = myData_Trans.Tran_ToTime_str(None, "%Y") 
+            if(txtInfo['wordText'].count('同花顺-资产分析') == 1):     #同花顺截图
+                #'u中国联通令\n下午3:10\n64%\n同花顺-资产分析\n2019-01-01~2019-08-27\n分享\n本月\n近三月\n近半年\n今年\n近两年\n30.0%\n10.0%\n0.0%\n-10.0%\n01-01\n04-01\n07-01\n我上证○深证○创业板○上证50\nC沪深30中证500收益走势\n今年跑嬴上证指数\n23.03%\n我\n3940%\n上证\n16.37%\n深证\n30.43%\n创业板\n30.19%' 
+                ind = txtInfo['words'].index('我')
+                if(ind > 0):
+                    txt = txtInfo['words'][ind + 1]
+                    dictInfos['收益率'] = float(txt.replace('%', "")) / 100
+                    if(txt.count('.') == 0): 
+                        dictInfos['收益率'] = dictInfos['收益率'] / 100   #小数点未正确识别修正
+                        
+                    # 提取日期
+                    lst = [n for n in txtInfo['words'] if n.count(year)==2]
+                    if(len(lst) == 1):
+                        times = lst[0].split('~')
+                        if(times[0][0:10] == year + "-01-01"):  #日期校检，必须当年开始
+                            dictInfos['日期'] = myData_Trans.Tran_ToDatetime(times[1], '%Y-%m-%d')
+                pass
+            else:   #君弘截图
+                #'10:09:1l\n(80\n资产分析\n20190101~20190828\n今年收益率17.48%\n今日本月近三个月近半年今年2018\n30%\n20%\n2019.01.31\n我:-0.11\n10%\n上证:3.64%\n10%\n01.31\n03.29\n05.31\n07.31\n●我○上证深证○创业\n1.46%\n跑赢上证\n1.46%\n跑输深证\n-12.56%\n跑输创业\n-12.47%\n资产分析\n证券分析\n月度分析\n账单'
+                # 提取今年收益率
+                lst = [n for n in txtInfo['words'] if n.count('今年收益率')==1]
+                if(len(lst) == 1):
+                    dictInfos['收益率'] = float(lst[0].replace('今年收益率', "").replace('%', "")) / 100
+
+                    # 提取日期
+                    lst = [n for n in txtInfo['words'] if n.count(year)==2]
+                    if(len(lst) == 1):
+                        times = lst[0].split('~')
+                        if(times[0][0:8] == year + "0101"):  #日期校检，必须当年开始
+                            dictInfos['日期'] = myData_Trans.Tran_ToDatetime(times[1], '%Y%m%d')
+                pass
+
+            # 修正日期为字符串、收益率格式等
+            if(dictInfos.get('日期', "") != ""):
+                dictInfos['日期'] = myData_Trans.Tran_ToDatetime_str(dictInfos['日期'], '%Y-%m-%d')
+            if(dictInfos.get('收益率', "") != ""):
+                dictInfos['收益率'] = str(Decimal((dictInfos['收益率'] * 100)).quantize(Decimal('0.00'))) + "%"
+            usrName = usrInfo.get('usrNameNick', "") 
+            return "@" + usrName + " " + str(dictInfos) 
+        return ""
+    
+    def _Title_User_Opened(self): 
+        return "自动处理所有股票偏好消息..."
+    def _Title_Helper(self): 
+        strReturn = "消息命令提示："
+        strReturn += self.perfix + "@￥帮助：输出所有命令说明"
+        strReturn += self.perfix + "@￥：输入君弘APP截图自己记录." 
+        strReturn += "\n命令参数以空格区分，如：\"@￥ 帮助\""
+        return strReturn
+        
+""" IORC接口有调用总限制，改为通用文件进行匹配解析
             if(myData.Matching_strs(txtInfo['wordText'], {"今年": 2, "近半年": 1, "本月": 1, "近三": 1})):
                 if(num == 2):       #君弘截图
                     #'10:09:1l\n(80\n资产分析\n20190101~20190828\n今年收益率17.48%\n今日本月近三个月近半年今年2018\n30%\n20%\n2019.01.31\n我:-0.11\n10%\n上证:3.64%\n10%\n01.31\n03.29\n05.31\n07.31\n●我○上证深证○创业\n1.46%\n跑赢上证\n1.46%\n跑输深证\n-12.56%\n跑输创业\n-12.47%\n资产分析\n证券分析\n月度分析\n账单'
@@ -89,24 +141,9 @@ class myRobot_StockAppetite(myRobot.myRobot):
                     dictInfos['收益率'] = imageInfo['收益率']['word'].replace('%', "")
                     times = imageInfo['时间段']['word'].split('~')
                     if(times[0][0:4] == times[1][0:4]):
-                        dictInfos['日期'] = myData_Trans.Tran_ToDatetime(times[1], '%Y-%m-%d')
+                        dictInfos['日期'] = myData_Trans.Tran_ToDatetime(times[1], '%Y-%m-%d') 
+"""
 
-            # 修正日期为字符串
-            if(dictInfos.get('日期', "") != ""):
-                dictInfos['日期'] = myData_Trans.Tran_ToDatetime_str(dictInfos['日期'], '%Y-%m-%d')
-            usrName = usrInfo.get('usrNameNick', "") 
-            return "@" + usrName + " " + str(dictInfos) 
-        return ""
-    
-    def _Title_User_Opened(self): 
-        return "自动处理所有股票偏好消息..."
-    def _Title_Helper(self): 
-        strReturn = "消息命令提示："
-        strReturn += self.perfix + "@￥帮助：输出所有命令说明"
-        strReturn += self.perfix + "@￥：输入君弘APP截图自己记录." 
-        strReturn += "\n命令参数以空格区分，如：\"@￥ 帮助\""
-        return strReturn
-        
 
 #主启动程序
 if __name__ == "__main__": 
@@ -127,7 +164,7 @@ if __name__ == "__main__":
 
 
     #图片自动处理
-    myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test3.jpg", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
+    myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test2.jpg", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
     myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test.png", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
 
 
