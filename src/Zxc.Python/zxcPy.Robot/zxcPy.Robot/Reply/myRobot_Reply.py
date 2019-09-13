@@ -107,6 +107,7 @@ class myRobot_Reply():
                 pGroup = self._Find_Group(idGroup, nameGroup, usrPlat)   
             msgR = pUser.Done(pPrj, strText, msgID, msgType, usrPlat, pGroup, nameSelf, bIsRegist, isCommand) 
             return msgR
+        print("无用户：", pUser)
         return None
      
     #消息处理
@@ -148,10 +149,12 @@ class myRobot_Reply():
     def _Find_Usr(self, usrID, usrName, usrName_Nick, usrID_sys = "", usrPlat = "",idGroup = "", nameGroup = ""): 
         #按消息生成对应对象  
         pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, False, False, True)
+        print("系统用户：", pUser.usrName)
         if(pUser == None or len(pUser.usrPrj.prjDos) < 1):      #非参与用户，于全局用户集信息提取，不存在的自动生成
             pUser = self.root.usrInfos._Find(usrID, usrName, usrName_Nick, usrID_sys, usrPlat, True, False, True)
             pUser.usrPrj._Add_prjDos(self.root.rootPrjs)
             self.usrReplys._Add(pUser)
+            print("新增用户：", pUser.usrName)
         return pUser
     def _Find_Group(self, idGroup, nameGroup, usrPlat = ""): 
         #按消息生成对应对象 
