@@ -8,7 +8,8 @@ Created on  张斌 2018-07-16 11:00:00
 """
 import sys, os, time, datetime, threading
 #import speech_recognition as sr
-import wave, pyaudio
+#import pyaudio
+import wave
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 import numpy as np
@@ -289,7 +290,7 @@ def Speech_thrd(word, times = 1):
         
 # 将语音转文本STT-
 def Speech_Recognition(path, silence_thresh=-50, out_debug=False):
-    return myAI_Voice_Baidu.Speech_Recognition(path, silence_thresh=silence_thresh, out_debug=out_debug)
+    return myAI_Baidu.Speech_Recognition(path, silence_thresh=silence_thresh, out_debug=out_debug)
 
 
 
