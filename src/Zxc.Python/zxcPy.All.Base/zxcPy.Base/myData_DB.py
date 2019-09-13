@@ -351,7 +351,7 @@ if __name__ == "__main__":
     print(pDB.Add_Row({'字段1': 'value2', '字段2': 'value3'}))
     
     # 自定义筛选
-    print(pDB._Find_ByFliter("字段1", '== value2'))
+    print("查询：", pDB._Find_ByFliter("字段1", '== value2'))
 
 
     print()

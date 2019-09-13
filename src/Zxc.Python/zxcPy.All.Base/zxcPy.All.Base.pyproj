@@ -32,6 +32,7 @@
     <Compile Include="zxcPy.Base\myMQ_Rabbit.py" />
     <Compile Include="zxcPy.Base\myManager_Msg.py" />
     <Compile Include="zxcPy.Base\myPyWin.py" />
+    <Compile Include="zxcPy.Base\myData_DB.py" />
     <Compile Include="zxcPy.Base\myVoice.py" />
     <Compile Include="zxcPy.Base\myGlobal.py" />
     <Compile Include="zxcPy.Base\myWeb\forms.py" />

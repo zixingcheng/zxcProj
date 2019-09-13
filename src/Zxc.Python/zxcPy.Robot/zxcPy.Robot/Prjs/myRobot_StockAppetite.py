@@ -88,8 +88,12 @@ class myRobot_StockAppetite(myRobot.myRobot):
                     times = imageInfo['时间段']['word'].split('~')
                     if(times[0][0:4] == times[1][0:4]):
                         dictInfos['日期'] = myData_Trans.Tran_ToDatetime(times[1], '%Y-%m-%d')
-        print(dictInfos)
-        return ""
+
+        # 修正日期为字符串
+        if(dictInfos.get('日期', "") != ""):
+            dictInfos['日期'] = myData_Trans.Tran_ToDatetime_str(dictInfos['日期'], '%Y-%m-%d')
+        usrName = usrInfo.get('usrNameNick', "") 
+        return "@" + usrName + " " + str(dictInfos) 
     
     def _Title_User_Opened(self): 
         return "自动处理所有股票偏好消息..."
@@ -124,6 +128,6 @@ if __name__ == "__main__":
     myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test.png", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
 
 
-    pRobot_Stock.Done("@@zxcRobot_Msg")
+    pRobot_Stock.Done("@@zxcRobot_StockAppetite")
     print()
     
