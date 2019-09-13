@@ -94,6 +94,7 @@ class myRobot_Reply():
         pGroup = None
         bIsRegist = False
         isCommand = False
+        print("消息处理：", usrID, usrName, nickName)
         if(strText[0:2] == "@@"):
             isCommand = True
             pPrj, pUser, bIsRegist = self._Create_Cmd(usrID, usrName, nickName, strText[2:], usrPlat, idGroup, nameGroup, nameSelf, isCommand)
