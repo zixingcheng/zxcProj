@@ -7,7 +7,7 @@ Created on  张斌 2018-07-16 11:00:00
     语音接口操作，百度api转换文字为语音文件，然后播放语音
 """
 import sys, os, time, datetime, threading
-import speech_recognition as sr
+#import speech_recognition as sr
 import wave, pyaudio
 import matplotlib.pyplot as plt
 import scipy.signal as signal
@@ -55,13 +55,13 @@ def Play_Audio_Wav(filepath):
     p.terminate()           #close PyAudio 
 # 录音，Use SpeechRecognition to record 使用语音识别包录制音频
 def Record_Audio(path, rate=16000):
-    r = sr.Recognizer()
-    with sr.Microphone(sample_rate=rate) as source:
-        print("please say something")
-        audio = r.listen(source)
+    #r = sr.Recognizer()
+    #with sr.Microphone(sample_rate=rate) as source:
+    #    print("please say something")
+    #    audio = r.listen(source)
  
-    with open(path, "wb") as f:
-        f.write(audio.get_wav_data())
+    #with open(path, "wb") as f:
+    #    f.write(audio.get_wav_data())
     print("录音完成！")
 
 
