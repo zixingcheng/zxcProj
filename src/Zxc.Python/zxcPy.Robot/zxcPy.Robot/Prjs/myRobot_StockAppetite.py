@@ -72,6 +72,7 @@ class myRobot_StockAppetite(myRobot.myRobot):
 
         #按文字内容组合定义图片类型
         num = txtInfo['wordText'].count('资产分析')
+        print(txtInfo['wordText'])
         if(num >= 1):
             if(myData.Matching_strs(txtInfo['wordText'], {"今年": 2, "近半年": 1, "本月": 1, "近三": 1})):
                 if(num == 2):       #君弘截图
