@@ -51,8 +51,8 @@ class myAPI_Quote_Set(myWeb.myAPI):
                     editInfo = myData_Trans.Tran_ToDict(request.args.get('editInfo', "{}"))
                     
                     # 特殊同步
-                    usrIDs = editInfo.get("msgUsers",{})
-                    if(usrIDs.get("茶叶一主号","") != "" or usrIDs.get("老婆","") != ""):
+                    usrIDs = editInfo.get("msgUsers",{}).keys()
+                    if("茶叶一主号" in usrIDs or "老婆" in usrIDs):
                         usrPlat = request.args.get('usrPlat', 'wx')
                         editInfo['msgUsers']['茶叶一主号'] = usrPlat
                         editInfo['msgUsers']['老婆'] = usrPlat
