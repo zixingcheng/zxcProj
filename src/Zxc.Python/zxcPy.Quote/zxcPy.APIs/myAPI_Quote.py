@@ -50,6 +50,10 @@ class myAPI_Quote_Set(myWeb.myAPI):
                 if(removeSet == False):
                     editInfo = myData_Trans.Tran_ToDict(request.args.get('editInfo', "{}"))
                     if(pSets._Edit(pStock.extype, pStock.code_id, "", editInfo)):
+                        # 特殊同步
+                        if(usrID == '茶叶一主号'): pSets._Edit(pStock.extype, pStock.code_id, "", '老婆')
+                        if(usrID == '老婆'): pSets._Edit(pStock.extype, pStock.code_id, "", '茶叶一主号')
+
                         pSource.params = pSource._getDefault_Param()
                         pMsg['text'] = strTag + " --设置已成功修改。" 
                         bResult = True

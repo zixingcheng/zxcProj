@@ -245,11 +245,12 @@ class myQuote_Sets():
         return True
 
     # 设置修改
-    def _Edit(self, exType, code_id, code_name, strSets = {}):
+    def _Edit(self, exType, code_id, code_name, strSets = {}, usrID = ''):
         bResult = True
+        if(usrID == ""): usrID = str(pSet.get("msgUsers","")).replace(',', '，')
         for x in strSets:
             pSet = strSets[x]
-            strSet = x + "," + str(pSet.get("isValid",False)) + "," + pSet.get("setStr","") + "," + str(pSet.get("msgUsers","")).replace(',', '，') + "," + pSet.get("mark", "")
+            strSet = x + "," + str(pSet.get("isValid",False)) + "," + pSet.get("setStr","") + "," + usrID + "," + pSet.get("mark", "")
             bResult = bResult and self._Init_BySet_str(exType + "." + code_id + "," + code_name + ",,,," + strSet)
         if(bResult): self._Save()
         return bResult   
@@ -261,7 +262,7 @@ class myQuote_Sets():
             bResult = pSet.RemoveSetting(usrID)
             if(bResult): 
                 self._Index_User_remove(pSet, usrID)
-                self._Refresh(pSet, usrID)
+                self._Refresh(pSet, usrID) 
         if(bResult): self._Save()
         return bResult    
     # 设置更新--移除多余
