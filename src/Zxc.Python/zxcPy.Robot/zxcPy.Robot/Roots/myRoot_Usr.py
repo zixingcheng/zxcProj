@@ -343,7 +343,7 @@ class myRoot_Usrs():
             pUser = self._Find_ByID_sys(usrID_sys.lower())
 
         #同步信息
-        if(bUpdata == True):
+        if(bUpdata == True and pUser != None):
             pUser.usrID = usrID
             pUser.usrName = usrName
             pUser.usrName_Nick = usrName_Nick
