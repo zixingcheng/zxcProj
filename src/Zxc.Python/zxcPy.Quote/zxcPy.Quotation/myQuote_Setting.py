@@ -248,7 +248,7 @@ class myQuote_Sets():
     def _Edit(self, exType, code_id, code_name, strSets = {}):
         bResult = True
         for x in strSets:
-            pSet = strSets[x]
+            pSet = strSets[x]            
             strSet = x + "," + str(pSet.get("isValid",False)) + "," + pSet.get("setStr","") + "," + str(pSet.get("msgUsers","")).replace(',', '，') + "," + pSet.get("mark", "")
             bResult = bResult and self._Init_BySet_str(exType + "." + code_id + "," + code_name + ",,,," + strSet)
         if(bResult): self._Save()
