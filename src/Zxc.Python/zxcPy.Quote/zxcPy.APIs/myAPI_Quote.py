@@ -49,6 +49,7 @@ class myAPI_Quote_Set(myWeb.myAPI):
             if(pSource != None and pSets != None):
                 if(removeSet == False):
                     editInfo = myData_Trans.Tran_ToDict(request.args.get('editInfo', "{}"))
+                    print(str(editInfo))
                     
                     # 特殊同步
                     usrID = request.args.get('usrID', '') 
