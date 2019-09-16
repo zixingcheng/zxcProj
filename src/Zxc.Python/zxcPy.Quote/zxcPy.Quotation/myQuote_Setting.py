@@ -144,6 +144,10 @@ class myQuote_Sets():
             msgUsers = myData_Trans.Tran_ToDict(strSets[8].replace('，', ','))
             for x in msgUsers:
                 pSetting.msgUsers[x] = msgUsers[x]
+                
+                # 特殊同步设置
+                if(x == "茶叶一主号"):
+                    pSetting.msgUsers["老婆"] = msgUsers[x]
             pSet.AddSetting(pSetting)
             self._Index_User(pSet)
             return True
@@ -262,6 +266,14 @@ class myQuote_Sets():
             if(bResult): 
                 self._Index_User_remove(pSet, usrID)
                 self._Refresh(pSet, usrID) 
+
+                # 特殊同步设置
+                if(usrID == "茶叶一主号"):
+                    bResult = pSet.RemoveSetting("老婆")
+                    if(bResult): 
+                        self._Index_User_remove(pSet, "老婆")
+                        self._Refresh(pSet, "老婆") 
+
         if(bResult): self._Save()
         return bResult    
     # 设置更新--移除多余
