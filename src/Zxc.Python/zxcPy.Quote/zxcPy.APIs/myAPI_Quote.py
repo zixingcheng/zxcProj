@@ -49,11 +49,15 @@ class myAPI_Quote_Set(myWeb.myAPI):
             if(pSource != None and pSets != None):
                 if(removeSet == False):
                     editInfo = myData_Trans.Tran_ToDict(request.args.get('editInfo', "{}"))
-                    if(pSets._Edit(pStock.extype, pStock.code_id, "", editInfo)):
-                        # 特殊同步
-                        if(usrID == '茶叶一主号'): pSets._Edit(pStock.extype, pStock.code_id, "", '老婆')
-                        if(usrID == '老婆'): pSets._Edit(pStock.extype, pStock.code_id, "", '茶叶一主号')
+                    
+                    # 特殊同步
+                    usrIDs = editInfo.get("msgUsers",{})
+                    if(usrIDs.get("茶叶一主号","") != "" or usrIDs.get("老婆","") != ""):
+                        usrPlat = request.args.get('usrPlat', 'wx')
+                        editInfo['msgUsers']['茶叶一主号'] = usrPlat
+                        editInfo['msgUsers']['老婆'] = usrPlat
 
+                    if(pSets._Edit(pStock.extype, pStock.code_id, "", editInfo)):
                         pSource.params = pSource._getDefault_Param()
                         pMsg['text'] = strTag + " --设置已成功修改。" 
                         bResult = True
