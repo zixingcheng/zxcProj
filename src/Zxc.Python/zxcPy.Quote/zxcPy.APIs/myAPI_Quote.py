@@ -58,6 +58,10 @@ class myAPI_Quote_Set(myWeb.myAPI):
                     usrID = request.args.get('usrID', '') 
                     usrPlat = request.args.get('usrPlat', 'wx')
                     if(pSets._Remove(pStock.extype, pStock.code_id, "", usrID)):
+                        # 特殊同步
+                        if(usrID == '茶叶一主号'): pSets._Remove(pStock.extype, pStock.code_id, "", '老婆')
+                        if(usrID == '老婆'): pSets._Remove(pStock.extype, pStock.code_id, "", '茶叶一主号')
+
                         pSource.params = pSource._getDefault_Param()
                         pMsg['text'] = strTag + " --设置已成功移除。" 
                         bResult = True
