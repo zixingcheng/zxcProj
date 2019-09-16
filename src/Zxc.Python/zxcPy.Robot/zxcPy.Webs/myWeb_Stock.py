@@ -111,9 +111,9 @@ def add_Webs(pWeb):
                 
                 # 特殊同步
                 usrIDs = { usrID : plat}
-                if(usrID == '茶叶一主号' or usrID == '老婆'): 
-                    usrIDs["茶叶一主号"] = plat
-                    usrIDs["老婆"] = plat
+                #if(usrID == '茶叶一主号' or usrID == '老婆'): 
+                #    usrIDs["茶叶一主号"] = plat
+                #    usrIDs["老婆"] = plat
                 editInfo[form.monitorHourly.label.text] = {'isValid': form.monitorHourly.data, 'msgUsers': usrIDs, 'mark' :""}
                 editInfo[form.monitorRise_Fall.label.text] = {'isValid': form.monitorRise_Fall.data, 'msgUsers': usrIDs, 'mark' :""}
 
