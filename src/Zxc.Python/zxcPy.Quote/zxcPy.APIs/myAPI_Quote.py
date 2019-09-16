@@ -51,14 +51,12 @@ class myAPI_Quote_Set(myWeb.myAPI):
                     editInfo = myData_Trans.Tran_ToDict(request.args.get('editInfo', "{}"))
                     
                     # 特殊同步
-                    for x in editInfo:
-                        pSet = editInfo[x]   
-                        usrIDs = list(pSet.get("msgUsers",{}))
-                        if("茶叶一主号" in usrIDs or "老婆" in usrIDs):
-                            usrPlat = request.args.get('usrPlat', 'wx')
-                            pSet['msgUsers']['茶叶一主号'] = usrPlat
-                            pSet['msgUsers']['老婆'] = usrPlat
-                            editInfo[x] = pSet
+                    usrID = request.args.get('usrID', '') 
+                    if(usrID == '茶叶一主号' or usrID == '老婆'):  
+                        for x in editInfo:
+                            editInfo[x] ['msgUsers']['茶叶一主号'] = usrPlat
+                            editInfo[x] ['msgUsers']['老婆'] = usrPlat
+                    print(str(editInfo))
 
                     if(pSets._Edit(pStock.extype, pStock.code_id, "", editInfo)):
                         pSource.params = pSource._getDefault_Param()
