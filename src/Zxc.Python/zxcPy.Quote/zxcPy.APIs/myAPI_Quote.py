@@ -49,16 +49,6 @@ class myAPI_Quote_Set(myWeb.myAPI):
             if(pSource != None and pSets != None):
                 if(removeSet == False):
                     editInfo = myData_Trans.Tran_ToDict(request.args.get('editInfo', "{}"))
-                    print(str(editInfo))
-                    
-                    # 特殊同步
-                    usrID = request.args.get('usrID', '') 
-                    if(usrID == '茶叶一主号' or usrID == '老婆'):  
-                        for x in editInfo:
-                            editInfo[x] ['msgUsers']['茶叶一主号'] = usrPlat
-                            editInfo[x] ['msgUsers']['老婆'] = usrPlat
-                    print(str(editInfo))
-
                     if(pSets._Edit(pStock.extype, pStock.code_id, "", editInfo)):
                         pSource.params = pSource._getDefault_Param()
                         pMsg['text'] = strTag + " --设置已成功修改。" 
@@ -68,10 +58,6 @@ class myAPI_Quote_Set(myWeb.myAPI):
                     usrID = request.args.get('usrID', '') 
                     usrPlat = request.args.get('usrPlat', 'wx')
                     if(pSets._Remove(pStock.extype, pStock.code_id, "", usrID)):
-                        # 特殊同步
-                        if(usrID == '茶叶一主号'): pSets._Remove(pStock.extype, pStock.code_id, "", '老婆')
-                        if(usrID == '老婆'): pSets._Remove(pStock.extype, pStock.code_id, "", '茶叶一主号')
-
                         pSource.params = pSource._getDefault_Param()
                         pMsg['text'] = strTag + " --设置已成功移除。" 
                         bResult = True

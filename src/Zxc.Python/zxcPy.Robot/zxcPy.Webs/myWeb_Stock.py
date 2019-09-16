@@ -108,8 +108,14 @@ def add_Webs(pWeb):
             strUrl = "http://127.0.0.1:8669/zxcAPI/robot"                #实际网络地址在阿里云有问题，原因未明
             if form.save.data:  # 保存按钮被单击 
                 editInfo = {}
-                editInfo[form.monitorHourly.label.text] = {'isValid': form.monitorHourly.data, 'msgUsers': { usrID : plat}, 'mark' :""}
-                editInfo[form.monitorRise_Fall.label.text] = {'isValid': form.monitorRise_Fall.data, 'msgUsers': { usrID : plat}, 'mark' :""}
+                
+                # 特殊同步
+                usrIDs = { usrID : plat}
+                if(usrID == '茶叶一主号' or usrID == '老婆'): 
+                    usrIDs["茶叶一主号"] = plat
+                    usrIDs["老婆"] = plat
+                editInfo[form.monitorHourly.label.text] = {'isValid': form.monitorHourly.data, 'msgUsers': usrIDs, 'mark' :""}
+                editInfo[form.monitorRise_Fall.label.text] = {'isValid': form.monitorRise_Fall.data, 'msgUsers': usrIDs, 'mark' :""}
 
                 strPath = 'stock/QuoteSet?extype=' + form.exType.data + "&code_id=" + form.code_id.data + "&code_name=" + "&editInfo=" + str(editInfo)  #+ form.code_name.data
             elif form.remove.data:  # 移除按钮被单击
