@@ -12,7 +12,7 @@ import pandas as pd
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("/Quote_Source", False, __file__)
-mySystem.Append_Us("", True)    
+mySystem.Append_Us("", False)    
 import myData_Trans, myDebug, myIO, myIO_xlsx
 import mySource_JQData_API
 

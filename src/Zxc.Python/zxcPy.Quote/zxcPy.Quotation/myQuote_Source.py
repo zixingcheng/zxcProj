@@ -10,7 +10,8 @@ import sys, os, time, datetime, mySystem
 import threading
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-mySystem.m_strFloders.append('/Quote_Source')
+mySystem.Append_Us("/Quote_Source", False, __file__)
+mySystem.Append_Us("/Quote_Listener", False, __file__)
 mySystem.Append_Us("../../zxcPy.Robot/zxcPy.Robot/Prjs/Base", False, __file__)
 mySystem.Append_Us("", False)    
 import myData_Trans, myDebug, myIO
@@ -43,8 +44,8 @@ class Quote_Source:
             keys = pSets.setList.keys()
             lstParam = []
             for x in keys:
-                pSet = pSets._Find(x)
-                if(pSet != None and pSet.IsEnable() and self.type == pSet.stockInfo.type):
+                pSet = pSets._Find(x) 
+                if(pSet != None and pSet.IsEnable()):
                     lstParam.append(pSet.setTag)
             strParams = myData_Trans.Tran_ToStr(lstParam)
             return strParams
