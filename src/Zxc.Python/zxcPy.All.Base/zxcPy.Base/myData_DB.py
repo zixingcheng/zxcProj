@@ -42,8 +42,27 @@ class myData_Table():
         if(len(strLines) < 1): return False
 
         #提取字段信息  
-        lstFields = strLines[0].split(',')
-        self.Add_Fields(lstFields)
+        lstTemps = strLines[0].replace("\r\n", "").split(',')
+        lstFields = []
+        lstTypes = []
+        lstIndexs = []
+        for x in lstTemps:
+            #是否索引
+            if(x[0:2] == "**"):
+                lstIndexs.append(True)
+                x = x[2:]
+            else:
+                lstIndexs.append(False)
+            
+            #字段和类型
+            if(x.count("(") == 1 and x.count(")") == 1):
+                temps = x.split("(")
+                lstFields.append(temps[0])
+                lstTypes.append(temps[1].replace(")", ""))
+            else:
+                lstFields.append(x)
+                lstTypes.append("string")
+        self.Add_Fields(lstFields, lstTypes, lstIndexs)
 
         #提取行数据
         strLines.pop(0)
@@ -231,6 +250,12 @@ class myData_Table():
         return list(self.rows.keys())[-1] + 1
     # 检查是否已经存在   
     def _Check(self, rowInfo, updata = False): 
+        #修正数据类型 
+        for x in self.fields:
+            value = rowInfo.get(x, "")
+            rowInfo[x] = self._Trans_Value(value, self.fields[x]['type'])
+
+        #检查是否已经存在
         keys = self.rows.keys()
         for x in keys:
             rowInfo_Base = self.rows[x]
@@ -279,6 +304,22 @@ class myData_Table():
         nMonths = dtTime.month 
         if(nYears > 1): nMonths += (nYears -1) * 12
         return self._Trans_Time_moth(dtTime, nMonths)
+    #转换行格子数据为对应数据类型
+    def _Trans_Value(self, value, type):  
+        if(type == "string"):
+            return str(value)
+        elif(type == "float"):
+            return myData_Trans.To_Float(value)
+        elif(type == "int"):
+            return myData_Trans.To_Int(value)
+        elif(type == "bool"):
+            return myData_Trans.To_Bool(value)
+        elif(type == "datetime"):
+            return self._Trans_Value_Datetime(value)
+        return value
+    #转换行格子数据为日期类型
+    def _Trans_Value_Datetime(self, value):  
+        return myData_Trans.Tran_ToDatetime(value, "%Y-%m-%d %H:%M:%S")
     #转换行格子数据为字符串
     def _Trans_Value_str(self, value, bSave_AsStr = True):        
         if(bSave_AsStr):
@@ -316,9 +357,9 @@ class myData_Table():
         # 写入字段
         nCols = self._FieldsCount() + 1
         nRows = self._RowsCount()
-        strLines = "ID" 
+        strLines = "ID(int)" 
         for x in self.fields:
-            strLines += "," + myData.iif(x in self.fields_index, "**", "") + x
+            strLines += "," + myData.iif(x in self.fields_index, "**", "") + x + "(" + self.fields[x]['type'] + ")"
 
         #循环所有格子组装数据 
         strEnt = myData.iif(isUtf, "\r\n", "\n")
