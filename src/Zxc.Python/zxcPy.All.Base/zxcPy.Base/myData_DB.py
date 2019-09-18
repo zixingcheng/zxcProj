@@ -19,13 +19,14 @@ from myGlobal import gol
 
 # 简易库表
 class myData_Table():
-    def __init__(self, nameDB = "zxcDB", dir = ""):  
+    def __init__(self, nameDB = "zxcDB", dir = "", oneValid = False):  
         self.dir = dir              #库表路径
         self.nameDB = nameDB        #库表名
         self.fields = OrderedDict() #库表字段信息
         self.fields_index = []      #库表字段-索引信息
         self.rows = OrderedDict()   #库表行数据集(带编号)
         self.indexs = {}            #索引集
+        self.oneValid = oneValid    #是否只有一条记录有效
 
         #初始根目录信息
         if(self.dir == ""):
@@ -67,7 +68,7 @@ class myData_Table():
         #提取行数据
         strLines.pop(0)
         for x in strLines:
-            self.Add_Row_BySimply(x)
+            self.Add_Row_BySimply(x, False, False)
         return True
         
     # 添加字段信息集合
@@ -80,6 +81,7 @@ class myData_Table():
        bResult = True
        for x in range(len(fieldNames)):
            if(fieldNames[x].lower() == 'id'): continue
+           if(fieldNames[x].lower() == 'isdel'): continue
            bResult = bResult and self.Add_Field(fieldNames[x], fieldTypes[x], isIndexs[x])
        return bResult
     # 添加字段信息
@@ -128,16 +130,21 @@ class myData_Table():
             rowInfo[x] = ""
         return rowInfo
     # 添加行数据
-    def Add_Row_BySimply(self, strInfo, updata = False):
+    def Add_Row_BySimply(self, strInfo, updata = False, bSave = True):
         lines = strInfo.replace('\r\n', '').replace('\n', '').split(',')
         ind = 1
         rowInfo = {}
         for x in self.fields:
             rowInfo[x] = lines[ind]
             ind = ind + 1
-        return self.Add_Row(rowInfo)
+
+        #系统字段初始
+        rowInfo["ID"] = myData_Trans.To_Int(lines[0])
+        if(len(lines) - 2 == len(self.fields)):
+            rowInfo["isDel"] = myData_Trans.To_Bool(lines[len(self.fields) + 1])
+        return self.Add_Row(rowInfo, updata, bSave)
     # 添加行数据
-    def Add_Row(self, rowInfo = {}, updata = False):
+    def Add_Row(self, rowInfo = {}, updata = False, bSave = True):
         # 检查可用性
         id = self._Check(rowInfo, updata)
         if(id != ""): 
@@ -149,15 +156,20 @@ class myData_Table():
 
         # 索引数据
         if(self._Index(rowInfo)):
+            #单条有效修正
+            if(self.oneValid):
+                self._Check_oneValid(rowInfo)
+
             # 添加数据
             id = rowInfo['ID']
             self.rows[id] = rowInfo
 
             # 校正存量
             bAppend = (id + 1 < self._Get_ID())
-        
+            if(self.oneValid): bAppend = False         #全部重新保存
+
             #保存--排序
-            if(self.Save_DB(bAppend, True)):
+            if(bSave and self.Save_DB(bAppend, True)):
                 return "添加成功，信息如下：\n" + self._Trans_ToStr_Title(rowInfo) 
     # 总行数
     def _RowsCount(self): 
@@ -254,6 +266,8 @@ class myData_Table():
         for x in self.fields:
             value = rowInfo.get(x, "")
             rowInfo[x] = self._Trans_Value(value, self.fields[x]['type'])
+        if(rowInfo.get("isDel", "") == ""):
+            rowInfo["isDel"] = False
 
         #检查是否已经存在
         keys = self.rows.keys()
@@ -265,6 +279,9 @@ class myData_Table():
                     self.rows[x] = row_base
                 return x
         return "" 
+    #单条有效修正
+    def _Check_oneValid(self, rowInfo): 
+        pass 
     # 检查是否相同--继承需重写  
     def _IsSame(self, rowInfo, rowInfo_Base): 
         if(rowInfo.get('ID', "") != ""):
@@ -340,6 +357,7 @@ class myData_Table():
         lisValue = [rowInfos.get("ID", "")]
         for x in self.fields:
             lisValue.append(self._Trans_Value_str(rowInfos.get(x, ""), True))
+        lisValue.append(rowInfos.get('isDel', False))
         return lisValue
     #生成字符串信息
     def _Trans_ToStr(self, rowInfos, nSpace = 0, isSimple = False, bTitle = False): 
@@ -360,6 +378,7 @@ class myData_Table():
         strLines = "ID(int)" 
         for x in self.fields:
             strLines += "," + myData.iif(x in self.fields_index, "**", "") + x + "(" + self.fields[x]['type'] + ")"
+        strLines += ",isDel(bool)" 
 
         #循环所有格子组装数据 
         strEnt = myData.iif(isUtf, "\r\n", "\n")

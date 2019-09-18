@@ -26,16 +26,26 @@ class myDataDB_StockReturns(myData_DB.myData_Table):
             self.Dir_Base = os.path.abspath(os.path.join(strDir, "../../.."))  
             self.Dir_DataDB = self.Dir_Base + "/Data/DB_Data/"
             myIO.mkdir(self.Dir_DataDB, False) 
-        super().__init__(nameDB, self.Dir_DataDB) 
+        super().__init__(nameDB, self.Dir_DataDB, True) 
         
 
     # 检查是否相同--继承需重写  
     def _IsSame(self, rowInfo, rowInfo_Base): 
         if(super()._IsSame(rowInfo, rowInfo_Base)): return True
 
-        if (rowInfo['日期'] - rowInfo_Base['日期']).days < 1: return True
+        if(rowInfo['用户名'] == rowInfo_Base['用户名']):
+            if (rowInfo['日期'] - rowInfo_Base['日期']).days < 1:
+               return True
         return False
     
+    #单条有效修正
+    def _Check_oneValid(self, rowInfo): 
+        if(rowInfo.get('用户名', '') != ""):
+            datas = self._Find_ByFliter("用户名", '== ' + rowInfo['用户名'])
+            for x in datas:
+                datas[x]['isDel'] = True
+        return True
+
     #转换行格子数据为日期类型
     def _Trans_Value_Datetime(self, value):  
         if(value.count(":") == 2):
@@ -57,10 +67,15 @@ if __name__ == "__main__":
     
     # 添加行数据
     print(pDB.Add_Row({'用户名': '茶叶一主号', '收益': '0.1576', '日期': '2019-08-27'}))
+    print(pDB.Add_Row({'用户名': '墨紫', '收益': '0.1476', '日期': '2019-08-26'}))
+    print(pDB.Add_Row({'用户名': '墨紫', '收益': '0.1976', '日期': '2019-08-27'}))
     
 
     # 自定义筛选
     print("查询：", pDB._Find_ByFliter("用户名", '== 茶叶一主号'))
+
+
+    # 排名查询
 
 
     print()
