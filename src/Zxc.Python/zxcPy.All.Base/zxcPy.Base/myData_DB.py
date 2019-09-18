@@ -217,7 +217,7 @@ class myData_Table():
     
 
     # 查询筛选--多参数（&&、||）
-    def Query(self, fliters): 
+    def Query(self, fliters, sortField="", reverse=False): 
         # 解析参数
         nPos_And = myData.Find_Pos(u'&&', fliters)
         nPos_Or = myData.Find_Pos(u'||', fliters)
@@ -247,6 +247,10 @@ class myData_Table():
 
             # 下一个
             pos = x + 2
+
+        #排序
+        if(sortField != ""):
+            datas = sorted(datas.items(), key = lambda d:d[1].get(sortField,0), reverse = reverse)
         return datas
     # 查询筛选
     def _Query(self, fliter): 

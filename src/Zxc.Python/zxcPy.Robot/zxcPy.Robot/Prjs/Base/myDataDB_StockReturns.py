@@ -9,6 +9,7 @@ Created on  张斌 2019-09-17 22:58:00
 import sys, os, time, copy, datetime, mySystem
 from collections import OrderedDict
 from operator import itemgetter, attrgetter
+from decimal import Decimal
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../Prjs", False, __file__)
@@ -46,11 +47,27 @@ class myDataDB_StockReturns(myData_DB.myData_Table):
                 datas[x]['isDel'] = True
         return True
 
-    #转换行格子数据为日期类型
+    #转换行格子数据为日期类型 "%Y-%m-%d"
     def _Trans_Value_Datetime(self, value):  
         if(value.count(":") == 2):
             return myData_Trans.Tran_ToDatetime(value)
         return myData_Trans.Tran_ToDatetime(value, "%Y-%m-%d")
+    
+    #获取排名-所有或单一
+    def Get_Ranks(self, usrID = ''):  
+        # 获取所有
+        datas = self.Query("isDel==False", "收益", True)
+       
+        # 循环组装排名
+        ind = 1
+        ranks = []
+        for x in datas:
+            data = x[1]
+            if(usrID == "" or usrID == data['用户名']):
+                strRank = "第" + str(ind) + "名：" + data['用户名'] + " " + str(Decimal((data['收益'] * 100)).quantize(Decimal('0.0'))) + "%"
+                ranks.append(strRank)
+            ind += 1
+        return ranks
 
 #初始全局消息管理器
 from myGlobal import gol 
@@ -73,10 +90,12 @@ if __name__ == "__main__":
 
     # 自定义筛选
     print("查询：", pDB.Query("用户名== 墨紫 && isDel==False"))
+    print("查询：", pDB.Query("isDel==False", "收益", True))
 
 
     # 排名查询
-
+    print(pDB.Get_Ranks())
+    print(pDB.Get_Ranks('茶叶一主号'))
 
     print()
 
