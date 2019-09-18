@@ -7,7 +7,7 @@ Created on  张斌 2016-10-07 16:45:00
     自定义数据类型操作
 
 """
-import sys, string
+import sys, string, re
 import interval 
 
 
@@ -159,7 +159,13 @@ def Matching_strs(Text, usrWords = {}):
         if(Text.count(x) != num):
             return False
     return True
-
+#查询指定字符出现的所有位置
+def Find_Pos(word, str):
+    if(word.count("|") > 0):
+        word = word.replace("|", "☀")
+        str = str.replace("|", "☀")
+    pos = [m.start() for m in re.finditer(word, str)] 
+    return pos
 
 
 if __name__ == '__main__':
@@ -178,3 +184,6 @@ if __name__ == '__main__':
 
 
     print(Matching_strs("你哎好aa！a", {'哎':1, "aa": 2}))
+    
+    print(Find_Pos(u'元' ,u"小明买冰棍花了5元，买糖果花了3元，买游戏花了59元，小明今天一共花了67元。"))
+    print(Find_Pos(u'||' ,u"小明买冰棍花了5元，买糖果花了3元，买游戏花了59元，小明今天一共花了67元。"))

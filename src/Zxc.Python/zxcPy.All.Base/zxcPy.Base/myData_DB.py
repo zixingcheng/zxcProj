@@ -216,13 +216,51 @@ class myData_Table():
         return ""
     
 
-    # 提取与指定筛选条件相同项--继承需重写
-    def _Find_ByFliters(self, fliters): 
-        # 依次筛选
-        data = self.rows
-        for x in fliters:
-            data = self._Find_ByFliter(x, fliters[x], data)
-        return data
+    # 查询筛选--多参数（&&、||）
+    def Query(self, fliters): 
+        # 解析参数
+        nPos_And = myData.Find_Pos(u'&&', fliters)
+        nPos_Or = myData.Find_Pos(u'||', fliters)
+        nPos = nPos_And + nPos_Or + [len(fliters)]
+        nPos.sort()
+        
+        #循环查询
+        datas = {}
+        pos = 0
+        for x in nPos:
+            fliter =  fliters[pos: x]
+            data = self._Query(fliter)
+            if(pos == 0):
+                datas.update(data)
+            else:
+                # 按类型组装结果
+                x = pos -2
+                if(x in nPos_And):
+                    indSames = []
+                    for x in datas:
+                        if(x not in data):
+                            indSames.append(x)
+                    for x in indSames:
+                        datas.pop(x)
+                elif(x in nPos_Or):
+                    datas.update(data)
+
+            # 下一个
+            pos = x + 2
+        return datas
+    # 查询筛选
+    def _Query(self, fliter): 
+        lstSymbol = ['==', '!=', '>', '<', '>=', '<=']
+        for x in lstSymbol:
+            ind = fliter.find(x)
+            if(ind < 1): continue
+
+            #解析并执行查询
+            field = fliter[0:ind].strip()
+            fliter = x + " " + fliter[ind + 2:].strip()
+            data = self._Find_ByFliter(field, fliter)
+            return data
+        return {}
     # 提取与指定筛选条件相同项--继承需重写
     def _Find_ByFliter(self, field, fliter, data = None): 
         # 解析条件
@@ -233,10 +271,11 @@ class myData_Table():
         # 解析运算符及运算值
         strIF = txts[0]
         value = txts[1]
-        type = self.fields[field]['type']
-        if(type == 'float' or type == 'int'):
-            if(myData_Trans.Is_Numberic(str(value))):
-                value = float(value)
+        if(field == "isDel"):
+            type = "bool"
+        else:
+            type = self.fields[field]['type']
+        value = self._Trans_Value(value, type)
 
         # 按条件组织
         if(strIF == "=="):

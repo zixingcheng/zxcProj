@@ -72,7 +72,7 @@ if __name__ == "__main__":
     
 
     # 自定义筛选
-    print("查询：", pDB._Find_ByFliter("用户名", '== 茶叶一主号'))
+    print("查询：", pDB.Query("用户名== 墨紫 && isDel==False"))
 
 
     # 排名查询
