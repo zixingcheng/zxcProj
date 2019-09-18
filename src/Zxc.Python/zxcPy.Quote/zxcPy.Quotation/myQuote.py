@@ -39,6 +39,7 @@ class myStock_Info():
     #是否是指数
     def IsIndex(self): 
         if(self.type.lower() == "index"): return True
+        if(self.type.lower() == "etf"): return True
         return False
     #信息修正
     def CheckInfo(self): 

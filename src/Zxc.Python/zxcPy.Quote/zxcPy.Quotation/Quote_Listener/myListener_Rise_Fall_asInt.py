@@ -63,10 +63,12 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
         dDelta = dValue_N - dValue                          #当前-历史的差值
          
         #涨跌超限值
-        if(abs(dDelta) >= self.deltaV):
+        deltaV = self.deltaV
+        if(bIndex): deltaV = self.deltaV / 2                #提高一倍精度
+        if(abs(dDelta) >= deltaV):
             #涨跌幅达到间隔值整数倍, 计算记录新值
-            nTimes = int(dDelta / self.deltaV)
-            value['now'] = dValue + nTimes * self.deltaV    #更新记录值
+            nTimes = int(dDelta / deltaV)
+            value['now'] = dValue + nTimes * deltaV         #更新记录值
             value['time'] = data.getTime()
             
             #涨跌幅突破标识
@@ -86,7 +88,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
 
             #计算涨跌返回对应说明标识
             strTag = ""  
-            strDelta = str(round(nTimes * self.deltaV * 100, 2)) + "%"
+            strDelta = str(round(nTimes * deltaV * 100, 2)) + "%"
             if(dDelta > 0):
                 #涨
                 strTag = strTag_M + "涨超: " + strDelta 
@@ -95,13 +97,13 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
 
             #涨跌反转标识 
             if(dValue_N >= 0 and dValue >= 0):
-                nTimes2 = int(value['max'] / self.deltaV)
+                nTimes2 = int(value['max'] / deltaV)
                 if(strTag_suffix == "" and abs(nTimes2) > 1): 
                     dDelta2 = value['max'] - dValue_N
                     strDelta2 = str(round(dDelta2 * 100, 2)) + "%"
                     strTag_suffix = ", 涨幅回落 " + strDelta2 + "."
             else:
-                nTimes2 = int(value['min'] / self.deltaV)
+                nTimes2 = int(value['min'] / deltaV)
                 if(strTag_suffix == "" and abs(nTimes2) > 1): 
                     dDelta2 = dValue_N - value['min']
                     strDelta2 = str(round(dDelta2 * 100, 2)) + "%"
