@@ -54,7 +54,7 @@ class myDataDB_StockReturns(myData_DB.myData_Table):
         return myData_Trans.Tran_ToDatetime(value, "%Y-%m-%d")
     
     #获取排名-所有或单一
-    def Get_Ranks(self, usrID = '', bOnlyRank = False):  
+    def Get_Ranks(self, usrID = '', bOnlyRank = False, nTop = 1024):  
         # 获取所有
         datas = self.Query("isDel==False", "收益", True)
        
@@ -65,11 +65,12 @@ class myDataDB_StockReturns(myData_DB.myData_Table):
             data = x[1]
             if(usrID == "" or usrID == data['用户名']):
                 if(bOnlyRank == False):
-                    strRank = "第" + str(ind) + "名：" + data['用户名'] + " " + str(Decimal((data['收益'] * 100)).quantize(Decimal('0.0'))) + "%"
+                    strRank = "第" + str(ind) + "名：" + data['用户名'] + "(" + str(Decimal((data['收益'] * 100)).quantize(Decimal('0.0'))) + "%)"
                 else:
                     strRank = {'name': data['用户名'], 'ranking': str(ind), 'profit': str(Decimal((data['收益'] * 100)).quantize(Decimal('0.0'))) + "%"}
                 ranks.append(strRank)
             ind += 1
+            if(nTop < ind): break
         return ranks
     
 
@@ -99,7 +100,7 @@ if __name__ == "__main__":
     pDB = gol._Get_Setting('zxcdbStockReturns')
     
     # 添加行数据
-    print(pDB.Add_Row({'用户名': '茶叶一主号', '收益': '0.1576', '日期': '2019-08-27'}))
+    print(pDB.Add_Row({'用户名': '茶叶一主号', '收益': 0.1576, '日期': '2019-08-27'}))
     print(pDB.Add_Row({'用户名': '墨紫', '收益': '0.1476', '日期': '2019-08-26'}))
     print(pDB.Add_Row({'用户名': '墨紫', '收益': '0.1976', '日期': '2019-08-27'}))
     
@@ -111,6 +112,8 @@ if __name__ == "__main__":
 
     # 排名查询
     print(pDB.Get_Ranks())
+    print(pDB.Get_Ranks(nTop = 1))
+    print(pDB.Get_Ranks(nTop = 2, bOnlyRank = True))
     print(pDB.Get_Ranks('茶叶一主号'))
     print(pDB.Get_Ranks('茶叶一主号', True))
 

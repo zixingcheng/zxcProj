@@ -11,9 +11,10 @@ from urllib.parse import quote
 from decimal import Decimal
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类 
+mySystem.Append_Us("../Prjs/Base", False, __file__)
 mySystem.Append_Us("", False) 
 import myDebug, myData, myData_Trans, myRobot, myIO, myAI_Baidu, myWeb_urlLib
-import myRobot_Robot, myManager_Msg
+import myRobot_Robot, myManager_Msg, myDataDB_StockReturns
 from myGlobal import gol   
 
     
@@ -52,9 +53,17 @@ class myRobot_StockAppetite(myRobot.myRobot):
         strReturn = ""
         if(cmd == "帮助"):
             return self._Title_Helper()  
+        elif(cmd == "排名"):
+            if("墨紫" == usrInfo.get('usrNameNick', "")):  
+                #提取排名信息
+                pDB = gol._Get_Setting('zxcdbStockReturns')
+                nTop = 10
+                if(len(cmds) > 1 and myData_Trans.Is_Numberic(cmds[1])):
+                    nTop = myData_Trans.To_Int(cmds[1])
+                lstRanks = pDB.Get_Ranks(nTop = nTop)
+                return myData_Trans.Tran_ToStr(lstRanks, "\r\n")
         return strReturn
-    
-    
+        
     #匹配指定字符集
     def Matching_strs(self, Text, usrWords = {}):
         for x in usrWords.keys():
@@ -106,14 +115,27 @@ class myRobot_StockAppetite(myRobot.myRobot):
                         if(times[0][0:8] == year + "0101"):  #日期校检，必须当年开始
                             dictInfos['日期'] = myData_Trans.Tran_ToDatetime(times[1], '%Y%m%d')
                 pass
+            if(dictInfos['收益率'] == 0): return ""
 
             # 修正日期为字符串、收益率格式等
+            usrName = usrInfo.get('usrNameNick', "") 
+            usrProfit = dictInfos['收益率']
             if(dictInfos.get('日期', "") != ""):
                 dictInfos['日期'] = myData_Trans.Tran_ToDatetime_str(dictInfos['日期'], '%Y-%m-%d')
             if(dictInfos.get('收益率', "") != ""):
-                dictInfos['收益率'] = str(Decimal((dictInfos['收益率'] * 100)).quantize(Decimal('0.00'))) + "%"
-            usrName = usrInfo.get('usrNameNick', "") 
-            return "@" + usrName + " " + str(dictInfos) 
+                dictInfos['收益率'] = str(Decimal((usrProfit * 100)).quantize(Decimal('0.00'))) + "%"
+
+            #记录信息
+            pDB = gol._Get_Setting('zxcdbStockReturns')
+            myDebug.Debug(pDB.Add_Row({'用户名': usrName, '收益': usrProfit, '日期': dictInfos['日期']}))
+            
+            #组装返回
+            lstR = pDB.Get_Ranks('茶叶一主号', True)
+            if(len(lstR) < 1):
+                return "@" + usrName + " 收益信息记录失败！当前收益率：" + dictInfos['收益率'] + "."
+            dicRand = lstR[0]
+            strRank = " 收益率：" + dicRand['profit'] + ", 排名：第" + dicRand['ranking'] + "."
+            return "@" + usrName + " " + strRank
         return ""
     
     def _Title_User_Opened(self): 
@@ -167,7 +189,12 @@ if __name__ == "__main__":
     myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test2.jpg", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
     myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test.png", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
 
+    #排名
+    pRobot_Stock.Done("@￥排名", usrNameNick='墨紫')  
+    pRobot_Stock.Done("@￥排名 1")   
 
+
+    #退出
     pRobot_Stock.Done("@@zxcRobot_StockAppetite")
     print()
     

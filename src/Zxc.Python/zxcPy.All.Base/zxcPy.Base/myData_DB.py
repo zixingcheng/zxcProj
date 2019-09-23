@@ -365,16 +365,21 @@ class myData_Table():
         if(nYears > 1): nMonths += (nYears -1) * 12
         return self._Trans_Time_moth(dtTime, nMonths)
     #转换行格子数据为对应数据类型
-    def _Trans_Value(self, value, type):  
-        if(type == "string"):
+    def _Trans_Value(self, value, utype):  
+        if(utype == "string"):
+            if(type(value) == str): return value
             return str(value)
-        elif(type == "float"):
+        elif(utype == "float"):
+            if(type(value) == float): return value
             return myData_Trans.To_Float(value)
-        elif(type == "int"):
+        elif(utype == "int"):
+            if(type(value) == int): return value
             return myData_Trans.To_Int(value)
-        elif(type == "bool"):
+        elif(utype == "bool"):
+            if(type(value) == bool): return value
             return myData_Trans.To_Bool(value)
-        elif(type == "datetime"):
+        elif(utype == "datetime"):
+            if(type(value) == datetime): return value
             return self._Trans_Value_Datetime(value)
         return value
     #转换行格子数据为日期类型

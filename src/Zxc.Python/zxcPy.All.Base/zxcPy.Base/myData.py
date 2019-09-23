@@ -160,11 +160,11 @@ def Matching_strs(Text, usrWords = {}):
             return False
     return True
 #查询指定字符出现的所有位置
-def Find_Pos(word, str):
+def Find_Pos(word, string):
     if(word.count("|") > 0):
         word = word.replace("|", "☀")
-        str = str.replace("|", "☀")
-    pos = [m.start() for m in re.finditer(word, str)] 
+        string = string.replace("|", "☀")
+    pos = [m.start() for m in re.finditer(word, string)] 
     return pos
 
 
