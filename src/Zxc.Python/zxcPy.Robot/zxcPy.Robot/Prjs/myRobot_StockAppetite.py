@@ -6,7 +6,7 @@ Created on  张斌 2019-08-30 15:16:00
 
     Weixin网页版消息处理接口（功能库）--机器人类--股票偏好(群信息统计)
 """
-import sys, string, ast, os, time, random, mySystem
+import sys, string, ast, os, time, datetime, random, mySystem
 from urllib.parse import quote
 from decimal import Decimal
 
@@ -61,7 +61,8 @@ class myRobot_StockAppetite(myRobot.myRobot):
                 if(len(cmds) > 1 and myData_Trans.Is_Numberic(cmds[1])):
                     nTop = myData_Trans.To_Int(cmds[1])
                 lstRanks = pDB.Get_Ranks(nTop = nTop)
-                return myData_Trans.Tran_ToStr(lstRanks, "\r\n").strip()
+                strRanks = "年收益排名(" + str(datetime.datetime.now().year) + ")：" + myData_Trans.Tran_ToStr(lstRanks, "\r\n")
+                return strRanks
         return strReturn
         
     #匹配指定字符集
