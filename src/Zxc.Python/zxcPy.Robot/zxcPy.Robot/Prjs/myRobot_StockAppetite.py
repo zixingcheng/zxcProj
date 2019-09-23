@@ -61,7 +61,7 @@ class myRobot_StockAppetite(myRobot.myRobot):
                 if(len(cmds) > 1 and myData_Trans.Is_Numberic(cmds[1])):
                     nTop = myData_Trans.To_Int(cmds[1])
                 lstRanks = pDB.Get_Ranks(nTop = nTop)
-                return myData_Trans.Tran_ToStr(lstRanks, "\r\n")
+                return myData_Trans.Tran_ToStr(lstRanks, "\r\n").strip()
         return strReturn
         
     #匹配指定字符集
@@ -191,8 +191,8 @@ if __name__ == "__main__":
     myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test.png", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
 
     #排名
-    pRobot_Stock.Done("@￥排名", usrNameNick='墨紫')  
-    pRobot_Stock.Done("@￥排名 1")   
+    pRobot_Stock.Done("@*排名", usrNameNick='墨紫')  
+    pRobot_Stock.Done("@*排名 1")   
 
 
     #退出
