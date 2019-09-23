@@ -135,7 +135,7 @@ class myRobot_StockAppetite(myRobot.myRobot):
             if(len(lstR) < 1):
                 return "@" + usrName + " 收益信息记录失败！当前收益率：" + dictInfos['收益率'] + "."
             dicRand = lstR[0]
-            strRank = " 收益率：" + dicRand['profit'] + ", 排名：第" + dicRand['ranking'] + "."
+            strRank = " 你的收益率: " + dicRand['profit'] + ", 排名: 第 " + dicRand['ranking'] + " "
             return "@" + usrName + " " + strRank
         return ""
     
