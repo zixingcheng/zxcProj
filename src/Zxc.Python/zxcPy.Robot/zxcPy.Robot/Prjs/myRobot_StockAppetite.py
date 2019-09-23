@@ -77,6 +77,7 @@ class myRobot_StockAppetite(myRobot.myRobot):
         #图片判别，只处理手机截图（图片行列比）
 
         #提取图片内容,ORC通用识别
+        #Text = "E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test.png"
         txtInfo = myAI_Baidu.ORC(Text, "", out_debug=False)
         dictInfos = {'收益率':"", '日期':""}
 
@@ -130,7 +131,7 @@ class myRobot_StockAppetite(myRobot.myRobot):
             myDebug.Debug(pDB.Add_Row({'用户名': usrName, '收益': usrProfit, '日期': dictInfos['日期']}))
             
             #组装返回
-            lstR = pDB.Get_Ranks('茶叶一主号', True)
+            lstR = pDB.Get_Ranks(usrName, True)
             if(len(lstR) < 1):
                 return "@" + usrName + " 收益信息记录失败！当前收益率：" + dictInfos['收益率'] + "."
             dicRand = lstR[0]

@@ -75,6 +75,8 @@ class myRobot():
                 if(self.isNoOwner):
                     if(usrInfo.get('usrNameSelf', "") == self.usrName): 
                         return None     #开启者除外 
+                    
+                print(self.prjName, Text)
                 strReturn = self._Done(Text, msgID, msgType, usrInfo)
             else:
                 return None
@@ -139,7 +141,6 @@ class myRobot():
         self.msg['msg'] = Text  
         self.msg['to_usrName'] = usrInfo.get('to_usrName', '')      #调整的转发用户名(自己"self")
         self.msg['prjTag'] = self.prjName                           #功能标识  
-        print(self.prjName, Text)
         return self.msg
     #关闭功能
     def _Close(self):
