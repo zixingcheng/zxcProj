@@ -54,7 +54,7 @@ class myDataDB_StockReturns(myData_DB.myData_Table):
         return myData_Trans.Tran_ToDatetime(value, "%Y-%m-%d")
     
     #获取排名-所有或单一
-    def Get_Ranks(self, usrID = ''):  
+    def Get_Ranks(self, usrID = '', bOnlyRank = False):  
         # 获取所有
         datas = self.Query("isDel==False", "收益", True)
        
@@ -64,10 +64,26 @@ class myDataDB_StockReturns(myData_DB.myData_Table):
         for x in datas:
             data = x[1]
             if(usrID == "" or usrID == data['用户名']):
-                strRank = "第" + str(ind) + "名：" + data['用户名'] + " " + str(Decimal((data['收益'] * 100)).quantize(Decimal('0.0'))) + "%"
+                if(bOnlyRank == False):
+                    strRank = "第" + str(ind) + "名：" + data['用户名'] + " " + str(Decimal((data['收益'] * 100)).quantize(Decimal('0.0'))) + "%"
+                else:
+                    strRank = {'name': data['用户名'], 'ranking': str(ind), 'profit': str(Decimal((data['收益'] * 100)).quantize(Decimal('0.0'))) + "%"}
                 ranks.append(strRank)
             ind += 1
         return ranks
+    
+
+# 自定义简易库表操作-股票收益排名(按月更新) 
+class myDataDB_StockReturns_Rank(myData_DB.myData_Table):
+    def __init__(self, nameDB = "zxcDB_StockReturns_Rank", dir = ""):  
+        #初始根目录信息
+        if(dir == ""):
+            strDir, strName = myIO.getPath_ByFile(__file__)
+            self.Dir_Base = os.path.abspath(os.path.join(strDir, "../../.."))  
+            self.Dir_DataDB = self.Dir_Base + "/Data/DB_Data/"
+            myIO.mkdir(self.Dir_DataDB, False) 
+        super().__init__(nameDB, self.Dir_DataDB, False) 
+
 
 #初始全局消息管理器
 from myGlobal import gol 
@@ -96,6 +112,7 @@ if __name__ == "__main__":
     # 排名查询
     print(pDB.Get_Ranks())
     print(pDB.Get_Ranks('茶叶一主号'))
+    print(pDB.Get_Ranks('茶叶一主号', True))
 
     print()
 
