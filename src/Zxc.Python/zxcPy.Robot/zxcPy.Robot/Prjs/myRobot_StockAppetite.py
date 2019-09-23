@@ -42,8 +42,8 @@ class myRobot_StockAppetite(myRobot.myRobot):
     
     #消息处理接口-Text
     def _Done_Text(self, Text, msgID = "", usrInfo = {}):
-        #提取命令内容@￥
-        if(Text.count("@￥") != 1): return ""
+        #提取命令内容@*
+        if(Text.count("@*") != 1): return ""
         cmds = Text.strip()[2:].split(" ")
         cmd = cmds[0].strip()
         nNum = len(cmds)
