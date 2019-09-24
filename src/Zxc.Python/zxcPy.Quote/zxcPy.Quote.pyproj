@@ -29,6 +29,7 @@
     <Compile Include="zxcPy.Quotation\myQuote_Setting.py" />
     <Compile Include="zxcPy.Quotation\myQuote.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myDataDB_StockTradeRisk.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myData_Trade.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\myData_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Hourly.py" />

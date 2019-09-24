@@ -1,0 +1,192 @@
+#-*- coding: utf-8 -*-
+"""
+Created on  张斌 2019-09-24 22:58:00 
+    @author: zhang bin
+    @email:  zhangbin@gsafety.com
+    
+    自定义简易库表操作-股票风险设置记录
+"""
+import sys, os, time, copy, datetime, mySystem
+from collections import OrderedDict
+from operator import itemgetter, attrgetter
+from decimal import Decimal
+
+#引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
+mySystem.Append_Us("../Prjs", False, __file__)
+mySystem.Append_Us("../../../zxcPy.Quotation", False, __file__)
+mySystem.Append_Us("", False) 
+import myEnum, myIO, myIO_xlsx, myData, myData_DB, myData_Trans, myDebug #myQuote_Setting
+
+
+
+# 股票风险设置记录 
+class mySet_StockTradeRisk():
+    def __init__(self, nameDB = "zxcDB_StockTradeRisk", dir = ""):  
+        self.usrID = ""
+        self.stockID = ""           #标的编号
+        self.stockName = ""         #标的名称
+        self.stockAvg = 0           #标的均价
+        self.stockNum = 0           #标的数量
+        self.stockPosition = 1      #标的仓位
+        
+        self.stopProfit = 0.06      #止盈线，默认为6%
+        self.stopLoss = -0.02       #止损线，默认为-2%
+        self.stopProfit_Dynamic = True  #动态止盈 
+        self.stopLoss_Dynamic = True    #动态止损 
+        self.stopProfit_Retreat = 0.01  #止盈回撤，默认为1%
+        self.stopLoss_Retreat = 0.01    #止损回撤，默认为1%
+        self.stopProfit_Trade = 0.2     #止盈交易比例，默认为20%
+        self.stopLoss_Trade = 0.2       #止损交易比例，默认为20%
+        self.datetime = datetime.datetime.now()  
+        self.remark = ""                #备注
+        self.dictSets = {}              #字典型设置信息
+
+    # 转换为字典结构
+    def Trans_ToDict(self, dictSets = None):  
+        if(dictSets == None): dictSets = self.dictSets
+        dictSets['用户名'] = self.usrID
+        dictSets['标的编号'] = self.usrID
+        dictSets['标的名称'] = self.stockName
+        dictSets['标的均价'] = self.stockAvg
+        dictSets['标的数量'] = self.stockNum
+        dictSets['标的仓位'] = self.stockPosition
+        
+        dictSets['止盈线'] = self.stopProfit
+        dictSets['止损线'] = self.stopLoss
+        dictSets['动态止盈'] = self.stopProfit_Dynamic
+        dictSets['动态止损'] = self.stopLoss_Dynamic
+        dictSets['止盈回撤'] = self.stopProfit_Retreat
+        dictSets['止损回撤'] = self.stopLoss_Retreat
+        dictSets['止盈比例'] = self.stopProfit_Trade
+        dictSets['止损比例'] = self.stopLoss_Trade
+        dictSets['日期'] = self.datetime
+        dictSets['备注'] = self.remark
+        return self.dictSets
+    # 转换为对象，由字典结构
+    def Trans_FromDict(self, dictSets):  
+        #验证股票信息
+        #pStocks = gol._Get_Value('setsStock', None)
+        #lstStock = pStocks._Find(dictSets.get('标的编号',""), dictSets.get('标的名称',""), exType="")
+        #if(len(lstStock) != 1): return{}
+        #pStock = lstStock[0]
+        #self.stockID = pStock.code_id
+        #self.stockName = pStock.code_name
+
+        self.usrID = dictSets['用户名']
+        self.stockID = dictSets.get('标的编号',"")
+        self.stockName = dictSets.get('标的名称',"")  
+
+        #计算仓位变化
+        stockNum_temp = myData_Trans.To_Float(str(dictSets.get("标的数量", 0)))
+        stockAvg_temp = myData_Trans.To_Float(str(dictSets.get("标的均价", 0)))
+        stockPosition_temp = myData_Trans.To_Float(str(dictSets.get("标的仓位", 1)))
+        stockNum = self.stockNum + stockNum_temp
+        stockMoney = self.stockAvg * self.stockNum + stockNum_temp * stockAvg_temp
+        self.stockPosition = (stockNum_temp * stockPosition_temp + self.stockNum * self.stockPosition) / stockNum
+        self.stockAvg = stockMoney / stockNum
+        self.stockNum = int(stockNum)
+        
+        self.stopProfit = dictSets.get("止盈线", self.stopProfit)
+        self.stopLoss = dictSets.get("止损线", self.stopLoss)
+        self.stopProfit_Dynamic = dictSets.get("动态止盈", self.stopProfit_Dynamic)
+        self.stopLoss_Dynamic = dictSets.get("动态止损", self.stopLoss_Dynamic)
+        self.stopProfit_Retreat = dictSets.get("止盈回撤", self.stopProfit_Retreat)
+        self.stopLoss_Retreat = dictSets.get("止损回撤", self.stopLoss_Retreat)
+        self.stopProfit_Trade = dictSets.get("止盈比例", self.stopProfit_Trade)
+        self.stopLoss_Trade = dictSets.get("止损比例", self.stopLoss_Trade)
+        self.datetime = dictSets.get("日期", self.datetime)
+        self.remark = dictSets.get("备注", self.remark)
+
+
+# 自定义简易库表操作-股票风险设置记录 
+class myDataDB_StockTradeRisk(myData_DB.myData_Table):
+    def __init__(self, nameDB = "zxcDB_StockTradeRisk", dir = ""):  
+        #初始根目录信息
+        if(dir == ""):
+            strDir, strName = myIO.getPath_ByFile(__file__)
+            self.Dir_Base = os.path.abspath(os.path.join(strDir, "../../.."))  
+            self.Dir_DataDB = self.Dir_Base + "/Data/DB_Trade/Stock_Risks/"
+            myIO.mkdir(self.Dir_DataDB, False) 
+        super().__init__(nameDB, self.Dir_DataDB, True) 
+    
+        
+    # 检查是否已经存在   
+    def _Check(self, rowInfo, updata = False): 
+        #修正数据类型 
+        psetRisk = mySet_StockTradeRisk()
+        psetRisk.Trans_FromDict(rowInfo)
+
+        #调用基类更新
+        psetRisk.Trans_ToDict(rowInfo)
+        return super()._Check(rowInfo, updata)
+    #单条有效修正
+    def _Check_oneValid(self, rowInfo): 
+        if(rowInfo.get('用户名', '') != ""):
+            datas = self.Query("用户名== " + rowInfo['用户名'] + " && 标的编号==" + rowInfo['标的编号'])
+            for x in datas:
+                datas[x]['isDel'] = True
+        return True
+    # 检查是否相同--继承需重写  
+    def _IsSame(self, rowInfo, rowInfo_Base): 
+        if(super()._IsSame(rowInfo, rowInfo_Base)): return True
+
+        if(rowInfo['用户名'] == rowInfo_Base['用户名']):
+            if(rowInfo['标的编号'] == rowInfo_Base['标的编号']):
+                if (rowInfo['日期'] - rowInfo_Base['日期']).days < 1024:
+                    return True
+        return False
+            
+    # 更新
+    def _Updata(self, x, rowInfo): 
+        #参数设置更新
+        psetRisk = mySet_StockTradeRisk()
+        psetRisk.Trans_FromDict(self.rows[x])
+        psetRisk.Trans_FromDict(rowInfo)
+
+        #调用基类更新
+        psetRisk.Trans_ToDict(rowInfo)
+        super()._Updata(x, rowInfo )
+    
+
+#初始全局消息管理器
+from myGlobal import gol 
+gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
+gol._Set_Setting('zxcDB_StockTradeRisk', myDataDB_StockTradeRisk())      #实例 股票收益库对象 
+gol._Get_Setting('zxcDB_StockTradeRisk').Add_Fields(['用户名', '标的编号', '标的名称', '标的均价', '标的数量', "标的仓位", '止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '日期', '备注'], ['string','string','string','float','int','float','float','bool','float','float','float','bool','float','float','datetime','string'], [])
+
+
+"""
+交易策略：
+1.10/5日高点取最高，日内高点，回撤起始1%建议平仓 20%，回撤2%建议平仓 20%，回撤3%建议平仓 20%，回撤4%建议平仓 20%，回撤5%建议平仓 20%
+2.建议需要记录，便于分阶段处理。
+3.止盈规则：
+	达到指定涨幅时（默认6%），触发交易止盈/动态止盈。
+	动态止盈：
+		按回撤比例分阶段分步卖出，从当前最高点回撤1%时第一次触发，之后每回撤1%触发一次，连续回撤5%时全部卖出。
+		当涨幅回升，突破新高时，初始回撤触发状态，即从高点再次回撤1%时触发，直到卖出完毕。
+			突破新高规则：涨幅突破前一阶段止盈点，涨幅突破止盈涨幅线，涨幅突破10/5日高点。突破后实时比对更新新高。
+			
+	关键点：止盈线、10/5日高点、回撤后实时新高
+
+3.止损规则：
+	达到指定跌幅时（默认-2%），触发交易止损/动态止损。
+	动态止损：
+		按跌幅比例分阶段分步卖出，从当前止损线跌1%时第一次触发，之后每跌1%触发一次，连续跌5%时全部卖出。
+		当涨幅回升，突破新高时，初始止损触发状态，即从高点再次回撤1%时触发，直到卖出完毕。
+			突破新高规则：涨幅突破前一阶段止损点，涨幅突破止损线。突破后实时比对更新新高。
+"""
+
+
+#主启动程序
+if __name__ == "__main__":
+    #测试库表操作
+    pDB = gol._Get_Setting('zxcDB_StockTradeRisk')
+    
+    # 添加行数据
+    print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '600001', '标的均价': '10.3', '标的数量': 5000, '止盈线': 0.06, '日期': '2019-08-27 11:11:00'}, True))
+    print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '600001', '标的均价': '9.7', '标的数量': 5000, '日期': '2019-08-27 11:11:00'}, True))
+
+
+
+    print()
+

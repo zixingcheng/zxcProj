@@ -316,7 +316,7 @@ if __name__ == '__main__':
    pMMsg._Log(msg)
    print(pMMsg._Find_Log("zxcID", "茶叶一主号", "").Find(msg["msgID"]))
    
+   time.sleep(13)
    gol._Close()
-   time.sleep(1)
    print()
     

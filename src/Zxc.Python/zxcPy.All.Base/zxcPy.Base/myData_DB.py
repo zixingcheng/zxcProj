@@ -319,7 +319,7 @@ class myData_Table():
             if(self._IsSame(rowInfo, rowInfo_Base)): 
                 # 修改
                 if(updata):
-                    self.rows[x] = row_base
+                    self._Updata(x, rowInfo)
                 return x
         return "" 
     #单条有效修正
@@ -340,7 +340,9 @@ class myData_Table():
             if(rowInfo.get(x, "") != rowInfo_Base.get(x, "")):
                 return False
         return True 
-
+    # 更新
+    def _Updata(self, x, rowInfo): 
+        self.rows[x] = rowInfo
 
     # 总行数
     def __len__(self):
