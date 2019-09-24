@@ -254,7 +254,7 @@ class myData_Table():
         return datas
     # 查询筛选
     def _Query(self, fliter): 
-        lstSymbol = ['==', '!=', '>', '<', '>=', '<=']
+        lstSymbol = ['==', '!=', '>=', '>', '<=', '<']
         for x in lstSymbol:
             ind = fliter.find(x)
             if(ind < 1): continue

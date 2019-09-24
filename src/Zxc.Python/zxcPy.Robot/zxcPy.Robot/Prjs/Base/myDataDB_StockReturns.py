@@ -108,6 +108,7 @@ if __name__ == "__main__":
     # 自定义筛选
     print("查询：", pDB.Query("用户名== 墨紫 && isDel==False"))
     print("查询：", pDB.Query("isDel==False", "收益", True))
+    print("查询：", pDB.Query("isDel==False && 日期>=2019-08-28", "收益", True))
 
 
     # 排名查询
@@ -116,6 +117,7 @@ if __name__ == "__main__":
     print(pDB.Get_Ranks(nTop = 2, bOnlyRank = True))
     print(pDB.Get_Ranks('茶叶一主号'))
     print(pDB.Get_Ranks('茶叶一主号', True))
+
 
     print()
 
