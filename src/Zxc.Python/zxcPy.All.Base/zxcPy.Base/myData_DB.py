@@ -237,11 +237,13 @@ class myData_Table():
                 x = pos -2
                 if(x in nPos_And):
                     indSames = []
-                    for x in datas:
-                        if(x not in data):
-                            indSames.append(x)
-                    for x in indSames:
-                        datas.pop(x)
+                    for xx in datas:
+                        if(xx not in data):
+                            indSames.append(xx)
+
+                    #移除不同
+                    for xx in indSames:
+                        datas.pop(xx)
                 elif(x in nPos_Or):
                     datas.update(data)
 
