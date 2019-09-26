@@ -6,7 +6,7 @@ Created on  张斌 2019-08-27 15:58:00
     
     自定义数据类型操作-简易库表
 """
-import sys, os, time, copy, datetime, mySystem
+import sys, os, time, copy, json, datetime, mySystem
 from collections import OrderedDict
 from operator import itemgetter, attrgetter
 
@@ -371,10 +371,10 @@ class myData_Table():
     #转换行格子数据为对应数据类型
     def _Trans_Value(self, value, utype):  
         if(utype == "string"):
-            if(type(value) == str): return value
             return str(value)
         elif(utype == "float"):
             if(type(value) == float): return value
+            if(type(value) == int): return value
             return myData_Trans.To_Float(value)
         elif(utype == "int"):
             if(type(value) == int): return value
@@ -385,6 +385,13 @@ class myData_Table():
         elif(utype == "datetime"):
             if(type(value) == datetime): return value
             return self._Trans_Value_Datetime(value)
+        elif(utype == "list"):
+            if(type(value) == list): return value
+            if(value.count("~*^") > 0):
+                data = list(json.loads(value.replace("~*^", ",")))
+                return data
+            else:
+                return []
         return value
     #转换行格子数据为日期类型
     def _Trans_Value_Datetime(self, value):  
@@ -401,6 +408,8 @@ class myData_Table():
             strVaulue = myData.iif(value, "TRUE", "FALSE")
         elif(type(value) == datetime.datetime):
             strVaulue = myData_Trans.Tran_ToDatetime_str(value)
+        elif(type(value) == list):
+            strVaulue = strVaulue.replace(",", "~*^").replace("'", "\"")
         return strVaulue
     
     #生成list
