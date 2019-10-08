@@ -132,7 +132,9 @@ class myRobot_StockAppetite(myRobot.myRobot):
 
             #记录信息
             pDB = gol._Get_Setting('zxcdbStockReturns')
-            myDebug.Debug(pDB.Add_Row({'用户名': usrName, '收益': usrProfit, '日期': dictInfos['日期']}))
+            lstQuery = pDB.Query("isDel==False && 日期>=" + dictInfos['日期'], "日期", True)
+            if(len(lstQuery) > 0): return ""    #必须比已有日期大
+            myDebug.Debug(pDB.Add_Row({'用户名': usrName, '收益': usrProfit, '日期': dictInfos['日期']}, True))
             
             #组装返回
             lstR = pDB.Get_Ranks(usrName, True)
