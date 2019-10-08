@@ -344,6 +344,8 @@ class myData_Table():
         return True 
     # 更新
     def _Updata(self, x, rowInfo): 
+        #保持原有编号
+        rowInfo['ID'] = self.rows[x]['ID']
         self.rows[x] = rowInfo
 
     # 总行数

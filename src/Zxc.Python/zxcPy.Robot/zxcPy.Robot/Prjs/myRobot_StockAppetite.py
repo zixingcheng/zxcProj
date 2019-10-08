@@ -108,7 +108,10 @@ class myRobot_StockAppetite(myRobot.myRobot):
                 # 提取今年收益率
                 lst = [n for n in txtInfo['words'] if n.count('今年收益率')==1]
                 if(len(lst) == 1):
-                    dictInfos['收益率'] = float(lst[0].replace('今年收益率', "").replace('%', "")) / 100
+                    txt = lst[0]
+                    dictInfos['收益率'] = float(txt.replace('今年收益率', "").replace('%', "")) / 100
+                    if(txt.count('.') == 0): 
+                        dictInfos['收益率'] = dictInfos['收益率'] / 100   #小数点未正确识别修正
 
                     # 提取日期
                     lst = [n for n in txtInfo['words'] if n.count(year)==2]
@@ -188,7 +191,7 @@ if __name__ == "__main__":
 
 
     #图片自动处理
-    myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test2.jpg", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
+    myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test4.jpg", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
     myDebug.Debug(pRobot_Stock.Done("E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test.png", msgType = "PICTURE", usrNameNick='茶叶一主号',)['msg'])  
 
     #排名
