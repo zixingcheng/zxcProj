@@ -80,9 +80,10 @@ class myRobot_StockAppetite(myRobot.myRobot):
         #提取图片内容,ORC通用识别
         #Text = "E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.All.Base\\Temps\\Images\\Test.png"
         txtInfo = myAI_Baidu.ORC(Text, "", out_debug=False)
-        dictInfos = {'收益率':"", '日期':""}
+        myDebug.Debug(str(txtInfo))
 
         #按文字内容组合定义图片类型
+        dictInfos = {'收益率':"", '日期':""}
         num = txtInfo['wordText'].count('资产分析')
         if(num >= 1):            
             # 使用文字匹配方式解析
@@ -126,13 +127,14 @@ class myRobot_StockAppetite(myRobot.myRobot):
             usrName = usrInfo.get('usrNameNick', "") 
             usrProfit = dictInfos['收益率']
             if(dictInfos.get('日期', "") != ""):
+                dictInfos['日期-前'] = myData_Trans.Tran_ToDatetime_str(dictInfos['日期'] + datetime.timedelta(days=1), '%Y-%m-%d')
                 dictInfos['日期'] = myData_Trans.Tran_ToDatetime_str(dictInfos['日期'], '%Y-%m-%d')
             if(dictInfos.get('收益率', "") != ""):
                 dictInfos['收益率'] = str(Decimal((usrProfit * 100)).quantize(Decimal('0.00'))) + "%"
 
             #记录信息
             pDB = gol._Get_Setting('zxcdbStockReturns')
-            lstQuery = pDB.Query("isDel==False && 日期>=" + dictInfos['日期'], "日期", True)
+            lstQuery = pDB.Query("isDel==False && 日期>=" + dictInfos['日期-前'], "日期", True)
             if(len(lstQuery) > 0): return ""    #必须比已有日期大
             myDebug.Debug(pDB.Add_Row({'用户名': usrName, '收益': usrProfit, '日期': dictInfos['日期']}, True))
             

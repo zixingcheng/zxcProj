@@ -132,6 +132,8 @@ class myWeixin_ItChat(myThread.myThread):
         #self.Send_Msg("", "茶叶一主号", "测试消息1", "TEXT", 0)
         #self.Send_Msg("", "测试", "测试消息22", "TEXT", 1)
         #self.Send_Msg("", "filehelper", "测试消息33", "TEXT", 1)
+        #self.Send_Msg("", "filehelper", "/root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Weixin/Data/Pic/Temps/191008-203316.png", "Image", 1)
+         
  
         #将friends列表存下来，看看内容
         if(bSave):
@@ -228,8 +230,8 @@ class myWeixin_ItChat(myThread.myThread):
         typeMsg = typeMsg.upper()
         if(typeMsg == "TEXT"):
             itchat.send('%s' % (msgInfo), userName)
-        elif(typeMsg == "IMage"):   #未实现
-            itchat.send_image('%s: %s' % (typeMsg, msgInfo), userName)
+        elif(typeMsg == "IMAGE"):   #未实现
+            itchat.send_image(msgInfo, userName)
         else:
             myDebug.Print("No this type.")
     #提取格式化返回信息 
@@ -317,6 +319,7 @@ class myWeixin_ItChat(myThread.myThread):
                 #图片缓存
                 if(msg['MsgType'] == 3): 
                     msg.download(self.dirPic + "Temps/" + msg.fileName)
+                    time.sleep(1)
 
                 if self.Auto_RreplyText:  
                     #提取回复消息内容
@@ -332,6 +335,8 @@ class myWeixin_ItChat(myThread.myThread):
                 #图片缓存
                 if(msg['MsgType'] == 3): 
                     msg.download(self.dirPic + "Temps/" + msg.fileName)
+                    itchat.send_image(self.dirPic + "Temps/" + msg.fileName, "filehelper")
+                    time.sleep(1)
 
                 if self.Auto_RreplyText_G: 
                     #提取回复消息内容
