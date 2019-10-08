@@ -4,4 +4,4 @@
 账单管家,myRobot_Bill,myRobot_Bill,BillManager,TRUE,FALSE,FALSE,TRUE,FALSE,测试群、茶,
 通知消息,myRobot_Note,myRobot_Note,zxcRobot_Note,TRUE,TRUE,TRUE,TRUE,TRUE,测试群、茶,
 消息处理,myRobot_Msg,myRobot_Msg,zxcRobot_Msg,TRUE,TRUE,TRUE,TRUE,FALSE,测试群、股票行情监测群、茶,
-股票偏好,myRobot_StockAppetite,myRobot_StockAppetite,zxcRobot_StockAppetite,TRUE,TRUE,FALSE,TRUE,FALSE,测试群、股票行情监测群,
+股票偏好,myRobot_StockAppetite,myRobot_StockAppetite,zxcRobot_StockAppetite,TRUE,TRUE,FALSE,TRUE,FALSE,测试群、股票行情监测群、国泰股友群,

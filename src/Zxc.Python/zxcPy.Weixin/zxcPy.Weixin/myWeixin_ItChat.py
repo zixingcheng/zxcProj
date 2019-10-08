@@ -131,7 +131,7 @@ class myWeixin_ItChat(myThread.myThread):
         #消息发送测试
         #self.Send_Msg("", "茶叶一主号", "测试消息1", "TEXT", 0)
         #self.Send_Msg("", "测试", "测试消息22", "TEXT", 1)
-        #self.Send_Msg("", "filehelper", "测试消息33", "TEXT", 1)
+        #self.Send_Msg("", "股票行情监测群", "测试消息33", "TEXT", 1)
         #self.Send_Msg("", "filehelper", "/root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Weixin/Data/Pic/Temps/191008-203316.png", "Image", 1)
          
  

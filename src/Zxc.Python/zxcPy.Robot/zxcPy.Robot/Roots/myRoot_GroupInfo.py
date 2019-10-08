@@ -97,6 +97,8 @@ class myRoot_GroupsInfo():
         return True
     # 查找群组
     def _Find_Group(self, pGroup):
+        if(pGroup == None):
+            return 
         return self.Find_Group(pGroup.groupID, pGroup.groupName, pGroup.typeName) 
     def Find_Group(self, groupID = "", groupName = "", typeName = "", bCreate_Auto = False, bAdd = True): 
         #按名称查找
