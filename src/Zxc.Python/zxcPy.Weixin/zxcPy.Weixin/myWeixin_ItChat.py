@@ -335,8 +335,8 @@ class myWeixin_ItChat(myThread.myThread):
                 #图片缓存
                 if(msg['MsgType'] == 3): 
                     msg.download(self.dirPic + "Temps/" + msg.fileName)
-                    itchat.send_image(self.dirPic + "Temps/" + msg.fileName, "filehelper")
                     time.sleep(1)
+                    #itchat.send_image(self.dirPic + "Temps/" + msg.fileName, "filehelper")
 
                 if self.Auto_RreplyText_G: 
                     #提取回复消息内容
