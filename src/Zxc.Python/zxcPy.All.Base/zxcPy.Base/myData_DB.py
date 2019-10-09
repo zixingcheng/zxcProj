@@ -343,10 +343,12 @@ class myData_Table():
                 return False
         return True 
     # 更新
-    def _Updata(self, x, rowInfo): 
+    def _Updata(self, x, rowInfo, bSave = False): 
         #保持原有编号
         rowInfo['ID'] = self.rows[x]['ID']
         self.rows[x] = rowInfo
+        if(bSave == True):
+            self.Save_DB()
 
     # 总行数
     def __len__(self):
@@ -385,7 +387,7 @@ class myData_Table():
             if(type(value) == bool): return value
             return myData_Trans.To_Bool(value)
         elif(utype == "datetime"):
-            if(type(value) == datetime): return value
+            if(type(value) == datetime.datetime): return value
             return self._Trans_Value_Datetime(value)
         elif(utype == "list"):
             if(type(value) == list): return value
