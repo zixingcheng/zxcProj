@@ -41,6 +41,7 @@ class mySet_StockTradeRisk():
         self.stopLoss_Trade = 0.2       #止损交易比例，默认为20%
         
         self.maxPrice = 0               #最高价格，默认为0，用于统计
+        self.costPrice = 0              #成本价格，默认为0 
         self.maxProfit = 0              #阶段浮盈，默认为0，触发止盈时更新
         self.stopProfit_goon = False    #正止盈状态
         self.logOperates = []           #操盘记录
@@ -107,19 +108,25 @@ class mySet_StockTradeRisk():
             self.logOperates.append({"股数": stockNum_temp,"股价":stockAvg_temp})    #仓位变化记录
         else:
             self.logOperates = dictSets.get('操作日志', self.logOperates)
+        self.datetime = dictSets.get("日期", self.datetime)
+        self.remark = dictSets.get("备注", self.remark)
+        self.valid = not dictSets.get('isDel', not self.valid)  
         
         #计算仓位变化
-        stockFee = 0
-        stockNum = self.stockNum + stockNum_temp
-        stockNum_Now = self.stockNum + stockNum_temp
-        if(stockNum_temp < 0 and stockNum + stockNum_temp > 0):
-            stockNum += abs(stockNum_temp)
-            stockFee = abs(stockNum_temp * stockAvg_temp) * self.stockFee
-
-        stockMoney = self.stockAvg * self.stockNum * self.stockPosition + stockNum_temp * stockAvg_temp + stockFee 
-        self.stockPosition = (stockNum_temp * stockPosition_temp + self.stockNum * self.stockPosition) / stockNum
-        self.stockAvg = stockMoney / stockNum_Now
-        self.stockNum = int(stockNum) 
+        stockNum = self.stockNum
+        if(stockNum_temp > 0):
+            #买入时更新成本 
+            stockNum += abs(stockNum_temp) 
+            stockMoney = self.stockAvg * self.stockNum + stockNum_temp * stockAvg_temp
+            self.stockPosition = (stockNum_temp * stockPosition_temp + self.stockNum * self.stockPosition) / stockNum
+            self.stockAvg = stockMoney / stockNum
+            self.stockNum = int(stockNum) 
+        else:
+            #卖出更新仓位
+            self.stockPosition = (stockNum_temp * stockPosition_temp + self.stockNum * self.stockPosition) / stockNum
+            if(self.stockPosition <= 0):
+                self.stockPosition = 0
+                self.valid = False
         self.stockFee = dictSets.get("手续费率", self.stockFee)
 
         self.stopProfit = dictSets.get("止盈线", self.stopProfit)
@@ -134,12 +141,6 @@ class mySet_StockTradeRisk():
         self.maxPrice = dictSets.get("最高价格", self.maxPrice)
         self.maxProfit = dictSets.get("阶段浮盈", self.maxProfit)
         self.stopProfit_goon = dictSets.get("止盈状态", self.stopProfit_goon)
-
-        self.datetime = dictSets.get("日期", self.datetime)
-        self.remark = dictSets.get("备注", self.remark)
-        self.valid = not dictSets.get('isDel',False)  
-        if(self.stockNum == 0): 
-            self.valid = False
         return True
 
     # 统计收益（实际浮盈、已卖出收益）
@@ -249,7 +250,7 @@ class myMonitor_TradeRisk():
         if(self.setRisk.stockPosition <=0): return
 
         #计算盈亏比例,更新统计值
-        prift = price / self.setRisk.stockAvg - 1
+        prift = round(price / self.setRisk.stockAvg - 1, 6)
         if(self.setRisk.maxPrice < price):
             self.setRisk.maxPrice = price
 
@@ -259,13 +260,13 @@ class myMonitor_TradeRisk():
             if(self.setRisk.stopProfit_Dynamic):    #开启动态止盈
                 #区分是否正止盈中
                 if(self.setRisk.stopProfit_goon):
-                    #回撤率修正，止盈线以上则为2倍，扩大回撤容忍范围，可以减少总回撤率
+                    #回撤率修正，前高为止盈线以上，扩大回撤容忍范围为2倍，可以减少总回撤率
                     self.stopProfit_Retreat = self.setRisk.stopProfit_Retreat
-                    if(prift >= self.setRisk.stopProfit + self.setRisk.stopProfit_Retreat):
+                    if(self.setRisk.maxProfit >= self.setRisk.stopProfit + self.setRisk.stopProfit_Retreat * 2):
                         self.stopProfit_Retreat = self.setRisk.stopProfit_Retreat * 2
 
-                    #回撤超过界限，激活止盈
-                    if(self.setRisk.maxProfit - prift - self.stopProfit_Retreat >= 0.0):
+                    #回撤超过界限，激活止盈(精度修正+0.00000001,避免计算过程小数点精度导致的临界计算错误)
+                    if(self.setRisk.maxProfit - prift - self.stopProfit_Retreat + 0.00000001 >= 0.0):
                         self.setState(True)
                     else:
                         #更新阶段最高价
@@ -337,6 +338,10 @@ class myDataDB_StockTradeRisk(myData_DB.myData_Table):
     def _IsSame(self, rowInfo, rowInfo_Base): 
         if(super()._IsSame(rowInfo, rowInfo_Base)): return True
 
+        # 必须ID相同、是否删除相同
+        if(rowInfo['ID'] > 0):
+            if(rowInfo['ID'] != rowInfo_Base['ID']): return False
+        if(rowInfo['isDel'] != rowInfo_Base['isDel']): return False
         if(rowInfo['用户名'] == rowInfo_Base['用户名']):
             if(rowInfo['标的编号'] == rowInfo_Base['标的编号']):
                 if (rowInfo['日期'] - rowInfo_Base['日期']).days < 1024:
@@ -414,7 +419,7 @@ if __name__ == "__main__":
     pRisk.notifyQuotation(10.6)     #回撤
     pRisk.notifyQuotation(10.7)     
     pRisk.notifyQuotation(10.7)     
-    pRisk.notifyQuotation(10.6)     #回撤
+    pRisk.notifyQuotation(10.6)     #回撤 
     pRisk.notifyQuotation(10.4)     
     pRisk.notifyQuotation(10.3)     
 

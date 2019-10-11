@@ -330,7 +330,8 @@ class myData_Table():
     # 检查是否相同--继承需重写  
     def _IsSame(self, rowInfo, rowInfo_Base): 
         if(rowInfo.get('ID', "") != ""):
-            if(rowInfo['ID'] == rowInfo_Base['ID']): return True
+            if(rowInfo['ID'] > 0):  # 给定序号时，序号必须相同
+                if(rowInfo['ID'] != rowInfo_Base['ID']): return False
             
         #对比索引，是否完全一致
         for x in self.fields_index:
