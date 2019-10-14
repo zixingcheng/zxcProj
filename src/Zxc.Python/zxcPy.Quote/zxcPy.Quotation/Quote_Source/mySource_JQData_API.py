@@ -86,11 +86,39 @@ class Source_JQData_API():
 
     # 查询周期价格信息，'1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
     # fields:['date', 'open', 'close', 'high', 'low', 'volume', 'money']
-    def getPrice_bars(self, security, count, end_date="", unit='1d', include_now=False, fields=None):
+    def getPrice_bars(self, security, count, unit='1d', include_now=False, fields=None, end_date=None):
         # 查询数据
-        if(fields == None): fields=['date','open','high','low','close']
-        values = jqdatasdk.get_bars(security=security, count=count, unit=unit, fields=fields, include_now=include_now, end_dt=end_date) 
-        return values
+        try:
+            if(fields == None): fields=['date', 'open', 'close', 'high', 'low', 'volume', 'money']
+            values = jqdatasdk.get_bars(security=security, count=count, unit=unit, fields=fields, include_now=include_now, end_dt=end_date) 
+            return values
+        except :
+            return []
+        
+    # 查询周期均价格信息，'1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M' 
+    def getPrice_avg(self, security, unit='1d', include_now=False, end_date=None):
+        values = self.getPrice_bars(security, 1, unit, include_now, ['date', 'open', 'close', 'high', 'low', 'volume', 'money'], end_date)
+        if(len(values) != 1):
+            return {'date':"", 'open':-1, 'close':-1, 'high':-1, 'low':-1, 'volume':-1, 'money':-1, 'avg':-1}
+        return {'date':values['date'][0], 'open':values['open'][0], 'close':values['close'][0], 'high':values['high'][0], 'low':values['low'][0], 'volume':values['volume'][0], 'money':values['money'][0], 'avg':values['money'][0]/values['volume'][0]}
+    # 查询周期均价格信息，N天
+    def getPrice_avg_day(self, security, N=1, include_now=False, end_date=None):
+        values = self.getPrice_bars(security, N, '1d', include_now, ['date', 'open', 'close', 'high', 'low', 'volume', 'money'], end_date)
+        if(len(values) <= 1):
+            return {'date':"", 'open':-1, 'close':-1, 'high':-1, 'low':-1, 'volume':-1, 'money':-1, 'avg':-1}
+
+        # 计算周期值
+        num = len(values)
+        dictValue = {'date':values['date'][num-1], 'open':values['open'][0], 'close':values['close'][num-1], 'high':0, 'low':0, 'volume':0, 'money':0, 'avg':0}
+        for x in range(0, num):
+            if(dictValue['high'] < values['high'][x]):
+                dictValue['high'] = values['high'][x]
+            if(dictValue['low'] > values['low'][x]):
+                dictValue['low'] = values['low'][x]
+            dictValue['volume'] += values['volume'][x]
+            dictValue['money'] += values['money'][x]
+        dictValue['avg'] = dictValue['money'] / dictValue['volume']
+        return dictValue
 
 
     
@@ -112,8 +140,13 @@ if __name__ == "__main__":
     opt = pSource.getOptInfo(3000)
     print(opt)
     print(pSource.getPrice(security=opt['code'],frequency='1m',start_date='2019-10-14 09:00:00',end_date='2019-10-14 15:00:00'))
+
     print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2019-10-14 15:00:00',include_now=False))
     print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
+
+    print(pSource.getPrice_avg(security='ddd',unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
+    print(pSource.getPrice_avg(security=opt['code'],unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
+    print(pSource.getPrice_avg_day(security=opt['code'],N=5,end_date='2019-10-14 15:00:00',include_now=True))
      
     
     print()
