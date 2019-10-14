@@ -26,10 +26,10 @@ class mySet_StockTradeRisk():
         self.usrID = ""
         self.stockID = ""           #标的编号
         self.stockName = ""         #标的名称
-        self.stockAvg = 0           #标的均价
+        self.stockAvg = 0           #标的均价-所有买入 
         self.stockNum = 0           #标的数量
-        self.stockPosition = 1      #标的仓位
-        self.stockFee = 0.003       #标的手续费率,买卖,卖出时计算
+        self.stockPosition = 1      #标的仓位-当前
+        self.stockFee = 0.003       #标的手续费率,卖出时统一计算
         
         self.stopProfit = 0.06          #止盈线，默认为6%
         self.stopLoss = -0.02           #止损线，默认为-2%
@@ -40,9 +40,13 @@ class mySet_StockTradeRisk():
         self.stopProfit_Trade = 0.2     #止盈交易比例，默认为20%
         self.stopLoss_Trade = 0.2       #止损交易比例，默认为20%
         
-        self.maxPrice = 0               #最高价格，默认为0，用于统计
-        self.costPrice = 0              #成本价格，默认为0 
-        self.maxProfit = 0              #阶段浮盈，默认为0，触发止盈时更新
+        self.priceMax = 0               #最高价格，默认为0，用于统计
+        self.priceCost = 0              #成本价格，默认为0，买卖时更新，当前仓位的实际成本均价，累计卖出收益，卖出手续费
+        self.priceAvg_sell = 0          #卖出均价，默认为0，用于统计
+        self.priceNow = 0               #当前价格，默认为0，用于统计
+        self.profitMax_Stage = 0        #阶段浮盈，默认为0，触发止盈、止损时更新
+        self.profitMax = 0              #最大浮盈，默认为0，触发止盈时更新
+        self.profitMin = 0              #最小浮盈，默认为0，触发止损时更新
         self.stopProfit_goon = False    #正止盈状态
         self.logOperates = []           #操盘记录
 
@@ -73,8 +77,12 @@ class mySet_StockTradeRisk():
         dictSets['止盈比例'] = self.stopProfit_Trade
         dictSets['止损比例'] = self.stopLoss_Trade
         
-        dictSets['最高价格'] = round(self.maxPrice, 4)
-        dictSets['阶段浮盈'] = round(self.maxProfit, 4)
+        dictSets['最高价格'] = round(self.priceMax, 4)
+        dictSets['成本价格'] = round(self.priceCost, 4)
+        dictSets['卖出均价'] = round(self.priceAvg_sell, 4)
+        dictSets['当前价格'] = round(self.priceNow, 4)
+        dictSets['阶段浮盈'] = round(self.profitMax_Stage, 4)
+        dictSets['最高浮盈'] = round(self.profitMax, 4)
         dictSets['止盈状态'] = self.stopProfit_goon
 
         dictSets['日期'] = self.datetime
@@ -138,25 +146,46 @@ class mySet_StockTradeRisk():
         self.stopProfit_Trade = dictSets.get("止盈比例", self.stopProfit_Trade)
         self.stopLoss_Trade = dictSets.get("止损比例", self.stopLoss_Trade)
         
-        self.maxPrice = dictSets.get("最高价格", self.maxPrice)
-        self.maxProfit = dictSets.get("阶段浮盈", self.maxProfit)
+        self.priceMax = dictSets.get("最高价格", self.priceMax)
+        self.priceCost = dictSets.get("成本价格", self.stockAvg)
+        self.priceAvg_sell = dictSets.get("卖出均价", stockAvg_temp)
+        self.priceNow = dictSets.get("当前价格", stockAvg_temp)
+        self.profitMax_Stage = dictSets.get("阶段浮盈", self.profitMax_Stage)
         self.stopProfit_goon = dictSets.get("止盈状态", self.stopProfit_goon)
         return True
 
     # 统计收益（实际浮盈、已卖出收益）
-    def Static_Profit(self, price):  
-        #统计已经卖出的收益
-        sumProfit = 0
-        sumStock = 0
+    def Static_Profit(self, strokPrice, bUpdata = True):  
+        #累计买入、卖出
+        sumStock_Buy = 0
+        sumMoney_Buy = 0
+        sumStock_Sell = 0
+        sumMoney_Sell_fee = 0
         for x in self.logOperates:
             if(x["股数"] < 0):
-                sumStock += x["股数"]
-                sumProfit += x["股价"] * x["股数"]
-            pass
+                sumStock_Sell += x["股数"]
+                sumMoney_Sell_fee += x["股价"] * x["股数"]      #计算含手续费
+            else:
+                sumStock_Buy += x["股数"]
+                sumMoney_Buy += x["股价"] * x["股数"]           #计算含手续费
 
-        #计算浮盈
-        profit = (price * (self.stockNum - sumStock) + sumProfit) / self.stockNum * self.stockAvg - 1
-        return profit, sumProfit
+        #统计计算
+        sumMoney_Sell = sumMoney_Sell_fee * (1 - self.stockFee)                     #卖出总金额（不含手续费）
+        sumMoney = (sumStock_Buy + sumStock_Sell) * strokPrice - sumMoney_Sell      #当前市值（含卖出）
+        sumStock = sumStock_Buy + sumStock_Sell
+        stockProfit = sumMoney / sumMoney_Buy                                       #当前浮盈-阶段
+        stockAvg_sell = sumMoney_Sell_fee / sumStock_Sell                           #卖出均价
+        stockCost = (sumMoney_Buy + sumMoney_Sell) / myData.iif(sumStock <= 0, sumStock_Buy, sumStock)
+
+        #更新
+        if(bUpdata == True):
+            self.priceCost = stockCost                      #更新成本价格
+            self.priceNow = strokPrice                      #更新当前价格
+            self.priceAvg_sell = stockAvg_sell              #更新卖出均价
+            self.stockProfit = stockProfit                  #更新当前阶段浮盈
+            if(self.profitMax < self.profitMax_Stage):
+                self.profitMax = self.profitMax_Stage       #更新最大浮盈
+        return stockProfit, stockCost
     
 # 股票风险监测类 
 class myMonitor_TradeRisk():
@@ -188,10 +217,8 @@ class myMonitor_TradeRisk():
         #复制当前设置
         rowInfo = {'ID': self.setRisk.ID,'用户名': self.setRisk.usrID, '标的编号': self.setRisk.stockID, '标的名称': self.setRisk.stockName, '标的均价': strokPrice, '标的数量': stockNum}
         self.setRisk.Trans_FromDict(rowInfo) 
-
-        #保存修改
-        self.saveSet()
-        #self.setDB.Add_Row({'用户名': self.setRisk.usrID, '标的编号': self.setRisk.stockID, '标的名称': self.setRisk.stockName, '标的均价': strokPrice, '标的数量': stockNum}, True)
+        self.setRisk.Static_Profit(strokPrice)  #收益统计
+        self.saveSet()                          #保存修改
 
     #通知接收新行情
     def notifyQuotation(self, price, bSave_Auto = True):
@@ -213,7 +240,7 @@ class myMonitor_TradeRisk():
     def stopProfit(self, price, bSave_Auto = False):
         #组装止盈提示
         prift = price / self.setRisk.stockAvg - 1                           #涨幅
-        priftMax = self.setRisk.maxPrice / self.setRisk.stockAvg - 1        #最大涨幅
+        priftMax = self.setRisk.priceMax / self.setRisk.stockAvg - 1        #最大涨幅
         numSell = self.setRisk.stopProfit_Trade * self.setRisk.stockNum     #卖出数量
         if(self.setRisk.stopProfit_Trade > self.setRisk.stockPosition):     #低仓位修正
             numSell = self.setRisk.stockPosition * self.setRisk.stockNum    
@@ -222,27 +249,21 @@ class myMonitor_TradeRisk():
         strSell = str(numSell) + "股"                                       #股数
         strRetreat = str(Decimal((self.stopProfit_Retreat * 100)).quantize(Decimal('0.0'))) + "%"       #回撤
         strTrade = str(Decimal((self.setRisk.stopProfit_Trade * 10)).quantize(Decimal('0.0'))) + "成"   #仓位
-        strMax_now = str(Decimal((self.setRisk.maxProfit * 100)).quantize(Decimal('0.00'))) + "%"       #阶段浮盈
+        strMax_now = str(Decimal((self.setRisk.profitMax_Stage * 100)).quantize(Decimal('0.00'))) + "%" #阶段浮盈
         strMax = str(Decimal((priftMax * 100)).quantize(Decimal('0.00'))) + "%"                         #最大浮盈
         strProfit = str(Decimal((prift * 100)).quantize(Decimal('0.0'))) + "%"                          #当前收益
         strReutrn = self.setRisk.stockName + ": 回撤逾 " + strRetreat + ",建议止盈. 卖出 " + strSell + "(总仓 " + strTrade +  "),收益: " + strProfit + ",阶段高点: " + strMax_now + ",最高点: " + strMax + "."
         #strReutrn = F"测试股票: {strPrice}, 回撤逾 {strRetreat}.\r\n操作策略: 建议止盈, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 总收益 {strProfit}, 涨幅前高 {strMax_now}, 最高 {strMax}."
         
         #设置同步
-        #self.setRisk.stockPosition = Decimal(self.setRisk.stockPosition) - Decimal(self.setRisk.stopProfit_Trade) #调整为外部更新
-        self.setRisk.maxProfit = prift  #修正阶段高值
-        self.isStop_Profit = False      #恢复状态
+        self.setRisk.profitMax_Stage = prift    #修正阶段高值
+        self.isStop_Profit = False              #恢复状态
         
         #自动更新交易记录
         if(bSave_Auto):
             self.updataTrade(price, -numSell)
         return strReutrn
 
-    #设置止盈止损状态   
-    def setState(self, isStopProfit):
-        if(self.setRisk.stockPosition >= 0):
-            self.isStop_Profit = isStopProfit
-            self.isStop_Loss = not isStopProfit
 
     #检查止盈止损状态
     def checkState(self, price):
@@ -251,8 +272,8 @@ class myMonitor_TradeRisk():
 
         #计算盈亏比例,更新统计值
         prift = round(price / self.setRisk.stockAvg - 1, 6)
-        if(self.setRisk.maxPrice < price):
-            self.setRisk.maxPrice = price
+        if(self.setRisk.priceMax < price):
+            self.setRisk.priceMax = price
 
         #区分止盈、止损，互斥
         if(prift > 0):
@@ -260,23 +281,26 @@ class myMonitor_TradeRisk():
             if(self.setRisk.stopProfit_Dynamic):    #开启动态止盈
                 #区分是否正止盈中
                 if(self.setRisk.stopProfit_goon):
-                    #回撤率修正，前高为止盈线以上，扩大回撤容忍范围为2倍，可以减少总回撤率
+                    #回撤率修正，前高为止盈线2倍以上，扩大回撤容忍范围为2倍，可以减少总回撤率
                     self.stopProfit_Retreat = self.setRisk.stopProfit_Retreat
-                    if(self.setRisk.maxProfit >= self.setRisk.stopProfit + self.setRisk.stopProfit_Retreat * 2):
+                    if(self.setRisk.profitMax_Stage >= (self.setRisk.stopProfit + self.setRisk.stopProfit_Retreat) * 2):
                         self.stopProfit_Retreat = self.setRisk.stopProfit_Retreat * 2
 
                     #回撤超过界限，激活止盈(精度修正+0.00000001,避免计算过程小数点精度导致的临界计算错误)
-                    if(self.setRisk.maxProfit - prift - self.stopProfit_Retreat + 0.00000001 >= 0.0):
+                    if(self.setRisk.profitMax_Stage - prift - self.stopProfit_Retreat + 0.00000001 >= 0.0):
                         self.setState(True)
                     else:
                         #更新阶段最高价
-                        if(self.setRisk.maxProfit < prift):
-                            self.setRisk.maxProfit = prift      #赋值阶段最高价
+                        if(self.setRisk.profitMax_Stage < prift):
+                            self.setRisk.profitMax_Stage = prift      #赋值阶段最高价
+
+                        #其他止盈逻辑-特殊
+                        pass
                 else:   
                     #非止盈状态，超过止盈线时激活止盈
                     if(prift >= self.setRisk.stopProfit):
                         self.setRisk.stopProfit_goon = True     #激活止盈状态
-                        self.setRisk.maxProfit = prift          #赋值阶段最高价
+                        self.setRisk.profitMax_Stage = prift          #赋值阶段最高价
             else:
                 #超过止盈线时激活止盈
                 if(prift >= self.setRisk.stopProfit):
@@ -287,7 +311,11 @@ class myMonitor_TradeRisk():
                 if(prift >= self.setRisk.stopLoss):
                     self.isStop_Loss = True
                     self.isStop_Profit = False
-        
+    #设置止盈止损状态   
+    def setState(self, isStopProfit):
+        if(self.setRisk.stockPosition >= 0):
+            self.isStop_Profit = isStopProfit
+            self.isStop_Loss = not isStopProfit
         
 
 
@@ -364,7 +392,7 @@ class myDataDB_StockTradeRisk(myData_DB.myData_Table):
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Setting('zxcDB_StockTradeRisk', myDataDB_StockTradeRisk())      #实例 股票收益库对象 
-gol._Get_Setting('zxcDB_StockTradeRisk').Add_Fields(['用户名', '标的编号', '标的名称', '标的均价', '标的数量', "标的仓位", "手续费率", '止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '阶段浮盈', '止盈状态', '日期', '备注', '操作日志'], ['string','string','string','float','int','float','float','float','bool','float','float','float','bool','float','float','float','float','bool','datetime','string','list'], [])
+gol._Get_Setting('zxcDB_StockTradeRisk').Add_Fields(['用户名', '标的编号', '标的名称', '标的均价', '标的数量', "标的仓位", "手续费率", '止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段浮盈', '止盈状态', '日期', '备注', '操作日志'], ['string','string','string','float','int','float','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','bool','datetime','string','list'], [])
 
 
 """
@@ -412,14 +440,14 @@ if __name__ == "__main__":
     pRisk.notifyQuotation(10.6)
     pRisk.notifyQuotation(10.7)     
     pRisk.notifyQuotation(10.9)
-    pRisk.notifyQuotation(10.7)     #回撤
-    pRisk.notifyQuotation(10.7)     
+    pRisk.notifyQuotation(10.8)     #回撤
+    pRisk.notifyQuotation(10.75)     
     pRisk.notifyQuotation(10.8)     
-    pRisk.notifyQuotation(10.7)     
+    pRisk.notifyQuotation(10.7)     #回撤
     pRisk.notifyQuotation(10.6)     #回撤
     pRisk.notifyQuotation(10.7)     
     pRisk.notifyQuotation(10.7)     
-    pRisk.notifyQuotation(10.6)     #回撤 
+    pRisk.notifyQuotation(10.6)      
     pRisk.notifyQuotation(10.4)     
     pRisk.notifyQuotation(10.3)     
 
