@@ -109,7 +109,7 @@ class Source_JQData_API():
 
         # 计算周期值
         num = len(values)
-        dictValue = {'date':values['date'][num-1], 'open':values['open'][0], 'close':values['close'][num-1], 'high':0, 'low':0, 'volume':0, 'money':0, 'avg':0}
+        dictValue = {'date':values['date'][num-1], 'open':values['open'][0], 'close':values['close'][num-1], 'high':0, 'low':values['low'][0], 'volume':0, 'money':0, 'avg':0}
         for x in range(0, num):
             if(dictValue['high'] < values['high'][x]):
                 dictValue['high'] = values['high'][x]
