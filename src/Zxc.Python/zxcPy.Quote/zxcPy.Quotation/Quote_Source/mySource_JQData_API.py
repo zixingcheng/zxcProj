@@ -55,11 +55,11 @@ class Source_JQData_API():
     
 
     # 查询期权信息，指定日期，默认当天
-    def getOptInfo(self, optPrice = 2500, dateTime = ""):
+    def getOptInfo(self, optPrice = 2500, dateTime = "", month_Delta = 0):
         # 同步参数
         if(dateTime == ""): dateTime = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d")
         dtFliter = myData_Trans.Tran_ToDatetime(dateTime, "%Y-%m-%d")
-        strFliter = "50ETF" + myData.iif(optPrice > 0, "购", "沽") + str(dtFliter.month) + "月" + str(optPrice)
+        strFliter = "50ETF" + myData.iif(optPrice > 0, "购", "沽") + str(dtFliter.month + month_Delta) + "月" + str(optPrice)
 
         # 查询
         optInfos = opt.run_query(query(opt.OPT_DAILY_PREOPEN).filter(opt.OPT_DAILY_PREOPEN.date==dateTime,opt.OPT_DAILY_PREOPEN.name==strFliter).limit(10))
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     # 提取50期权信息
     print("当天3000的期权信息：")
-    opt = pSource.getOptInfo(3000)
+    opt = pSource.getOptInfo(3100, "", 1)
     print(opt)
     print(pSource.getPrice(security=opt['code'],frequency='1m',start_date='2019-10-14 09:00:00',end_date='2019-10-14 15:00:00'))
 

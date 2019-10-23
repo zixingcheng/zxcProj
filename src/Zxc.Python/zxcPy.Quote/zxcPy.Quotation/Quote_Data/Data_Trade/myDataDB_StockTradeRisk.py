@@ -108,7 +108,7 @@ class mySet_StockTradeRisk():
         #交易信息必须存在
         if(dictSets == None): return False
         index = -1
-        strTime = dictSets['日期']
+        strTime = dictSets.get('日期', "")
         if(type(strTime) != str): strTime = myData_Trans.Tran_ToDatetime_str(dictSets['日期'], "%Y-%m-%d %H:%M:%S")
         for x in self.logOperates:
             if(x['时间'] == strTime):
@@ -133,7 +133,7 @@ class mySet_StockTradeRisk():
         if(canLog):
             #提取时间
             strTime = self.datetime
-            if(type(strTime) != str): strTime = myData_Trans.Tran_ToDatetime_str(dictSets['日期'], "%Y-%m-%d %H:%M:%S")
+            if(type(strTime) != str): strTime = myData_Trans.Tran_ToDatetime_str(strTime, "%Y-%m-%d %H:%M:%S")
 
             #存在则更新
             if(index == -1):
@@ -277,7 +277,7 @@ class myMonitor_TradeRisk():
         numSell = self.stopProfit_Trade * self.setRisk.stockNum             #卖出数量
         if(self.stopProfit_Trade > self.setRisk.stockPosition):             #低仓位修正
             numSell = self.setRisk.stockPosition * self.setRisk.stockNum    
-            numSell = int(Decimal(numSell) + Decimal(0.5))
+        numSell = int(Decimal(numSell) + Decimal(0.5))
         if(bSave_Auto):
             self.updataTrade(price, -numSell)
 
@@ -291,7 +291,7 @@ class myMonitor_TradeRisk():
         strMax = str(Decimal((priftMax * 100)).quantize(Decimal('0.00'))) + "%"                         #最高浮盈
         strMaxStage = str(Decimal((self.setRisk.profitMax_Stage * 100)).quantize(Decimal('0.00'))) + "%"#阶段浮盈-前高
 
-        strReutrn = F"测试股票: {strPrice}, 回撤逾 {strRetreat}.\r\n操作策略: 建议止盈, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+        strReutrn = F"{self.setRisk.stockName}: {strPrice}, 回撤逾 {strRetreat}.\r\n操作策略: 建议止盈, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
         if(self.setRisk.stopProfit_Dynamic == False):
             strStopProfit = str(Decimal((self.setRisk.stopProfit * 100)).quantize(Decimal('0.0'))) + "%"#回撤
             strReutrn = F"测试股票: {strPrice}, 浮盈超 {strStopProfit}.\r\n操作策略: 建议止盈, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
@@ -452,7 +452,7 @@ class myDataDB_StockTradeRisk(myData_DB.myData_Table):
     # 提取设置，指定用户名、股票编号
     def getSet(self, usrNmae, stockID, isDel = False, setDB = None): 
         # 组装查询条件
-        strFilter = F"isDel=={isDel} && 用户名=={usrNmae} && 标的编号=={stockID}" 
+        strFilter = F"isDel=={str(isDel)} && 用户名=={usrNmae} && 标的编号=={stockID}" 
 
         # 查询数据
         if(setDB == None):
@@ -468,7 +468,7 @@ class myDataDB_StockTradeRisk(myData_DB.myData_Table):
     def getTradeRisk(self, usrNmae, stockID, avg5 = True, avg10 = False, avg20 = False, end_date=None): 
         # 提取设置
         setDB = gol._Get_Value('zxcDB_StockTradeRisk')
-        dictSet = self.getSet(usrNmae, stockID, setDB)
+        dictSet = self.getSet(usrNmae, stockID, False, setDB)
         if(dictSet == None): return None
         
         #获取均值
@@ -491,7 +491,7 @@ class myDataDB_StockTradeRisk(myData_DB.myData_Table):
         # 初始风险监测对象
         pSet = mySet_StockTradeRisk(dictSet)
         if(nTimes == 10000):    # 修正期权默认设置
-            pSet.stopProfit = 0.15          #止盈线，默认为6%
+            pSet.stopProfit = 0.10          #止盈线，默认为6%
             pSet.stopLoss = 0.06            #止损线，默认为-2%  
             pSet.stopProfit_Retreat = 0.03  #止盈回撤，默认为1%, 超过止盈线以上则为2倍
             pSet.stopLoss_Retreat = 0.02    #止损回撤，默认为1%
@@ -526,9 +526,29 @@ class myRisk_Control():
 
         #提取风险对象
         pRisk = self.riskDB.getTradeRisk(usrID, stockID, True)
+        return pRisk
+        
+    # 添加设置
+    def addRiskSet(self, usrID, stockID, stockName, stockPrice, stockNum, time = "", dictSet = {}):  
+        dictSet['用户名'] = usrID
+        
+        #解析正确股票信息
+        if(True):
+            stocks = self.stockSet._Find(stockID, stockName, "****")
+            if(len(stocks) == 1):
+                pStock = stocks[0]
+                stockID = pStock.code_id + "." + pStock.extype2
+                stockName = pStock.code_name
 
+        dictSet['标的编号'] = stockID
+        dictSet['标的名称'] = stockName
+        dictSet['标的均价'] = stockPrice
+        dictSet['标的数量'] = stockNum
+        dictSet['日期'] = myData.iif(time != "", time, myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d %H:%M:%S"))
 
-        inta = 0
+        #添加
+        strR = self.riskDB.Add_Row(dictSet, True)
+        myDebug.Debug(strR)
 
 #初始全局消息管理器
 from myGlobal import gol 
@@ -567,9 +587,10 @@ if __name__ == "__main__":
     pRisk = gol._Get_Value('zxcRisk_Control')
     
     # 添加买入及测试信息 sz,002547,春兴精工,CXJG,stock,CN,深圳证券交易所,XSHE
-    print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '002547.XSHE', '标的名称': "春兴精工", '标的均价': '8', '标的数量': 10000, '日期': '2019-10-14 09:31:02'}, True))
+    pRisk.addRiskSet('茶叶一主号','002547',"", 8, 10000, '2019-08-27 11:11:00', {}) 
+    pRisk.addRiskSet('茶叶一主号','10001965.XSHG',"50ETF购11月3000", 550.25, 8, '2019-10-23 09:31:00', {}) 
+    pRisk.addRiskSet('茶叶一主号','10001966.XSHG',"50ETF购11月3100", 226, 7, '2019-10-23 09:31:00', {}) 
 
-    #pRisk.initRiskSet('002547', "春兴")
 
 
     # 添加行数据
@@ -607,9 +628,8 @@ if __name__ == "__main__":
         pRisk.notifyQuotation(10.3)     
 
     # 期权交易测试
+    pSource = gol._Get_Value('quoteSource_API', None)
     if(1 == 2):
-        import mySource_JQData_API
-
         print("当天3000的期权信息：")
         pSource = gol._Get_Value('quoteSource_API', None)
         sources = pSource.getPrice(security='10001945.XSHG',frequency='1m',start_date='2019-10-14 09:30:00',end_date='2019-10-14 15:00:00')
@@ -622,7 +642,54 @@ if __name__ == "__main__":
              pRisk.notifyQuotation(sources['high'][x] * 10000)    
 
         print()
+        
+    # 期权交易测试-实时模拟
+    if(1 == 1):
+        #初始风险对象
+        pRisk_3000 = pRisk.initRiskSet('茶叶一主号', '10001965.XSHG', "", True)
+        pRisk_3100 = pDB.getTradeRisk('茶叶一主号', '10001966.XSHG', "", True)
 
+        #消息初始
+        import myManager_Msg
+        pMMsg = gol._Get_Setting('manageMsgs')
+        msg = pMMsg.OnCreatMsg()
+        msg["usrName"] = "@*股票风控监测群"
+        msg["msgType"] = "TEXT"
+        msg["usrPlat"] = "wx"
+
+        #循环
+        dtTime = myData_Trans.Tran_ToDatetime("2019-10-23 09:30:00", "%Y-%m-%d %H:%M:%S")
+        while(True):
+            #时间参数
+            dtTime += datetime.timedelta(minutes=1)
+            dtNow = myData_Trans.Tran_ToDatetime_str(dtTime, "%Y-%m-%d %H:%M")
+            dtStart = myData_Trans.Tran_ToDatetime(dtNow + ":00", "%Y-%m-%d %H:%M:%S")
+            dtNext = myData_Trans.Tran_ToDatetime(dtNow + ":59", "%Y-%m-%d %H:%M:%S")
+        
+            #提取当前期权价格
+            sources_3000 = pSource.getPrice(security='10001965.XSHG',frequency='1m',start_date=dtStart,end_date=dtNext)
+            sources_3100 = pSource.getPrice(security='10001966.XSHG',frequency='1m',start_date=dtStart,end_date=dtNext)
+            if(len(sources_3100) < 1): continue
+
+            priceAvg_3000 = sources_3000['money'][0] / sources_3000['volume'][0]
+            priceAvg_3100 = sources_3100['money'][0] / sources_3100['volume'][0]
+            print(priceAvg_3000, priceAvg_3100, "---", dtStart)
+
+            #风险调用
+            strR_3000 = pRisk_3000.notifyQuotation(priceAvg_3000)
+            strR_3100 = pRisk_3100.notifyQuotation(priceAvg_3100)
+
+            #推送消息
+            if(strR_3000 != ""):
+                msg["msg"] = strR_3000
+                pMMsg.OnHandleMsg(msg)
+            if(strR_3100 != ""):
+                msg["msg"] = strR_3100
+                pMMsg.OnHandleMsg(msg)
+
+            #延时5秒     
+            time.sleep(1)
+        
 
     #需要调整盈利对比，实际利润变动，不可靠
     print()

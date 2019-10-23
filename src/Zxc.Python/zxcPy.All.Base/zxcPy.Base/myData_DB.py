@@ -234,8 +234,8 @@ class myData_Table():
                 datas.update(data)
             else:
                 # 按类型组装结果
-                x = pos -2
-                if(x in nPos_And):
+                xxx = pos -2
+                if(xxx in nPos_And):
                     indSames = []
                     for xx in datas:
                         if(xx not in data):
@@ -244,7 +244,7 @@ class myData_Table():
                     #移除不同
                     for xx in indSames:
                         datas.pop(xx)
-                elif(x in nPos_Or):
+                elif(xxx in nPos_Or):
                     datas.update(data)
 
             # 下一个
