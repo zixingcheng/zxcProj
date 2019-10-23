@@ -16,7 +16,7 @@ mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("../../../zxcPy.Quotation", False, __file__)
 mySystem.Append_Us("../../../zxcPy.Quotation/Quote_Source", False, __file__)
 mySystem.Append_Us("", False) 
-import myEnum, myIO, myIO_xlsx, myData, myData_DB, myData_Trans, myDebug #myQuote_Setting
+import myEnum, myIO, myIO_xlsx, myData, myData_DB, myData_Trans, myManager_Msg, myDebug #myQuote_Setting
 import myQuote
 
 
@@ -269,6 +269,20 @@ class myMonitor_TradeRisk():
 
             
     #止盈操作(1.非动态，到达位置立即卖出，1.动态，到达位置触发止盈) 
+    """
+    交易策略：
+    1.前20/10/5日高点取最高，日内高点，回撤起始1%建议平仓 20%，回撤2%建议平仓 20%，回撤3%建议平仓 20%，回撤4%建议平仓 20%，回撤5%建议平仓 20%
+    2.建议需要记录，便于分阶段处理。
+    3.止盈规则：
+	    达到指定涨幅时（默认10%），触发交易止盈/动态止盈。
+	    动态止盈：
+		    按回撤比例分阶段分步卖出，从当前最高点回撤1%时第一次触发，之后每回撤1%触发一次，连续回撤5%时全部卖出。
+		    当涨幅回升，突破新高时，初始回撤触发状态，即从高点再次回撤1%时触发，直到卖出完毕。
+			    突破新高规则：涨幅突破前一阶段止盈点，涨幅突破止盈涨幅线，涨幅突破10/5日高点。突破后实时比对更新新高，更新最高点。
+            动态回撤计算，按浮盈与止盈线比值来确定倍数，最大6%
+			
+	    关键点：止盈线、10/5日高点、回撤后实时新高
+    """
     def stopProfit(self, price, bSave_Auto = False):
         #自动更新交易记录
         prift = price / self.setRisk.stockAvg - 1                           #涨幅
@@ -374,20 +388,6 @@ class myMonitor_TradeRisk():
             self.isStop_Profit = isStopProfit
             self.isStop_Loss = not isStopProfit
 
-"""
-交易策略：
-1.前20/10/5日高点取最高，日内高点，回撤起始1%建议平仓 20%，回撤2%建议平仓 20%，回撤3%建议平仓 20%，回撤4%建议平仓 20%，回撤5%建议平仓 20%
-2.建议需要记录，便于分阶段处理。
-3.止盈规则：
-	达到指定涨幅时（默认10%），触发交易止盈/动态止盈。
-	动态止盈：
-		按回撤比例分阶段分步卖出，从当前最高点回撤1%时第一次触发，之后每回撤1%触发一次，连续回撤5%时全部卖出。
-		当涨幅回升，突破新高时，初始回撤触发状态，即从高点再次回撤1%时触发，直到卖出完毕。
-			突破新高规则：涨幅突破前一阶段止盈点，涨幅突破止盈涨幅线，涨幅突破10/5日高点。突破后实时比对更新新高，更新最高点。
-        动态回撤计算，按浮盈与止盈线比值来确定倍数，最大6%
-			
-	关键点：止盈线、10/5日高点、回撤后实时新高
-"""
 
 # 自定义简易库表操作-股票风险设置记录 
 class myDataDB_StockTradeRisk(myData_DB.myData_Table):
@@ -505,14 +505,21 @@ class myRisk_Control():
     def __init__(self):   
         self.riskDB = gol._Get_Value('zxcDB_StockTradeRisk')
         self.stockSet = gol._Get_Value('setsStock')
+        self.msgManger = gol._Get_Setting('manageMsgs')
         self.initRiskSets()
-        
     # 初始风控设置集
     def initRiskSets(self):  
         pSets = self.riskDB.getSets(self.riskDB )
+        self.dictRisk = {}
         for x in pSets:
             pSet = pSets[x]
-            self.initRiskSet(pSet['用户名'], pSet['标的编号'], pSet['标的名称'], False)
+            pRisk = self.initRiskSet(pSet['用户名'], pSet['标的编号'], pSet['标的名称'], False)
+
+            #缓存
+            dictRisk = self.dictRisk.get(pSet['标的编号'], {})
+            dictRisk[pSet['用户名']] = pRisk
+            if(len(dictRisk) == 1):
+                self.dictRisk[pSet['标的编号']] = dictRisk
         
     # 初始风控设置
     def initRiskSet(self, usrID, stockID, stockName, bCheck = True):  
@@ -528,6 +535,21 @@ class myRisk_Control():
         pRisk = self.riskDB.getTradeRisk(usrID, stockID, True)
         return pRisk
         
+    # 提取风控对象
+    def getRiskSet(self, usrID, stockID, stockName, bCheck = True):  
+        #解析正确股票信息
+        if(bCheck):
+            stocks = self.stockSet._Find(stockID, stockName, "****")
+            if(len(stocks) == 1):
+                pStock = stocks[0]
+                stockID = pStock.code_id + "." + pStock.extype2
+                stockName = pStock.code_name
+
+        #提取
+        dictRisk = self.dictRisk.get(stockID, None)
+        if(dictRisk == None): return None
+        return dictRisk.get(usrID, None)
+
     # 添加设置
     def addRiskSet(self, usrID, stockID, stockName, stockPrice, stockNum, time = "", dictSet = {}):  
         dictSet['用户名'] = usrID
@@ -549,6 +571,26 @@ class myRisk_Control():
         #添加
         strR = self.riskDB.Add_Row(dictSet, True)
         myDebug.Debug(strR)
+        
+    #通知接收新行情
+    def notifyRisk(self, price, stockID, stockName, bSave_Auto = True):
+        #提取设置字典
+        dictRisk = self.dictRisk.get(stockID, None)
+        if(dictRisk != None):
+            for x in dictRisk:
+                pRisk = dictRisk[x]
+                strR = pRisk.notifyQuotation(price)
+
+                #发送消息
+                if(strR != ""):
+                    msg = self.msgManger.OnCreatMsg()
+                    msg["usrName"] = "@*股票风控监测群"
+                    msg["msgType"] = "TEXT"
+                    msg["usrPlat"] = "wx"
+                    msg["msg"] = strR
+                    self.msgManger.OnHandleMsg(msg)
+
+
 
 #初始全局消息管理器
 from myGlobal import gol 
@@ -646,11 +688,10 @@ if __name__ == "__main__":
     # 期权交易测试-实时模拟
     if(1 == 1):
         #初始风险对象
-        pRisk_3000 = pRisk.initRiskSet('茶叶一主号', '10001965.XSHG', "", True)
-        pRisk_3100 = pDB.getTradeRisk('茶叶一主号', '10001966.XSHG', "", True)
+        pRisk_3000 = pRisk.getRiskSet('茶叶一主号', '10001965.XSHG', "", True)
+        pRisk_3100 = pRisk.getRiskSet('茶叶一主号', '10001966.XSHG', "", True)
 
-        #消息初始
-        import myManager_Msg
+        #消息初始 
         pMMsg = gol._Get_Setting('manageMsgs')
         msg = pMMsg.OnCreatMsg()
         msg["usrName"] = "@*股票风控监测群"
@@ -676,16 +717,8 @@ if __name__ == "__main__":
             print(priceAvg_3000, priceAvg_3100, "---", dtStart)
 
             #风险调用
-            strR_3000 = pRisk_3000.notifyQuotation(priceAvg_3000)
-            strR_3100 = pRisk_3100.notifyQuotation(priceAvg_3100)
-
-            #推送消息
-            if(strR_3000 != ""):
-                msg["msg"] = strR_3000
-                pMMsg.OnHandleMsg(msg)
-            if(strR_3100 != ""):
-                msg["msg"] = strR_3100
-                pMMsg.OnHandleMsg(msg)
+            pRisk.notifyRisk(priceAvg_3000, '10001965.XSHG', "")
+            pRisk.notifyRisk(priceAvg_3100, '10001966.XSHG', "")
 
             #延时5秒     
             time.sleep(1)
