@@ -216,12 +216,10 @@ class Data_Stock(myQuote_Data.Quote_Data):
         lstValue = self.toValueList()
         strValue = str(round(lstValue[1], 2))
         
-        strMsg = self.name + ": "  
-        if(bIndex == False):
-            strMsg += + str(round(lstValue[1], 2)) + "元"
-        else:
-            strMsg += + str(round(lstValue[1], 3)) 
-            
+        nDigit = myData.iif(bIndex, 3, 2)
+        strUnit = myData.iif(bIndex, "", "元")
+        strMsg = self.name + ": " + str(round(lstValue[1], nDigit)) + strUnit
+           
         #涨跌标识    
         dValue_N = self.priceRiseFall
         strTag0 = myData.iif(dValue_N >=0, "涨", "跌")
