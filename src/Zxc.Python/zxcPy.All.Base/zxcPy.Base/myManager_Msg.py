@@ -284,7 +284,8 @@ class myManager_Msg():
 #初始全局消息管理器
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
-gol._Set_Setting('manageMsgs', myManager_Msg())    #实例 消息管理器并初始消息api及消息队列 
+gol._Set_Setting('bufferMsgs', myMsgs("zxc", "zxc", "", ""))    #实例 消息缓存
+gol._Set_Setting('manageMsgs', myManager_Msg())                 #实例 消息管理器并初始消息api及消息队列 
 gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "")    #不使用api回调
 gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "", usrHelper = 'filehelper')    #不使用api回调
 
@@ -303,7 +304,7 @@ if __name__ == '__main__':
    msg["usrPlat"] = "wx"
    pMMsg.OnHandleMsg(msg)
 
-   msg["usrName"] = "@*股票行情监测群"
+   #msg["usrName"] = "@*股票行情监测群"
    pMMsg.OnHandleMsg(msg)
    pMMsg.OnHandleMsg(msg, '', True)     #必须check
    msg["msg"] = "测试消息py--延时"

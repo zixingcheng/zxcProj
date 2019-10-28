@@ -17,7 +17,7 @@ mySystem.Append_Us("../zxcPy.Robot/Prjs", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Reply", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myIO, myWeb, myDebug, myRobot_Reply, myRobot_Reply_MQ, myManager_Msg
+import myIO, myData_Trans, myWeb, myDebug, myRobot_Reply, myRobot_Reply_MQ, myManager_Msg
 from myGlobal import gol   
 
 
@@ -57,6 +57,50 @@ class myAPI_Robot_Reply(myWeb.myAPI):
         except :
             return None
 
+#API-验证码人工处理
+class myAPI_Robot_Captcha(myWeb.myAPI): 
+    def get(self, msgInfo):
+        #提取消息内容
+        msgInfo = myData_Trans.Tran_ToDict(msgInfo)
+        imgPath = msgInfo.get('imgPath', "")
+        usrName = msgInfo.get('usrName', "")
+        urlCallback = msgInfo.get('urlCallback', "")
+
+        #发送wx消息
+        pMMsg = gol._Get_Setting('manageMsgs')
+        if(pMMsg != None):
+            bufMsgs = gol._Get_Setting('bufferMsgs')        #消息缓存
+            id = len(bufMsgs.usrMsgs) + 1
+            msgID = "*" + str(id)
+
+            msg = pMMsg.OnCreatMsg()
+            msg["usrPlat"] = "wx"
+            msg["usrName"] = usrName
+            msg["bufTimes"] = 2
+
+            #发送标识信息
+            msg["msgType"] = "TEXT"
+            msg["msg"] = "@*" + msgID + " "
+            pMMsg.OnHandleMsg(msg)
+            
+            #发送验证码图片信息
+            imgPath = "E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.gsLog_Submits\\code.jpg"
+            msg["msgType"] = "IMage"
+            msg["msg"] = imgPath
+            pMMsg.OnHandleMsg(msg)
+
+            return {"res": "OK", "msgID": msgID}
+        else:
+            return {"err": 0} 
+class myAPI_Robot_Captcha_Code(myWeb.myAPI): 
+    def get(self, msgID):
+        #提取消息内容
+        bufMsgs = gol._Get_Setting('bufferMsgs')        #消息缓存
+        pMsg = bufMsgs.Find(msgID)  
+        if(pMsg == None): 
+            return ""
+        return str(pMsg.msg['value'])
+
 
 #初始消息处理对象
 def init_Reply():     
@@ -71,8 +115,10 @@ def add_APIs(pWeb):
     # 创建Web API
     pWeb.add_API(myAPI_Robot_RegistPlat, '/zxcAPI/robot/regist/Plat/<usrName>/<usrID>/<PlatName>')
     pWeb.add_API(myAPI_Robot_Reply, '/zxcAPI/robot/reply/<msgInfo>')
+    pWeb.add_API(myAPI_Robot_Captcha, '/zxcAPI/robot/captcha/<msgInfo>')
+    pWeb.add_API(myAPI_Robot_Captcha_Code, '/zxcAPI/robot/captcha/code/<msgID>')
     
-
+    
     # 显示登录二维码图片
     @pWeb.app.route('/zxcAPI/robot/wechat/login', methods=['GET'])
     def login_WeChat():

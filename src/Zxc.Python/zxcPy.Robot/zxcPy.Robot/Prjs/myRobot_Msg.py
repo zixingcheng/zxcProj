@@ -28,7 +28,8 @@ class myRobot_Msg(myRobot.myRobot):
 
         #初始全局操作对象
         #self.webQuote = myWeb_urlLib.myWeb("http://127.0.0.1:8669/zxcAPI/robot", "", False)   
-        self.myRobot = myRobot_Robot.myRobot_Robot()
+        self.myRobot = myRobot_Robot.myRobot_Robot()        
+        self.bufMsgs = gol._Get_Setting('bufferMsgs')        #消息缓存
         self.myRobot.isRunning = True
                 
     #消息处理接口
@@ -49,10 +50,14 @@ class myRobot_Msg(myRobot.myRobot):
         nNum = len(cmds)
         myDebug.Print(Text.strip())
         
+
         #账单命令处理
         strReturn = ""
         if(cmd == "帮助"):
             return self._Title_Helper()
+        elif(cmd.count("*") == 1):
+            #消息交互
+            return self._Done_Text_Buffer(Text, "TEXT", usrInfo)
         elif(cmd == ""):
             #机器人
             return self.myRobot._Done(Text, msgID, "TEXT", usrInfo)
@@ -68,7 +73,41 @@ class myRobot_Msg(myRobot.myRobot):
             url = 'http://39.105.196.175:8668/zxcWebs/order/Add/' + orderType + "?usrID=" + usrID
             strReturn = quote(url, safe = string.printable)   # unquote
         return strReturn
-        
+    #缓存消息处理接口-Text
+    def _Done_Text_Buffer(self, Text, msgID = "", usrInfo = {}):
+        #查找或初始ID
+        Text = Text[2:]
+        ind_S = myData.Find(Text, " ", 0)                #查找有效起始
+        if(ind_S > 0):
+            id = Text[0: ind_S]
+            msgText = Text[ind_S:].strip()
+        else:
+            id = Text
+            msgText = ""
+
+        pMsg = self.bufMsgs.Find(id)
+        if(pMsg == None):
+            msg = { "value": [], "times": usrInfo.get('bufTimes', 1)}
+            self.bufMsgs.Add(msg, id, "TEXT", usrInfo.get('to_usrName', ''), usrInfo.get('usrPlat', ''))
+            pMsg = self.bufMsgs.Find(id)
+            if(pMsg == None): 
+                return ""
+            msgText = ""
+
+        #提取次数限制
+        times = pMsg.msg.get("times", 0)
+        if(len(pMsg.msg['value']) >= times): return ""
+
+        #添加新内容
+        if(msgText != ""):
+            pMsg.msg['value'].append(msgText)
+
+            #回调
+            callBack = usrInfo.get("urlCallback", "")
+            if(callBack != ""):
+                pass
+        return ""
+
     def _Title_User_Opened(self): 
         return "自动处理所有消息..."
     def _Title_Helper(self): 
@@ -105,6 +144,12 @@ if __name__ == "__main__":
     
     myDebug.Debug(pRobot_Msg.Done("@*股票", usrNameNick='茶叶一主号')['msg'])  
     myDebug.Debug(pRobot_Msg.Done("@*订单 茶叶", usrNameNick='茶叶一主号')['msg'])  
+
+    #消息缓存
+    myDebug.Debug(pRobot_Msg.Done("@**123", usrNameNick='茶叶一主号')['msg']) 
+    myDebug.Debug(pRobot_Msg.Done("@**123 你好啊", usrNameNick='茶叶一主号')['msg']) 
+    myDebug.Debug(pRobot_Msg.Done("@**123 不好吧", usrNameNick='茶叶一主号')['msg']) 
+
 
     pRobot_Msg.Done("@@zxcRobot_Msg")
     print()
