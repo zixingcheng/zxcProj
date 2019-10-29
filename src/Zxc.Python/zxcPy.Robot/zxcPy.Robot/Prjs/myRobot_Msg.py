@@ -106,7 +106,7 @@ class myRobot_Msg(myRobot.myRobot):
             callBack = usrInfo.get("urlCallback", "")
             if(callBack != ""):
                 pass
-            return F"缓存消息({id}), 更新为: {msgText}"
+            return "缓存消息(" + id + "), 更新为: " + msgText
         return ""
 
     def _Title_User_Opened(self): 
