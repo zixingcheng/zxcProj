@@ -6,7 +6,7 @@ Created on  张斌 2016-09-02 16:30:00
 
     IO操作 
 """
-import os, time, codecs
+import os, time, codecs, base64
 import shutil
 
  
@@ -179,7 +179,22 @@ def getContent_EndByTag(path, strTag = "@@", noBOM = False, isUtf = True):
     #关闭文件      
     f.close()
     return (content,list_content)
- 
+
+
+# 将图片读入，对byte进行str解码
+def getImage_Str(path):
+    with open(path, 'rb') as f:
+        img_byte = base64.b64encode(f.read())
+
+    img_str = img_byte.decode('ascii')
+    return img_str
+# 将str解码，返回byte
+def getImage_Byte(img_str):
+    # 解码得到图像并保存 
+    img_decode_ = img_str.encode('ascii')       # ascii编码
+    img_decode = base64.b64decode(img_decode_)  # base64解码 
+    return img_decode
+
 
 #获取代码文件路径函数 2017-10-18
 def getPath_ByFile(file):

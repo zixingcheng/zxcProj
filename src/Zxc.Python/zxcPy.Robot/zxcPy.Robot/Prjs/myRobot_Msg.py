@@ -92,7 +92,6 @@ class myRobot_Msg(myRobot.myRobot):
             pMsg = self.bufMsgs.Find(id)
             if(pMsg == None): 
                 return ""
-            msgText = ""
 
         #提取次数限制
         times = pMsg.msg.get("times", 0)
@@ -101,11 +100,13 @@ class myRobot_Msg(myRobot.myRobot):
         #添加新内容
         if(msgText != ""):
             pMsg.msg['value'].append(msgText)
+            print("add:", msgText)
 
             #回调
             callBack = usrInfo.get("urlCallback", "")
             if(callBack != ""):
                 pass
+            return F"缓存消息({id})更新为：{msgText}"
         return ""
 
     def _Title_User_Opened(self): 

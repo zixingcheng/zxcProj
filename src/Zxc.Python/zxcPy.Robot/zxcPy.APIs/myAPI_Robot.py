@@ -6,9 +6,10 @@ Created on  张斌 2018-07-04 15:58:00
 
     Rest API --平台注册
 """
-import os, copy, ast 
+import os, copy, ast
 import mySystem 
 from flask import jsonify, request, make_response
+from flask_restful import reqparse, abort, Api, Resource
     
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../zxcPy.APIs", False, __file__)
@@ -17,7 +18,7 @@ mySystem.Append_Us("../zxcPy.Robot/Prjs", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Reply", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
 mySystem.Append_Us("", False)    
-import myIO, myData_Trans, myWeb, myDebug, myRobot_Reply, myRobot_Reply_MQ, myManager_Msg
+import myIO, myData, myData_Trans, myWeb, myWeb_urlLib, myDebug, myRobot_Reply, myRobot_Reply_MQ, myManager_Msg
 from myGlobal import gol   
 
 
@@ -62,36 +63,89 @@ class myAPI_Robot_Captcha(myWeb.myAPI):
     def get(self, msgInfo):
         #提取消息内容
         msgInfo = myData_Trans.Tran_ToDict(msgInfo)
-        imgPath = msgInfo.get('imgPath', "")
+        imgPath = msgInfo.get('imgPath', "").replace("☀", "/")
         usrName = msgInfo.get('usrName', "")
         urlCallback = msgInfo.get('urlCallback', "")
-
-        #发送wx消息
-        pMMsg = gol._Get_Setting('manageMsgs')
-        if(pMMsg != None):
-            bufMsgs = gol._Get_Setting('bufferMsgs')        #消息缓存
-            id = len(bufMsgs.usrMsgs) + 1
-            msgID = "*" + str(id)
-
-            msg = pMMsg.OnCreatMsg()
-            msg["usrPlat"] = "wx"
-            msg["usrName"] = usrName
-            msg["bufTimes"] = 2
-
-            #发送标识信息
-            msg["msgType"] = "TEXT"
-            msg["msg"] = "@*" + msgID + " "
-            pMMsg.OnHandleMsg(msg)
+        if(imgPath == "" or usrName == ""):
+            return {"err": -1} 
             
-            #发送验证码图片信息
-            imgPath = "E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.gsLog_Submits\\code.jpg"
-            msg["msgType"] = "IMage"
-            msg["msg"] = imgPath
-            pMMsg.OnHandleMsg(msg)
+            #发送wx消息,wx处理       
+            pMMsg = gol._Get_Setting('manageMsgs')
+            if(pMMsg != None):
+                bufMsgs = gol._Get_Setting('bufferMsgs')        #消息缓存
+                id = len(bufMsgs.usrMsgs) + 1
+                msgID = "*" + str(id)
 
-            return {"res": "OK", "msgID": msgID}
-        else:
-            return {"err": 0} 
+                msg = pMMsg.OnCreatMsg()
+                msg["usrPlat"] = "wx"
+                msg["usrName"] = usrName
+                msg["bufTimes"] = 2
+
+                #发送标识信息
+                msg["msgType"] = "TEXT"
+                msg["msg"] = "@*" + msgID + " "
+                pMMsg.OnHandleMsg(msg)
+            
+                #发送验证码图片信息
+                #imgPath = "E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.gsLog_Submits\\code.jpg"
+                msg["msgType"] = "IMAGE"
+                msg["msg"] = imgPath
+                pMMsg.OnHandleMsg(msg)
+
+                return {"res": "OK", "msgID": msgID}
+            else:
+                return {"err": 0} 
+#API-验证码人工处理
+class myAPI_Robot_Captcha_img(myWeb.myAPI): 
+    def __init__(self):
+        #初始根目录信息
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        self.Dir_Base = os.path.abspath(os.path.join(strDir, ".."))  
+        self.Dir_Image = self.Dir_Base + "/Temps/Images/wxTemps/"
+        self.Dir_Image = myIO.checkPath(self.Dir_Image)
+        myIO.mkdir(self.Dir_Image, False) 
+    def post(self):
+        args = myWeb.parser.parse_args()
+        params = myData_Trans.Tran_ToDict(args['params'])
+
+        # 解码得到图像
+        img_str = params['imgData']
+        img_decode = myIO.getImage_Byte(img_str)
+
+        #保存图片
+        if(img_str != ""):
+            imgPath = self.Dir_Image + params['imgName']
+            usrName = params['usrName']
+            with open(imgPath, 'wb') as f:
+                f.write(img_decode)
+                  
+            #发送wx消息
+            pMMsg = gol._Get_Setting('manageMsgs')
+            if(pMMsg != None):
+                bufMsgs = gol._Get_Setting('bufferMsgs')        #消息缓存
+                id = len(bufMsgs.usrMsgs) + 1
+                msgID = "*" + str(id)
+
+                msg = pMMsg.OnCreatMsg()
+                msg["usrPlat"] = "wx"
+                msg["usrName"] = usrName
+                msg["bufTimes"] = 2
+
+                #发送标识信息
+                msg["msgType"] = "TEXT"
+                msg["msg"] = "@*" + msgID + " "
+                pMMsg.OnHandleMsg(msg)
+            
+                #发送验证码图片信息
+                #imgPath = "E:\\myCode\\zxcProj\\src\\Zxc.Python\\zxcPy.gsLog_Submits\\code.jpg"
+                msg["msgType"] = "IMAGE"
+                msg["msg"] = imgPath
+                pMMsg.OnHandleMsg(msg)
+
+                return {"res": "OK", "msgID": msgID}
+            else:
+                return {"err": 0} 
+#API-验证码结果提取 
 class myAPI_Robot_Captcha_Code(myWeb.myAPI): 
     def get(self, msgID):
         #提取消息内容
@@ -99,7 +153,7 @@ class myAPI_Robot_Captcha_Code(myWeb.myAPI):
         pMsg = bufMsgs.Find(msgID)  
         if(pMsg == None): 
             return ""
-        return str(pMsg.msg['value'])
+        return myData_Trans.Tran_ToStr(pMsg.msg['value'])
 
 
 #初始消息处理对象
@@ -116,6 +170,7 @@ def add_APIs(pWeb):
     pWeb.add_API(myAPI_Robot_RegistPlat, '/zxcAPI/robot/regist/Plat/<usrName>/<usrID>/<PlatName>')
     pWeb.add_API(myAPI_Robot_Reply, '/zxcAPI/robot/reply/<msgInfo>')
     pWeb.add_API(myAPI_Robot_Captcha, '/zxcAPI/robot/captcha/<msgInfo>')
+    pWeb.add_API(myAPI_Robot_Captcha_img, '/zxcAPI/robot/captcha_img')
     pWeb.add_API(myAPI_Robot_Captcha_Code, '/zxcAPI/robot/captcha/code/<msgID>')
     
     

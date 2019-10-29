@@ -87,6 +87,10 @@ class myWeb(myThread.myThread):
         self.app.run(host = self.host, port = self.port, debug = self.debug, use_reloader = use_reloader)  
 
 
+# RESTfulAPI的参数解析 -- put / post参数解析
+parser = reqparse.RequestParser()
+parser.add_argument("params", type=str, required=True, help="need user params")
+
 #API接口类(Restful)
 class myAPI(Resource):
     def get(self): 
