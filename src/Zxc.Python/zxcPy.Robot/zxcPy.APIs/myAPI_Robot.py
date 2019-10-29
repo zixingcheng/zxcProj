@@ -115,7 +115,7 @@ class myAPI_Robot_Captcha_img(myWeb.myAPI):
         #保存图片
         if(img_str != ""):
             imgPath = self.Dir_Image + params['imgName']
-            usrName = params['usrName']
+            usrName = params.get('usrName', "茶叶一主号")
             with open(imgPath, 'wb') as f:
                 f.write(img_decode)
                   
