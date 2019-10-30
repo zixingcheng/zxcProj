@@ -7,22 +7,22 @@ Created on  张斌 2016-09-02 16:30:00
     Web操作模拟类
     @依赖库： urllib
 """
+import json, myDebug
+import urllib,urllib.request, http.cookiejar
 from requests import get, put, post, delete
-import json
-import urllib,urllib.request
-import http.cookiejar
-import myDebug;
 
 class myWeb:
     #初始构造 
-    def __init__(self, Host = "http://127.0.0.1",Path = '',bPrint = True):
+    def __init__(self, Host = "http://127.0.0.1",Path = '',bPrint = True, cookie = None):
         self.Host = Host
         self.Path = Path
         self.Referer = Host + "/" + Path
         self.canPrint = bPrint
         
         #声明一个CookieJar对象实例来保存cookie
-        self.cookie = http.cookiejar.CookieJar()
+        self.cookie = cookie
+        if(cookie == None):
+            self.cookie = http.cookiejar.CookieJar()
 
         #利用urllib2库的HTTPCookieProcessor对象来创建cookie处理器
         self.handler = urllib.request.HTTPCookieProcessor(self.cookie)
