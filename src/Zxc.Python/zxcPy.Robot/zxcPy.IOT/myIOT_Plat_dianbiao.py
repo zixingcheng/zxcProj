@@ -9,7 +9,7 @@ Created on  张斌 2019-10-28 16:00:00
 """
 
 import sys, os, time
-import re, requests
+import re, json, requests
 import mySystem
 import urllib,urllib.parse,urllib.request,http.cookiejar 
 from bs4 import BeautifulSoup
@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 sysDir = mySystem.Append_Us("")
 sysDir = mySystem.Append_Dir("myFunction")
-import myIO, myData_Trans, myIOT
+import myIO, myData, myData_Trans, myIOT
 from myWeb_urlLib import myWeb  
 
 
@@ -26,11 +26,11 @@ from myWeb_urlLib import myWeb
 # 物联网IOT-电表对象
 class myIOT_Dianbiao(myIOT.myIOT): 
     def __init__(self, dictSets = None):  
-        super().__init__(id, dictSets)   
+        super().__init__(dictSets)   
 
     # 转换为字典结构
     def Trans_ToDict(self, dictSets = None):  
-        dictSets = super().Trans_ToDict(id, dictSets)   
+        dictSets = super().Trans_ToDict(dictSets)   
         return dictSets
     # 转换为对象，由字典结构
     def Trans_FromDict(self, dictSets):   
@@ -58,7 +58,7 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
     # 模拟登录
     def Login(self, urlLogin = "", urlDoLogin = "", url_img_code = "", cookie_str = ""):   
         #方便调试区分真实登录，和本地cookie
-        cookie_str = r'Av2dfsdf_admin_username=%E7%AE%80%E6%98%93%E7%94%9F%E6%B4%BB; Hm_lvt_2510c71771575460d26bb883a51bde54=1571463497,1572248265,1572361282,1572414162; Av2dfsdf_language=zh-CN; sign=qtkkoajhh292bm9fqr5daak99m; Hm_lpvt_2510c71771575460d26bb883a51bde54=1572485723'
+        cookie_str = r'Av2dfsdf_admin_username=%E7%AE%80%E6%98%93%E7%94%9F%E6%B4%BB; Hm_lvt_2510c71771575460d26bb883a51bde54=1572248265,1572361282,1572414162,1572509480; Av2dfsdf_language=zh-CN; sign=3kvm66ege89m4j8olcrionfr5f; Hm_lpvt_2510c71771575460d26bb883a51bde54=1572528119'
 
         #固定模拟登陆网址参数
         urlLogin = "admin/public/login"
@@ -66,22 +66,124 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
         url_img_code = "index.php?g=admin&m=checkcode&a=index&length=4&font_size=25&width=235&height=52&use_noise=1&use_curve=0&time=Math.random()"
         super().Login(urlLogin , urlDoLogin, url_img_code, cookie_str)  
         
+
     # 控制--状态
-    def Control_State(self, state = ""):
-        if(state not in self.ctrlStates): return False
+    def Control_State(self, iotID, state = ""):
+        if(super().Control_State(iotID, state) == False): return False
+
+        # 提取IOT对象
+        pIot = self.Get_Iot(iotID, True)        #更新状态
+        if(pIot == None): return False
 
         #分类型操作
-        if(state == "open"):
-            resp = self._DoWeb_Get("", "admin/card_opr/pull_on_off/mid/1290780/action/pull_on", {})
-            self._getTable_Actions("1290780")
-        pass
-        return True
+        if(pIot.iotConnected):
+            if(state == "open"):
+                resp = self._DoWeb_Get("", "admin/card_opr/pull_on_off/mid/{pIot.usrID}/action/pull_on", {})
+            return True
+        return {'err': '未连接'}
     
 
-    # 查询操作记录列表（区分是否已经完成更新）
-    def _getTable_Actions(self, id, bUpdated = True):
+    # 获取Iot基本信息
+    def _getIot_Info_Base(self, pIot):
         #使用BeautifulSoup解析代码,并锁定页码指定标签内容
-        resp = self._DoWeb_Get("", F"admin/ele_opration/index/mid/{id}/tab/4/controller/CardOpr", {})
+        resp = self._DoWeb_Get("基本信息", F"admin/card_opr/index/tab/1/mid/{pIot.usrID}", {})
+        soup = BeautifulSoup(resp.text,'lxml')
+
+        #提取基本信息内容
+        divs = soup.find_all('div')
+
+        #提取行数据    
+        baseInfo = pIot.iotInfo
+        baseInfo['编号'] = divs[1].find('label').string
+        baseInfo['连接状态'] = divs[1].find('font').string
+        baseInfo['连接地址'] = divs[4].string.strip()
+        baseInfo['电表类型'] = divs[6].find('a').string
+
+        baseInfo['电表参数集']= {}
+        for x in divs[7].find_all('option'):
+            value = x.attrs.get('value', "0")
+            if(x.attrs.get('selected', "noSelect") == ''):
+                baseInfo['电表参数'] = x.string
+            baseInfo['电表参数集'][value] = x.string
+
+        baseInfo['户号'] = divs[9].find('span').string
+        baseInfo['绑定用户'] = divs[11].find('a').string
+        baseInfo['绑定用户编号'] = divs[11].find('a').attrs.get('data-href', "-1").replace("/admin/custom/index/id/", "")
+        baseInfo['绑定卡号'] = divs[14].string.strip()
+        baseInfo['描述'] = divs[16].string.strip()
+        baseInfo['购电次数'] = divs[17].contents[3].next.string.replace('已于', "").strip()
+        baseInfo['开户时间'] = divs[17].find('span').attrs.get('title', "")
+        baseInfo['互感器变比'] = divs[20].find('input').attrs.get('value', "")
+        baseInfo['继电器状态'] = divs[24].find('font').string
+
+        #更新Iot信息
+        self.iotConnected = myData.iif(baseInfo['连接状态'] == '已连接', True, False)
+        return baseInfo
+    # 获取Iot基本信息-电量电费
+    def _getIot_Info_PowerMoney(self, pIot):
+        #使用BeautifulSoup解析代码,并锁定页码指定标签内容
+        resp = self._DoWeb_Get("基本信息-电量电费", F"admin/card_opr/index/tab/3/mid/{pIot.usrID}", {})
+        soup = BeautifulSoup(resp.text,'lxml')
+
+        #提取基本信息内容
+        divs = soup.find_all('div')
+        
+        #提取行数据    
+        baseInfo = pIot.iotInfo
+        baseInfo['购电次数'] = divs[10].string.strip()
+        baseInfo['当前总电量'] = divs[15].find('input').attrs.get('value', "0.00kwh")
+        baseInfo['当前总电量同步时间'] = divs[18].find('input').attrs.get('value', "")
+        
+        baseInfo['当前剩余金额'] = divs[19].find('input').attrs.get('value', "0.00")
+        baseInfo['当前剩余金额同步时间'] = divs[21].find('input').attrs.get('value', "")
+        
+        baseInfo['总充值金额'] = divs[23].find('input').attrs.get('value', "0.00元")
+
+        #更新Iot信息
+        return baseInfo
+
+
+
+    # 获取Iot电量信息
+    def _getIot_Info_Power(self, pIot):
+        #使用BeautifulSoup解析代码,并锁定页码指定标签内容
+        resp = self._DoWeb_Get("查询电量", F"admin/card_opr/query_now/mid/{pIot.usrID}/q/power", {})
+        soup = BeautifulSoup(resp.content.decode('unicode-escape'),'lxml')
+
+        #提取基本信息内容
+        res = myData_Trans.Tran_ToDict(soup.find('p').string)
+        if(res['state'] == 'fail'):
+            return False
+        elif(res['state'] == 'success'):
+            baseInfo['当前总电量'] = divs[1].find('label').string
+            baseInfo['电量同步时间'] = divs[1].find('font').string
+
+        info: "已成功添加任务 <br>&nbsp;&nbsp;请稍后刷新本页面或打开下方手动抄表界面等待抄表结果"
+        #提取行数据    
+        baseInfo = pIot.iotInfo
+        baseInfo['当前总电量'] = divs[1].find('label').string
+        baseInfo['电量同步时间'] = divs[1].find('font').string
+        return baseInfo
+    # 获取Iot电费信息
+    def _getIot_Info_Money(self, pIot):
+        #使用BeautifulSoup解析代码,并锁定页码指定标签内容
+        #https://168.tqdianbiao.com/admin/card_opr/query_now/mid/1290780/q/money
+        resp = self._DoWeb_Get("", F"admin/card_opr/index/tab/1/mid/{pIot.usrID}", {})
+        soup = BeautifulSoup(resp.text,'lxml')
+
+        #提取基本信息内容
+        divs = soup.find_all('div')
+
+        #提取行数据    
+        baseInfo = pIot.iotInfo
+        baseInfo['当前总电量'] = divs[1].find('label').string
+        baseInfo['电量同步时间'] = divs[1].find('font').string
+        return baseInfo
+
+    # 获取Iot命令执行状态
+    def _getIot_Info_CmdsState(self, pIot, bNoSucess = True):
+        #使用BeautifulSoup解析代码,并锁定页码指定标签内容
+        resp = self._DoWeb_Get("", F"admin/ele_opration/index/mid/{pIot.usrID}/tab/4/controller/CardOpr", {})
         soup = BeautifulSoup(resp.text,'lxml')
 
         #提取表内容
@@ -117,8 +219,8 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
                     row['data-logurl'] = tds[9].contents[1].attrs.get('data-href', "")
 
             #区分更新
-            if(bUpdated):
-                if(row['data-update'] == '0'):
+            if(bNoSucess):
+                if(row['data-state'] not in ['1']):
                     continue
             rows.append(row)
         return rows
@@ -134,13 +236,15 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
 if __name__ == "__main__":    
     #添加Iot信息
     pIOT_Plat = myIOT_Plat_Dianbiao_tq()
-    pIOT_Plat.Add_Iot({'设备编号': '190801207866', '设备名称': '测试电表-01', '通讯地址': "190801207866", '用户名': 'zxc', '用户编号': '1290780', '日期': '2019-08-27 11:12:00'})
-    pIOT_Plat.Add_Iot({'设备编号': '190500004102', '设备名称': '测试电表-02', '通讯地址': "190500004102", '用户名': 'zxc', '用户编号': '1290799', '日期': '2019-08-27 11:12:00'})
+    #pIOT_Plat.Add_Iot({'设备编号': '190801207866', '设备名称': '测试电表-01', '通讯地址': "190801207866", '用户名': 'zxc', '用户编号': '1290780', '日期': '2019-08-27 11:12:00'})
+    #pIOT_Plat.Add_Iot({'设备编号': '190500004102', '设备名称': '测试电表-02', '通讯地址': "190500004102", '用户名': 'zxc', '用户编号': '1290799', '日期': '2019-08-27 11:12:00'})
 
     
     # 模拟登录
     pIOT_Plat.Login()
-    pIOT_Plat.Control_State('open')
+
+    # 电表控制-开合闸
+    pIOT_Plat.Control_State('190801207866', 'open')
     
 
     exit(0)

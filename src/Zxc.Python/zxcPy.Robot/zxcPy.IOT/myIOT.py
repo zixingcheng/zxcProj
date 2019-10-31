@@ -31,6 +31,8 @@ class myIOT():
         self.iotType = ""           #自定义IOT类型
         self.iotState = ""          #自定义IOT状态
         self.iotAddress_Postal = "" #自定义IOT通讯地址
+        self.iotConnected = False   #自定义IOT是否连接
+
         self.iotAddress = ""        #自定义IOT地址
         self.iotCoor_X = ""         #自定义IOT坐标X
         self.iotCoor_Y = ""         #自定义IOT坐标Y
@@ -42,6 +44,7 @@ class myIOT():
         self.remark = ""            #备注
         self.valid = True           #是否有效
         self.dictSets = {}          #字典型设置信息
+        self.iotInfo = {}           #设备其他信息-自定义
         self.Trans_FromDict(dictSets)
 
     # 转换为字典结构
@@ -52,7 +55,9 @@ class myIOT():
         dictSets['设备名称'] = self.iotName
         dictSets['设备类型'] = self.iotType
         dictSets['设备状态'] = self.iotState
+        dictSets['设备信息'] = self.iotInfo
         dictSets['通讯地址'] = self.iotAddress_Postal
+        dictSets['是否连接'] = self.iotConnected
         dictSets['用户编号'] = self.usrID
         dictSets['用户名'] = self.usrName
 
@@ -75,7 +80,9 @@ class myIOT():
         self.iotName = dictSets.get('设备名称', self.iotName)   
         self.iotType = dictSets.get('设备类型', self.iotType) 
         self.iotState = dictSets.get('设备状态', self.iotState)  
+        self.iotInfo = dictSets.get('设备信息', self.iotInfo)  
         self.iotAddress_Postal = dictSets.get('通讯地址', self.iotAddress_Postal)   
+        self.iotConnected = dictSets.get('是否连接', self.iotConnected) 
         
         self.usrID = dictSets.get('用户编号', self.usrID)   
         self.usrName = dictSets.get('用户名', self.usrName)   
@@ -112,12 +119,23 @@ class myIOTs(myData_DB.myData_Table):
         dictSet = self.Query(strFilter, "", True)
 
         # 返回Iot对象
-        if(dictSet == None): return None
-        return self._new_Iot(dictSet)
+        if(dictSet == None or len(dictSet) != 1): 
+            return None
+        return self._new_Iot(list(dictSet.values())[0])
     # 初始物联网对象集
     def _new_Iot(self, dictSet):
         return myIOT(dictSet)
+    
+    # 检查是否已经存在   
+    def _Check(self, rowInfo, updata = False): 
+        #修正数据类型 
+        if(rowInfo.get('操作日志', "") == ""):
+            pIot = myIOT()
+            pIot.Trans_FromDict(rowInfo)
 
+            #调用基类更新
+            pIot.Trans_ToDict(rowInfo)
+        return super()._Check(rowInfo, updata)
     # 检查是否相同--继承需重写  
     def _IsSame(self, rowInfo, rowInfo_Base): 
         if(super()._IsSame(rowInfo, rowInfo_Base)): return True
@@ -164,7 +182,10 @@ class myIOT_Plat():
     # 模拟登录
     def Login(self, urlLogin = "", urlDoLogin = "", url_img_code = "", cookie_str = ""):   
         # 创建连接
-        self._webHeaders = {'User-agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'}
+        self._webHeaders = {
+            'User-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299',
+            'X-Requested-With': 'XMLHttpRequest'
+            }
         
         #方便调试区分真实登录，和本地cookie
         if(cookie_str != ""):
@@ -175,10 +196,10 @@ class myIOT_Plat():
 
             #在发送get请求时带上请求头和cookies
             #r = self.web.Do_API_get(urlLogin, "验证码结果").strip().replace("\"", "")   # 不兼容封装调用
-            return self._DoWeb_Get("登录页面", urlLogin, {})
+            return self._DoWeb_Get("登录", urlLogin, {})
         else:
             # 登录页面
-            resp = self._DoWeb_Get("登录页面", urlLogin, {})
+            resp = self._DoWeb_Get("登录", urlLogin, {})
 
             # 获取验证码信息
             captcha_code = ""
@@ -255,16 +276,88 @@ class myIOT_Plat():
                         time.sleep(3)
         return captcha_code
     
+
+    # Iot状态信息--更新
+    def Updata_Iot_State(self, pIot):
+        self._getIot_Info_Base(pIot)            #更新Iot基本信息
+        self._getIot_Info_PowerMoney(pIot)      #更新Iot基本信息-电费电量
+
+        # Iot信息同步
+        return self.Updata_Iot_Info(pIot)
+    # Iot信息同步--更新
+    def Updata_Iot_Info(self, pIot):
+        self.Iots._Updata(pIot.ID, pIot.Trans_ToDict(), False, False)
+        return True
+
+        self._getIot_Info_Base(pIot)            #更新Iot基本信息
+        self._getIot_Info_PowerMoney(pIot)      #更新Iot基本信息-电费电量
+        # 提取未执行完成命令
+        pCmds = self._getIot_Info_CmdsState(pIot, True)
+        if(len(pCmds) > 0):
+            for x in pCmds:
+                if(x['状态'] == '等待采集器连接'):
+                    pIot.S
+            pIot.cmds = 0
+        pass  
+    
+
+    # 控制--状态
+    def Control_State(self, iotID, state = ""):
+        # 提取IOT对象
+        if(state not in self.ctrlStates): return False
+        return True
+    # 控制--命令任务
+    def Control_Cmd(self, iotID, cmdType = ""):
+        # 提取IOT对象
+        if(state not in self.ctrlStates): return False
+        return True
+
+
+    # Iot信息管理
+    #region Iot信息管理
+
     # Iot信息--添加
     def Add_Iot(self, dictSet):
         dictSet['设备类型'] = self.typeIot
         return self.Iots.Add_Row(dictSet, True)
-
-    # 控制--状态
-    def Control_State(self, state = ""):
-        if(state not in self.ctrlStates): return False
-        pass  
+    # Iot信息--获取
+    def Get_Iot(self, iotID, bRefresh = True):
+        pIot = self.Iots.getIOT(iotID)
+        if(bRefresh):
+            self.Updata_Iot_State(pIot)
+        return pIot
     
+    
+    # 获取Iot基本信息
+    def _getIot_Info_Base(self, pIot):
+        return pIot.iotInfo
+    # 获取Iot基本信息-电量电费
+    def _getIot_Info_PowerMoney(self, pIot):
+        return pIot.iotInfo
+
+    # 获取Iot电量信息
+    def _getIot_Info_Power(self, pIot):
+        return pIot.iotInfo
+    # 获取Iot电费信息
+    def _getIot_Info_Money(self, pIot):
+        return pIot.iotInfo
+
+    # 获取Iot命令执行状态
+    def _getIot_Info_CmdsState(self, pIot, bNoSucess = True):
+        return []
+
+    #endregion
+    
+
+    # 初始物联网对象集
+    def _Init_Iots(self, dir = ""):
+        self.typeIot = "电表"
+        self.Iots = myIOTs(dir = dir)    
+    # 初始IOT状态集
+    def _Init_ctrlState(self):
+        self.ctrlStates = ["open", "close"]   
+
+
     # 操作webApi接口-Post方式
     def _DoWeb_Post(self, strTag = "", url = "", data = None, checkInfo = {}, bDebug = True):
         self._webReferer = self._webHost + "/" + url
@@ -278,7 +371,7 @@ class myIOT_Plat():
 
         # 输出结果
         print(resp.content.decode('utf-8'))
-        if(bDebug): myDebug.Debug("    请求完毕。")
+        if(bDebug): myDebug.Debug(" ---请求完毕。\n")
 
         # 验证信息
         if(len(checkInfo) > 0):
@@ -297,21 +390,12 @@ class myIOT_Plat():
             
         # 输出结果
         #print(resp.content.decode('utf-8'))
-        if(bDebug): myDebug.Debug("    请求完毕。")
+        if(bDebug): myDebug.Debug(" ---请求完毕。\n")
             
         # 验证信息
         if(len(checkInfo) > 0):
             pass
         return resp
-
-
-    # 初始物联网对象集
-    def _Init_Iots(self, dir = ""):
-        self.typeIot = "电表"
-        self.Iots = myIOTs(dir = dir)    
-    # 初始IOT状态集
-    def _Init_ctrlState(self):
-        self.ctrlStates = ["open", "close"]   
 
 
 
