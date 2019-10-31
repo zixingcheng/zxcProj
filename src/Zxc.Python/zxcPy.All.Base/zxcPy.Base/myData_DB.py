@@ -332,6 +332,9 @@ class myData_Table():
         if(rowInfo.get('ID', "") != ""):
             if(rowInfo['ID'] > 0):  # 给定序号时，序号必须相同
                 if(rowInfo['ID'] != rowInfo_Base['ID']): return False
+        else:
+            rowInfo["ID"] = -1
+            return False
             
         #对比索引，是否完全一致
         for x in self.fields_index:
