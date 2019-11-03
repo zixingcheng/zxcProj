@@ -7,7 +7,6 @@ Created on  张斌 2019-10-28 16:00:00
 
     物联网IOT -智能物联网综合管理平台
 """
-
 import sys, os, time
 import re, json, requests
 import mySystem
@@ -19,12 +18,12 @@ from bs4 import BeautifulSoup
 sysDir = mySystem.Append_Us("")
 sysDir = mySystem.Append_Dir("myFunction")
 import myIO, myData, myData_Trans, myIOT
-from myWeb_urlLib import myWeb  
+from myWeb_urlLib import myWeb
 
 
 
 # 物联网IOT-电表对象
-class myIOT_Dianbiao(myIOT.myIOT): 
+class myIOT_Dianbiao(myIOT.myIOT):
     def __init__(self, dictSets = None):  
         super().__init__(dictSets)   
 
@@ -58,7 +57,7 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
     # 模拟登录
     def Login(self, urlLogin = "", urlDoLogin = "", url_img_code = "", cookie_str = ""):   
         #方便调试区分真实登录，和本地cookie
-        cookie_str = r'Av2dfsdf_admin_username=%E7%AE%80%E6%98%93%E7%94%9F%E6%B4%BB; Hm_lvt_2510c71771575460d26bb883a51bde54=1572248265,1572361282,1572414162,1572509480; Av2dfsdf_language=zh-CN; sign=3kvm66ege89m4j8olcrionfr5f; Hm_lpvt_2510c71771575460d26bb883a51bde54=1572528119'
+        cookie_str = r'Av2dfsdf_admin_username=%E7%AE%80%E6%98%93%E7%94%9F%E6%B4%BB; Av2dfsdf_language=zh-CN; sign=3q754sqbuk1pto5str9ad1n242; Hm_lvt_2510c71771575460d26bb883a51bde54=1572361282,1572414162,1572509480,1572749055; Hm_lpvt_2510c71771575460d26bb883a51bde54=1572749163'
 
         #固定模拟登陆网址参数
         urlLogin = "admin/public/login"
@@ -141,9 +140,187 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
 
         #更新Iot信息
         return baseInfo
+    # 获取Iot命令执行状态-只要
+    def _getIot_Info_CmdsState(self, pIot, bOnlyFail = True):
+        rows = self._getIot_Info_CmdsState_Order(pIot, bOnlyFail)
+        rows += self._getIot_Info_CmdsState_Meter(pIot, bOnlyFail)
+        return rows
+    # 获取Iot命令执行状态-控制命令
+    def _getIot_Info_CmdsState_Order(self, pIot, bOnlyFail = True):
+        #使用BeautifulSoup解析代码,并锁定页码指定标签内容
+        resp = self._DoWeb_Get("操作记录", F"admin/ele_opration/index/mid/{pIot.usrID}/tab/4/controller/CardOpr", {})
+        soup = BeautifulSoup(resp.text,'lxml')
 
+        #提取表内容
+        trs = soup.find_all('tr')
+        fileds = []
 
+        #初始字段
+        for x in trs[0].find_all('th'):
+            fileds.append(x.string.replace("\xa0", ""))
+        fileds.append("aliasname")          #电表别名
+        fileds.append("data-id")            #任务编号
+        fileds.append("data-state")         #任务状态
+        fileds.append("data-update")        #任务更新
+        fileds.append("data-time")          #任务下发时间
+        fileds.append("data-logurl")        #任务日志url 
+        fileds.append("命令状态")           #命令状态
 
+        #提取行数据    
+        pCmds_ok = pIot.iotInfo['命令']['已完成']        #命令操作已完成信息
+        pCmds_doing = pIot.iotInfo['命令']['未完成']     #命令操作未完成信息
+        rows = []
+        for tr in trs[1:]:
+            row = {'命令类型': 'order', '命令状态': '', '执行时间': 0}
+            tds = tr.find_all('td')
+            for x in range(len(fileds) - 7):
+                row[fileds[x]] = tds[x].string
+
+            #特殊属性信息提取
+            if(len(tds) > 8):
+                row['aliasname'] = tds[1].next.attrs['title']
+                row['data-time'] = tds[4].next.attrs['title']
+                row['data-id'] = tds[7].attrs['data-id']
+                row['data-state'] = tds[7].attrs['data-state']
+                row['data-update'] = tds[7].attrs['data-update']
+                row['data-logurl'] = ""
+                if(len(tds[9].contents) > 1):
+                    row['data-logurl'] = ""
+                    row['cmd-cancelurl'] = ""
+                    for xx in tds[9].find_all('a'):
+                        if(xx.string == '日志'):
+                            row['data-logurl'] = xx.attrs.get('data-href', "")[1:]
+                        elif(xx.string == '取消'):
+                            row['cmd-cancelurl'] = xx.attrs.get('href', "")[1:]
+                            row['命令状态'] = "doing"
+
+            #命令完成状态判别
+            if(row['状态'] in ['已完成', '已取消', '超时']):
+                row['命令状态'] = myData.iif(row['状态'] == '已完成', "ok", "fail")
+                row['执行时间'] = myData_Trans.Tran_ToTime(row['data-time'], "%Y-%m-%d %H:%M:%S")  
+
+            #区分更新
+            key = row['data-time']
+            if(row['命令状态'] == "doing"):
+                if(pCmds_doing.get(key, None) == None):
+                    row['命令校检'] = {'校检次数': 0, '命令ID': row['data-id'], '命令状态': "doing", '校检提示': ""}
+                    pCmds_doing[key] = row
+                    self._iotCmds[key] = row            #传址同步修改值
+            else:
+                if(pCmds_ok.get(key, None) == None):
+                    pCmds_ok[key] = row
+
+                #剔除完成
+                if(bOnlyFail ):
+                    continue
+
+            #缓存用于返回
+            rows.append(row)
+        return rows
+    # 获取Iot命令执行状态-抄表命令
+    def _getIot_Info_CmdsState_Meter(self, pIot, bOnlyFail = True):
+        #使用BeautifulSoup解析代码,并锁定页码指定标签内容
+        resp = self._DoWeb_Get("操作记录", F"admin/meter_task/index/_afid/1096", {})
+        soup = BeautifulSoup(resp.text,'lxml')
+
+        #提取表内容
+        trs = soup.find_all('tr')
+        fileds = []
+
+        #初始字段
+        for x in trs[0].find_all('th'):
+            fileds.append(x.string.replace("\xa0", ""))
+        fileds.append("aliasname")          #电表别名
+        fileds.append("data-id")            #任务编号
+        fileds.append("data-state")         #任务状态
+        fileds.append("data-update")        #任务更新
+        fileds.append("data-time")          #任务下发时间
+        fileds.append("data-logurl")        #任务日志url 
+        fileds.append("命令状态")           #命令状态
+
+        #提取行数据    
+        pCmds_ok = pIot.iotInfo['命令']['已完成']        #命令操作已完成信息
+        pCmds_doing = pIot.iotInfo['命令']['未完成']     #命令操作未完成信息
+        rows = []
+        for tr in trs[1:]:
+            row = {'命令类型': 'meter', '命令状态': '', '执行时间': 0}
+            tds = tr.find_all('td')
+            for x in range(len(fileds) - 7):
+                row[fileds[x]] = tr.contents[x*2 + 1].string
+            if(pIot.iotId != row['采集器编号']):         #只提取相同
+                continue
+
+                #特殊属性信息提取
+            if(len(tds) > 7):
+                row['aliasname'] = tds[2].next.attrs['title']
+                row['data-time'] = tds[4].next.attrs['title']
+                row['data-id'] = tds[7].attrs['data-id']
+                row['data-state'] = tds[7].attrs['data-state']
+                row['data-update'] = tds[7].attrs['data-update']
+                row['data-logurl'] = ""
+                if(len(tds[8].contents) > 1):
+                    row['data-logurl'] = ""
+                    row['cmd-cancelurl'] = ""
+                    for xx in tds[8].find_all('a'):
+                        if(xx.string == '日志'):
+                            row['data-logurl'] = xx.attrs.get('data-href', "")[1:]
+                        elif(xx.string == '取消'):
+                            row['cmd-cancelurl'] = xx.attrs.get('href', "")[1:]
+                            row['命令状态'] = "doing"
+
+            #命令完成状态判别
+            if(row['状态'] in ['已完成', '已取消', '超时']):
+                row['命令状态'] = myData.iif(row['状态'] == '已完成', "ok", "fail")
+                row['执行时间'] = myData_Trans.Tran_ToTime(row['data-time'], "%Y-%m-%d %H:%M:%S")  
+
+            #区分更新
+            key = row['data-time']
+            if(row['命令状态'] == "doing"):
+                if(pCmds_doing.get(key, None) == None):
+                    row['命令校检'] = {'校检次数': 0, '命令ID': row['data-id'], '命令状态': "doing", '校检提示': ""}
+                    pCmds_doing[key] = row
+                    self._iotCmds[key] = row            #传址同步修改值
+            else:
+                if(pCmds_ok.get(key, None) == None):
+                    pCmds_ok[key] = row
+
+                #剔除完成
+                if(bOnlyFail ):
+                    continue
+
+            #缓存用于返回
+            rows.append(row)
+        return rows
+    
+    # Iot命令状态校检-所有执行中-重写按实际分类实现True
+    def _checkIot_CmdsState_doing(self):
+        #提取未完成操作编号集
+        ids_Order = []
+        ids_Meter = []
+        for x in self._iotCmds:
+            # 提取命令信息
+            pCmd = self._iotCmds[x]
+            pCheck = pCmd['命令校检']
+
+            if(pCheck['命令状态'] == "doing"):
+                if(pCmd['命令类型'] == 'order'):
+                    ids_Order.append(pCmd['data-id']) 
+                elif(pCmd['命令类型'] == 'meter'):
+                    ids_Meter.append(pCmd['data-id']) 
+
+        # 命令状态分类校检
+        bRes = self._checkIot_CmdsState_doing_Order(ids_Order)
+        bRes = bRes & self._checkIot_CmdsState_doing_Meter(ids_Meter)
+        return bRes
+    
+    # Iot命令状态校检-Order
+    def _checkIot_CmdsState_doing_Order(self, ids):
+        return True
+    # Iot命令状态校检-抄表
+    def _checkIot_CmdsState_doing_Meter(self, ids):
+        return True
+
+    
     # 获取Iot电量信息
     def _getIot_Info_Power(self, pIot):
         #使用BeautifulSoup解析代码,并锁定页码指定标签内容
@@ -164,7 +341,7 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
         baseInfo['当前总电量'] = divs[1].find('label').string
         baseInfo['电量同步时间'] = divs[1].find('font').string
         return baseInfo
-    # 获取Iot电费信息
+    # 获取Iot费用信息
     def _getIot_Info_Money(self, pIot):
         #使用BeautifulSoup解析代码,并锁定页码指定标签内容
         #https://168.tqdianbiao.com/admin/card_opr/query_now/mid/1290780/q/money
@@ -180,50 +357,6 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
         baseInfo['电量同步时间'] = divs[1].find('font').string
         return baseInfo
 
-    # 获取Iot命令执行状态
-    def _getIot_Info_CmdsState(self, pIot, bNoSucess = True):
-        #使用BeautifulSoup解析代码,并锁定页码指定标签内容
-        resp = self._DoWeb_Get("", F"admin/ele_opration/index/mid/{pIot.usrID}/tab/4/controller/CardOpr", {})
-        soup = BeautifulSoup(resp.text,'lxml')
-
-        #提取表内容
-        trs = soup.find_all('tr')
-        fileds = []
-
-        #初始字段
-        for x in trs[0].find_all('th'):
-            fileds.append(x.string.replace("\xa0", ""))
-        fileds.append("aliasname")          #电表别名
-        fileds.append("data-id")            #任务编号
-        fileds.append("data-state")         #任务状态
-        fileds.append("data-update")        #任务更新
-        fileds.append("data-time")          #任务下发时间
-        fileds.append("data-logurl")        #任务日志url 
-
-        #提取行数据    
-        rows = []
-        for tr in trs[1:]:
-            row = {}
-            tds = tr.find_all('td')
-            for x in range(len(fileds) - 6):
-                row[fileds[x]] = tds[x].string
-
-                #特殊属性信息提取
-                row['aliasname'] = tds[1].next.attrs['title']
-                row['data-time'] = tds[4].next.attrs['title']
-                row['data-id'] = tds[7].attrs['data-id']
-                row['data-state'] = tds[7].attrs['data-state']
-                row['data-update'] = tds[7].attrs['data-update']
-                row['data-logurl'] = ""
-                if(len(tds[9].contents) > 1):
-                    row['data-logurl'] = tds[9].contents[1].attrs.get('data-href', "")
-
-            #区分更新
-            if(bNoSucess):
-                if(row['data-state'] not in ['1']):
-                    continue
-            rows.append(row)
-        return rows
 
     # 初始物联网对象集
     def _Init_Iots(self, dir = ""):

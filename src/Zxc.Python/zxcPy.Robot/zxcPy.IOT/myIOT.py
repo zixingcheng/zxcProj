@@ -43,8 +43,9 @@ class myIOT():
         self.datetime = datetime.datetime.now()  
         self.remark = ""            #备注
         self.valid = True           #是否有效
+        self.loaded = False         #是否已加载
         self.dictSets = {}          #字典型设置信息
-        self.iotInfo = {}           #设备其他信息-自定义
+        self.iotInfo = {'命令': {'未完成': {}, '已完成': {}}}  #设备其他信息-自定义
         self.Trans_FromDict(dictSets)
 
     # 转换为字典结构
@@ -67,6 +68,7 @@ class myIOT():
 
         dictSets['日期'] = self.datetime
         dictSets['isDel'] = not self.valid 
+        dictSets['isLoad'] = self.loaded 
         dictSets['备注'] = self.remark
         return dictSets
     # 转换为对象，由字典结构
@@ -94,7 +96,19 @@ class myIOT():
         self.datetime = dictSets.get("日期", self.datetime)
         self.remark = dictSets.get("备注", self.remark)
         self.isDel = not dictSets.get('isDel', not self.valid)  
+        self.valid = not self.isDel
+        self.loaded = dictSets.get('isLoad', self.loaded)  
         return True
+    
+    # Iot命令状态检查-多种类型
+    def Check_CmdState(self, cmdType):
+        # 提取命令
+        isDone = False
+        for x in self._iotCmds:
+
+            # 命令已完成，超过10分钟后移入已完成
+            pass
+        return 'done'
 
 # 物联网IOT对象集
 class myIOTs(myData_DB.myData_Table): 
@@ -169,6 +183,7 @@ class myIOT_Plat():
         self._webCookies = {}
         self._webSession = requests.Session()   #构造Session
         self._webImg_ind = 0                    #图片下载序号，避免重复
+        self._iotCmds = {}                      #待执行命令集   
         self._Init_Iots()                       #初始物联网对象集
         self._Init_ctrlState()                  #初始IOT状态集 
         
@@ -278,28 +293,87 @@ class myIOT_Plat():
     
 
     # Iot状态信息--更新
-    def Updata_Iot_State(self, pIot):
-        self._getIot_Info_Base(pIot)            #更新Iot基本信息
-        self._getIot_Info_PowerMoney(pIot)      #更新Iot基本信息-电费电量
+    '''
+    1.提取基本信息，电量电费信息，以及命令、抄表信息等，区分未执行；
+    2.未执行的命令、抄表添加进监测命令队列；
+    3.命令监测线程，监测命令队列，未完成定时查询执行状态，并更新，已完成的推送通知，统一处理；
 
-        # Iot信息同步
+    '''
+    def Updata_Iot_State(self, pIot):
+        self._getIot_Info_Base(pIot)                #更新Iot基本信息
+        self._getIot_Info_PowerMoney(pIot)          #更新Iot基本信息-电量、费用信息      
+        
+        self._getIot_Info_CmdsState(pIot, True)     #提取未执行完成命令，并更新当前未完成
+
+
+        #@Test 命令状态校检
+        self._checkIot_CmdsState_Monitor()
+
         return self.Updata_Iot_Info(pIot)
     # Iot信息同步--更新
     def Updata_Iot_Info(self, pIot):
+        pIot.loaded = True                          #标识已加载
         self.Iots._Updata(pIot.ID, pIot.Trans_ToDict(), False, False)
         return True
-
-        self._getIot_Info_Base(pIot)            #更新Iot基本信息
-        self._getIot_Info_PowerMoney(pIot)      #更新Iot基本信息-电费电量
-        # 提取未执行完成命令
-        pCmds = self._getIot_Info_CmdsState(pIot, True)
-        if(len(pCmds) > 0):
-            for x in pCmds:
-                if(x['状态'] == '等待采集器连接'):
-                    pIot.S
-            pIot.cmds = 0
-        pass  
     
+
+    
+    # Iot命令状态校检-后台监测线程
+    def _checkIot_CmdsState_Monitorthread(self):
+        # 循环所有执行中命令
+        pass
+    # Iot命令状态校检
+    def _checkIot_CmdsState_Monitor(self):
+        # 提取命令、抄表未完成状态信息
+        self._checkIot_CmdsState_doing()
+
+
+        # 循环所有执行中命令
+        timeNow = time.time()
+        for x in self._iotCmds:
+            # 提取命令信息
+            pCmd = self._iotCmds[x]
+            isOvertime = False          #是否超时
+            timesCheck = pCmd['命令校检']['校检次数']
+
+
+            # 对未完成信息计数，超过次数/超时，则执行取消
+            if(row['执行时间'] == 0):
+                timeCmd = myData_Trans.Tran_ToTime(row['data-time'], "%Y-%m-%d %H:%M:%S")
+
+                # 超时，超次数检查
+                if(timeNow - timeCmd > 60):
+                    isOvertime = True
+                elif(timesCheck > 30):
+                    # 超次数检查
+                    isOvertime = True
+                else:
+                    #检查次数累加
+                    pCmd['命令校检']['校检次数'] = isOvertime + 1
+            else:
+                # 已执行，超过10分钟后移入已完成
+                pass
+
+                    
+            if(timeNow - pCmd['执行时间']):
+                pass
+
+                row['执行时间'] = myData_Trans.Tran_ToTime(row['data-time'], "%Y-%m-%d %H:%M:%S")  
+
+
+            #  #time类型，便于超时计算，统一记录为操作时间，注意未执行时直接计算为超时
+
+
+            #self._iotCmds[key] = row            #传址同步修改值
+
+            # 命令已完成，超过10分钟后移入已完成
+            pass
+        pass
+    # Iot命令状态校检-所有执行中-重写按实际分类实现
+    def _checkIot_CmdsState_doing(self):
+        pass
+    
+
 
     # 控制--状态
     def Control_State(self, iotID, state = ""):
@@ -331,19 +405,12 @@ class myIOT_Plat():
     # 获取Iot基本信息
     def _getIot_Info_Base(self, pIot):
         return pIot.iotInfo
-    # 获取Iot基本信息-电量电费
+    # 获取Iot基本信息-电量、费用
     def _getIot_Info_PowerMoney(self, pIot):
         return pIot.iotInfo
-
-    # 获取Iot电量信息
-    def _getIot_Info_Power(self, pIot):
-        return pIot.iotInfo
-    # 获取Iot电费信息
-    def _getIot_Info_Money(self, pIot):
-        return pIot.iotInfo
-
     # 获取Iot命令执行状态
-    def _getIot_Info_CmdsState(self, pIot, bNoSucess = True):
+    def _getIot_Info_CmdsState(self, pIot, bOnlyFail = True):
+        #row = {'命令状态': '', '执行时间': ''}
         return []
 
     #endregion
@@ -351,7 +418,7 @@ class myIOT_Plat():
 
     # 初始物联网对象集
     def _Init_Iots(self, dir = ""):
-        self.typeIot = "电表"
+        self.typeIot = "电表"         
         self.Iots = myIOTs(dir = dir)    
     # 初始IOT状态集
     def _Init_ctrlState(self):
