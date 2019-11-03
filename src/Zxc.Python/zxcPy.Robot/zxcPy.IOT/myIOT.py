@@ -8,7 +8,7 @@ Created on  张斌 2019-10-28 16:00:00
     物联网IOT  智能物联网综合管理平台
 """
 
-import sys, os, time, datetime
+import sys, os, time, datetime, threading
 import re, requests
 import urllib,urllib.parse,urllib.request,http.cookiejar 
 from lxml import etree
@@ -95,7 +95,7 @@ class myIOT():
 
         self.datetime = dictSets.get("日期", self.datetime)
         self.remark = dictSets.get("备注", self.remark)
-        self.isDel = not dictSets.get('isDel', not self.valid)  
+        self.isDel = dictSets.get('isDel', not self.valid)  
         self.valid = not self.isDel
         self.loaded = dictSets.get('isLoad', self.loaded)  
         return True
@@ -183,7 +183,6 @@ class myIOT_Plat():
         self._webCookies = {}
         self._webSession = requests.Session()   #构造Session
         self._webImg_ind = 0                    #图片下载序号，避免重复
-        self._iotCmds = {}                      #待执行命令集   
         self._Init_Iots()                       #初始物联网对象集
         self._Init_ctrlState()                  #初始IOT状态集 
         
@@ -193,6 +192,12 @@ class myIOT_Plat():
         self._Dir_Image = self._Dir_Base + "/Temps/Images"
         self._Dir_Image = myIO.checkPath(self._Dir_Image)
         myIO.mkdir(self._Dir_Image, False, True)#覆盖    
+        
+        #命令任务状态监测线程启动
+        self.isRuning = False
+        self._iotCmds = {}          #待执行命令集   
+        self._iotCmds_ok = {}       #已执行命令集（含失败）
+        self.Start()
 
     # 模拟登录
     def Login(self, urlLogin = "", urlDoLogin = "", url_img_code = "", cookie_str = ""):   
@@ -304,75 +309,15 @@ class myIOT_Plat():
         self._getIot_Info_PowerMoney(pIot)          #更新Iot基本信息-电量、费用信息      
         
         self._getIot_Info_CmdsState(pIot, True)     #提取未执行完成命令，并更新当前未完成
-
-
-        #@Test 命令状态校检
-        self._checkIot_CmdsState_Monitor()
-
         return self.Updata_Iot_Info(pIot)
     # Iot信息同步--更新
     def Updata_Iot_Info(self, pIot):
         pIot.loaded = True                          #标识已加载
         self.Iots._Updata(pIot.ID, pIot.Trans_ToDict(), False, False)
         return True
-    
-
-    
-    # Iot命令状态校检-后台监测线程
-    def _checkIot_CmdsState_Monitorthread(self):
-        # 循环所有执行中命令
+    # 通知任务运行状态
+    def Notify_CmdState(self, taskInfo):
         pass
-    # Iot命令状态校检
-    def _checkIot_CmdsState_Monitor(self):
-        # 提取命令、抄表未完成状态信息
-        self._checkIot_CmdsState_doing()
-
-
-        # 循环所有执行中命令
-        timeNow = time.time()
-        for x in self._iotCmds:
-            # 提取命令信息
-            pCmd = self._iotCmds[x]
-            isOvertime = False          #是否超时
-            timesCheck = pCmd['命令校检']['校检次数']
-
-
-            # 对未完成信息计数，超过次数/超时，则执行取消
-            if(row['执行时间'] == 0):
-                timeCmd = myData_Trans.Tran_ToTime(row['data-time'], "%Y-%m-%d %H:%M:%S")
-
-                # 超时，超次数检查
-                if(timeNow - timeCmd > 60):
-                    isOvertime = True
-                elif(timesCheck > 30):
-                    # 超次数检查
-                    isOvertime = True
-                else:
-                    #检查次数累加
-                    pCmd['命令校检']['校检次数'] = isOvertime + 1
-            else:
-                # 已执行，超过10分钟后移入已完成
-                pass
-
-                    
-            if(timeNow - pCmd['执行时间']):
-                pass
-
-                row['执行时间'] = myData_Trans.Tran_ToTime(row['data-time'], "%Y-%m-%d %H:%M:%S")  
-
-
-            #  #time类型，便于超时计算，统一记录为操作时间，注意未执行时直接计算为超时
-
-
-            #self._iotCmds[key] = row            #传址同步修改值
-
-            # 命令已完成，超过10分钟后移入已完成
-            pass
-        pass
-    # Iot命令状态校检-所有执行中-重写按实际分类实现
-    def _checkIot_CmdsState_doing(self):
-        pass
-    
 
 
     # 控制--状态
@@ -385,7 +330,9 @@ class myIOT_Plat():
         # 提取IOT对象
         if(state not in self.ctrlStates): return False
         return True
-
+    # 取消--命令任务
+    def Cancel_Cmd(self, cmdID, cmdType = ""):
+        pass
 
     # Iot信息管理
     #region Iot信息管理
@@ -409,7 +356,7 @@ class myIOT_Plat():
     def _getIot_Info_PowerMoney(self, pIot):
         return pIot.iotInfo
     # 获取Iot命令执行状态
-    def _getIot_Info_CmdsState(self, pIot, bOnlyFail = True):
+    def _getIot_Info_CmdsState(self, pIot, bOnlyDoing = True):
         #row = {'命令状态': '', '执行时间': ''}
         return []
 
@@ -418,13 +365,127 @@ class myIOT_Plat():
 
     # 初始物联网对象集
     def _Init_Iots(self, dir = ""):
-        self.typeIot = "电表"         
+        self.typeIot = "电表"    
         self.Iots = myIOTs(dir = dir)    
     # 初始IOT状态集
     def _Init_ctrlState(self):
         self.ctrlStates = ["open", "close"]   
 
 
+    # 通知任务信息
+    def Notify_CmdTask(self, pIot, taskInfo):
+        pCmds_ok = pIot.iotInfo['命令']['已完成']        #命令操作已完成信息
+        pCmds_doing = pIot.iotInfo['命令']['未完成']     #命令操作未完成信息
+        key = taskInfo['data-time']
+
+        #按命令状态记录
+        id = taskInfo['命令类型'] + "-" + taskInfo['data-id']
+        if(taskInfo['命令状态'] == "doing"):
+            if(pCmds_doing.get(key, None) == None):
+                taskInfo['命令校检'] = {'校检次数': 0, '命令ID': taskInfo['data-id'], '命令状态': "doing", '校检提示': ""}
+                pCmds_doing[key] = taskInfo
+                self._iotCmds[id] = taskInfo            #传址同步修改值                    
+        else:
+            if(pCmds_ok.get(key, None) == None):
+                if(pIot.loaded == False):     #第一次全部加载，后续由任务通知完成
+                    pCmds_ok[key] = taskInfo
+                    self._iotCmds_ok[id] = taskInfo     #传址同步修改值  
+                else:
+                    if(self._iotCmds_ok.get(id, None) == None): 
+                        taskInfo['命令校检'] = {'校检次数': 0, '命令ID': taskInfo['data-id'], '命令状态': "doing", '校检提示': ""}
+                        pCmds_doing[key] = taskInfo
+                        self._iotCmds[id] = taskInfo        #传址同步修改值   
+        pass
+    # 通知任务运行状态
+    def Notify_CmdState(self, taskInfo):
+        # 提取记录信息
+        state = ''
+        id = taskInfo['type'] + "-" + taskInfo['id']
+
+        # 判断成功与否
+        if(taskInfo['result'] == ""):
+            # 执行中
+            pTask = self._iotCmds.get(id, None)
+            if(pTask != None):
+                pTask['命令校检']['校检次数'] += 1
+                state = 'doing'
+
+            # 超次、超时执行取消
+            if(pTask['命令校检']['校检次数'] > 30 or 
+               (pTask['执行时间'] == 0 and time.time() - time.mktime(myData_Trans.Tran_ToTime(pTask['data-time'])) > 60)):
+                self.Cancel_Cmd(taskInfo['id'], taskInfo['type'])
+                #self.Get_Iot(pTask['通讯地址'])    #立即同步，太快，无效
+        else:
+            #移入到已完成
+            pTask = self._iotCmds.get(id, None)
+            if(pTask != None):
+                #非执行中
+                pTask['状态'] = taskInfo['result']
+                pTask['结果'] = taskInfo['state_dsp']
+                pTask['命令状态'] = 'ok'
+                pTask['命令校检']['命令状态'] = 'ok'
+                self._iotCmds_ok[id] = pTask
+                self._iotCmds.pop(id)
+
+                #操作结果通知，区分已完成、已取消、超时
+                pRes = taskInfo['state_dsp']
+                if(pRes == "已取消"):
+                    self.Notify_CmdState_cancel(taskInfo)
+                elif(pRes == "超时"):
+                    self.Notify_CmdState_fail(taskInfo)
+                elif(pRes == "已完成"):
+                    self.Notify_CmdState_ok(taskInfo)
+        pass
+    # 通知任务运行状态--完成
+    def Notify_CmdState_ok(self, taskInfo):
+        myDebug.Debug("完成: ")
+        myDebug.Debug(taskInfo)
+        pass
+    # 通知任务运行状态--取消
+    def Notify_CmdState_cancel(self, taskInfo):
+        myDebug.Debug("取消: ")
+        myDebug.Debug(taskInfo)
+        pass
+    # 通知任务运行状态--失败
+    def Notify_CmdState_fail(self, taskInfo):
+        myDebug.Debug("失败: ")
+        myDebug.Debug(taskInfo)
+        pass
+
+
+    # 运行监测线程
+    def Start(self):
+        if(True):
+            self.isRuning = True
+            self.thrd_Handle = threading.Thread(target = self._OnHandle_Iot_CmdsState_Monitorthread)
+            self.thrd_Handle.setDaemon(False)
+            self.thrd_Handle.start()
+        pass
+    # Iot命令状态校检-后台监测线程
+    def _OnHandle_Iot_CmdsState_Monitorthread(self):
+        # 循环所有执行中命令
+        try:
+            # 延时2秒
+            time.sleep(2)
+
+            #线程循环
+            while self.isRuning:
+                try:
+                    # Iot命令状态校检-所有执行中
+                    self._checkIot_CmdsState_doing()
+                                    
+                    # 延时2秒
+                    time.sleep(2)
+                except :
+                    myDebug.Error("Err:: Run_OnHandle_Iot_CmdsState_Monitor_ByThread... ")
+        except :
+            myDebug.Error("Err:: Run_OnHandle_Iot_CmdsState_Monitor_ByThread... Restart...")
+        myDebug.Print('Thread Run_OnHandle_Iot_CmdsState_Monitor_ByThread is exiting...')
+    # Iot命令状态校检-所有执行中-重写按实际分类实现True
+    def _checkIot_CmdsState_doing(self):
+        pass
+
+    
     # 操作webApi接口-Post方式
     def _DoWeb_Post(self, strTag = "", url = "", data = None, checkInfo = {}, bDebug = True):
         self._webReferer = self._webHost + "/" + url
@@ -437,7 +498,7 @@ class myIOT_Plat():
             resp = self._webSession.post(self._webReferer, data)
 
         # 输出结果
-        print(resp.content.decode('utf-8'))
+        #print(resp.content.decode('utf-8'))
         if(bDebug): myDebug.Debug(" ---请求完毕。\n")
 
         # 验证信息

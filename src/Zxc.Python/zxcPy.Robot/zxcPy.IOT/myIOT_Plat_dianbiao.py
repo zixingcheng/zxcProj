@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 sysDir = mySystem.Append_Us("")
 sysDir = mySystem.Append_Dir("myFunction")
-import myIO, myData, myData_Trans, myIOT
+import myIO, myData, myData_Json, myData_Trans, myIOT
 from myWeb_urlLib import myWeb
 
 
@@ -78,8 +78,19 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
         if(pIot.iotConnected):
             if(state == "open"):
                 resp = self._DoWeb_Get("", "admin/card_opr/pull_on_off/mid/{pIot.usrID}/action/pull_on", {})
+            elif(state == "close"):
+                resp = self._DoWeb_Get("", "admin/card_opr/pull_on_off/mid/{pIot.usrID}/action/pull_off", {})
             return True
         return {'err': '未连接'}
+    # 取消--命令任务
+    def Cancel_Cmd(self, cmdID, cmdType = ""):
+        if(cmdType == 'order'):
+            url = 'admin/ele_opration/cancel/id/' +cmdID
+            self._DoWeb_Get("取消操作", url, {})
+        elif(cmdType == 'meter'):
+            url = 'admin/meter_task/cancel/id/' +cmdID
+            self._DoWeb_Get("取消抄表", url, {})
+        pass
     
 
     # 获取Iot基本信息
@@ -141,12 +152,15 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
         #更新Iot信息
         return baseInfo
     # 获取Iot命令执行状态-只要
-    def _getIot_Info_CmdsState(self, pIot, bOnlyFail = True):
-        rows = self._getIot_Info_CmdsState_Order(pIot, bOnlyFail)
-        rows += self._getIot_Info_CmdsState_Meter(pIot, bOnlyFail)
+    def _getIot_Info_CmdsState(self, pIot, bOnlyDoing = True):
+        rows = self._getIot_Info_CmdsState_Order(pIot, bOnlyDoing)
+        rows += self._getIot_Info_CmdsState_Meter(pIot, bOnlyDoing)
+
+        #命令状态校检-加快发出命令的校检
+        self._checkIot_CmdsState_doing()
         return rows
     # 获取Iot命令执行状态-控制命令
-    def _getIot_Info_CmdsState_Order(self, pIot, bOnlyFail = True):
+    def _getIot_Info_CmdsState_Order(self, pIot, bOnlyDoing = True):
         #使用BeautifulSoup解析代码,并锁定页码指定标签内容
         resp = self._DoWeb_Get("操作记录", F"admin/ele_opration/index/mid/{pIot.usrID}/tab/4/controller/CardOpr", {})
         soup = BeautifulSoup(resp.text,'lxml')
@@ -166,9 +180,7 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
         fileds.append("data-logurl")        #任务日志url 
         fileds.append("命令状态")           #命令状态
 
-        #提取行数据    
-        pCmds_ok = pIot.iotInfo['命令']['已完成']        #命令操作已完成信息
-        pCmds_doing = pIot.iotInfo['命令']['未完成']     #命令操作未完成信息
+        #提取行数据     
         rows = []
         for tr in trs[1:]:
             row = {'命令类型': 'order', '命令状态': '', '执行时间': 0}
@@ -199,26 +211,20 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
                 row['命令状态'] = myData.iif(row['状态'] == '已完成', "ok", "fail")
                 row['执行时间'] = myData_Trans.Tran_ToTime(row['data-time'], "%Y-%m-%d %H:%M:%S")  
 
-            #区分更新
-            key = row['data-time']
-            if(row['命令状态'] == "doing"):
-                if(pCmds_doing.get(key, None) == None):
-                    row['命令校检'] = {'校检次数': 0, '命令ID': row['data-id'], '命令状态': "doing", '校检提示': ""}
-                    pCmds_doing[key] = row
-                    self._iotCmds[key] = row            #传址同步修改值
-            else:
-                if(pCmds_ok.get(key, None) == None):
-                    pCmds_ok[key] = row
 
-                #剔除完成
-                if(bOnlyFail ):
+            #更新命令任务信息
+            self.Notify_CmdTask(pIot, row)
+
+            #剔除完成
+            if(bOnlyDoing ):
+                if(row['命令状态'] != "doing"):
                     continue
 
             #缓存用于返回
             rows.append(row)
         return rows
     # 获取Iot命令执行状态-抄表命令
-    def _getIot_Info_CmdsState_Meter(self, pIot, bOnlyFail = True):
+    def _getIot_Info_CmdsState_Meter(self, pIot, bOnlyDoing = True):
         #使用BeautifulSoup解析代码,并锁定页码指定标签内容
         resp = self._DoWeb_Get("操作记录", F"admin/meter_task/index/_afid/1096", {})
         soup = BeautifulSoup(resp.text,'lxml')
@@ -272,26 +278,21 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
             if(row['状态'] in ['已完成', '已取消', '超时']):
                 row['命令状态'] = myData.iif(row['状态'] == '已完成', "ok", "fail")
                 row['执行时间'] = myData_Trans.Tran_ToTime(row['data-time'], "%Y-%m-%d %H:%M:%S")  
+                
+                
+            #更新命令任务信息
+            self.Notify_CmdTask(pIot, row)
 
-            #区分更新
-            key = row['data-time']
-            if(row['命令状态'] == "doing"):
-                if(pCmds_doing.get(key, None) == None):
-                    row['命令校检'] = {'校检次数': 0, '命令ID': row['data-id'], '命令状态': "doing", '校检提示': ""}
-                    pCmds_doing[key] = row
-                    self._iotCmds[key] = row            #传址同步修改值
-            else:
-                if(pCmds_ok.get(key, None) == None):
-                    pCmds_ok[key] = row
-
-                #剔除完成
-                if(bOnlyFail ):
+            #剔除完成
+            if(bOnlyDoing ):
+                if(row['命令状态'] != "doing"):
                     continue
 
             #缓存用于返回
             rows.append(row)
         return rows
     
+
     # Iot命令状态校检-所有执行中-重写按实际分类实现True
     def _checkIot_CmdsState_doing(self):
         #提取未完成操作编号集
@@ -312,12 +313,47 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
         bRes = self._checkIot_CmdsState_doing_Order(ids_Order)
         bRes = bRes & self._checkIot_CmdsState_doing_Meter(ids_Meter)
         return bRes
-    
     # Iot命令状态校检-Order
     def _checkIot_CmdsState_doing_Order(self, ids):
+        # 操作任务状态查询
+        if(len(ids) < 1): return True
+        data = {
+                    'ids': myData_Trans.Tran_ToStr(ids)
+                }
+        resp = self._DoWeb_Post("操作记录状态", "admin/ele_opration/state_update", data, {})
+        soup = BeautifulSoup(resp.content.decode('unicode-escape'),'lxml')
+
+        # 提取任务状态信息内容
+        pJson = myData_Json.Json_Object()
+        pJson.Trans_FromStr(soup.string)
+
+        pDatas = pJson['info']['data']
+        for x in pDatas:
+            #通知任务状态
+            taskInfo = dict(x)
+            taskInfo['type'] = 'order'
+            self.Notify_CmdState(taskInfo)
         return True
     # Iot命令状态校检-抄表
     def _checkIot_CmdsState_doing_Meter(self, ids):
+        # 操作任务状态查询
+        if(len(ids) < 1): return True
+        data = {
+                    'ids': myData_Trans.Tran_ToStr(ids)
+                }
+        resp = self._DoWeb_Post("抄表记录状态", "admin/meter_task/state_update", data, {})
+        soup = BeautifulSoup(resp.content.decode('unicode-escape'),'lxml')
+
+        # 提取任务状态信息内容
+        pJson = myData_Json.Json_Object()
+        pJson.Trans_FromStr(soup.string)
+
+        pDatas = pJson['data']
+        for x in pDatas:
+            #通知任务状态
+            taskInfo = dict(x)
+            taskInfo['type'] = 'meter'
+            self.Notify_CmdState(taskInfo)
         return True
 
     
@@ -365,6 +401,7 @@ class myIOT_Plat_Dianbiao_tq(myIOT.myIOT_Plat):
 
 
 
+
 #主启动程序 
 if __name__ == "__main__":    
     #添加Iot信息
@@ -379,7 +416,9 @@ if __name__ == "__main__":
     # 电表控制-开合闸
     pIOT_Plat.Control_State('190801207866', 'open')
     
-
+    while(True):
+        pIot = pIOT_Plat.Get_Iot('190801207866', True)          #更新状态
+        time.sleep(1)
     exit(0)
     
     '''
