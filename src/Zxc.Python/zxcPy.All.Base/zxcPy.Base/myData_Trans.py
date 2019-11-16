@@ -153,6 +153,8 @@ def Tran_ToTimes(List, strFormat="%Y-%m-%d %H:%M:%S"):
 # 字符串转datetime
 def Tran_ToDatetime(strTime, strFormat="%Y-%m-%d %H:%M:%S"):
     # 时间转换 
+    if(strTime == ""):
+        return datetime.datetime.now() 
     dtDatetime = datetime.datetime.strptime(strTime, strFormat)   
     return dtDatetime
 

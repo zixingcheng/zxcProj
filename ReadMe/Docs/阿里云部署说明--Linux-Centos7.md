@@ -250,6 +250,82 @@ Known problems with Fedora Linux and Python 3 version: Error message:
 　　(如有报错： RuntimeError: Compression requires the (missing) zlib module，则需要安装yum install zlib-devel，安装后要重新编译 python3.5:   
 
 
+### mysql数据库安装 
+
+	参考 centos7下安装mysql5.7（rpm） https://blog.csdn.net/wudinaniya/article/details/81094578
+	
+	实测:
+	
+	第一步：下载地址；https://dev.mysql.com/downloads/mysql/，可以选择 RPM Bundle,下载完记得解压  tar -xvf xxx.tar
+	
+	第二步：卸载旧版本的MySql
+	
+		查看旧版本MySql： rpm -qa | grep mysql
+      	逐个删除掉旧的组件： rpm -e --nodeps {-file-name}
+
+    第三步：使用 rpm 命令安装MySql组件
+
+    	使用命令rpm -ivh {-file-name}进行安装操作。按照依赖关系依次安装rpm包 依赖关系依次为common→libs→client→server
+
+		rpm -ivh mysql-community-common-5.7.22-1.el7.x86_64.rpm
+		rpm -ivh mysql-community-libs-5.7.22-1.el7.x86_64.rpm
+		rpm -ivh mysql-community-client-5.7.22-1.el7.x86_64.rpm
+		rpm -ivh mysql-community-server-5.7.22-1.el7.x86_64.rpm
+
+		注：ivh中， i-install安装；v-verbose进度条；h-hash哈希校验
+
+	第四步：登录并创建MySql密码
+	
+    	1.启动MySql service mysqld start 或 systemctl start mysqld.service 启动MySQL服务。（如果mysql服务无法启动，就重启一下系统）
+ 
+			systemctl start mysqld.service    启动mysql
+			systemctl status mysqld.service   查看mysql状态
+			systemctl stop mysqld.service     关闭mysql
+
+			查看mysql进程 ps -ef|grep mysql
+			查看3306端口 netstat -anop|grep 3306
+			
+			
+		2.登陆mysql修改root密码
+		
+        	由于MySQL5.7.4之前的版本中默认是没有密码的，登录后直接回车就可以进入数据库，进而进行设置密码等操作。其后版本对密码等安全相关操作进行了一些改变，在安装过程中，会在安装日志中生成一个临时密码。
+			grep 'temporary password' /var/log/mysqld.log  可查询到类似于如下的一条日志记录：
+				[root@nfs_client tools]# grep 'temporary password' /var/log/mysqld.log    # 在/var/log/mysqld.log文件中搜索字段‘temporary password’
+					2018-07-18T06:02:23.579753Z 1 [Note] A temporary password is generated for root@localhost: n(jPp4l-C33#
+			
+			n(jPp4l-C33#即为登录密码。使用这个随机密码登录进去，然后修改密码，使用命令： mysql -uroot -p
+
+			'''
+			[root@nfs_client tools]# mysql -uroot -p
+				Enter password:   # 在这里输入密码
+				Welcome to the MySQL monitor.  Commands end with ; or \g.
+				Your MySQL connection id is 2
+				Server version: 5.7.22
+				 
+				Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
+				 
+				Oracle is a registered trademark of Oracle Corporation and/or its
+				affiliates. Other names may be trademarks of their respective
+				owners.
+				 
+				Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+				 
+				mysql> quit      # 输入quit 或 exit 都能退出mysql
+				Bye
+			'''
+			
+			执行下面的命令修改MySql root密码： alter user root@localhost identified by 'zxcvbnm,./1238';
+			
+		3.授予root用户远程访问权限：
+			mysql> grant all privileges on *.* to root@'%' identified by 'zxcvbnm1238';
+
+		4.刷新权限，使设置生效， OK。
+			mysql> flush privileges;
+			
+		5.在远程机器上测试远程连接：  mysql -h 172.17.39.35 -P 3306 -u root -p
+		
+		6.使用Navicat进行界面级操作。
+			
 
 
 ## 配置运维
