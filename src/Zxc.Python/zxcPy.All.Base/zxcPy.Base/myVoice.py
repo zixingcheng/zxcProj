@@ -10,7 +10,7 @@ import sys, os, time, datetime, threading
 #import speech_recognition as sr
 #import pyaudio
 import wave
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import scipy.signal as signal
 import numpy as np
 from pydub import AudioSegment

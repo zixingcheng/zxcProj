@@ -8,7 +8,7 @@ Created on  张斌 2019-11-07 16:30:00
 """
 import os, sys, re
 import pymysql
-import myData, myDebug
+import myData, myData_Trans, myIO, myIO_md, myDebug
 
 
 
@@ -103,8 +103,77 @@ class myPyMysql():
         except Exception as e:
             myDebug.Debug(f'error:{e}')
             return False
+    # 判断索引是否存在
+    def isExist_Index(self, tableName, indexName):
+        try:
+            rs = self.execute("", f'SELECT * FROM information_schema.statistics WHERE table_schema=CurrentDatabase AND table_name = {tableName} AND index_name = {indexName};')
+            field_list = re.findall('(\'.*?\')',str(rs).lower())
+            field_list = [re.sub("'",'',each) for each in field_list]
+            
+            return indexName.lower() in field_list
+        except Exception as e:
+            myDebug.Debug(f'error:{e}')
+            return False
          
+    
+    # 创建数据库-由外部md设置
+    def createDB_ByFile(self, dbName, dbSet_MdFile = '', isRecover = False): 
+        try:
+            #读取表字段信息集
+            if(dbSet_MdFile == ""):
+                strDir, strName = myIO.getPath_ByFile(__file__)
+                dirBase = os.path.abspath(os.path.join(strDir, ".."))  
+                dir = dirBase + "/Data/DB_Data/"
+                dbSet_MdFile = dir + dbName + ".md"
+            pMD = myIO_md.myMD(dbSet_MdFile)
+            if(len(pMD.nodesMD) < 1): return False
 
+            #数据库创建,不存在或者强制覆盖
+            bReusult = True
+            if(self.isExist_DB(dbName) == False or isRecover == True):
+                bReusult = bReusult & (self.createDB(dbName) >= 0)
+
+            #循环更新创建表信息
+            self.initConnect(dbName)
+            for x in pMD[0].Childs:
+                #提取表信息
+                pTable = x.getTable()
+                bRecover = x.titleName.count("-*r") == 1
+                tbName = x.titleName.replace("-*r", "")
+                
+                #创建表-检查存在，如果覆盖则重建
+                if(bRecover == True):
+                    bReusult = bReusult & (self.dropTable(tbName) >= 0)
+                if(self.isExist_Table(tbName) == False or bRecover == True):
+                    bReusult = bReusult & (self.createTable(tbName) >= 0)
+
+                #循环所有字段，创建或更新字段信息
+                for ind in range(1, pTable.rows):
+                    fieldName = pTable['字段名'].values[ind]
+                    fieldType = pTable['字段类型'].values[ind]
+                    fieldLength = myData_Trans.To_Int(pTable['字段长度'].values[ind])
+                    nullable = myData_Trans.To_Bool(pTable['是否可空'].values[ind])
+                    isIndex = myData_Trans.To_Bool(pTable['是否索引'].values[ind])
+                    default = pTable['默认值'].values[ind].replace('-', '')
+                    indexType = pTable['索引类型'].values[ind].replace('-', '')
+                    
+                    #创建字段
+                    tableInfo = {'tb_name': tbName, 'fields': [{"columnName": fieldName, "dataType": fieldType, "fieldLength": fieldLength, 'nullable': nullable, 'columnDefault': default}]}
+                    bReusult = bReusult & (self.createField(tableInfo) >= 0)
+
+                    #创建索引
+                    if(isIndex and indexType != ""):
+                        bReusult = bReusult & (self.createIndex(tbName, indexType, indexType + "_" + fieldName, fieldName) >= 0)
+
+                #创建默认字段
+                tableInfo = {'tb_name': tbName, 'fields': [{"columnName": 'isDel', "dataType": 'bool', "fieldLength": 0, 'nullable': True}]}
+                bReusult = bReusult & (self.createField(tableInfo) >= 0)
+                tableInfo = {'tb_name': tbName, 'fields': [{"columnName": 'editTime', "dataType": 'datetime', "fieldLength": 0, 'nullable': True}]}
+                bReusult = bReusult & (self.createField(tableInfo) >= 0)
+            return bReusult
+        except Exception as e:
+            myDebug.Debug(f'error:{e}')
+            return False
     # 创建数据库（0：已存在，1：成功，-1：失败）
     def createDB(self, dbName):
         # 查询 数据库是否存在 
@@ -226,6 +295,29 @@ class myPyMysql():
                 nState = -1
                 myDebug.Debug(f'error:{e}')
         return nState
+    # 创建数据库表索引（0：已存在，1：成功，-1：失败）
+    def createIndex(self, tableName, indexType, indexName, fieldNames):
+        # 查询 表索引是否存在 
+        nState = 0
+        if(self.isExist_Index(tableName, indexName) == True): 
+            myDebug.Debug(f'表{tableName}索引{indexName}已存在.\n')
+            return nState
+        else:
+            myDebug.Debug(f"开始创建表索引{indexName}......")
+            try:
+                indexType = indexType.strip().lower()
+                if(indexType == 'unique'): indexType += " index"
+                if(indexType == 'primary'): 
+                    indexType += " key"
+                    indexName = ""
+                               
+                rs = self.execute("", f'ALTER TABLE {tableName} ADD {indexType} {indexName}({fieldNames});')
+                nState = myData.iif(rs == None, -1, 1)
+            except Exception as e:
+                myDebug.Debug(f'error:{e}')
+                nState = -1
+        myDebug.Debug(f'表{tableName}索引{indexName}创建完毕!\n')
+        return nState 
 
     # 删除数据库（0：不存在，1：成功，-1：失败）
     def dropDB(self, dbName):
@@ -263,7 +355,7 @@ class myPyMysql():
         return nState
     # 删除数据库表字段（0：不存在，1：成功，-1：失败）
     def dropField(self, tableName, fieldName):
-        # 查询 数据库是否存在 
+        # 查询 表字段是否存在 
         nState = 0
         if(self.isExist_Field(tableName, fieldName) == False): 
             myDebug.Debug(f'表{tableName}字段{fieldName}不存在.\n')
@@ -277,6 +369,23 @@ class myPyMysql():
                 myDebug.Debug(f'error:{e}')
                 nState = -1
         myDebug.Debug(f'表{tableName}字段{fieldName}删除完毕!\n')
+        return nState
+    # 删除数据库表索引（0：不存在，1：成功，-1：失败）
+    def dropIndex(self, tableName, indexName):
+        # 查询 表索引是否存在 
+        nState = 0
+        if(self.isExist_Index(tableName, indexName) == False): 
+            myDebug.Debug(f'表{tableName}索引{indexName}不存在.\n')
+            return nState
+        else:
+            myDebug.Debug(f"开始删除表索引{indexName}......")
+            try:
+                rs = self.execute(dbName, f'ALTER TABLE {tableName} DROP INDEX {indexName};')
+                nState = myData.iif(rs == None, -1, 1)
+            except Exception as e:
+                myDebug.Debug(f'error:{e}')
+                nState = -1
+        myDebug.Debug(f'表{tableName}索引{indexName}删除完毕!\n')
         return nState
 
 
@@ -364,13 +473,16 @@ class myPyMysql():
 
 
 
-
 #测试
 if __name__ ==  "__main__":
     # 测试mysql操作
     #pMysql = myPyMysql(usrName='root', usrPw='Zxcvbnm123*', charset='utf8', host = '39.105.196.175')   #远程操作测试
     pMysql = myPyMysql(usrName='root', usrPw='Zxcvbnm123*', charset='utf8', host = '127.0.0.1')         #本地操作测试
     
+    # 文件型初始
+    pMysql.createDB_ByFile("zxcDB")
+    pMysql.query("INSERT INTO zxcTable_0(字段1, 字段2, 字段3) VALUES ('value1', 'value2', 33);")
+
 
     pMysql.createDB('myTestDB')
     pMysql.initConnect('myTestDB')
@@ -387,5 +499,6 @@ if __name__ ==  "__main__":
     pMysql.dropTable('zxcTest')
     pMysql.dropDB('myTestDB')
 
-     
+
+
     pass
