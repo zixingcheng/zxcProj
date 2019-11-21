@@ -106,7 +106,7 @@ class myPyMysql():
     # 判断索引是否存在
     def isExist_Index(self, tableName, indexName):
         try:
-            rs = self.execute("", f'SELECT * FROM information_schema.statistics WHERE table_schema=CurrentDatabase AND table_name = {tableName} AND index_name = {indexName};')
+            rs = self.execute("", f"SELECT * FROM information_schema.statistics WHERE TABLE_SCHEMA = '{self._dbName}' AND TABLE_NAME = '{tableName}' AND index_name = '{indexName}';")
             field_list = re.findall('(\'.*?\')',str(rs).lower())
             field_list = [re.sub("'",'',each) for each in field_list]
             
@@ -417,7 +417,7 @@ class myPyMysql():
             index = cur.description
             for res in rows:
                 row = {}
-                for i in range(len(index) - 1):
+                for i in range(len(index)):
                     row[index[i][0]] = res[i]
                 result.append(row)
                 
@@ -453,7 +453,109 @@ class myPyMysql():
             for x in rows:
                 if(x['columnName'].lower() == fieldName.lower()):
                     return [x]
-        return rows
+        return rows      
+    # 提取表字段信息    
+    def queryFields(self, tableName = ""):
+        infoFields = {}
+        try:
+            fieldInfo = f"SELECT TABLE_SCHEMA AS `databaseName`,\
+                                        TABLE_NAME AS 'tableName'," \
+                                        "COLUMN_NAME AS 'columnName'," \
+                                        "COLUMN_COMMENT AS 'columnComment'," \
+                                        "COLUMN_KEY AS 'columnKey'," \
+                                        "COLUMN_TYPE AS 'columnType'," \
+                                        "COLUMN_DEFAULT AS 'columnDefault'," \
+                                        "ORDINAL_POSITION AS 'columnIndex'," \
+                                        "EXTRA AS 'columnExtra'," \
+                                        "IS_NULLABLE AS 'nullable'," \
+                                        "DATA_TYPE AS 'dataType'," \
+                                        "CHARACTER_MAXIMUM_LENGTH AS 'strLength'," \
+                                        "NUMERIC_PRECISION AS 'numLength'," \
+                                        "NUMERIC_SCALE AS 'numBit' " \
+                                f"FROM information_schema.`COLUMNS` " \
+                                f"WHERE TABLE_SCHEMA = '{self._dbName}' " \
+                                f"AND TABLE_NAME = '{tableName}' " \
+                                f"ORDER BY  TABLE_NAME, ORDINAL_POSITION;" 
+            rows = self.query(fieldInfo)
+            
+            #返回指定字段
+            for x in rows:
+                fieldName = x['columnName']
+                isIndex = x['columnKey'] != ""
+                infoFields[fieldName] = {'name': fieldName, 'type': x['dataType'], 'isIndex': isIndex, 'nameAlias': x['columnComment']}
+        except Exception as e:
+            myDebug.Debug(f'error:{e}')
+        return infoFields
+
+
+    # 添加行数据
+    def _Add(self, rowInfo = {}, tableName = ""):
+        # 提取组装字段及数据
+        fields = ""
+        values = ""
+        hasDel = False
+        hasDate = False
+        
+        # 默认字段修正
+        keys = rowInfo.keys()
+        keys = [item.lower() for item in keys]
+        if('isdel' not in keys): rowInfo['isdel'] = False
+        if('edittime' not in keys): rowInfo['edittime'] = myData_Trans.Tran_ToDatetime_str()
+
+        # 提取组装字段及数据
+        keys = rowInfo.keys()
+        for x in keys:
+            x = x.lower()
+            fields += "," + x
+            if(type(rowInfo[x]) == str):
+                values += ",'" + rowInfo[x] + "'"
+            else:
+                values += "," + str(rowInfo[x])
+
+            if(x == 'isdel'): hasDel = True
+            if(x == 'edittime'): hasDate = True
+            
+        # 调用插入数据
+        fields = myData.iif(len(fields) > 1, fields[1:], fields)
+        values = myData.iif(len(values) > 1, values[1:], values)
+        rs = self.execute(self._dbName, f"INSERT INTO {tableName}({fields}) VALUES ({values});")
+        return not rs == None
+    # 更新行数据，必须指定id
+    def _Update(self, id, rowInfo = {}, tableName = "", idField = 'id'):
+        # 提取组装字段及数据
+        editInfo = ""
+        keys = rowInfo.keys()
+        for x in keys:
+            if(x.lower() == 'id'): continue
+
+            if(type(rowInfo[x]) == str):
+                editInfo += f",{x}='{rowInfo[x]}'"
+            else:
+                editInfo += f",{x}={rowInfo[x]}"
+
+        # 调用修改数据
+        editInfo = myData.iif(len(editInfo) > 1, editInfo[1:], editInfo)
+        idInfo = myData.iif(type(id) == str, f"'{id}'", str(id))
+        rs = self.execute(self._dbName, f"UPDATE {tableName} SET {editInfo} WHERE {idField} = {idInfo};")
+        return not rs == None
+    # 删除行数据，必须指定id
+    def _Query(self, fliter, tableName = "", fields = []): 
+        # 组装查询返回字段
+        infoFields = ""
+        for x in fields:
+            infoFields += ',' + x
+
+        # 调用查询数据
+        infoFields = myData.iif(len(infoFields) > 1, infoFields[1:], "*")
+        rs = self.query(f"SELECT {infoFields} FROM {tableName} WHERE {fliter};")
+        return rs
+    # 删除行数据，必须指定id
+    def _Delete(self, id, tableName = "", idField = 'id'):
+        # 调用删除数据
+        idInfo = myData.iif(type(id) == str, f"'{id}'", str(id))
+        rs = self.execute(self._dbName, f"DELETE FROM {tableName} WHERE {idField} = {idInfo};")
+        return not rs == None
+
 
     # 关闭游标、连接，默认提交数据 
     def clossCursor(self, cur, bCommit = True, bCloseCon = False):
@@ -481,7 +583,12 @@ if __name__ ==  "__main__":
     
     # 文件型初始
     pMysql.createDB_ByFile("zxcDB")
-    pMysql.query("INSERT INTO zxcTable_0(字段1, 字段2, 字段3) VALUES ('value1', 'value2', 33);")
+    print(pMysql.queryFields('zxcTable_0'))
+    print(pMysql._Add(tableName = 'zxcTable_0', rowInfo = {"id": 1, "字段1": 'value1', "字段2": 'value2', "字段3": 33}))
+    print(pMysql._Update(1, tableName = 'zxcTable_0', rowInfo = {"字段1": 'value11', "字段2": 'value22', "字段3": 333}))
+    print(pMysql._Query("id=1", tableName = 'zxcTable_0', fields = ["字段1","字段1","字段3"]))
+    print(pMysql._Query("id=1", tableName = 'zxcTable_0'))
+    print(pMysql._Delete(1, tableName = 'zxcTable_0'))
 
 
     pMysql.createDB('myTestDB')
