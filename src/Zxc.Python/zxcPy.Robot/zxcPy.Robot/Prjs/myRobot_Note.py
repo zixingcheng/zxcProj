@@ -38,6 +38,8 @@ class myRobot_Note(myRobot.myRobot):
         noteTag = msg.get('noteTag', "").upper()
         if(noteTag == "REVOKE"):    #消息撤回通知
             strReturn = self._Done_Revoke(msg, msgID, msgType, usrInfo)
+        elif(noteTag == "PAY"):     #消息撤回通知
+            strReturn = self._Done_Pay(msg, msgID, msgType, usrInfo)
         return strReturn 
 
     #消息撤回通知        
@@ -65,6 +67,20 @@ class myRobot_Note(myRobot.myRobot):
                     strReturn += "消息内容：\"" + pMsg.msg + "\""
                 elif(msgType_old == "SHARING"):
                     strReturn += "分享链接：\"" + pMsg.msgUrl + "\""
+        return strReturn  
+    #转账通知        
+    def _Done_Pay(self, msg, msgID, msgType, usrInfo = {}):
+        strReturn = "" 
+        if(msg['paySubType'] == '1'): 
+            if(msg['payUser'] == "Self"):
+                strReturn = f"已发转账 ￥{msg['payMoney']}。"
+            else:
+                strReturn = f"待收转账 ￥{msg['payMoney']}。"
+        elif(msg['paySubType'] == '3'): 
+            if(msg['payUser'] == "Self"):
+                strReturn = f"已成转账 ￥{msg['payMoney']}。"
+            else:
+                strReturn = f"已收转账 ￥{msg['payMoney']}。" 
         return strReturn  
     
     def _Title_User_Opened(self): 

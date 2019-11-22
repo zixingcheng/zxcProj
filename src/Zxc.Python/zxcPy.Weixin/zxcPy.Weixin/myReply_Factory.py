@@ -141,6 +141,17 @@ class myWx_Reply():
         if(strText.count("撤回了一条消息") == 1):
             noteMsg['noteTag'] = "REVOKE"
             noteMsg['old_msg_id'] = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)     # 获取消息的id
+        elif(strText.count("收到转账") == 1):
+            noteMsg['noteTag'] = "PAY"
+            noteMsg['noteMark'] = myData.Cut_str(msg['Content'],"<pay_memo><![CDATA[","]]></pay_memo>")[2]
+            noteMsg['payUser'] = msg['ToUserName']
+            noteMsg['payMoney'] = myData.Cut_str(msg['Content'],"<feedesc><![CDATA[￥","]]></feedesc>")[2]
+            noteMsg['paySubType'] = myData.Cut_str(msg['Content'],"<paysubtype>","</paysubtype>")[2]        # 1 转账，3 确认转账
+            noteMsg['payTranscationid'] = myData.Cut_str(msg['Content'],"<transcationid><![CDATA[","]]></transcationid>")[2]
+            noteMsg['payTransferid'] = myData.Cut_str(msg['Content'],"<transferid><![CDATA[","]]></transferid>")[2]
+            noteMsg['payTransfertime'] = myData.Cut_str(msg['Content'],"<begintransfertime><![CDATA[","]]></begintransfertime>")[2]
+            if(noteMsg['payUser'] == self.usrID):
+                noteMsg['payUser'] = "Self"         # 主动转账
         return noteMsg
     
     #消息超时校检
