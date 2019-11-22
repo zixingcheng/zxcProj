@@ -75,7 +75,7 @@ class myWx_Reply():
         myDebug.Debug(nameSelf,",", usrID,",", usrName,",", nickName, ",", msgID, ",",strText, ",", idGroup, ",",nameGroup)
 
         #Note信息(增加Note标识及提取信息)
-        noteMsg = self.get_NoteTag(msgType, msg)
+        noteMsg = self.get_NoteTag(msgType, msg, usrID)
         
         #按消息类型进一步修正处理('PICTURE', 'VOICE', 'VIDEO')
         if(msgType == myManager_Msg.myMsgType.PICTURE):
@@ -133,7 +133,7 @@ class myWx_Reply():
         return None
     
     #处理封装返回消息(按标识内容处理)
-    def get_NoteTag(self, msgType, msg):
+    def get_NoteTag(self, msgType, msg, usrID):
         if(msgType != "NOTE"): return None
         strText = msg['Text']   #消息内容
 
@@ -144,12 +144,12 @@ class myWx_Reply():
         elif(strText.count("收到转账") == 1):
             noteMsg['noteTag'] = "PAY"
             noteMsg['noteMark'] = myData.Cut_str(msg['Content'],"<pay_memo><![CDATA[","]]></pay_memo>")[2]
-            noteMsg['payUser'] = msg['ToUserName']
             noteMsg['payMoney'] = myData.Cut_str(msg['Content'],"<feedesc><![CDATA[￥","]]></feedesc>")[2]
             noteMsg['paySubType'] = myData.Cut_str(msg['Content'],"<paysubtype>","</paysubtype>")[2]        # 1 转账，3 确认转账
             noteMsg['payTranscationid'] = myData.Cut_str(msg['Content'],"<transcationid><![CDATA[","]]></transcationid>")[2]
             noteMsg['payTransferid'] = myData.Cut_str(msg['Content'],"<transferid><![CDATA[","]]></transferid>")[2]
             noteMsg['payTransfertime'] = myData.Cut_str(msg['Content'],"<begintransfertime><![CDATA[","]]></begintransfertime>")[2]
+            noteMsg['payUser'] = myData.iif(noteMsg['paySubType'] == "1", msg['FromUserName'], msg['ToUserName'])
             if(noteMsg['payUser'] == self.usrID):
                 noteMsg['payUser'] = "Self"         # 主动转账
         return noteMsg
