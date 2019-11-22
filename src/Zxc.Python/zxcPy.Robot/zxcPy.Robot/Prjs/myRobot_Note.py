@@ -73,15 +73,15 @@ class myRobot_Note(myRobot.myRobot):
         strReturn = "" 
         if(msg['paySubType'] == '1'): 
             if(msg['payUser'] == "Self"):
-                strReturn = f"已发转账 ￥{msg['payMoney']}。"
+                strReturn = f"已发转账 ￥"
             else:
-                strReturn = f"待收转账 ￥{msg['payMoney']}。"
+                strReturn = f"待收转账 ￥"
         elif(msg['paySubType'] == '3'): 
             if(msg['payUser'] == "Self"):
-                strReturn = f"已成转账 ￥{msg['payMoney']}。"
+                strReturn = f"已成转账 ￥"
             else:
-                strReturn = f"已收转账 ￥{msg['payMoney']}。" 
-        return strReturn  
+                strReturn = f"已收转账 ￥"
+        return strReturn + msg['payMoney'] + "。"
     
     def _Title_User_Opened(self): 
         return "自动处理所有通知消息..."
