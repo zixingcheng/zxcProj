@@ -167,9 +167,9 @@ class myPyMysql():
                         bReusult = bReusult & (self.createIndex(tbName, indexType, indexType + "_" + fieldName, fieldName) >= 0)
 
                 #创建默认字段
-                tableInfo = {'tb_name': tbName, 'fields': [{"columnName": 'isDel', "dataType": 'bool', "fieldLength": 0, 'nullable': True}]}
+                tableInfo = {'tb_name': tbName, 'fields': [{"columnName": 'isDel', "dataType": 'bool', "fieldLength": 0, 'nullable': False}]}
                 bReusult = bReusult & (self.createField(tableInfo) >= 0)
-                tableInfo = {'tb_name': tbName, 'fields': [{"columnName": 'editTime', "dataType": 'datetime', "fieldLength": 0, 'nullable': True}]}
+                tableInfo = {'tb_name': tbName, 'fields': [{"columnName": 'editTime', "dataType": 'datetime', "fieldLength": 0, 'nullable': False}]}
                 bReusult = bReusult & (self.createField(tableInfo) >= 0)
             return bReusult
         except Exception as e:
