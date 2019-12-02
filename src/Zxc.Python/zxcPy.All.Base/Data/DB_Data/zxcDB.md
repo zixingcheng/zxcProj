@@ -9,7 +9,7 @@
 
 	| 字段名 | 字段类型 | 字段长度 | 是否可空 | 是否索引 | 默认值 | 索引类型 |
 	| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-	| Id | int | 11 | False | True | - | - |
+	| id | int | 11 | False | True | - | - |
 	| 字段1 | char | 15 | False | True | - | index |
 	| 字段2 | char | 10 | True | True | - | unique |
 	| 字段3 | int | 12 | True | False | - | - |

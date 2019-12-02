@@ -19,7 +19,7 @@ from myGlobal import gol
 
 # 简易库表
 class myData_Table():
-    def __init__(self, nameDB = "zxcDB", dir = "", oneValid = False):  
+    def __init__(self, nameDB = "zxcDB", dir = "", oneValid = False, params = {}, initAuto = True):  
         self.dir = dir              #库表路径
         self.nameDB = nameDB        #库表名
         self.fields = OrderedDict() #库表字段信息
@@ -27,6 +27,7 @@ class myData_Table():
         self.rows = OrderedDict()   #库表行数据集(带编号)
         self.indexs = {}            #索引集
         self.oneValid = oneValid    #是否只有一条记录有效
+        self.params = params
 
         #初始根目录信息
         if(self.dir == ""):
@@ -34,7 +35,8 @@ class myData_Table():
             self.dirBase = os.path.abspath(os.path.join(strDir, ".."))  
             self.dir = self.dirBase + "/Data/DB_Data/"
             myIO.mkdir(self.dir, False)
-        self._Init_DB(self.dir + nameDB + ".csv"  )    #初始参数信息等 
+        if(initAuto):
+            self._Init_DB(self.dir + nameDB + ".csv"  )    #初始参数信息等 
     #初始信息库   
     def _Init_DB(self, path): 
         #提取行信息集
@@ -116,15 +118,18 @@ class myData_Table():
             self._Add_IndexField(fieldName, False)
         return True
     # 提取字段信息
-    def Get_Field(self, fieldName): 
+    def Get_Field(self, fieldName, tableName = ""): 
         return self.fields.get(fieldName, None)
+    # 提取字段信息集
+    def Get_Fields(self, tableName = ""): 
+        return self.fields
     # 总字段数
-    def _FieldsCount(self): 
+    def _FieldsCount(self, tableName = ""): 
         return len(self.fields)
 
     
     #生成信息字典
-    def OnCreat_RowInfo(self): 
+    def OnCreat_RowInfo(self, tableName = ""): 
         rowInfo = {}
         for x in self.fields:
             rowInfo[x] = ""
@@ -144,7 +149,7 @@ class myData_Table():
             rowInfo["isDel"] = myData_Trans.To_Bool(lines[len(self.fields) + 1])
         return self.Add_Row(rowInfo, updata, bSave)
     # 添加行数据
-    def Add_Row(self, rowInfo = {}, updata = False, bSave = True):
+    def Add_Row(self, rowInfo = {}, updata = False, bSave = True, tableName = ""):
         # 检查可用性
         id = self._Check(rowInfo, updata)
         if(id != ""): 
@@ -172,7 +177,7 @@ class myData_Table():
             if(bSave and self.Save_DB(bAppend, True)):
                 return "添加成功，信息如下：\n" + self._Trans_ToStr_Title(rowInfo) 
     # 总行数
-    def _RowsCount(self): 
+    def _RowsCount(self, tableName = ""): 
         return len(self.rows)
     
 
@@ -217,7 +222,7 @@ class myData_Table():
     
 
     # 查询筛选--多参数（&&、||）
-    def Query(self, fliters, sortField="", reverse=False): 
+    def Query(self, fliters, sortField="", reverse=False, tableName = ""): 
         # 解析参数
         nPos_And = myData.Find_Pos(u'&&', fliters)
         nPos_Or = myData.Find_Pos(u'||', fliters)
@@ -255,7 +260,7 @@ class myData_Table():
             datas = sorted(datas.items(), key = lambda d:d[1].get(sortField,0), reverse = reverse)
         return datas
     # 查询筛选
-    def _Query(self, fliter): 
+    def _Query(self, fliter, tableName = ""): 
         lstSymbol = ['==', '!=', '>=', '>', '<=', '<']
         for x in lstSymbol:
             ind = fliter.find(x)
@@ -268,7 +273,7 @@ class myData_Table():
             return data
         return {}
     # 提取与指定筛选条件相同项--继承需重写
-    def _Find_ByFliter(self, field, fliter, data = None): 
+    def _Find_ByFliter(self, field, fliter, data = None, tableName = ""): 
         # 解析条件
         if(data == None): data = self.rows
         txts = fliter.strip().split(' ')
@@ -298,15 +303,15 @@ class myData_Table():
             return {k: v for k, v in data.items() if v[field] <= value }
         return data 
     # 提取当前编号行数据
-    def _Find(self, id): 
+    def _Find(self, id, tableName = ""): 
         return self.rows.get(id, None)
 
     # 提取当前编号(最大编号+1)        
-    def _Get_ID(self):
+    def _Get_ID(self, tableName = ""):
         if(self._RowsCount() == 0): return 1
         return list(self.rows.keys())[-1] + 1
     # 检查是否已经存在   
-    def _Check(self, rowInfo, updata = False): 
+    def _Check(self, rowInfo, updata = False, tableName = ""): 
         #修正数据类型 
         for x in self.fields:
             value = rowInfo.get(x, "")
@@ -318,36 +323,37 @@ class myData_Table():
         keys = self.rows.keys()
         for x in keys:
             rowInfo_Base = self.rows[x]
-            if(self._IsSame(rowInfo, rowInfo_Base)): 
+            if(self._IsSame(rowInfo, rowInfo_Base)[0]): 
                 # 修改
                 if(updata):
                     self._Updata(x, rowInfo)
                 return x
         return "" 
     #单条有效修正
-    def _Check_oneValid(self, rowInfo): 
+    def _Check_oneValid(self, rowInfo, tableName = ""): 
         pass 
     # 检查是否相同--继承需重写  
-    def _IsSame(self, rowInfo, rowInfo_Base): 
+    def _IsSame(self, rowInfo, rowInfo_Base, tableName = ""): 
+        sameID = -1
         if(rowInfo.get('ID', "") != ""):
             if(rowInfo['ID'] > 0):  # 给定序号时，序号必须相同
-                if(rowInfo['ID'] != rowInfo_Base['ID']): return False
+                if(rowInfo['ID'] != rowInfo_Base['ID']): return False, sameID
         else:
             rowInfo["ID"] = -1
-            return False
+            return False, sameID
             
         #对比索引，是否完全一致
         for x in self.fields_index:
             if(rowInfo.get(x, "") == rowInfo_Base.get(x, "")):
-                return True
+                return True, sameID
 
         #对比属性，是否完全一致(可继承重写)
         for x in self.fields:
             if(rowInfo.get(x, "") != rowInfo_Base.get(x, "")):
-                return False
-        return True 
+                return False, sameID
+        return True, rowInfo.get('ID', -1)
     # 更新
-    def _Updata(self, x, rowInfo, bSave = False): 
+    def _Updata(self, x, rowInfo, bSave = False, tableName = "", idField = 'id'): 
         #保持原有编号
         rowInfo['ID'] = self.rows[x]['ID']
         self.rows[x] = rowInfo
@@ -472,7 +478,7 @@ class myData_Table():
 if __name__ == "__main__":
     #测试库表操作
     pDB = myData_Table()
-    pDB.Add_Fields(['字段1', '字段2', '字段3', '字段4'], ['int'], [True])
+    pDB.Add_Fields(['字段1', '字段2', '字段3', '字段4'], ['str'], [True])
     
     # 添加行数据
     print(pDB.Add_Row({'字段1': 'value1', '字段2': 'value2'}))

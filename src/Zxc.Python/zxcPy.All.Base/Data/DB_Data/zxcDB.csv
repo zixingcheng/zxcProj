@@ -1,3 +1,4 @@
 ﻿ID(int),**字段1(str),字段2(string),字段3(string),字段4(string),isDel(bool)
 1,value1,value2,,,False
 2,value2,value3,,,False
+3,value1,value2,,,False

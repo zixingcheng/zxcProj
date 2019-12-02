@@ -7,6 +7,7 @@ Created on  张斌 2019-11-07 16:30:00
     pySql操作 
 """
 import os, sys, re
+import time, datetime
 import pymysql
 import myData, myData_Trans, myIO, myIO_md, myDebug
 
@@ -498,22 +499,25 @@ class myPyMysql():
         
         # 默认字段修正
         keys = rowInfo.keys()
-        keys = [item.lower() for item in keys]
-        if('isdel' not in keys): rowInfo['isdel'] = False
-        if('edittime' not in keys): rowInfo['edittime'] = myData_Trans.Tran_ToDatetime_str()
+        # keys = [item.lower() for item in keys]
+        if('isDel' not in keys): rowInfo['isDel'] = False
+        if('editTime' not in keys): rowInfo['editTime'] = myData_Trans.Tran_ToDatetime_str()
 
         # 提取组装字段及数据
         keys = rowInfo.keys()
         for x in keys:
-            x = x.lower()
+            if(x.lower() == 'id'): x = x.lower()
             fields += "," + x
+
             if(type(rowInfo[x]) == str):
                 values += ",'" + rowInfo[x] + "'"
+            elif(type(rowInfo[x]) == datetime.datetime):
+                values += ",'" + myData_Trans.Tran_ToDatetime_str(rowInfo[x]) + "'"
             else:
                 values += "," + str(rowInfo[x])
 
-            if(x == 'isdel'): hasDel = True
-            if(x == 'edittime'): hasDate = True
+            if(x == 'isDel'): hasDel = True
+            if(x == 'editTime'): hasDate = True
             
         # 调用插入数据
         fields = myData.iif(len(fields) > 1, fields[1:], fields)
@@ -530,6 +534,8 @@ class myPyMysql():
 
             if(type(rowInfo[x]) == str):
                 editInfo += f",{x}='{rowInfo[x]}'"
+            elif(type(rowInfo[x]) == datetime.datetime):
+                values += ",'" + myData_Trans.Tran_ToDatetime_str(rowInfo[x]) + "'"
             else:
                 editInfo += f",{x}={rowInfo[x]}"
 
@@ -539,15 +545,18 @@ class myPyMysql():
         rs = self.execute(self._dbName, f"UPDATE {tableName} SET {editInfo} WHERE {idField} = {idInfo};")
         return not rs == None
     # 删除行数据，必须指定id
-    def _Query(self, fliter, tableName = "", fields = []): 
+    def _Query(self, fliter, tableName = "", fields = [], orderField = ''): 
         # 组装查询返回字段
         infoFields = ""
         for x in fields:
             infoFields += ',' + x
 
+        if(orderField != ""):
+            orderField = F"ORDER BY {orderField} "
+
         # 调用查询数据
         infoFields = myData.iif(len(infoFields) > 1, infoFields[1:], "*")
-        rs = self.query(f"SELECT {infoFields} FROM {tableName} WHERE {fliter};")
+        rs = self.query(f"SELECT {infoFields} FROM {tableName} WHERE {fliter} {orderField};")
         return rs
     # 删除行数据，必须指定id
     def _Delete(self, id, tableName = "", idField = 'id'):

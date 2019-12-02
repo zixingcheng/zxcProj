@@ -1,6 +1,6 @@
 :: 设置路径信息
-set varPath_py=C:\Python35-32\Lib\site-packages
-set varPath_base=D:\myGit\zxcProj
+set varPath_py=E:\myCode\zxcProj\src\Zxc.Python\zxcPy.All.Base\zxcPy.Base
+set varPath_base=E:\myCode\zxcProj
 set varPath=%varPath_base%\ReadMe\Tools\PSCP\UpLoad
 set varPath_Url=root@39.105.196.175:
 set varPath_Linux=%varPath_Url%/root/Public
