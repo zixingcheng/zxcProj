@@ -109,8 +109,17 @@ class DtTable:
                 if(pTypes[j] == myFiledype.float): 
                     pValues.append(float(rows[j]))
                     continue
+                elif(pTypes[j] == myFiledype.int): 
+                    pValues.append(int(rows[j]))
+                    continue
                 elif(pTypes[j] == myFiledype.datetime): 
-                    pValues.append(myData_Trans.Tran_ToDatetime(rows[j]))
+                    nCount = rows[j].count(":")
+                    if(nCount == 0):
+                        pValues.append(myData_Trans.Tran_ToDatetime(rows[j]), "%Y-%m-%d")
+                    elif(nCount == 2):
+                        pValues.append(myData_Trans.Tran_ToDatetime(rows[j]), "%Y-%m-%d %H:%M")
+                    else:
+                        pValues.append(myData_Trans.Tran_ToDatetime(rows[j]))
                     continue
                 elif(pTypes[j] == myFiledype.bool): 
                     pValues.append(myData_Trans.To_Bool(rows[j]))
@@ -120,9 +129,9 @@ class DtTable:
         return pValues
 
     #保存数据
-    def Save(self, strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = "", row_end = -1, col_end = -1, bSave_AsStr = True):  
+    def Save(self, strDir, fileName, row_start = 0, col_start = 0, cell_overwrite = True, sheet_name = "", row_end = -1, col_end = -1, bSave_AsStr = True, styleSets = []):  
         #创建workbook和sheet对象
-        pWorkbook = xlwt.Workbook()  #注意Workbook的开头W要大写
+        pWorkbook = xlwt.Workbook()     #注意Workbook的开头W要大写
         pName = myData.iif(sheet_name == "","sheet1", sheet_name)
         pSheet = pWorkbook.add_sheet(pName, cell_overwrite_ok = cell_overwrite) 
         
@@ -143,12 +152,41 @@ class DtTable:
                 strVaulue = self.Trans_Value_str(pValues[j], bSave_AsStr)
                 pSheet.write(i - row_start + 1, j - col_start, strVaulue)                
         
+        #保存风格
+        self.setStyles(pSheet, styleSets)
+
         #保存该excel文件,有同名文件时直接覆盖
         strPath = strDir + "/" + fileName + ".xls"
         strPath.replace("\/", "/")
         strPath.replace("//", "/")
         pWorkbook.save(strPath)
         return True 
+    
+    #设置数据--风格
+    def setStyles(self, pSheet, styleSets = []):  
+        # 循环处理所有风格
+        for x in styleSets:
+            if x['type'] == "Merge":
+                # 提取合并区间、保留内容
+                pos = x['pos'] 
+                text = x['text']
+                if(len(pos) != 4): continue
+                
+                style = xlwt.XFStyle()      # 创建一个样式对象，初始化样式
+                al = xlwt.Alignment()
+                # al.horz = 0x02      # 设置水平居中
+                al.vert = 0x01      # 设置垂直居中
+                style.alignment = al
+
+                # 合并
+                pSheet.write_merge(pos[0], pos[1], pos[2], pos[3], text, style)
+            elif x['type'] == "Font":
+                font = xlwt.Font()
+                font.blod = True
+            else:
+                pass
+        return True 
+
     #保存数据
     def Save_csv(self, strDir, fileName, isUtf = False, row_start = 0, col_start = 0, symbol = ",", row_end = -1, col_end = -1, bSave_AsStr = True):  
         nCols = self._Cloumns(col_end)
