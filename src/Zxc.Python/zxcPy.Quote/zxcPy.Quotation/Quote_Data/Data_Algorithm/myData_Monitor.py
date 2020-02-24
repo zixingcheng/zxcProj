@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on  张斌 2018-07-13 14:28:00 
+Created on  张斌 2020-02-13 14:28:00 
     @author: zhang bin
     @email:  zhangbin@gsafety.com
 
@@ -26,8 +26,8 @@ class myData_Monitor():
 
         self.valueDelta = valueDelta
         self.valueBase = valueBase; self.valueLast = valueLast
-        self.valueMax = -999999; self.valueMax_last = valueMax
-        self.valueMin = 999999; self.valueMin_last = valueMin
+        self.valueMax = self.iif(valueMax == 0, -999999, valueMax); self.valueMax_last = valueMax
+        self.valueMin = self.iif(valueMin == 0, 999999, valueMin); self.valueMin_last = valueMin
         self.valueIndexs = [0] * 5      # 依次：valueLast、valueMax_last、valueMin_last、valueMax、valueMin
         
     # 消息装饰函数，用于传递外部重写方法，便于后续调用      
@@ -39,7 +39,7 @@ class myData_Monitor():
             return fn
         return _msg_register
     # 回调装饰函数，封装触发消息，并回调
-    def configured_reply(self, monitorType):
+    def configured_reply(self, monitorType, handle_user = True):
         # 提取触发消息
         msg = self.get_msg()
 
@@ -48,6 +48,12 @@ class myData_Monitor():
         if(replyFn != None):
             try:
                 r = replyFn(msg) 
+            except:
+                pass 
+        # 自定义处理
+        if(handle_user):
+            try:
+                self.handle_user(msg)
             except:
                 pass 
             
@@ -90,6 +96,9 @@ class myData_Monitor():
             if(self.valueMin > dataValue): 
                 self.valueMin = dataValue; self.valueIndexs[4] = self.dataNum - 1
 
+    # 自定义处理
+    def handle_user(self, msg):
+        pass
     # 处理新数据，分为增大、减小、拐点
     def handle_data(self, dataValue, recursion = False):
         # 数据初始
@@ -138,7 +147,8 @@ class myData_Monitor():
             index = self.dataNum - 2 + (valueLast - self.valueLast_old)/(dataValue - self.valueLast_old)
             if(monitorType == "BREAK"): 
                 index = self.iif(self.state < 0, self.valueIndexs[1], self.valueIndexs[2])
-            msg = {"Index": index, "Type": monitorType, "codeState": self.state, "hitLimit": hitLimit, "Value":  valueLast, "Ratio":  ratio}
+            profit = round(valueLast / self.valueBase - 1, 6)
+            msg = {"Index": index, "Type": monitorType, "codeState": self.state, "hitLimit": hitLimit, "Value":  valueLast, "Ratio":  ratio, "Profit": profit}
             self.msgList.append(msg)
             self.datasMonitor.append([index, valueLast, monitorType, self.state, hitLimit])
 
@@ -192,7 +202,6 @@ class myData_Monitor():
 
         # 展示图表
         plt.show()
-
 
 
 if __name__ == '__main__':
