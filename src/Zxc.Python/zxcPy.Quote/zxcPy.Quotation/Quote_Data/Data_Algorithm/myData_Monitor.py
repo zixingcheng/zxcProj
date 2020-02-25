@@ -26,8 +26,8 @@ class myData_Monitor():
 
         self.valueDelta = valueDelta
         self.valueBase = valueBase; self.valueLast = valueLast
-        self.valueMax = self.iif(valueMax == 0, -999999, valueMax); self.valueMax_last = valueMax
-        self.valueMin = self.iif(valueMin == 0, 999999, valueMin); self.valueMin_last = valueMin
+        self.valueMax = self.iif(valueMax == 0, -999999, valueMax); self.valueMax_last = -999999
+        self.valueMin = self.iif(valueMin == 0, 999999, valueMin); self.valueMin_last = 999999
         self.valueIndexs = [0] * 5      # 依次：valueLast、valueMax_last、valueMin_last、valueMax、valueMin
         
     # 消息装饰函数，用于传递外部重写方法，便于后续调用      
@@ -123,6 +123,7 @@ class myData_Monitor():
             # 超限跨区间限制处理
             if(abs(ratio) > self.valueDelta):
                 valueLast = self.valueLast + self.valueBase * self.valueDelta * self.state
+                
                 hitLimit = True; ratio = self.valueDelta; self.valueLast = valueLast            
                 self.updata_buffer(valueLast)   # 更新最大最小值等缓存信息
             elif(recursion == False):           # 未超限不触发

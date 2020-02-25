@@ -18,20 +18,33 @@ mySystem.Append_Us("", False)
 class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
     def __init__(self, name, saveData=True, valueDelta=0.0025, valueMax=0, valueMin=0, valueLast=0, valueBase=0, riskSets = {}):
         super().__init__(name, saveData, valueDelta, valueMax, valueMin, valueLast, valueBase)
+        
+        self.newBorder = 0                  #新边界更新，2：新高，1：阶段新高，0：无变化，-1：阶段新低，-2：新低
+        self.limitHit = True                #高低边界监测
+        self.stopProfit_Dynamic = True      #动态止盈
+        self.stopProfit = 0.06              #止盈线，默认为6%
+        self.stopProfit_Retreat = 0.01      #止盈回撤，默认为1%
+        self.stopProfit_goon = False        #是否止盈中
+        self.profitMax_Stage = -999999; self.profitMax_Stage_last = -999999     
+
+        self.stopLoss_Dynamic = True        #动态止损
+        self.stopLoss = -0.02               #止损线，默认为-2%
+        self.stopLoss_Retreat = 0.01        #止损回撤，默认为1% 
+        self.stopLoss_goon = False          #是否止损中
+        self.profitMin_Stage = 9999999; self.profitMin_Stage_last = 9999999        
         self.init_riskSets(riskSets)
     # 初始风险策略参数
     def init_riskSets(self, riskSets = {}):
-        self.stopProfit_Dynamic = riskSets.get("stopProfit_Dynamic", True)          #动态止盈
-        self.stopProfit = riskSets.get("stopProfit", 0.06)                          #止盈线，默认为6%
-        self.stopProfit_Retreat = riskSets.get("stopLoss_Retreat", 0.01)            #止盈回撤，默认为1%
-        self.stopProfit_goon = riskSets.get("stopProfit_goon", False)               #是否止盈中
-        self.profitMax_Stage = -999999; self.profitMax_Stage_last = -999999     
+        self.limitHit = riskSets.get("limitHit", self.limitHit)                                     #高低边界监测
+        self.stopProfit_Dynamic = riskSets.get("stopProfit_Dynamic", self.stopProfit_Dynamic)       #动态止盈
+        self.stopProfit = riskSets.get("stopProfit", self.stopProfit)                               #止盈线，默认为6%
+        self.stopProfit_Retreat = riskSets.get("stopLoss_Retreat", self.stopProfit_Retreat)         #止盈回撤，默认为1%
+        self.stopProfit_goon = riskSets.get("stopProfit_goon", self.stopProfit_goon)                #是否止盈中
 
-        self.stopLoss_Dynamic = riskSets.get("stopLoss_Dynamic", True)              #动态止损
-        self.stopLoss = riskSets.get("stopLoss", -0.02)                             #止损线，默认为-2%
-        self.stopLoss_Retreat = riskSets.get("stopLoss_Retreat", 0.01)              #止损回撤，默认为1% 
-        self.stopLoss_goon = riskSets.get("stopLoss_goon", False)                   #是否止损中
-        self.profitMin_Stage = 9999999; self.profitMin_Stage_last = 9999999        
+        self.stopLoss_Dynamic = riskSets.get("stopLoss_Dynamic", self.stopLoss_Dynamic)             #动态止损
+        self.stopLoss = riskSets.get("stopLoss", self.stopLoss)                                     #止损线，默认为-2%
+        self.stopLoss_Retreat = riskSets.get("stopLoss_Retreat", self.stopLoss_Retreat)             #止损回撤，默认为1% 
+        self.stopLoss_goon = riskSets.get("stopLoss_goon", self.stopLoss_goon)                      #是否止损中
         
     # 自定义处理
     def handle_user(self, msg):
@@ -73,8 +86,10 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
                     self.setState(True, msg)
                     self.profitMax_Stage_last = prift
             else:
-                self.updataStatic(prift)    # 新高统计
-                pass                        # 其他止盈逻辑-特殊
+                self.updataStatic(prift)                    # 新高统计
+                if(self.limitHit and self.newBorder == 2):
+                    self.setState(True, msg, True, True)    # 设置止盈状态
+                pass                                        # 其他止盈逻辑-特殊
         elif(self.stopLoss_goon):       
             # 回撤超过界限，激活止损(精度修正+0.00000001,避免计算过程小数点精度导致的临界计算错误)
             if(state == -1):
@@ -82,23 +97,27 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
                     self.setState(False, msg)               # 更新最大最小值等统计信息
                     self.profitMin_Stage_last = prift
             else:
-                self.updataStatic(prift)    # 新低统计
-                pass                        # 其他止盈逻辑-特殊
+                self.updataStatic(prift)                    # 新低统计
+                if(self.limitHit and self.newBorder ==-2):
+                    self.setState(False, msg, True, True)   # 设置止盈状态
+                pass                                        # 其他止盈逻辑-特殊
     #设置止盈止损状态   
-    def setState(self, isStopProfit, msgOld = None, isBreak = False): 
+    def setState(self, isStopProfit, msgOld = None, isHit = False, noStatic = False): 
         self.isStop_Profit = isStopProfit
         self.isStop_Loss = not isStopProfit
         
         # 组装消息
         if(msgOld != None):
-            self.updataStatic(msgOld['Profit'])
+            if(noStatic == False):
+                self.updataStatic(msgOld['Profit'])
             riskType = self.iif(self.isStop_Profit, "stopProfit", "stopLoss")
             isDynamic = self.iif(self.isStop_Profit, self.stopProfit_Dynamic, self.stopLoss_Dynamic)
             lastProfit = self.iif(self.isStop_Profit, self.profitMax_Stage_last, self.profitMin_Stage_last)
+            typeBorder = self.iif(self.newBorder == 2, "newTop", self.iif(self.newBorder == -2, "newBottom", "interval"))
 
             msg = msgOld.copy()
-            msg['Type'] = "RISK"
-            msg['riskInfo'] = {'riskType': riskType, 'isBreak': isBreak, 'isDynamic': isDynamic, 'lastProfit': lastProfit, 'minProfit': self.profitMin_Stage, 'maxProfit': self.profitMax_Stage} 
+            msg['riskInfo'] = {'baseType': msg['Type'], 'riskType': riskType, 'hitPoint': isHit, 'typeBorder': typeBorder, 'isDynamic': isDynamic, 'lastProfit': lastProfit, 'minProfit': self.profitMin_Stage, 'maxProfit': self.profitMax_Stage}
+            msg['Type'] = "RISK" 
             self.msgList.append(msg)
             
             # 调用装饰函数
@@ -106,6 +125,26 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
             
     # 更新最大最小值等统计信息
     def updataStatic(self, prift):
+        if(self.profitMin_Stage_last == 999999):  self.profitMin_Stage_last = prift
+        if(self.profitMax_Stage_last == -999999):  self.profitMax_Stage_last = prift
+        
+        self.newBorder = 0                           # 新边界更新，2：新高，1：阶段新高，0：无变化，-1：阶段新低，-2：新低
+        if(self.profitMin_Stage_last > prift):       # 阶段新低判断
+            self.profitMin_Stage_last = prift        # 赋值阶段最低
+            self.newBorder = -1                    
+        if(self.profitMin_Stage > prift):            # 新低判断
+            self.profitMin_Stage = prift             # 赋值最低
+            self.newBorder = -2                    
+
+        if(self.profitMax_Stage_last < prift):       # 阶段新高判断
+            self.profitMax_Stage_last = prift        # 赋值阶段最高
+            self.newBorder = 1                      
+        if(self.profitMax_Stage < prift):  
+            self.profitMax_Stage = prift             # 新高判断
+            self.newBorder = 2                       # 赋值最高
+            
+    # 更新收益
+    def updataProfit(self, prift):
         if(self.profitMin_Stage_last == 999999):  self.profitMin_Stage_last = prift
         if(self.profitMax_Stage_last == -999999):  self.profitMax_Stage_last = prift
 
@@ -121,7 +160,7 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
 if __name__ == '__main__':
     datas1 = [12, 11.7, 12.7, 13.3, 10.4, 10.6, 10.7, 10.9, 10.8, 10.75, 10.8, 10.7]
     datas2 = [10.6, 10.5, 10.4, 10.3, 10.2, 10.1, 10.0, 9.9, 9.8, 9.6]
-    datas3 = [9.8, 9.6]
+    datas3 = [9.8, 9.6, 10, 10.6, 10.8, 10.6]
     pRisk = myData_Monitor_Risk("Test",valueMin=9.5, valueMax=10.8, valueBase=10, valueDelta=0.0025)
     
     # 装饰函数，处理监测到的上升、下降、拐点
@@ -130,7 +169,7 @@ if __name__ == '__main__':
         print(msg)
 
     # 循环数据进行监测
-    for x in datas1:
+    for x in datas3:
         pRisk.add_data(x)
     
     print("")
