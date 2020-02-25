@@ -123,7 +123,7 @@ def IORC(path, templateSign, classifierId = 0, out_debug=False):
 
 if __name__ == '__main__':
     # 语音合成 
-    dir = "E:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/"
+    dir = "D:/myCode/zxcProj/src/Zxc.Python/zxcPy.All.Base/Temps/"
     #path = Speech_Synthesis('你好，世界！', dir + "auido.mp3") 
     
     # 语音文件播放
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     # print("you said: " + strText)
 
     # ORC识别-自定义模板
-    strText = ORC(dir + "Images/Test.jpg", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
+    strText = ORC(dir + "Images/Test5.jpg", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
     print("you image: \n" + str(strText))
     
     strText = ORC(dir + "Images/Test.png", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)

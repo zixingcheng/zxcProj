@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{f001c86f-593e-40cb-8491-9e93c8630403}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>myQuote_API.py</StartupFile>
+    <StartupFile>zxcPy.Quotation\Quote_Data\Data_Algorithm\myData_Monitor_Risk.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -28,12 +28,16 @@
     <Compile Include="zxcPy.Quotation\myQuote_Source.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Setting.py" />
     <Compile Include="zxcPy.Quotation\myQuote.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myData_Monitor_Risk.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myData_Monitor.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myDataDB_StockTradeRisk.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myData_DB.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myData_Trade.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\myData_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Hourly.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_FixedMonitor.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Risk_Control.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Rise_Fall_asInt.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_StaticsM5.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Printer.py" />

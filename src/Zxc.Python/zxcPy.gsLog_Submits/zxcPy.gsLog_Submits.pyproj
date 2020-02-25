@@ -11,7 +11,8 @@
     <OutputPath>.</OutputPath>
     <Name>PythonApplication1</Name>
     <RootNamespace>PythonApplication1</RootNamespace>
-    <InterpreterId>Global|PythonCore|3.5</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -125,10 +126,16 @@
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="myFunction\myIO_xlsx.py" />
     <Compile Include="myFunction\mySetting_Note.py" />
+    <Compile Include="myFunction\myWork_gdMSLT.py" />
+    <Compile Include="myFunction\myWebFun_gdsafety.py" />
     <Compile Include="myFunction\myWebFun_gsafety.py" />
     <Compile Include="myFunction\myWebFun_gsafety_prj.py" />
     <Compile Include="自动提交日报.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.7" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

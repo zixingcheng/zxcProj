@@ -317,7 +317,7 @@ if __name__ == '__main__':
                 para = paras[x + nRows]
                 indCol = para.level - nDelta
                 values[indCol] = para.headTitle
-                values[nCols - 1] = "应急救援.docx 段落 " + para.getheadID_str()
+                values[nCols - 1] = "《应急救援.docx》段落 " + para.getheadID_str()
                 
                 # 主节点合并
                 if(para.headCount_child > 0):

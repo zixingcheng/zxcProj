@@ -9,6 +9,8 @@
 	https://oneinstack.com/docs/rabbitmq-image-guide/
 	按操作打开远程访问，可以正常访问rabbitmq即可。 
 	
+	
+	
 
 ### 图形界面
 		 
@@ -51,11 +53,54 @@
 ···
 
 	安装
-	方式一：将下载的安装文件    放入linux 目录
+	方式一：已经测试成功	
 
-	执行：yum install esl-erlang_21.0.5-1_centos_7_amd64.rpm
+		wget --content-disposition https://packagecloud.io/rabbitmq/erlang/packages/el/7/erlang-20.3-1.el7.centos.x86_64.rpm/download.rpm
+		yum install erlang-20.3-1.el7.centos.x86_64.rpm
+		———————————————
 
-	    一路通行之后执行： erl -version 检查是否安装成功，如果提示如图：则表示成功
+
+		wget https://dl.bintray.com/rabbitmq/all/rabbitmq-server/3.7.6/rabbitmq-server-3.7.6-1.el7.noarch.rpm
+		yum install rabbitmq-server-3.7.6-1.el7.noarch.rpm
+		————————————————
+
+
+		systemctl status firewalld
+		systemctl start firewalld
+
+
+		firewall-cmd --zone=public --add-port=15672/tcp --permanent
+		firewall-cmd --reload    		#重新载入，更新防火墙规则
+		firewall-cmd --list-port		#查看已开启的端口
+		————————————————
+
+		rabbitmqctl status
+		service rabbitmq-server restart
+		rabbitmqctl status
+		
+
+		rabbitmq-plugins enable rabbitmq_management
+
+
+		rabbitmqctl add_user admin(账号) 123456(密码)
+		rabbitmqctl add_user admin a123456
+		rabbitmqctl set_user_tags admin administrator			#用户设置为administrator才能远程访问
+		rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"   #给用户”djs“赋予了权限，结果ok了，nice。
+
+
+		添加用户可能报错：
+		chown rabbitmq:rabbitmq .erlang.cookie
+		chmod 400 .erlang.cookie
+
+
+		rabbitmqctl status
+		echo 106.13.206.223 rabbitmq>>/etc/hosts
+
+		service rabbitmq-server restart
+		rabbitmqctl status
+		
+		chkconfig rabbitmq-server on
+ 
 
 
 	方式二：本人的选则的方式
@@ -140,6 +185,7 @@
 　　tar -zxvf Python-3.5.3.tgz
 　　cd Python-3.5.3
 
+
 	配置及安装：
 	./configure --prefix=/opt/python3.5 --enable-shared	
 	make && make install
@@ -153,6 +199,53 @@
 	echo "/opt/python3.5/lib" > /etc/ld.so.conf.d/python3.5.conf
 	ldconfig 
 
+### 安装python3.7
+
+	下载：
+	wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz   
+
+	解压：
+	tar -zxvf Python-3.7.0.tgz
+　　cd Python-3.7.0
+
+	安装依赖包
+	yum -y install openssl-devel
+	yum install libffi-devel 
+
+	配置及安装：
+	./configure --prefix=/opt/python3.7 --enable-shared	
+	make && make install
+	
+	编译报错：
+	
+		第一、update最新版本系统软件
+		yum update
+		这个必须要执行后才可以安装我们的系统软件或者一键包。
+		
+		第二、编译缺失关联软件
+		yum install gcc build-essential
+		编译执行完毕之后，我们在执行./configure && make这类的执行命令就可以解决问题。
+
+
+		第二种：
+		一、Linux下各种依赖都已经安装,是因为没有找到makefile。
+		如果是自己写的，确定在当前目录下；如果是源码安装，先运行./configure，生成makefile，再执行make，即可正常运行。
+
+		二、如果没有安装其他依赖先安装依赖
+		yum install gcc gcc-c++ autoconf automake
+		yum -y install zlib zlib-devel openssl openssl-devel pcre pcre-devel （安装依赖zlib、openssl和pcre）
+		
+	
+	软链接：
+	ln -s /opt/python3.7/bin/python3.7 /usr/bin/python3	（默认安装到opt避免路径链接问题）
+	ln -sf /opt/python3.7/bin/python3.7 /usr/bin/python	（需要按替换系统中的python）
+	ln -s /opt/python3.7/bin/pip3.7 /usr/bin/pip3
+
+	
+	配置库链接：
+	echo "/opt/python3.7/lib" > /etc/ld.so.conf.d/python3.7.conf
+	ldconfig 
+	
 安装完毕，/usr/local/目录下就会有python3了
 	
 * 注意部分链接已经存在pyton2.7的快捷方式，可以直接删除，再创建python3的链接。
@@ -207,8 +300,8 @@ Known problems with Fedora Linux and Python 3 version: Error message:
 
 ### 安装pip
 
-	/opt/python3.5/bin/pip3 install --upgrade pip
-	ln -s /opt/python3.5/bin/pip /usr/bin/pip
+	/opt/python3.7/bin/pip3 install --upgrade pip
+	ln -sf /opt/python3.7/bin/pip3 /usr/bin/pip
 	
 	
 	或：
@@ -254,9 +347,132 @@ Known problems with Fedora Linux and Python 3 version: Error message:
 
 	参考 centos7下安装mysql5.7（rpm） https://blog.csdn.net/wudinaniya/article/details/81094578
 	
-	实测:
+	实测一：参考 https://blog.csdn.net/qq_32074527/article/details/93176210
+	一、安装配置MySQL的yum源
+		# 安装MySQL的yum源，下面是RHEL6系列的下载地址
+		rpm -Uvh http://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm
+
+		# 安装yum-config-manager
+		yum install yum-utils -y
+
+		# 禁用MySQL5.6的源
+		yum-config-manager --disable mysql56-community
+
+		# 启用MySQL5.7的源
+		yum-config-manager --enable mysql57-community-dmr
+
+		# 用下面的命令查看是否配置正确		
+		yum repolist enabled | grep mysql 
 	
+	二、yum安装MySQL5.7
+	yum install mysql-community-server
+
+ 
+	报错； 您可以尝试添加 --skip-broken 选项来解决该问题  您可以尝试执行：rpm -Va --nofiles --nodigest
+	修改/etc/yum.repos.d/mysql-community.repo 源文件，修改为el/7/
+	vim /etc/yum.repos.d/mysql-community.repo 
+	
+	然后再次执行yum install mysql-community-server
+	
+	三、启动MySQL
+	
+		禁用selinux
+		setenforce 0
+		sed -i '/^SELINUX=/c\SELINUX=disabled' /etc/selinux/config 
+
+		启动mysqld，启动之前先修改/etc/my.cnf配置文件，本文用默认的配置。
+		service mysqld start
+	
+	四、连接MySQL并修改密码
+	
+		grep "password" /var/log/mysqld.log
+		mysql -uroot -p
+		
+		update user set authentication_string=password('a123456') where user='root';
+		update user set host = '%' where user = 'root' and host = 'localhost';
+		
+		mysql> set global validate_password_policy=0;
+		mysql> set global validate_password_length=1;
+		mysql> set password=password('a123456');
+	
+	五、使用Navicat远程连接MySQL报错1103
+		
+		mysql> grant all privileges on *.* to 'root'@'%' identified by 'Zxcvbnm!@#45678' with grant option;
+			   grant all privileges on *.* to 'root'@'%' identified by 'Zxcvbnm!@#45678' with grant option;
+			   grant all privileges on *.* to 'root'@'%' identified by 'Zxcvbnm!@#45678';
+		mysql> flush privileges; 
+	
+	开放3306端口；
+	[root@iZrj98hvt5pgeax2pgdjw3Z ~]# vi  /etc/sysconfig/iptables
+
+	防火墙开放3306端口
+		1、打开防火墙配置文件
+		vi  /etc/sysconfig/iptables
+		如果没有这个文件，需要安装iptables
+
+		先检查是否安装了iptables
+		service iptables status
+		安装iptables
+		yum install -y iptables
+		升级iptables
+		yum update iptables 
+		安装iptables-services
+		yum install iptables-services
+		禁用/停止自带的firewalld服务
+
+		停止firewalld服务
+		systemctl stop firewalld
+		禁用firewalld服务
+		systemctl mask firewalld
+		开启iptables服务 
+
+
+		注册iptables服务
+		相当于以前的chkconfig iptables on
+		systemctl enable iptables.service
+		开启服务
+		systemctl start iptables.service
+		查看状态
+		systemctl status iptables.service
+		vi /etc/sysconfig/iptables
+
+		2、增加下面一行
+		注意：增加的开放3306端口的语句一定要在icmp-host-prohibited之前
+		-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+		
+		3、重启防火墙
+		service  iptables restart
+		附：个人配置
+
+
+
+	# Firewall configuration written by system-config-firewall
+	# Manual customization of this file is not recommended.
+	*filter
+	:INPUT ACCEPT [0:0]
+	:FORWARD ACCEPT [0:0]
+	:OUTPUT ACCEPT [0:0]
+	-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+	-A INPUT -p icmp -j ACCEPT
+	-A INPUT -i lo -j ACCEPT
+	-A INPUT -i eth0 -j ACCEPT
+	-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+	-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+	-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+	-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+	-A FORWARD -p icmp -j ACCEPT
+	-A FORWARD -i lo -j ACCEPT
+	-A FORWARD -i eth0 -j ACCEPT
+	-A INPUT -j REJECT --reject-with icmp-host-prohibited
+	-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+	COMMIT
+
+
+	实测二:	
 	第一步：下载地址；https://dev.mysql.com/downloads/mysql/，可以选择 RPM Bundle,下载完记得解压  tar -xvf xxx.tar
+		wget https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.22-linux-glibc2.12-x86_64.tar.gz
+		wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.22-linux-glibc2.12-x86_64.tar.gz
+		tar -xvf xxx.tar
 	
 	第二步：卸载旧版本的MySql
 	
@@ -473,6 +689,11 @@ crontabs软件包是用来安装、卸装、或列举用来驱动 cron 守护进
 	命令： crontab -e
 	*/1 8-23 * * * python /root/Public/UpLoad/Temp/hello.py
 
+### 自定义进程CPU占用 
+	
+	限制进程cpu占用最高50
+	cpulimit --pid `ps aux|awk '{if($3 > 60) print $2}'` --limit 50
+	
 
 ### 脚本启动
 
@@ -517,7 +738,7 @@ git 更新脚本：
 
 	--在使用iptables服务,开放443端口(HTTPS)	
 	3.iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-
+	  
 	--保存上述规则
 	4.service iptables save
 
