@@ -18,6 +18,7 @@ class myData_Monitor():
     def __init__(self, name, saveData=True, valueDelta=0.0025, valueMax=0, valueMin=0, valueLast=0, valueBase=0):
         self.functionDict = {}          # 缓存外部装饰函数，用于回调
         self.saveData = saveData
+        self.fixedHit = True
         self.dataNum = 0
         self.datas = []
         self.datasMonitor = []
@@ -150,11 +151,12 @@ class myData_Monitor():
                 index = self.iif(self.state < 0, self.valueIndexs[1], self.valueIndexs[2])
             profit = round(valueLast / self.valueBase - 1, 6)
             msg = {"Index": index, "Type": monitorType, "codeState": self.state, "hitLimit": hitLimit, "Value":  valueLast, "Ratio":  ratio, "Profit": profit}
-            self.msgList.append(msg)
             self.datasMonitor.append([index, valueLast, monitorType, self.state, hitLimit])
 
             # 调用装饰函数
-            self.configured_reply(monitorType)
+            if(self.fixedHit or self.fixedHit == hitLimit):
+                self.msgList.append(msg)
+                self.configured_reply(monitorType)
 
             # 超限点处理
             if(hitLimit): self.handle_data(dataValue, True)

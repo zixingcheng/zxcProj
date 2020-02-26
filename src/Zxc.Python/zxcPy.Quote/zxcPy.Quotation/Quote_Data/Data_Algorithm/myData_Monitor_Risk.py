@@ -21,6 +21,7 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
         
         self.newBorder = 0                  #新边界更新，2：新高，1：阶段新高，0：无变化，-1：阶段新低，-2：新低
         self.limitHit = True                #高低边界监测
+        self.riskMonitor = True             #风险监测有效
         self.stopProfit_Dynamic = True      #动态止盈
         self.stopProfit = 0.06              #止盈线，默认为6%
         self.stopProfit_Retreat = 0.01      #止盈回撤，默认为1%
@@ -48,7 +49,8 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
         
     # 自定义处理
     def handle_user(self, msg):
-        self.checkState(msg)    # 检查止盈止损状态
+        if(self.riskMonitor):
+            self.checkState(msg)    # 检查止盈止损状态
         
     # 检查止盈止损状态
     def checkState(self, msg):
@@ -143,17 +145,9 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
             self.profitMax_Stage = prift             # 新高判断
             self.newBorder = 2                       # 赋值最高
             
-    # 更新收益
-    def updataProfit(self, prift):
-        if(self.profitMin_Stage_last == 999999):  self.profitMin_Stage_last = prift
-        if(self.profitMax_Stage_last == -999999):  self.profitMax_Stage_last = prift
-
-        if(self.profitMax_Stage_last < prift):       # 新高判断
-            self.profitMax_Stage_last = prift        # 赋值阶段最高价
-        if(self.profitMax_Stage < prift):  self.profitMax_Stage = prift  
-
-        if(self.profitMin_Stage > prift):            # 新低判断
-            self.profitMin_Stage = prift             # 赋值阶段最低价
+    # 设置风险监测是否开启
+    def setMonitor_risk(self, riskMonitor = True):
+        self.riskMonitor = riskMonitor              #风险监测有效
 
 
 
@@ -171,5 +165,7 @@ if __name__ == '__main__':
     # 循环数据进行监测
     for x in datas3:
         pRisk.add_data(x)
+        if(x > 10.6): pRisk.setMonitor_risk(False)
+
     
     print("")
