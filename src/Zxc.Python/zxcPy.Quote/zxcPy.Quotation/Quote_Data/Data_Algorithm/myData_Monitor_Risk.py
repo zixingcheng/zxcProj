@@ -90,7 +90,7 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
             else:
                 self.updataStatic(prift)                    # 新高统计
                 if(self.limitHit and self.newBorder == 2):
-                    self.setState(True, msg, True, True)    # 设置止盈状态
+                    self.setState(True, msg, False, True)   # 设置止盈状态
                 pass                                        # 其他止盈逻辑-特殊
         elif(self.stopLoss_goon):       
             # 回撤超过界限，激活止损(精度修正+0.00000001,避免计算过程小数点精度导致的临界计算错误)
@@ -101,7 +101,7 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
             else:
                 self.updataStatic(prift)                    # 新低统计
                 if(self.limitHit and self.newBorder ==-2):
-                    self.setState(False, msg, True, True)   # 设置止盈状态
+                    self.setState(False, msg, False, True)  # 设置止盈状态
                 pass                                        # 其他止盈逻辑-特殊
     #设置止盈止损状态   
     def setState(self, isStopProfit, msgOld = None, isHit = False, noStatic = False): 
@@ -115,7 +115,7 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
             riskType = self.iif(self.isStop_Profit, "stopProfit", "stopLoss")
             isDynamic = self.iif(self.isStop_Profit, self.stopProfit_Dynamic, self.stopLoss_Dynamic)
             lastProfit = self.iif(self.isStop_Profit, self.profitMax_Stage_last, self.profitMin_Stage_last)
-            typeBorder = self.iif(self.newBorder == 2, "newTop", self.iif(self.newBorder == -2, "newBottom", "interval"))
+            typeBorder = self.iif(self.newBorder == 2, "newTop", self.iif(self.newBorder == -2, "newLow", "interval"))
 
             msg = msgOld.copy()
             msg['riskInfo'] = {'baseType': msg['Type'], 'riskType': riskType, 'hitPoint': isHit, 'typeBorder': typeBorder, 'isDynamic': isDynamic, 'lastProfit': lastProfit, 'minProfit': self.profitMin_Stage, 'maxProfit': self.profitMax_Stage}
