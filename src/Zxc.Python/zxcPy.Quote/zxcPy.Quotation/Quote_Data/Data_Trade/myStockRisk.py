@@ -125,13 +125,14 @@ class mySet_StockRisk():
 
         #交易信息必须存在
         if(dictSets == None): return False
-        index = -1
+        bExsit = False; index = -1
         strTime = dictSets.get('日期', "")
         if(type(strTime) != str): strTime = myData_Trans.Tran_ToDatetime_str(dictSets['日期'], "%Y-%m-%d %H:%M:%S")
         for x in self.logOperates:
+            index += 1
             if(x['时间'] == strTime):
-                index += 1
-                break
+                bExsit = True; break
+                
 
         #解析信息
         self.ID = dictSets.get('ID',-1)
@@ -155,7 +156,7 @@ class mySet_StockRisk():
             if(type(strTime) != str): strTime = myData_Trans.Tran_ToDatetime_str(strTime, "%Y-%m-%d %H:%M:%S")
 
             #存在则更新
-            if(index == -1):
+            if(bExsit == False):
                 self.logOperates.append({"股数": stockNum_temp,"股价":stockAvg_temp,"时间": strTime})    #仓位变化记录
             else:
                 self.logOperates[index] = {"股数": stockNum_temp,"股价":stockAvg_temp,"时间": strTime}
@@ -164,7 +165,7 @@ class mySet_StockRisk():
         self.sumOperates = dictSets.get('操作统计数',0)
         
         #计算仓位变化
-        if(index == -1):
+        if(bExsit == False):
             stockNum = self.stockNum
             if(stockNum_temp > 0):
                 #买入时更新成本 
