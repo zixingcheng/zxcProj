@@ -7,6 +7,7 @@ Created on  张斌 2020-02-13 14:28:00
     数据监测类，分析拐点与方向等
 """
 import sys, os, mySystem 
+from decimal import Decimal
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("../../Quote_Data", False, __file__) 
@@ -115,6 +116,7 @@ class myData_Monitor():
         # 数值变动幅度区间超限
         monitorType = ""; hitLimit = False; valueLast = dataValue
         ratio = (dataValue - self.valueLast) / self.valueBase
+        ratio = Decimal(ratio).quantize(Decimal('0.000000'))
         if(ratio * self.state >= 0):             # 同方向，超限触发超限点及该值
             if(ratio > 0):      # 上升
                 monitorType = "RAISE"; self.state = 1
@@ -124,7 +126,7 @@ class myData_Monitor():
             # 超限跨区间限制处理
             if(abs(ratio) > self.valueDelta):
                 valueLast = self.valueLast + self.valueBase * self.valueDelta * self.state
-                
+
                 hitLimit = True; ratio = self.valueDelta; self.valueLast = valueLast            
                 self.updata_buffer(valueLast)   # 更新最大最小值等缓存信息
             elif(recursion == False):           # 未超限不触发

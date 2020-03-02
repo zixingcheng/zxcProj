@@ -20,6 +20,7 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
         super().__init__(name, saveData, valueDelta, valueMax, valueMin, valueLast, valueBase)
         
         self.newBorder = 0                  #新边界更新，2：新高，1：阶段新高，0：无变化，-1：阶段新低，-2：新低
+        self.newBorder_tag = "interval"     #新边界更新描述：newLowest、newLowest、interval、newHigher、newHighest      
         self.limitHit = True                #高低边界监测
         self.riskMonitor = True             #风险监测有效
         self.stopProfit_Dynamic = True      #动态止盈
@@ -57,6 +58,7 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
         prift = msg['Profit']
         price = msg['Value']
         state = msg['codeState']
+        self.newBorder_tag = "interval" 
 
         # 上涨为止盈，下跌为止损
         if(prift > 0):
@@ -89,8 +91,8 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
                     self.profitMax_Stage_last = prift
             else:
                 self.updataStatic(prift)                    # 新高统计
-                if(self.limitHit and self.newBorder == 2):
-                    self.setState(True, msg, False, True)   # 设置止盈状态
+                if(self.limitHit and self.newBorder > 0):   # 新高，或阶段新高，设置止盈状态（阶段止盈线上移）
+                    self.setState(True, msg, False, True)    
                 pass                                        # 其他止盈逻辑-特殊
         elif(self.stopLoss_goon):       
             # 回撤超过界限，激活止损(精度修正+0.00000001,避免计算过程小数点精度导致的临界计算错误)
@@ -115,10 +117,9 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
             riskType = self.iif(self.isStop_Profit, "stopProfit", "stopLoss")
             isDynamic = self.iif(self.isStop_Profit, self.stopProfit_Dynamic, self.stopLoss_Dynamic)
             lastProfit = self.iif(self.isStop_Profit, self.profitMax_Stage_last, self.profitMin_Stage_last)
-            typeBorder = self.iif(self.newBorder == 2, "newTop", self.iif(self.newBorder == -2, "newLow", "interval"))
 
             msg = msgOld.copy()
-            msg['riskInfo'] = {'baseType': msg['Type'], 'riskType': riskType, 'hitPoint': isHit, 'typeBorder': typeBorder, 'isDynamic': isDynamic, 'lastProfit': lastProfit, 'minProfit': self.profitMin_Stage, 'maxProfit': self.profitMax_Stage}
+            msg['riskInfo'] = {'baseType': msg['Type'], 'riskType': riskType, 'hitPoint': isHit, 'typeBorder': self.newBorder_tag, 'isDynamic': isDynamic, 'lastProfit': lastProfit, 'minProfit': self.profitMin_Stage, 'maxProfit': self.profitMax_Stage}
             msg['Type'] = "RISK" 
             self.msgList.append(msg)
             
@@ -133,17 +134,18 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
         self.newBorder = 0                           # 新边界更新，2：新高，1：阶段新高，0：无变化，-1：阶段新低，-2：新低
         if(self.profitMin_Stage_last > prift):       # 阶段新低判断
             self.profitMin_Stage_last = prift        # 赋值阶段最低
-            self.newBorder = -1                    
+            self.newBorder = -1; self.newBorder_tag = "newLower"                   
         if(self.profitMin_Stage > prift):            # 新低判断
             self.profitMin_Stage = prift             # 赋值最低
-            self.newBorder = -2                    
+            self.newBorder = -2; self.newBorder_tag = "newLowest"                     
 
-        if(self.profitMax_Stage_last < prift):       # 阶段新高判断
-            self.profitMax_Stage_last = prift        # 赋值阶段最高
-            self.newBorder = 1                      
-        if(self.profitMax_Stage < prift):  
-            self.profitMax_Stage = prift             # 新高判断
-            self.newBorder = 2                       # 赋值最高
+        if(self.profitMax_Stage_last < prift):       # 阶段新高判断-回升超回撤处理间隔时更新
+            if(prift - self.profitMax_Stage_last - self.stopProfit_Retreat + 0.00000001 >= 0.0):
+                self.profitMax_Stage_last = prift        # 赋值阶段最高
+                self.newBorder = 1; self.newBorder_tag = "newHigher"                        
+        if(self.profitMax_Stage < prift):            # 新高判断
+            self.profitMax_Stage = prift             # 赋值最高
+            self.newBorder = 2 ; self.newBorder_tag = "newHighest"                        
             
     # 设置风险监测是否开启
     def setMonitor_risk(self, riskMonitor = True):

@@ -36,7 +36,7 @@ class mySet_StockRisk():
         self.stockPosition = 1      #标的仓位-当前
         self.stockFee = 0.003       #标的手续费率,卖出时统一计算
         
-        self.fixHit = True             #是否启用定量监测
+        self.fixHit = False             #是否启用定量监测
         self.limitHit = True            #是否启用高低边界监测
         self.deltaProfit = 0.0025       #数据监测触发最小间隔
         self.stopProfit = 0.06          #止盈线，默认为6%
@@ -487,17 +487,22 @@ class myMonitor_StockRisk():
             self.updataRiskSet()                        #同步风险交易数据
             self.priceNow = msg['Value']
             self.profitNow = msg['Profit']
-
+            
+            typeBorder = riskInfo['typeBorder']
             if(riskInfo['riskType'] == 'stopProfit'):
-                if(riskInfo['typeBorder'] == 'newTop'):     #新高
-                    strTitle = self.getTitleMark(self.priceNow, True, not riskInfo['hitPoint'], True)
+                if(typeBorder == 'newHighest'):         #新高
+                    strTitle = self.getTitleMark(self.priceNow, True, not riskInfo['hitPoint'], True, True)
+                elif(typeBorder == 'newHigher'):        #新高-阶段
+                    strTitle = self.getTitleMark(self.priceNow, True, not riskInfo['hitPoint'], False, True)
                 else:
-                    strTitle = self.getTitleMark(self.priceNow, False, False, True)
+                    strTitle = self.getTitleMark(self.priceNow, False, False, False, True)
             elif(riskInfo['riskType'] == 'stopLoss'):
-                if(riskInfo['typeBorder'] == 'newLow'):     #新低
-                    strTitle = self.getTitleMark(self.priceNow, True, not riskInfo['hitPoint'], False)
+                if(typeBorder == 'newLowest'):          #新低
+                    strTitle = self.getTitleMark(self.priceNow, True, not riskInfo['hitPoint'], True, False)
+                elif(typeBorder == 'newLower'):         #新低-阶段
+                    strTitle = self.getTitleMark(self.priceNow, True, not riskInfo['hitPoint'], False, False)
                 else:
-                    strTitle = self.getTitleMark(self.priceNow, False, False, False)
+                    strTitle = self.getTitleMark(self.priceNow, False, False, False, False)
         return strTitle
 
     
@@ -542,7 +547,7 @@ class myMonitor_StockRisk():
         #返回提示信息
         return self.getTitleMark(price, True, numSell)
 
-    # 提取股票交易建议s信息
+    # 提取股票交易建议信息
     def getTradeInfo(self, price, stopProfit = True, numSell = 0):
         #股票信息
         self.setRisk.Static_Profit(price)                                   #更新股票操作统计信息
@@ -562,7 +567,7 @@ class myMonitor_StockRisk():
             numSell = int(Decimal(numSell) + Decimal(0.5))
         return {"prift": prift, "priftMax": priftMax, "numTrade": numTrade, "numSell": numSell}
     # 提取返回信息
-    def getTitleMark(self, price, isHit, isNewLimit, isStopProfit = True, numSell = 0):
+    def getTitleMark(self, price, isHit, isNewLimit, isBreakLimit = True, isStopProfit = True, numSell = 0):
         #提取股票交易建议信息
         tradeInfo = self.getTradeInfo(price) 
         numTrade = tradeInfo['numTrade'] 
@@ -577,20 +582,22 @@ class myMonitor_StockRisk():
         strProfitNow = str(Decimal((self.profitNow * 100)).quantize(Decimal('0.0'))) + "%"              #当前浮盈
         strMax = str(Decimal((self.setRisk.profitMax * 100)).quantize(Decimal('0.00'))) + "%"           #最高浮盈
         strMaxStage = str(Decimal((self.setRisk.profitMax_Stage * 100)).quantize(Decimal('0.00'))) + "%"#阶段浮盈-前高
-
+        
         #触发止盈止损
         strReutrn = F"{self.setRisk.stockName}: {strPrice}"
         if(isHit):
             if(isNewLimit == False):    #第一次触发
                 if(isStopProfit):   
-                    strReutrn += F", 浮盈超 {strProfitNow}.\r\n操作策略: 触发动态止盈.\r\n策略收益: {strProfit}."
+                    strReutrn += F", 浮盈超 {strProfitNow}, 触发止盈.\r\n操作策略: 启动动态止盈.\r\n策略收益: {strProfit}."
                 else:
-                    strReutrn += F", 浮亏超 {strProfitNow}.\r\n操作策略: 触发动态止损.\r\n策略收益: {strProfit}."
-            else:                       #再一次触发
-                if(isStopProfit):   
-                    strReutrn += F", 浮盈超 {strProfitNow}.\r\n操作策略: 止盈线动态上移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strReutrn += F", 浮亏超 {strProfitNow}, 触发止损.\r\n操作策略: 启动动态止损.\r\n策略收益: {strProfit}."
+            else:                       #再一次触发                
+                if(isStopProfit):  
+                    strTag = myData.iif(isBreakLimit, "突破新高", "阶段新高")
+                    strReutrn += F", 浮盈超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止盈线上移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
                 else:
-                    strReutrn += F", 浮亏超 {strProfitNow}.\r\n操作策略: 止损线动态上移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strTag = myData.iif(isBreakLimit, "突破新低", "阶段新低")
+                    strReutrn += F", 浮亏超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止损线上移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
         else:
             if(isStopProfit):   
                 if(self.setRisk.stopProfit_Dynamic == False):
@@ -742,7 +749,6 @@ if __name__ == "__main__":
     pRisks.addRiskSet('茶叶一主号','','10002033.XSHG',"50ETF购12月2900", 300, 10, '2019-10-23 09:31:00', {}) 
 
 
-
     # 添加行数据
     if(1==1):
         print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '600001', '标的名称': "测试股票", '标的均价': '10.3', '标的数量': 5000, '止盈线': 0.08, '日期': '2019-08-27 11:11:00'}, True))
@@ -763,7 +769,7 @@ if __name__ == "__main__":
         pRisk.notifyQuotation(10.4)     #回撤
         pRisk.notifyQuotation(10.6)
         pRisk.notifyQuotation(10.7)     
-        pRisk.notifyQuotation(10.9)     --回调上移
+        pRisk.notifyQuotation(10.9)     
         pRisk.notifyQuotation(10.8)     #回撤
         pRisk.notifyQuotation(10.75)     
         pRisk.notifyQuotation(10.8)     
