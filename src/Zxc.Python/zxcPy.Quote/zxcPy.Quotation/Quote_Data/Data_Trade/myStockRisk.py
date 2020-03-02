@@ -176,6 +176,8 @@ class mySet_StockRisk():
                 self.stockNum = int(stockNum) 
             else:
                 #卖出更新仓位
+                if(stockNum == 0): 
+                    stockNum = stockNum_temp; self.stockNum = int(stockNum); self.stockAvg = stockAvg_temp
                 self.stockPosition = (stockNum_temp * stockPosition_temp + self.stockNum * self.stockPosition) / stockNum
                 if(self.stockPosition <= 0):
                     self.stockPosition = 0
@@ -233,11 +235,13 @@ class mySet_StockRisk():
         sumMoney_Sell = sumMoney_Sell_fee * (1 - self.stockFee)                     #卖出总金额（不含手续费）
         sumMoney = (sumStock_Buy + sumStock_Sell) * strokPrice - sumMoney_Sell      #当前市值（含卖出）
         sumStock = sumStock_Buy + sumStock_Sell
+        if(sumMoney_Buy == 0): sumMoney_Buy = sumMoney
         profitNow = sumMoney / sumMoney_Buy - 1                                     #当前浮盈-阶段
         stockAvg_sell = 0
         if(sumStock_Sell != 0):
             stockAvg_sell = sumMoney_Sell_fee / sumStock_Sell                       #卖出均价
-        stockCost = (sumMoney_Buy + sumMoney_Sell) / myData.iif(sumStock <= 0, sumStock_Buy, sumStock)
+        if(sumStock == 0 ): sumStock = sumMoney_Buy
+        stockCost = (sumMoney_Buy + sumMoney_Sell) / sumStock
 
         #更新
         if(bUpdata == True):
@@ -252,6 +256,7 @@ class mySet_StockRisk():
                 self.profitMin = self.profitMin_Stage       #更新最小浮盈
             if(self.priceMax < maxPrice): self.priceMax = maxPrice
             if(self.priceMin == 0 or self.priceMin > minPrice): self.priceMin = minPrice
+            if(self.sumOperates < len(self.logOperates)): self.sumOperates += 1
         return profitNow, stockCost
 
 # 自定义简易库表操作-股票风险设置记录 
@@ -389,15 +394,8 @@ class myMonitor_StockRisk():
 			    突破新高规则：涨幅突破前一阶段止损点，涨幅突破止损线。突破后实时比对更新新高。
     """
     def __init__(self, minPrice5, maxPrice5, minPrice10=9999999, maxPrice10=-9999999, minPrice20=9999999, maxPrice20=-9999999):  
-        self.setRisk = mySet_StockRisk()   #交易风险设置
-        self.maxPrice5 = maxPrice5              #5日最高价
-        self.maxPrice10 = maxPrice10            #10日最高价
-        self.maxPrice20 = maxPrice20            #20日最高价
-        self.minPrice5 = minPrice5              #5日最低价
-        self.minPrice10 = minPrice10            #10日最低价
-        self.minPrice20 = minPrice20            #20日最低价
-        self.maxPrice = max(self.maxPrice5, self.maxPrice10, self.maxPrice20)
-        self.minPrice = min(self.minPrice5, self.minPrice10, self.minPrice20)
+        self.setRisk = mySet_StockRisk()        #交易风险设置 
+        self.msgManger = None
 
         self.priceNow = 0                       #当前价格
         self.profitNow = 0                      #当前浮盈
@@ -467,12 +465,18 @@ class myMonitor_StockRisk():
         self.setRisk.priceMin = self.riskMonitor.valueMin     
         self.setRisk.priceNow = self.riskMonitor.valueLast  
     # 更新交易操作
-    def updataTrade(self, strokPrice, stockNum):
+    def updataTrade(self, strokPrice, stockNum, strTime = ""):
         #复制当前设置
         rowInfo = {'ID': self.setRisk.ID,'用户名': self.setRisk.usrID,'用户标签': self.setRisk.usrTag, '标的编号': self.setRisk.stockID, '标的名称': self.setRisk.stockName, '标的均价': strokPrice, '标的数量': stockNum}
+        if(strTime != ""): rowInfo['日期'] = strTime
+        strR = str(rowInfo)
+        
+        #添加卖出信息
+        #strR = self.setDB.Add_Row(rowInfo, True)   #负数操作仍旧存在些问题
         self.setRisk.Trans_FromDict(rowInfo) 
         self.setRisk.Static_Profit(strokPrice)  #收益统计
         self.saveSet()                          #保存修改
+        self.handleMsg(strR)      
 
     # 通知接收新行情
     def notifyQuotation(self, price, bSave_Auto = True):
@@ -482,6 +486,9 @@ class myMonitor_StockRisk():
         
     # 风险处置
     def handleRisk(self, msg, bSave_Auto = True):
+        if(self.setRisk.stockPosition <= 0): return
+
+        # 生成操作建议
         strTitle = ""
         if(msg['Type'] == "RISK"):
             riskInfo = msg['riskInfo']
@@ -504,49 +511,29 @@ class myMonitor_StockRisk():
                     strTitle = self.getTitleMark(self.priceNow, True, not riskInfo['hitPoint'], False, False)
                 else:
                     strTitle = self.getTitleMark(self.priceNow, False, False, False, False)
+        self.handleMsg(strTitle)            
         return strTitle
-
-    
-
-        #检查止盈止损状态
-        self.checkState(price)
-
-        #执行动态止盈止损
-        strTitle = ""
-        if(self.isStop_Profit):
-            strTitle = self.stopProfit(price, bSave_Auto)
-        elif(self.isStop_Loss):
-            self.isStop_Loss = False            
-        else:
-            prift = price / self.setRisk.stockAvg - 1
-            strProfit = str(Decimal((prift * 100)).quantize(Decimal('0.00'))) + "%"
-            myDebug.Debug("收益：" + strProfit)
-            
-            #触发止盈-每次启动提醒一次
-            if(self.setRisk.stopProfit_goon and self.markStop_Profit == 0):
-                strTitle = self.getTitleMark(price, True) 
-        return strTitle
-
-            
-    #交易策略-止盈(1.非动态，到达位置立即卖出，1.动态，到达位置触发止盈) 
-    def handleTrade_stopProfit(self, price, bSave_Auto = False):
-        """
-        交易策略：
-        1.止盈后，分段每回撤1%建议平仓 n%，直到清仓；
-        2.建议需要记录，便于分阶段处理。
-        """
-        #提取股票交易建议信息
-        tradeInfo = self.getTradeInfo(price)
-        numSell = tradeInfo['numSell'] 
-
+    # 消息处理
+    def handleMsg(self, strTitle):
+        #发送消息
+        if(False):
+            if(True):
+                if(strTitle != ""):
+                    if(self.msgManger == None): self.msgManger = gol._Get_Setting('manageMsgs')
+                    msg = self.msgManger.OnCreatMsg()
+                    msg["usrName"] = "@*股票风控监测群"
+                    msg["msgType"] = "TEXT"
+                    msg["usrPlat"] = "wx"
+                    msg["msg"] = strTitle
+                    self.msgManger.OnHandleMsg(msg, '', True)   #必须check
+    # 交易处置
+    def handleTrade(self, price, numSell, bSave_Auto = False):
         #自动更新交易记录
         if(bSave_Auto):
             self.updataTrade(price, -numSell)
         else:
             self.setRisk.Static_Profit(price)  #收益统计
-
-        #返回提示信息
-        return self.getTitleMark(price, True, numSell)
+        return True
 
     # 提取股票交易建议信息
     def getTradeInfo(self, price, stopProfit = True, numSell = 0):
@@ -611,36 +598,16 @@ class myMonitor_StockRisk():
                 else:
                     strReutrn += F", 亏损逾 {strRetreat}.\r\n操作策略: 建议止损, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
         myDebug.Debug(strReutrn.replace("\r\n", ""))
+        
+        #交易处置
+        self.handleTrade(price, -numSell, False)
         return strReutrn
-
-    #校正回撤动态幅度 
-    def checkPiofitRetreat(self):
-        #默认回撤为设置值 
-        self.stopProfit_Retreat = self.setRisk.stopProfit_Retreat
-            
-        #特殊修正
-        if(1 == 1):
-            #计算当前与前期高点差价
-            profitStage = self.setRisk.profitMax_Stage - self.setRisk.profitMax
-            
-            #回撤率修正，阶段盈利为前高2倍以上，扩大回撤容忍范围为2倍，可以减少总回撤率
-            if(profitStage >= (self.setRisk.stopProfit) * 3):
-                self.stopProfit_Retreat = self.setRisk.stopProfit_Retreat * 3
-            elif(profitStage >= (self.setRisk.stopProfit) * 2):
-                self.stopProfit_Retreat = self.setRisk.stopProfit_Retreat * 2
-            pass
-      
-        #最大回撤限制
-        self.stopProfit_Retreat = myData.iif(self.stopProfit_Retreat > 0.06, 0.06, self.stopProfit_Retreat)
-        return self.stopProfit_Retreat
-
-
+    
 # 风险控制操作类 
 class myStockRisk_Control():
     def __init__(self):   
         self.riskDB = gol._Get_Value('zxcDB_StockRisk')
         self.stockSet = gol._Get_Value('setsStock')
-        self.msgManger = gol._Get_Setting('manageMsgs')
         self.initRiskSets()
     # 初始风控设置集
     def initRiskSets(self):  
@@ -655,7 +622,6 @@ class myStockRisk_Control():
             dictRisk[pSet['用户名'] + "_" + pSet['用户标签']] = pRisk
             if(len(dictRisk) == 1):
                 self.dictRisk[pSet['标的编号']] = dictRisk
-        
     # 初始风控设置
     def initRiskSet(self, usrID, usrTag, stockID, stockName, bCheck = True):  
         #解析正确股票信息
@@ -670,22 +636,7 @@ class myStockRisk_Control():
         pRisk = self.riskDB.getTradeRisk(usrID, usrTag, stockID, True)
         return pRisk
         
-    # 提取风控对象
-    def getRiskSet(self, usrID, usrTag, stockID, stockName, bCheck = True):  
-        #解析正确股票信息
-        if(bCheck):
-            stocks = self.stockSet._Find(stockID, stockName, "****")
-            if(len(stocks) == 1):
-                pStock = stocks[0]
-                stockID = pStock.code_id + "." + pStock.extype2
-                stockName = pStock.code_name
-
-        #提取
-        dictRisk = self.dictRisk.get(stockID, None)
-        if(dictRisk == None): return None
-        return dictRisk.get(usrID, None)
-
-    # 添加设置
+    # 添加设置(stockNum < 0代表卖出)
     def addRiskSet(self, usrID, usrTag, stockID, stockName, stockPrice, stockNum, time = "", dictSet = {}):  
         dictSet['用户名'] = usrID  
         dictSet['用户标签'] = usrTag
@@ -704,10 +655,42 @@ class myStockRisk_Control():
         dictSet['标的数量'] = stockNum
         dictSet['日期'] = myData.iif(time != "", time, myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d %H:%M:%S"))
 
-        #添加
-        strR = self.riskDB.Add_Row(dictSet, True)
-        myDebug.Debug(strR)
-        
+        #添加-区分买入卖出
+        pRisk = self.getRisk(usrID, usrTag, stockID, stockName, False)
+        if(stockNum > 0):
+            strR = self.riskDB.Add_Row(dictSet, True)
+            myDebug.Debug(strR)
+            if(pRisk == None):
+                #添加记录信息
+                pRisk = self.initRiskSet(dictSet['用户名'], dictSet['用户标签'], dictSet['标的编号'], dictSet['标的名称'], False)
+                
+                #缓存
+                dictRisk = self.dictRisk.get(dictSet['标的编号'], {})
+                dictRisk[dictSet['用户名'] + "_" + dictSet['用户标签']] = pRisk
+                if(len(dictRisk) == 1):
+                    self.dictRisk[dictSet['标的编号']] = dictRisk
+            else:
+                setRisk = self.riskDB.getSet(usrID, usrTag, stockID, isDel = False, setDB = pRisk.setDB)
+                pSet = mySet_StockRisk(dictSet)
+                pRisk.initSet(pSet, pRisk.setDB)
+        elif(stockNum < 0):
+            if(pRisk != None):
+                pRisk.updataTrade(stockPrice, stockNum, dictSet['日期'])
+    # 提取风控对象
+    def getRisk(self, usrID, usrTag, stockID, stockName, bCheck = True):  
+        #解析正确股票信息
+        if(bCheck):
+            stocks = self.stockSet._Find(stockID, stockName, "****")
+            if(len(stocks) == 1):
+                pStock = stocks[0]
+                stockID = pStock.code_id + "." + pStock.extype2
+                stockName = pStock.code_name
+
+        #提取
+        dictRisk = self.dictRisk.get(stockID, None)
+        if(dictRisk == None): return None
+        return dictRisk.get(usrID + "_" + usrTag, None) 
+
     #通知接收新行情
     def notifyRisk(self, price, stockID, stockName, bSave_Auto = True):
         #提取设置字典
@@ -715,16 +698,7 @@ class myStockRisk_Control():
         if(dictRisk != None):
             for x in dictRisk:
                 pRisk = dictRisk[x]
-                strR = pRisk.notifyQuotation(price, bSave_Auto)
-
-                #发送消息
-                if(strR != ""):
-                    msg = self.msgManger.OnCreatMsg()
-                    msg["usrName"] = "@*股票风控监测群"
-                    msg["msgType"] = "TEXT"
-                    msg["usrPlat"] = "wx"
-                    msg["msg"] = strR
-                    self.msgManger.OnHandleMsg(msg, '', True)   #必须check
+                pRisk.notifyQuotation(price, bSave_Auto)
 
 
 
@@ -732,7 +706,7 @@ class myStockRisk_Control():
 from myGlobal import gol 
 gol._Init()                 # 先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Value('zxcDB_StockRisk', myDataDB_StockRisk())     #实例 股票收益库对象 
-gol._Get_Value('zxcDB_StockRisk').Add_Fields(['用户名', '用户标签', '标的编号', '标的名称', '标的均价', '标的数量', "标的仓位", "手续费率", '边界限制','监测定量','监测间隔','止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段止盈','阶段止损','当前浮盈','止盈状态','止损状态', '日期', '备注', '操作统计数', '操作日志'], ['string','string','string','string','float','int','float','float','bool','bool','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','float','float','bool','bool','datetime','string','int','list'], [])
+gol._Get_Value('zxcDB_StockRisk').Add_Fields(['用户名', '用户标签', '标的编号', '标的名称', '标的均价', '标的数量', "标的仓位", "手续费率", '边界限制','定量监测','监测间隔','止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段止盈','阶段止损','当前浮盈','止盈状态','止损状态', '日期', '备注', '操作统计数', '操作日志'], ['string','string','string','string','float','int','float','float','bool','bool','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','float','float','bool','bool','datetime','string','int','list'], [])
 gol._Set_Value('zxcRisk_Control', myStockRisk_Control())    #实例 风险控制操作类 
 
 
@@ -752,19 +726,22 @@ if __name__ == "__main__":
 
     # 添加行数据
     if(1==1):
-        print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '600001', '标的名称': "测试股票", '标的均价': '10.3', '标的数量': 5000, '止盈线': 0.08, '日期': '2019-08-27 11:11:00'}, True))
-        print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '600001', '标的名称': "测试股票", '标的均价': '9.7', '标的数量': 5000, '日期': '2019-08-27 11:12:00'}, True))
-    
+        #print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '600001.XSHG', '标的名称': "邯郸钢铁", '标的均价': '10.3', '标的数量': 5000, '止盈线': 0.08, '日期': '2019-08-27 11:11:00'}, True))
+        pRisks.addRiskSet('茶叶一主号','','600001',"测试股票", 10.3, 5000, '2019-08-27 11:11:00', {})  
+        pRisks.addRiskSet('茶叶一主号','','600001',"测试股票", 9.7, 5000, '2019-08-27 11:12:00', {})  
+        
         # 查询数据
-        dictSet = pDB.Query("isDel==False && 用户名==茶叶一主号 && 标的编号==600001", "", True)
+        dictSet = pDB.Query("isDel==False && 用户名==茶叶一主号 && 标的编号==600001.XSHG", "", True)
         pSet = mySet_StockRisk(list(dictSet.values())[0])
 
 
         # 风险监测测试
-        pRisk = myMonitor_StockRisk(9.5, 10.8)
-        pRisk.initSet(pSet, pDB)
-        pRisk.notifyQuotation(12)     
+        #pRisk = myMonitor_StockRisk(9.5, 10.8)
+        #pRisk.initSet(pSet, pDB)
+        pRisk = pRisks.getRisk('茶叶一主号', '', '600001.XSHG', '')
+        pRisk.notifyQuotation(12)
         pRisk.notifyQuotation(11.7)     #回撤 
+        pRisks.addRiskSet('茶叶一主号','','600001',"", 11.7, -10000, '2019-08-27 11:18:00', {})  
         pRisk.notifyQuotation(12.7)      
         pRisk.notifyQuotation(13.3)      
         pRisk.notifyQuotation(10.4)     #回撤
@@ -803,9 +780,9 @@ if __name__ == "__main__":
     # 期权交易测试-实时模拟
     if(1 == 2):
         #初始风险对象
-        pRisk_300033 = pRisks.getRiskSet('茶叶一主号', '','300033', "", True)
-        pRisk_3000 = pRisks.getRiskSet('茶叶一主号', '','10001832.XSHG', "", True)
-        pRisk_3100 = pRisks.getRiskSet('茶叶一主号', '','10002033.XSHG', "", True)
+        pRisk_300033 = pRisks.getRisk('茶叶一主号', '','300033', "", True)
+        pRisk_3000 = pRisks.getRisk('茶叶一主号', '','10001832.XSHG', "", True)
+        pRisk_3100 = pRisks.getRisk('茶叶一主号', '','10002033.XSHG', "", True)
 
         #消息初始 
         pMMsg = gol._Get_Setting('manageMsgs')
