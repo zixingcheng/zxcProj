@@ -135,11 +135,17 @@ if __name__ == "__main__":
     print(pSource.getSecurities())
     print(pSource.getSecurities('index'))
 
+    values = pSource.getPrice(security="600332.XSHG",frequency='1m',start_date='2020-02-05 09:00:00',end_date='2020-02-05 15:00:00')
+    lstPrices = []; strList = ""
+    for x in range(1,len(values)):
+        lstPrices.append(values['open'][x])
+    print(str(lstPrices))
+
     # 提取50期权信息
     print("当天3000的期权信息：")
-    opt = pSource.getOptInfo(3100, "", 1)
+    opt = pSource.getOptInfo(2900, "", 0)
     print(opt)
-    print(pSource.getPrice(security=opt['code'],frequency='1m',start_date='2019-10-14 09:00:00',end_date='2019-10-14 15:00:00'))
+    print(pSource.getPrice(security=opt['code'],frequency='1m',start_date='2020-02-04 09:00:00',end_date='2020-02-04 15:00:00'))
 
     print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2019-10-14 15:00:00',include_now=False))
     print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
@@ -147,6 +153,7 @@ if __name__ == "__main__":
     print(pSource.getPrice_avg(security='ddd',unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
     print(pSource.getPrice_avg(security=opt['code'],unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
     print(pSource.getPrice_avg_day(security=opt['code'],N=5,end_date='2019-10-14 15:00:00',include_now=True))
-     
+    
     
     print()
+ 

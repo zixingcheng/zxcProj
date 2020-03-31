@@ -69,6 +69,8 @@
 		systemctl start firewalld
 
 
+		iptables -A INPUT -p tcp --dport 5672 -j ACCEPT	#后续调整为iptables
+		iptables -A INPUT -p tcp --dport 15672 -j ACCEPT	#后续调整为iptables
 		firewall-cmd --zone=public --add-port=15672/tcp --permanent
 		firewall-cmd --reload    		#重新载入，更新防火墙规则
 		firewall-cmd --list-port		#查看已开启的端口
@@ -738,11 +740,18 @@ git 更新脚本：
 
 	--在使用iptables服务,开放443端口(HTTPS)	
 	3.iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-	  
+	  iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+	  iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 15672 -j ACCEPT
+		  
 	--保存上述规则
 	4.service iptables save
 
 	--开启服务
 	5.systemctl restart iptables.service
 	
+## 本地WIFI密码查看命令
+	
+	windows：netsh wlan show profiles
+			 netsh wlan show profiles HUAWEI-NNRZ key=clear
+
 	
