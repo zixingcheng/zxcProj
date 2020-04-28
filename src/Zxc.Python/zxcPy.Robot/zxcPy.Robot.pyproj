@@ -21,8 +21,14 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="zxcPy.IOT\myData_DB.py" />
+    <Compile Include="zxcPy.IOT\myIOT_Plat_Dianbiao.py" />
+    <Compile Include="zxcPy.IOT\myIOT.py" />
     <Compile Include="myRobot_API.py" />
     <Compile Include="zxcPy.APIs\myAPI_Robot.py" />
+    <Compile Include="zxcPy.Plat\myData_DB_Mysql.py" />
+    <Compile Include="zxcPy.Plat\myPlat_User.py" />
+    <Compile Include="zxcPy.Plat\myPyMysql.py" />
     <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel.py" />
     <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel28 - Copy.py" />
     <Compile Include="zxcPy.Quantify\myStrategy\myStrategy_Wheel28.py" />
@@ -38,6 +44,7 @@
     <Compile Include="zxcPy.Quantify\Test_JQData\myTest_JQData_API.py" />
     <Compile Include="zxcPy.Quantify\Test_JQData\myTest_JQData_API_Factor.py" />
     <Compile Include="zxcPy.Robot\Prjs\Base\myDataDB_StockReturns.py" />
+    <Compile Include="zxcPy.Robot\Prjs\Base\myData_DB.py" />
     <Compile Include="zxcPy.Robot\Prjs\Base\myManager_Bill.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot_StockAppetite.py" />
     <Compile Include="zxcPy.Robot\Reply\myRobot_Reply_AI.py" />
@@ -57,6 +64,8 @@
     <Compile Include="zxcPy.Robot\Roots\myRoot_Usr.py" />
     <Compile Include="zxcPy.Robot\Roots\myRoot_Prj.py" />
     <Compile Include="zxcPy.Robot\Prjs\myRobot.py" />
+    <Compile Include="zxcPy.Trade\myData_DB.py" />
+    <Compile Include="zxcPy.Trade\myPlat_Trade.py" />
     <Compile Include="zxcPy.VoiceAI\myVoiceAI.py" />
     <Compile Include="zxcPy.Webs\myWeb_User.py" />
     <Compile Include="zxcPy.Webs\myWeb_Stock.py" />
@@ -66,6 +75,9 @@
     <Folder Include="Data\" />
     <Folder Include="Data\DB_Bill\" />
     <Folder Include="Docs\" />
+    <Folder Include="zxcPy.Plat\" />
+    <Folder Include="zxcPy.Trade\" />
+    <Folder Include="zxcPy.IOT\" />
     <Folder Include="Setting\" />
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Quantify\" />

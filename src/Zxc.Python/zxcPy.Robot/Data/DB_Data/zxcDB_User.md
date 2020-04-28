@@ -14,14 +14,20 @@
 	| 字段名 | 字段类型 | 字段长度 | 是否可空 | 是否索引 | 默认值 | 索引类型 |
 	| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 	| id | int | 11 | False | True | - | - |
+	| 用户ID | char | 12 | False | True | - | unique |
 	| 用户名 | char | 12 | False | True | - | unique |
+	| 用户昵称 | char | 12 | False | True | - | - |
+	| 图像ID | char | 12 | False | True | - | - |
 	| 姓名 | char | 12 | True | True | - | - |
 	| 性别 | char | 1 | True | False | - | - |
 	| 电话 | char | 11 | False | True | - | unique |
+	| 省份 | char | 10 | False | True | - | - |
+	| 城市 | char | 10 | False | True | - | - |
 	| 微信ID | char | 16 | True | True | - | - |
 	| 微信名 | char | 16 | True | False | - | - |
 	| 电桩数 | int | 8 | True | False | - | - |
 	| 车辆数 | int | 8 | True | False | - | - |
+	| 备注 | char | 30 | True | False | - | - |
 	
 
 ## zxcAccountInfo-*r

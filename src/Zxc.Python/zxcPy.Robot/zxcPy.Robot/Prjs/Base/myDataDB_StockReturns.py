@@ -32,12 +32,13 @@ class myDataDB_StockReturns(myData_DB.myData_Table):
 
     # 检查是否相同--继承需重写  
     def _IsSame(self, rowInfo, rowInfo_Base): 
-        if(super()._IsSame(rowInfo, rowInfo_Base)): return True
+        bResult, sameID = super()._IsSame(rowInfo, rowInfo_Base)
+        if(bResult): return bResult, sameID
 
         if(rowInfo['用户名'] == rowInfo_Base['用户名']):
             if (rowInfo['日期'] - rowInfo_Base['日期']).days < 1:
-               return True
-        return False
+               return True, sameID
+        return False, sameID
     
     #单条有效修正
     def _Check_oneValid(self, rowInfo): 

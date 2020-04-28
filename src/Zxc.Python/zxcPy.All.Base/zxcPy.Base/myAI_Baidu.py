@@ -10,7 +10,7 @@ import sys, os, datetime
 from aip import AipSpeech, AipOcr
 
 # 加载自定义库
-import myIO, myData_Trans, myVoice
+import myIO, myData_Trans #, myVoice
 
 # 百度语音识别API配置参数 
 APP_ID = '17073439'                                     # 你的 APPID

@@ -17,7 +17,7 @@ from wtforms.validators import DataRequired,ValidationError,Email,Regexp,EqualTo
 mySystem.Append_Us("", False)  
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
 mySystem.Append_Us("../../zxcPy.Quote/zxcPy.Quotation", False, __file__)
-import myIO, myWeb, myWeb_urlLib, myDebug, myData_Json, myRoot_Usr, myQuote
+import myIO, myWeb, myWeb_urlLib, myDebug, myData_Json, myRoot_Usr
 from myGlobal import gol
 
 
