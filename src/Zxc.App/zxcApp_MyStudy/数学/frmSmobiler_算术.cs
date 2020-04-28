@@ -17,7 +17,7 @@ namespace zxcApp.MyStudy
         private int[] m_Parms = { 0, 0, 0, 0 };                      //全局参数
         private int m_nTimer = 4; int m_nTimer2 = 0;
         private int m_nTimerCountdown = 30; int m_nTimerCountdown2 = 0;
-        private int m_nNumber = 3; int m_nNumber2 = 0;
+        private int m_nNumber = 5; int m_nNumber2 = 0;
         private int m_nSteptimes = 1; int m_nSteptimes2 = 0;
         private int m_nIndex = 0;
         private readonly Random m_Random = new Random(unchecked((int)DateTime.Now.Ticks));
@@ -135,6 +135,11 @@ namespace zxcApp.MyStudy
         {
             if (this.Check_答完()) return;  //题目答完
 
+
+            for (int i = 0; i < 20; i++)
+            {
+                imgs[i].Visible = false;
+            }
             this.img_遮挡.Visible = false;
             this.img_Right.Visible = false;
             this.img_Wrong.Visible = false;
@@ -289,7 +294,8 @@ namespace zxcApp.MyStudy
                 }
 
                 int nFraction = (int)(nCount_right * 1.0 / m_nNumber * 100);
-                MessageBox.Show("小朋友，考试分数为" + nFraction.ToString() + "!");
+                frmSmobiler_成绩 frmResult = new frmSmobiler_成绩(nCount_right, m_nNumber - nCount_right, nFraction);
+                Show(frmResult);
             }
             else
             {
@@ -319,9 +325,9 @@ namespace zxcApp.MyStudy
             if (m_nNumber2 >= m_nNumber)    //题目答完
             {
                 this.timer2.Stop();         //关闭倒数
+                this.Statics_题目(false);
                 this.lab_Countdown.Text = "";
                 this.btn_控制.Text = "开始";
-                this.Statics_题目(false);
                 return true;
             }
             return false;
@@ -359,7 +365,7 @@ namespace zxcApp.MyStudy
                 imgs[i + index].Width = nWidth;
                 imgs[i + index].Height = nWidth;
                 imgs[i + index].Visible = true;
-                panel.Controls.Add(imgs[i + index]);
+                //panel.Controls.Add(imgs[i + index]);
             }
             return nY + nWidth;
         }

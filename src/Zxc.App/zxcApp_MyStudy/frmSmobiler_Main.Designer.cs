@@ -24,6 +24,9 @@ namespace zxcApp.MyStudy
             this.button1 = new Smobiler.Core.Controls.Button();
             this.voiceRecorder1 = new Smobiler.Core.Controls.VoiceRecorder();
             this.button2 = new Smobiler.Core.Controls.Button();
+            this.atozListView1 = new Smobiler.Plugins.AtozListView();
+            this.sectionListView1 = new Smobiler.Core.Controls.SectionListView();
+            this.listView1 = new Smobiler.Core.Controls.ListView();
             voiceRecorder2 = new Smobiler.Core.Controls.VoiceRecorder();
             // 
             // voiceRecorder2
@@ -64,6 +67,28 @@ namespace zxcApp.MyStudy
             this.button2.Text = "button2";
             this.button2.Press += new System.EventHandler(this.button2_Press);
             // 
+            // atozListView1
+            // 
+            this.atozListView1.LineColor = System.Drawing.Color.Gray;
+            this.atozListView1.Location = new System.Drawing.Point(131, 139);
+            this.atozListView1.Name = "atozListView1";
+            this.atozListView1.Size = new System.Drawing.Size(100, 30);
+            // 
+            // sectionListView1
+            // 
+            this.sectionListView1.Location = new System.Drawing.Point(0, 60);
+            this.sectionListView1.Name = "sectionListView1";
+            this.sectionListView1.PickerForeColor = System.Drawing.Color.Black;
+            this.sectionListView1.Size = new System.Drawing.Size(175, 117);
+            // 
+            // listView1
+            // 
+            this.listView1.Location = new System.Drawing.Point(188, 51);
+            this.listView1.Name = "listView1";
+            this.listView1.PageSizeTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(145)))), ((int)(((byte)(145)))), ((int)(((byte)(145)))));
+            this.listView1.PageSizeTextSize = 11F;
+            this.listView1.Size = new System.Drawing.Size(141, 136);
+            // 
             // frmSmobiler_Main
             // 
             this.Components.AddRange(new Smobiler.Core.Controls.MobileComponent[] {
@@ -72,7 +97,10 @@ namespace zxcApp.MyStudy
             this.Controls.AddRange(new Smobiler.Core.Controls.MobileControl[] {
             this.iconMenuView1,
             this.button1,
-            this.button2});
+            this.button2,
+            this.atozListView1,
+            this.sectionListView1,
+            this.listView1});
             this.Load += new System.EventHandler(this.frmSmobiler_Main_Load);
             this.Name = "frmSmobiler_Main";
 
@@ -82,5 +110,8 @@ namespace zxcApp.MyStudy
         private Smobiler.Core.Controls.Button button1;
         private Smobiler.Core.Controls.VoiceRecorder voiceRecorder1;
         private Smobiler.Core.Controls.Button button2;
+        private Smobiler.Plugins.AtozListView atozListView1;
+        private Smobiler.Core.Controls.SectionListView sectionListView1;
+        private Smobiler.Core.Controls.ListView listView1;
     }
 }

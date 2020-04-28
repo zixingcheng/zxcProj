@@ -105,6 +105,18 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="数学\frmSmobiler_语音设置.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="数学\frmSmobiler_语音设置.Designer.cs">
+      <DependentUpon>frmSmobiler_语音设置.cs</DependentUpon>
+    </Compile>
+    <Compile Include="考试\frmSmobiler_成绩.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="考试\frmSmobiler_成绩.Designer.cs">
+      <DependentUpon>frmSmobiler_成绩.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmGenerateQRcode.resx">
@@ -128,6 +140,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="数学\frmSmobiler_算术.resx">
       <DependentUpon>frmSmobiler_算术.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="考试\frmSmobiler_成绩.resx">
+      <DependentUpon>frmSmobiler_成绩.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

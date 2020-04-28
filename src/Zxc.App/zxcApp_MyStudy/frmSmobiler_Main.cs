@@ -67,7 +67,7 @@ namespace zxcApp.MyStudy
         {
             try
             {
-                this.Client.PlayAudio("2.aac", "resNumber", ResourceMode.Client);
+                this.Client.PlayAudio("wrong.aac", "resNumber", ResourceMode.File);
             }
             catch (Exception ex)
             {
