@@ -532,7 +532,7 @@ Known problems with Fedora Linux and Python 3 version: Error message:
 				Bye
 			'''
 			
-			执行下面的命令修改MySql root密码： alter user root@localhost identified by 'zxcvbnm,./1238';
+			执行下面的命令修改MySql root密码： alter user root@localhost identified by 'zxcvbnm,./123*';
 			
 		3.授予root用户远程访问权限：
 			mysql> grant all privileges on *.* to root@'%' identified by 'zxcvbnm1238';

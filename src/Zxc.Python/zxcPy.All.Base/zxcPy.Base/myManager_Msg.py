@@ -202,7 +202,8 @@ class myManager_Msg():
                     msg['usrNameNick'] = ""
                 #转发消息
                 usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
-                myDebug.Print("消息管理器转发::", usrMQ.nameQueue + ">> ",strMsg)
+                if(self.usePrint):
+                    myDebug.Print("消息管理器转发::", usrMQ.nameQueue + ">> ",strMsg)
     #运行（线程检测, 异步延时发送）
     def OnHandleMsg_ByThread(self): 
         try:
@@ -308,7 +309,7 @@ if __name__ == '__main__':
    pMMsg.OnHandleMsg(msg)
    pMMsg.OnHandleMsg(msg, '', True)     #必须check
    msg["msg"] = "测试消息py--延时"
-   msg["usrName"] = "@*测试群"
+   msg["usrName"] = "@*股票风控监测群"
    msg["msg"] = "测试股票: 10.37 元, 回撤逾1.4%.\r\n操作策略: 建议止盈, 操作2.0成仓, 卖出2000股.\r\n策略收益: 7.0%, 总收益 9.0%, 涨幅前高 10.5%, 最高13.5%."
    pMMsg.OnHandleMsg(msg, '', False, 5)
    

@@ -13,7 +13,7 @@ from atexit import register
 
 class myMQ_Rabbit:
     #初始构造 
-    def __init__(self, isSender = False, nameQueue = 'zxcTest', Host = "127.0.0.1", Port = 5672, usrName = 'guest', usrPwd = 'guest'):
+    def __init__(self, isSender = False, nameQueue = 'zxcTest', Host = "106.13.206.223", Port = 5672, usrName = 'admin', usrPwd = 'a123456'):
         self.isSender = isSender    #是否为生产者
         self.Host = Host            #指定远程RabbitMQ的地址
         self.Port = Port            #指定远程RabbitMQ的端口
@@ -28,7 +28,7 @@ class myMQ_Rabbit:
         #认证信息
         self.usrCredentials = pika.PlainCredentials(self.usrName, self.usrPwd)       
         #创建连接
-        self.usrConn = pika.BlockingConnection(pika.ConnectionParameters(self.Host, port=self.Port, credentials=self.usrCredentials, heartbeat_interval=0))    
+        self.usrConn = pika.BlockingConnection(pika.ConnectionParameters(host=self.Host, port=self.Port, credentials=self.usrCredentials, heartbeat=None))    
     #初始消息接收回调    
     def Init_callback_RecvMsg(self, callback_RecvMsg):
         self.callback_RecvMsg = callback_RecvMsg
@@ -50,10 +50,12 @@ class myMQ_Rabbit:
         #区分生产者(发送)/消费者(接收)
         if(self.isSender == False):
             #调用回调函数，从队列里取消息
-            self.usrChannel.basic_consume(self.callback_Consumer,    #调用回调函数，从队列里取消息
-                            queue=nameQueue,                #指定取消息的队列名
-                            no_ack=isNo_ack                 #取完一条消息后，不给生产者发送确认消息，默认是False的，即  默认给rabbitmq发送一个收到消息的确认，一般默认即可
+            self.usrChannel.basic_consume(on_message_callback=self.callback_Consumer,     #调用回调函数，从队列里取消息
+                            queue=nameQueue,                  #指定取消息的队列名
+                            auto_ack=not isNo_ack             #该参数调整 
+                            #no_ack=isNo_ack                  #取完一条消息后，不给生产者发送确认消息，默认是False的，即  默认给rabbitmq发送一个收到消息的确认，一般默认即可
                            )
+            #channel.basic_consume(queue='hello', auto_ack=True, on_message_callback=callback)
         else: 
             self.nameQueue = nameQueue
 
@@ -61,7 +63,8 @@ class myMQ_Rabbit:
     def _Check_Connection(self):
         #TCP是否关闭或正在关闭，则重连
         isReConnect = False
-        if(self.usrConn.is_closed or self.usrConn.is_closing):
+        #if(self.usrConn.is_closed or self.usrConn.is_closing):
+        if(self.usrConn.is_closed):
             self.Init()
             isReConnect = True
 
@@ -101,8 +104,9 @@ class myMQ_Rabbit:
         if(self.callback_RecvMsg != None):
             if(self.callback_RecvMsg(body.decode('utf-8'))):
                 #回复确认消息已处理
-                if(self.isNoAck == False):
-                    ch.basic_ack(delivery_tag=method.delivery_tag)  #接收到消息后会给rabbitmq发送一个确认
+                #if(self.isNoAck == False):
+                #    ch.basic_ack(delivery_tag=method.delivery_tag)  #接收到消息后会给rabbitmq发送一个确认
+                pass
 
     #定义消息接收方法，外部可重写@register
     def Recv_Msg(self, body):
@@ -112,14 +116,14 @@ class myMQ_Rabbit:
 
 
 if __name__ == '__main__':
-    #实例生产者、消费者
+    #实例生产者、消费者 http://106.13.206.223:15672/#/
     nameMQ = 'zxcTest'
-    pMQ_Send = myMQ_Rabbit(True)
+    pMQ_Send = myMQ_Rabbit(True, 'zxcTest', "106.13.206.223")
     pMQ_Send.Init_Queue(nameMQ, True, True)
-    pMQ_Send2 = myMQ_Rabbit(True)
+    pMQ_Send2 = myMQ_Rabbit(True, 'zxcTest', "106.13.206.223")
     pMQ_Send2.Init_Queue(nameMQ, True, True)
     
-    pMQ_Recv = myMQ_Rabbit(False)
+    pMQ_Recv = myMQ_Rabbit(False, 'zxcTest', "106.13.206.223")
     pMQ_Recv.Init_Queue(nameMQ, True, False)
     pMQ_Recv.Init_callback_RecvMsg(pMQ_Recv.Recv_Msg)
     
@@ -127,6 +131,7 @@ if __name__ == '__main__':
     thrdMQ = threading.Thread(target = pMQ_Recv.Start)
     thrdMQ.setDaemon(False)
     thrdMQ.start() 
+    
 
     #循环测试
     nTimes = 1000
