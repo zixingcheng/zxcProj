@@ -31,8 +31,8 @@
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myData_Monitor_Risk.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myData_Monitor.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myStockRisk.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myDataDB_StockTradeRisk.py" />
-    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myData_DB.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myData_Trade.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\myData_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Hourly.py" />

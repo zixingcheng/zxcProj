@@ -64,13 +64,13 @@ class myRobot_Msg(myRobot.myRobot):
         elif(cmd == "股票"):
             #发送股票设置界面链接
             usrPlat, usrID = self._Done_Check_UserBack(usrInfo) 
-            url = 'http://39.105.196.175:8668/zxcWebs/stock/quoteset/' + usrID + "/" + usrPlat
+            url = gol._Get_Setting("serverUrl") + 'zxcWebs/stock/quoteset/' + usrID + "/" + usrPlat
             strReturn = quote(url, safe = string.printable)   # unquote
         elif(cmd == "订单"):
             #发送订单相关界面链接
             usrPlat, usrID = self._Done_Check_UserBack(usrInfo) 
             orderType = cmds[1].strip()
-            url = 'http://39.105.196.175:8668/zxcWebs/order/Add/' + orderType + "?usrID=" + usrID
+            url = gol._Get_Setting("serverUrl") +  'zxcWebs/order/Add/' + orderType + "?usrID=" + usrID
             strReturn = quote(url, safe = string.printable)   # unquote
         return strReturn
     #缓存消息处理接口-Text

@@ -59,7 +59,7 @@ class Source_JQData_API():
         # 同步参数
         if(dateTime == ""): dateTime = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d")
         dtFliter = myData_Trans.Tran_ToDatetime(dateTime, "%Y-%m-%d")
-        strFliter = "50ETF" + myData.iif(optPrice > 0, "购", "沽") + str(dtFliter.month + month_Delta) + "月" + str(optPrice)
+        strFliter = "50ETF" + myData.iif(optPrice > 0, "购", "沽") + str(dtFliter.month + month_Delta) + "月" + str(abs(optPrice))
 
         # 查询
         optInfos = opt.run_query(query(opt.OPT_DAILY_PREOPEN).filter(opt.OPT_DAILY_PREOPEN.date==dateTime,opt.OPT_DAILY_PREOPEN.name==strFliter).limit(10))
@@ -70,7 +70,7 @@ class Source_JQData_API():
         optInfo = query(opt.OPT_CONTRACT_INFO).filter(opt.OPT_CONTRACT_INFO.code==code)
         value = opt.run_query(optInfo)
         if(len(value) != 1): return None
-        return {'id': value['id'][0], 'code': value['code'][0], 'trading_code': value['trading_code'][0]}
+        return {'id': value['id'][0], 'code': value['code'][0], 'trading_code': value['trading_code'][0], 'name': value['name'][0]}
 
     # 查询价格信息，指定日期范围、数据频率
     # fields:['open', ' close', 'low', 'high', 'volume', 'money', 'factor', 'high_limit',' low_limit', 'avg', ' pre_close', 'paused']
@@ -143,16 +143,17 @@ if __name__ == "__main__":
 
     # 提取50期权信息
     print("当天3000的期权信息：")
-    opt = pSource.getOptInfo(2900, "", 0)
+    opt = pSource.getOptInfo(2900, "", 1)
     print(opt)
-    print(pSource.getPrice(security=opt['code'],frequency='1m',start_date='2020-02-04 09:00:00',end_date='2020-02-04 15:00:00'))
+    
+    print(pSource.getPrice(security=opt['code'],frequency='1m',start_date='2020-04-28 09:00:00',end_date='2020-04-28 15:00:00'))
 
-    print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2019-10-14 15:00:00',include_now=False))
-    print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
+    print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2020-04-28 15:00:00',include_now=False))
+    print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2020-04-28 15:00:00',include_now=True))
 
-    print(pSource.getPrice_avg(security='ddd',unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
-    print(pSource.getPrice_avg(security=opt['code'],unit='1d',end_date='2019-10-14 15:00:00',include_now=True))
-    print(pSource.getPrice_avg_day(security=opt['code'],N=5,end_date='2019-10-14 15:00:00',include_now=True))
+    print(pSource.getPrice_avg(security='ddd',unit='1d',end_date='2020-04-28 15:00:00',include_now=True))
+    print(pSource.getPrice_avg(security=opt['code'],unit='1d',end_date='2020-04-28 15:00:00',include_now=True))
+    print(pSource.getPrice_avg_day(security=opt['code'],N=5,end_date='2020-04-28 15:00:00',include_now=True))
     
     
     print()
