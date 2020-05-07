@@ -115,9 +115,9 @@ class DtTable:
                 elif(pTypes[j] == myFiledype.datetime): 
                     nCount = rows[j].count(":")
                     if(nCount == 0):
-                        pValues.append(myData_Trans.Tran_ToDatetime(rows[j]), "%Y-%m-%d")
-                    elif(nCount == 2):
-                        pValues.append(myData_Trans.Tran_ToDatetime(rows[j]), "%Y-%m-%d %H:%M")
+                        pValues.append(myData_Trans.Tran_ToDatetime(rows[j], "%Y-%m-%d"))
+                    elif(nCount == 1):
+                        pValues.append(myData_Trans.Tran_ToDatetime(rows[j], "%Y-%m-%d %H:%M"))
                     else:
                         pValues.append(myData_Trans.Tran_ToDatetime(rows[j]))
                     continue
