@@ -17,8 +17,10 @@ mySystem.Append_Us("../zxcPy.Robot", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Prjs", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Reply", False, __file__)
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
+mySystem.Append_Us("../../zxcPy.Quote//zxcPy.Quotation", False, __file__)
 mySystem.Append_Us("", False)    
 import myIO, myData, myData_Trans, myWeb, myWeb_urlLib, myDebug, myRobot_Reply, myRobot_Reply_MQ, myManager_Msg
+import myQuote
 from myGlobal import gol   
 
 
