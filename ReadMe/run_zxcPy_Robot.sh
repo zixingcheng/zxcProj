@@ -6,15 +6,15 @@ dirPath_srcPy=/root/Public/myPrjs/zxcProj/src/Zxc.Python
 
 
 #启动微信后台
-logfile_Wx=$dirPath/Logs/myWeixin_ItChat.log
-file_Wx=$dirPath_srcPy/zxcPy.Weixin/zxcPy.Weixin/myWeixin_ItChat.py
+#logfile_Wx=$dirPath/Logs/myWeixin_ItChat.log
+#file_Wx=$dirPath_srcPy/zxcPy.Weixin/zxcPy.Weixin/myWeixin_ItChat.py
 
-count_Wx=`ps -ef |grep $file_Wx |grep -v "grep" |wc -l`
-if [ 0 == $count_Wx ];then
-	nohup python $file_Wx  > $logfile_Wx 2>&1 &
-echo $count_Wx
-fi
-sleep 10s
+#count_Wx=`ps -ef |grep $file_Wx |grep -v "grep" |wc -l`
+#if [ 0 == $count_Wx ];then
+#	nohup python $file_Wx  > $logfile_Wx 2>&1 &
+#echo $count_Wx
+#fi
+#sleep 10s
 
 
 #启动微信API
