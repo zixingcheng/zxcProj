@@ -25,7 +25,7 @@ if __name__ == '__main__':
     if(gol._Run_Lock(__file__) == False):
        exit(0)
     #gol._Set_Setting("CanPrint", False)
-    gol._Set_Setting("serverUrl", 'http://39.105.196.175:8668/')
+    gol._Set_Setting("serverUrl", 'http://106.13.206.223:8668/')
     
 
     import myRobot_Updata   #更新说明
