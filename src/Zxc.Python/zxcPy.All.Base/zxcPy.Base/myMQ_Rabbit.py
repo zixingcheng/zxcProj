@@ -33,7 +33,7 @@ class myMQ_Rabbit:
     def Init_callback_RecvMsg(self, callback_RecvMsg):
         self.callback_RecvMsg = callback_RecvMsg
     #初始消息队列    
-    def Init_Queue(self, nameQueue, isDurable = False, isAuto_ack = True):
+    def Init_Queue(self, nameQueue, isDurable = False, isAuto_ack = False):
         #在连接上创建一个频道
         self.usrChannel = self.usrConn.channel() 
 
@@ -44,11 +44,12 @@ class myMQ_Rabbit:
 
         #接收到消息后会给rabbitmq发送一个确认
         self.isAutoAck = isAuto_ack
-        if(isAuto_ack == False):
-            self.usrChannel.basic_qos(prefetch_count=1)       #消费者给rabbitmq发送一个信息：在消费者处理完消息之前不要再给消费者发送消息
 
         #区分生产者(发送)/消费者(接收)
         if(self.isSender == False):
+            if(isAuto_ack == False):
+                self.usrChannel.basic_qos(prefetch_count=1)   #消费者给rabbitmq发送一个信息：在消费者处理完消息之前不要再给消费者发送消息
+
             #调用回调函数，从队列里取消息
             self.usrChannel.basic_consume(on_message_callback=self.callback_Consumer,     #调用回调函数，从队列里取消息
                             queue=nameQueue,                  #指定取消息的队列名
