@@ -742,6 +742,9 @@ git 更新脚本：
 	3.iptables -A INPUT -p tcp --dport 443 -j ACCEPT
 	  iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
 	  iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 15672 -j ACCEPT
+	  iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8666 -j ACCEPT
+	  iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8668 -j ACCEPT
+	  iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8669 -j ACCEPT
 		  
 	--保存上述规则
 	4.service iptables save

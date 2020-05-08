@@ -21,7 +21,7 @@ class myMQ_Rabbit:
         self.usrName = usrName      #远程RabbitMQ的用户名
         self.usrPwd = usrPwd        #远程RabbitMQ的用户密码
         self.callback_RecvMsg = None#消息接收回调函数
-        self.isAutoAck = True         #接收消息不通知
+        self.isAutoAck = True       #接收消息不通知
         self.Init()                 #初始MQ
     #初始RabbitMQ认证及连接信息
     def Init(self):
