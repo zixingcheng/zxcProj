@@ -97,7 +97,7 @@ class myManager_Msg():
 
         #消息队列
         if(msgMQ_Sender != None): 
-            msgMQ_Sender.Init_Queue(msgMQ_Sender.nameQueue, True, True)     #消息持久化设置
+            msgMQ_Sender.Init_Queue(msgMQ_Sender.nameQueue, True, False)    #消息持久化设置
             self.usrMQs[plat] = msgMQ_Sender
             
         #消息回调API

@@ -21,7 +21,7 @@ class myMQ_Rabbit:
         self.usrName = usrName      #远程RabbitMQ的用户名
         self.usrPwd = usrPwd        #远程RabbitMQ的用户密码
         self.callback_RecvMsg = None#消息接收回调函数
-        self.isNoAck = True         #接收消息不通知
+        self.isAutoAck = True         #接收消息不通知
         self.Init()                 #初始MQ
     #初始RabbitMQ认证及连接信息
     def Init(self):
@@ -33,7 +33,7 @@ class myMQ_Rabbit:
     def Init_callback_RecvMsg(self, callback_RecvMsg):
         self.callback_RecvMsg = callback_RecvMsg
     #初始消息队列    
-    def Init_Queue(self, nameQueue, isDurable = False, isNo_ack = True):
+    def Init_Queue(self, nameQueue, isDurable = False, isAuto_ack = True):
         #在连接上创建一个频道
         self.usrChannel = self.usrConn.channel() 
 
@@ -43,19 +43,18 @@ class myMQ_Rabbit:
         self.usrChannel.queue_declare(queue=nameQueue, durable=isDurable)    # durable=True 持久化
 
         #接收到消息后会给rabbitmq发送一个确认
-        self.isNoAck = isNo_ack
-        if(isNo_ack == False):
-            self.usrChannel.basic_qos(prefetch_count=1)     #消费者给rabbitmq发送一个信息：在消费者处理完消息之前不要再给消费者发送消息
+        self.isAutoAck = isAuto_ack
+        if(isAuto_ack == False):
+            self.usrChannel.basic_qos(prefetch_count=1)       #消费者给rabbitmq发送一个信息：在消费者处理完消息之前不要再给消费者发送消息
 
         #区分生产者(发送)/消费者(接收)
         if(self.isSender == False):
             #调用回调函数，从队列里取消息
             self.usrChannel.basic_consume(on_message_callback=self.callback_Consumer,     #调用回调函数，从队列里取消息
                             queue=nameQueue,                  #指定取消息的队列名
-                            auto_ack=not isNo_ack             #该参数调整 
+                            auto_ack=isAuto_ack               #该参数调整 ,设置成 False，在调用callback函数时，未收到确认标识，消息会重回队列。True，无论调用callback成功与否，消息都被消费掉
                             #no_ack=isNo_ack                  #取完一条消息后，不给生产者发送确认消息，默认是False的，即  默认给rabbitmq发送一个收到消息的确认，一般默认即可
                            )
-            #channel.basic_consume(queue='hello', auto_ack=True, on_message_callback=callback)
         else: 
             self.nameQueue = nameQueue
 
@@ -94,7 +93,7 @@ class myMQ_Rabbit:
     #消息队列关闭
     def Close(self,):
         self.usrConn.close()    #关闭连接
-
+        
     #定义一个回调函数，用来接收生产者发送的消息
     def callback_Consumer(self, ch, method, properties, body): 
         #print("[消费者] recv %s" % body
@@ -104,8 +103,8 @@ class myMQ_Rabbit:
         if(self.callback_RecvMsg != None):
             if(self.callback_RecvMsg(body.decode('utf-8'))):
                 #回复确认消息已处理
-                #if(self.isNoAck == False):
-                #    ch.basic_ack(delivery_tag=method.delivery_tag)  #接收到消息后会给rabbitmq发送一个确认
+                if(self.isAutoAck == False):
+                    ch.basic_ack(delivery_tag = method.delivery_tag)  #接收到消息后会给rabbitmq发送一个确认
                 pass
 
     #定义消息接收方法，外部可重写@register
@@ -119,12 +118,12 @@ if __name__ == '__main__':
     #实例生产者、消费者 http://106.13.206.223:15672/#/
     nameMQ = 'zxcTest'
     pMQ_Send = myMQ_Rabbit(True, 'zxcTest', "106.13.206.223")
-    pMQ_Send.Init_Queue(nameMQ, True, True)
+    pMQ_Send.Init_Queue(nameMQ, True, False)
     pMQ_Send2 = myMQ_Rabbit(True, 'zxcTest', "106.13.206.223")
-    pMQ_Send2.Init_Queue(nameMQ, True, True)
+    pMQ_Send2.Init_Queue(nameMQ, True, False)
     
     pMQ_Recv = myMQ_Rabbit(False, 'zxcTest', "106.13.206.223")
-    pMQ_Recv.Init_Queue(nameMQ, True, False)
+    pMQ_Recv.Init_Queue(nameMQ, True)
     pMQ_Recv.Init_callback_RecvMsg(pMQ_Recv.Recv_Msg)
     
     #接收消息线程
