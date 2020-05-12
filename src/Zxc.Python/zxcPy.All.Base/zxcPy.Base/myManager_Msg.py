@@ -97,7 +97,7 @@ class myManager_Msg():
 
         #消息队列
         if(msgMQ_Sender != None): 
-            msgMQ_Sender.Init_Queue(msgMQ_Sender.nameQueue, True, False)    #消息持久化设置
+            msgMQ_Sender.Init_Queue(msgMQ_Sender.nameQueue, True)           #消息持久化设置
             self.usrMQs[plat] = msgMQ_Sender
             
         #消息回调API
@@ -161,6 +161,9 @@ class myManager_Msg():
     def OnHandleMsg(self, msg, plat = "", bCheck = False, nSleep = 0):
         if(msg == None): return
         strMsg = msg.get('msg')
+        if(strMsg == '~__~'): 
+            myDebug.Print("消息管理器::", typePlatform + ">> ", "心跳::" + strMsg)
+            return
         
         #异步延迟消息处理
         if(nSleep > 0):

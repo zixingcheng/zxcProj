@@ -29,14 +29,18 @@ class myRobot_Reply_MQ(myRobot_Reply):
         self.mqName = 'zxcMQ_robot'
         if(self.mqRecv == None):
             self.mqRecv = myMQ_Rabbit.myMQ_Rabbit(False)
-            self.mqRecv.Init_Queue(self.mqName, True, False)
+            self.mqRecv.Init_Queue(self.mqName, True)
             self.mqRecv.Init_callback_RecvMsg(self.callback_RecvMsg)    #消息接收回调
             myDebug.Print("消息队列(" + self.mqName + ")创建成功...")
             
+        #接收消息 
+        if(bStart): 
+            self.mqRecv.Start()
+
         #接收消息--x线程方式
-        self.thrd_MQ = threading.Thread(target = self.mqRecv.Start)
-        self.thrd_MQ.setDaemon(False)
-        if(bStart): self.thrd_MQ.start()
+        #self.thrd_MQ = threading.Thread(target = self.mqRecv.Start)
+        #self.thrd_MQ.setDaemon(False)
+        #if(bStart): self.thrd_MQ.start()
 
     #定义消息接收方法回调
     def callback_RecvMsg(self, body):
@@ -63,7 +67,7 @@ from myGlobal import gol
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 if(gol._Get_Setting('robotReply', None) == None):
     gol._Set_Setting('robotReply', myRobot_Reply_MQ(True))    #实例 机器人消息处理工厂类
-    myDebug.Print("消息处理工厂类::", "MQ" + ">> ", "--已开启")
+    myDebug.Print("消息处理工厂类::", "MQ" + ">> ", "--已开启\r\n")
 
 
 #主启动程序

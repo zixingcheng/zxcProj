@@ -5,7 +5,7 @@
     <ProjectGuid>91159e89-71e7-4dac-9414-10b79ace9cc6</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>zxcPy.Base\myMQ_Rabbit.py</StartupFile>
+    <StartupFile>zxcPy.Install\Install.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>

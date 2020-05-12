@@ -85,12 +85,17 @@ class myWeixin_ItChat(myThread.myThread):
             self.mqRecv.Init_callback_RecvMsg(self.callback_RecvMsg)    #消息接收回调
             myDebug.Print("消息队列(" + self.mqName + ")创建成功...")
             
-        #接收消息--x线程方式
-        self.thrd_MQ = threading.Thread(target = self.mqRecv.Start)
-        self.thrd_MQ.setDaemon(False)
+        #接收消息 
         if(bStart): 
-            self.thrd_MQ.start()
+            self.mqRecv.Start()
             self.mqTimeNow = myData_Trans.Tran_ToTime_int()   #接收开始时间
+
+        #接收消息--x线程方式
+        #self.thrd_MQ = threading.Thread(target = self.mqRecv.Start)
+        #self.thrd_MQ.setDaemon(False)
+        #if(bStart): 
+        #    self.thrd_MQ.start()
+        #    self.mqTimeNow = myData_Trans.Tran_ToTime_int()   #接收开始时间
 
     #运行
     def run(self): 
@@ -299,6 +304,14 @@ class myWeixin_ItChat(myThread.myThread):
     #登出后回调函数
     def _LogionOuted(self):
         myDebug.Print('系统已退出')
+        
+        #掉线重连
+        if(True):
+            #登录微信网页版(二维码扫码)
+            self.Logion();
+ 
+            #运行 
+            pWeixin.Run_ByThread();
          
         
     #运行（单线程）
@@ -347,7 +360,8 @@ class myWeixin_ItChat(myThread.myThread):
         #注册普通文本消息回复(一对一)
         if self.Auto_RreplyText != self.funStatus_RText:
             #注册普通文本消息回复                 
-            @itchat.msg_register([TEXT, PICTURE, SYSTEM, CARD, NOTE, SHARING], isFriendChat=True) 
+            #@itchat.msg_register([TEXT, PICTURE, SYSTEM, CARD, NOTE, SHARING], isFriendChat=True) 
+            @itchat.msg_register([TEXT, PICTURE, SYSTEM, NOTE], isFriendChat=True) 
             def Reply_Text(msg): 
                 #图片缓存
                 if(msg['MsgType'] == 3): 
@@ -378,7 +392,8 @@ class myWeixin_ItChat(myThread.myThread):
         #注册普通文本消息回复(群消息)    
         if self.Auto_RreplyText_G != self.funStatus_RText_G:
             #注册普通文本消息回复                 
-            @itchat.msg_register([TEXT, PICTURE, FRIENDS, SYSTEM, CARD, NOTE, SHARING], isGroupChat=True)
+            #@itchat.msg_register([TEXT, PICTURE, FRIENDS, SYSTEM, CARD, NOTE, SHARING], isGroupChat=True)
+            @itchat.msg_register([TEXT, PICTURE, SYSTEM, NOTE], isGroupChat=True)
             def Reply_Text_Group(msg): 
                 #图片缓存
                 if(msg['MsgType'] == 3): 

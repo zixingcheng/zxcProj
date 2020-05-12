@@ -10,7 +10,7 @@ import sys, os, ast, re, mySystem
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类  
 mySystem.Append_Us("", False) 
-import myWeb, myWeb_urlLib, myManager_Msg, myDebug, myData, myIO
+import myWeb, myWeb_urlLib, myManager_Msg, myDebug, myData, myError, myIO
 from myGlobal import gol 
 
 
@@ -46,6 +46,7 @@ class myWx_Reply():
         msgType = msg['Type'].upper()               #消息类型
         msgTime = msg.get('CreateTime', 0)          #消息时间
         strText = msg['Text']                       #消息内容
+        if(strText == []): return None
 
         #区分群与个人
         idGroup = "" 
@@ -128,7 +129,8 @@ class myWx_Reply():
                 if(strReturn != None):
                     msgRe = ast.literal_eval(strReturn) 
                     return msgRe
-        except :
+        except Exception as ex:
+            myError.Error(ex)
             pass
         return None
     
