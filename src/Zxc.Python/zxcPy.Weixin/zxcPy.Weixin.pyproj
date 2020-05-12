@@ -26,6 +26,7 @@
     <Compile Include="myWeixin_API.py" />
     <Compile Include="zxcPy.Test\myTest_Event.py" />
     <Compile Include="zxcPy.Weixin\myReply_Factory.py" />
+    <Compile Include="zxcPy.Weixin\myWeixin_ItChat_Debug.py" />
     <Compile Include="zxcPy.Weixin\myWeixin_Cmd.py" />
     <Compile Include="zxcPy.Weixin\myWeixin_ItChat.py" />
   </ItemGroup>

@@ -21,6 +21,7 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="myRobot_API_Debug.py" />
     <Compile Include="zxcPy.IOT\myData_DB.py" />
     <Compile Include="zxcPy.IOT\myIOT_Plat_Dianbiao.py" />
     <Compile Include="zxcPy.IOT\myIOT.py" />

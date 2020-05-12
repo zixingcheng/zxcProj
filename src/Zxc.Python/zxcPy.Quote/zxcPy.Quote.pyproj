@@ -21,6 +21,7 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="myQuote_API_Debug.py" />
     <Compile Include="myQuote_API.py" />
     <Compile Include="zxcPy.APIs\myAPI_Quote.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Data.py" />
