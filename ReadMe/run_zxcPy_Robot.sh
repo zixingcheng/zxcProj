@@ -6,7 +6,7 @@ dirPath_srcPy=/root/Public/myPrjs/zxcProj/src/Zxc.Python
 
 #调试判断-存在文件中断(用于调试)
 file_Debug=$dirPath/ReadMe/zxcPy_Debug.log 
-if [ -d "$file_Debug"]; then  
+if [ -d $file_Debug]; then  
 　　exit
 fi
 
