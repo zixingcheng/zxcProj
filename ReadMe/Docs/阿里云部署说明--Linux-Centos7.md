@@ -718,6 +718,11 @@ git 更新脚本：
 	#启动行情监测 
 	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Quote/zxcPy.Quotation/myQuote_Source.py
 	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Quote/myQuote_API.py
+	
+	
+	#启动阻塞进程 
+	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Weixin/zxcPy.Weixin/myWeixin_ItChat_Debug.py
+	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Quote/myQuote_API_Debug.py 
 
 #### 查看进程python：
 

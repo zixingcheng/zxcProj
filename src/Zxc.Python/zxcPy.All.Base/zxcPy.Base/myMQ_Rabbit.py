@@ -24,7 +24,7 @@ class myMQ_Rabbit:
         self.usrPwd = usrPwd        #远程RabbitMQ的用户密码
         self.callback_RecvMsg = None#消息接收回调函数
         self.strHeartbeat = '~__~'  #心跳包内容
-        self.nHeartbeat = 30        #心跳包间隔
+        self.nHeartbeat = 15        #心跳包间隔
         self.isAutoAck = True       #接收消息不通知
         self.Init()                 #初始MQ
     #初始RabbitMQ认证及连接信息
