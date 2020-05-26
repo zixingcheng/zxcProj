@@ -7,9 +7,9 @@ Created on  张斌 2016-09-02 16:30:00
     IO操作 
 """
 import os, time, codecs, base64
-import shutil
-
+import shutil, random, datetime
  
+
 #检查路径    
 def checkPath(path):
     if(path.count("\\")):
@@ -262,10 +262,13 @@ def Save_File(path, text, isUtf = True, isNoBoom = True):
         text = u'\ufeff' + text
     pFile.write(text)
     pFile.close()
-        
+      
     
-
-# 定义要创建的目录
-#mkpath="d:\\qttc\\web\\"
-# 调用函数
-#mkdir(mkpath)
+#生成唯一名称字符串
+def create_UUID(): 
+    nowTime = datetime.datetime.now().strftime("%Y%m%d%H%M%S")  # 生成当前时间
+    randomNum = random.randint(0, 100)                          # 生成的随机整数n，其中0<=n<=100
+    if randomNum <= 10:
+        randomNum = str(0) + str(randomNum)
+    uniqueNum = str(nowTime) + str(randomNum)
+    return uniqueNum
