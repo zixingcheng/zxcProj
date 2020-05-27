@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+﻿ # -*- coding: utf-8 -*-
 """
 Created on  张斌 2020-05-20 10:20:00 
     @author: zhang bin
@@ -6,7 +6,8 @@ Created on  张斌 2020-05-20 10:20:00
 
     pyWeb --生态环境局表单代码
 """ 
-import sys, os, string, mySystem  
+import sys, os, time, string, mySystem  
+from datetime import timedelta
 
 #导入模块
 from flask import jsonify, request, flash, render_template, redirect    #导入模块
@@ -16,42 +17,67 @@ from wtforms import BooleanField,IntegerField,DecimalField,StringField,TextAreaF
 from wtforms.validators import DataRequired,ValidationError,Email,Regexp,EqualTo,Required,NumberRange,Length
 from werkzeug.utils import secure_filename
 
-import os
-import time
-from datetime import timedelta
-
-
-
 mySystem.Append_Us("", False)  
 import myIO
 from zxcPy_Form import * 
 
 
-# 测试设置页面
-class myTestForm(FlaskForm):  
-    #商品信息
-    stockID = StringField('股票代码', [DataRequired(),Length(min=4, max=10)], render_kw={"placeholder": "请输入股票代码"})  
-    stockName = StringField('股票名称', [DataRequired(),Length(min=2, max=12)], render_kw={"placeholder": "请输入股票名称/首字母"})
-
-
-def save_image(files):
-    images = []
-    for img in files:
-        # 处理文件名
-        filename = hashlib.md5(current_user.username + str(time.time())).hexdigest()[:10]
-        image = photos.save(img, name=filename + '.')
-        file_url = photos.url(image)
-        url_s = create_show(image)  # 创建展示图
-        url_t = create_thumbnail(image)  # 创建缩略图
-        images.append((file_url, url_s, url_t))
-    return images
+# 企业信息设置页面
+class myCompanyForm(FlaskForm):  
+    # 企业信息
+    txtStyle = "font-size: 16px;width: 360px;height: 30px;"
+    companyID = StringField('统一社会信用代码', [DataRequired(),Length(min=18, max=18)], render_kw={"placeholder": "请输入统一社会信用代码", "style": txtStyle})  
+    companyName = StringField('企业全称', [DataRequired(),Length(min=2, max=50)], render_kw={"placeholder": "请输入企业全称", "style": txtStyle})
+    companyInStreet = StringField('所在镇街', [DataRequired(),Length(min=2, max=50)], render_kw={"placeholder": "请输入企业所在镇街", "style": txtStyle})
+    companyInVillage = StringField('所属村（社区）', [DataRequired(),Length(min=2, max=50)], render_kw={"placeholder": "请输入企业所属村（社区）", "style": txtStyle})
+    companyAdrr = StringField('详细地址', [DataRequired(),Length(min=10, max=100)], render_kw={"placeholder": "请输入企业详细地址", "style": txtStyle})    
+    companyScale = StringField('企业规模', [DataRequired()], render_kw={"placeholder": "请选择企业规模", "style": txtStyle})
+    companyContacts = StringField('企业联系人', [DataRequired(),Length(min=2, max=8)], render_kw={"placeholder": "请输入企业联系人", "style": txtStyle})
+    companyPhone = StringField('电话号码', validators=[DataRequired(),Regexp("1[3578]\d{9}", message="手机格式不正确")], render_kw={"placeholder": "请输入联系电话", "style": txtStyle})
+    
+    companyHasProcess  = StringField('是否采用活性炭吸附工艺', [DataRequired()], render_kw={"placeholder": "请选择是否", "style": txtStyle})
+    companyNumProcess = StringField('活性炭吸附工艺设施套数', [DataRequired(),Length(min=10, max=100)], render_kw={"placeholder": "请输入采用活性炭吸附工艺设施套数", "style": txtStyle})
+    companyRecycle = StringField('正常更换周期（日/次）', [DataRequired(),Length(min=10, max=100)], render_kw={"placeholder": "请输入更换周期（日/次）", "style": txtStyle})
+    companyVolumeTotal = StringField('设计总填装量（千克）', [DataRequired(),Length(min=10, max=100)], render_kw={"placeholder": "请输入设计总填装量（千克）", "style": txtStyle})
+    
+    companyRedate = StringField('新活性炭更换日期', [DataRequired(),Length(min=10, max=100)], render_kw={"placeholder": "请选择企业规模", "style": txtStyle}) 
+    companyRevolume = StringField('新活性炭更换量（千克）', [DataRequired(),Length(min=10, max=100)], render_kw={"placeholder": "请选择企业规模", "style": txtStyle})
+    companyTransferredvolume = StringField('已转移废活性炭量（千克）', [DataRequired(),Length(min=10, max=100)], render_kw={"placeholder": "请选择企业规模", "style": txtStyle})
+    companyNoTransferredvolume = StringField('暂未转移废活性炭量（千克）', [DataRequired(),Length(min=10, max=100)], render_kw={"placeholder": "请选择企业规模", "style": txtStyle})
+    
+    save = SubmitField('保存信息', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
+    # 图片信息    
+    #imgName_1 = StringField('图片_1', [DataRequired()], render_kw={"style": "display:none;"}) 
+    #imgName_2 = StringField('图片_2', [DataRequired()], render_kw={"style": "display:none;"}) 
+    #imgName_3 = StringField('图片_3', [DataRequired()], render_kw={"style": "display:none;"}) 
 
 #集中添加所有Web
-def add_Webs(appWeb, dirBase):       
+def add_Webs(appWeb, dirBase):
     imgPath = dirBase + "/static/images/"
     dirPath = dirBase
     
     #添加页面--股票选择页面-测试
+    @appWeb.app.route('/zxcWebs/companyinfo/<string:companyID>', methods = ['GET', 'POST'])    
+    def upload_company(companyID):
+        form = myCompanyForm()                      #生成form实例，给render_template渲染使用  
+        if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
+
+            print("od")
+            if form.save.data:  # 保存按钮被单击 
+                editInfo = {}
+                
+                # 特殊同步
+                # strPath = 'stock/QuoteSet?extype=' + form.exType.data + "&code_id=" + form.code_id.data + "&code_name=" + "&editInfo=" + str(editInfo)  #+ form.code_name.data
+            
+            #修改接口执行
+            pWeb = myWeb_urlLib.myWeb(strUrl, bPrint=False)
+            strReturn = pWeb.Do_API_get(strPath, "zxcAPI-py")
+            jsonRes = myData_Json.Trans_ToJson(strReturn)
+
+            #结果处理 
+            return jsonRes['text']
+        return render_template('company_active carbon.html', title = 'company upload', form = form, companyID = companyID, imgRR = "")
+
     @appWeb.app.route('/zxcWebs/stock/myTest', methods=['POST', 'GET'])  # 添加路由
     def upload():
         if request.method == 'POST':

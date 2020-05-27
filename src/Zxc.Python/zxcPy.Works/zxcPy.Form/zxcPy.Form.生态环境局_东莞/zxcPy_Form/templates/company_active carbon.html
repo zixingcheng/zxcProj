@@ -1,0 +1,89 @@
+﻿<!-- extend from base layout -->
+<!doctype html>
+{% extends "company_base.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
+
+{% block content %}
+  {% from "company_base.html" import render_field %}
+<form action="" method="post" name="stockQuery" style="margin-left:10px;margin-top:10px">
+    {{ form.hidden_tag() }}
+
+    <div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">企业基本信息</h1>
+        <table cellspacing="0" cellpadding="0">
+            {{ render_field(form.companyID, size=20) }}
+            {{ render_field(form.companyName, size=20) }}
+
+            {{ render_field(form.companyInStreet, size=20) }}
+            {{ render_field(form.companyInVillage, size=20) }}
+            {{ render_field(form.companyAdrr, size=20) }}
+
+            {{ render_field(form.companyScale, size=20) }}
+            {{ render_field(form.companyContacts, size=20) }}
+            {{ render_field(form.companyPhone, size=20) }}
+        </table>
+    </div>
+
+    <!--<div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">活性炭工艺信息 </h1>
+        <table cellspacing="0" cellpadding="0">
+            {{ render_field(form.companyHasProcess, size=20) }}
+            {{ render_field(form.companyNumProcess, size=20) }}
+            {{ render_field(form.companyRecycle, size=20) }}
+            {{ render_field(form.companyVolumeTotal, size=20) }}
+
+            {{ render_field(form.companyRedate, size=20) }}
+            {{ render_field(form.companyRevolume, size=20) }}
+            {{ render_field(form.companyTransferredvolume, size=20) }}
+            {{ render_field(form.companyNoTransferredvolume, size=20) }}
+        </table>
+    </div>-->
+
+    <div class="upload-content">
+        <div class="content-img" maxImg="1" fileSize="2">
+            <ul class="content-img-list" id="img-list_1">
+                <!--<li class="content-img-list-item"> <img src="/img/base/add_img.jpg" alt=""><a index='0' class="delete-btn"><i class="ico-delete"></i></a></li>-->
+            </ul>
+            <div class="file">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload1" img-list-id="img-list_1" onchange="event_uploadImg(this)">
+            </div>
+        </div>
+        <div class="upload-tips">
+            最多上传1张图片，支持jpg/png，单张不超过2M
+        </div>
+    </div>
+
+    <div class="upload-content">
+        <p style="margin-left:110px">{{ form.save|safe }}</p>
+    </div>
+
+    <div class="upload-content">
+        <div class="content-img" maxImg="4" fileSize="2">
+            <ul class="content-img-list" id="img-list_2">
+            </ul>
+            <div class="file">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload2" img-list-id="img-list_2" onchange="event_uploadImg(this)">
+            </div>
+        </div>
+        <div class="upload-tips">
+            最多上传1张图片，支持jpg/png，单张不超过2M
+        </div>
+    </div>
+
+
+    <div class="upload-submit">
+        <input type="submit" value="上传" class="button-new" style="margin-top:15px;" />
+        <a href="javascript:;" id="btn-submit-upload" class="btn-submit-upload">提交</a>
+    </div>
+    <datalist id="lstStockIDs"></datalist>
+    <datalist id="lstStockNames"></datalist>
+
+    <link rel="stylesheet" type="text/css" href="/static/content/upload_img.css">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/static/scripts/upload_img.js"></script>
+    <script type="text/javascript">
+        $("#companyID").val('{{companyID}}');
+    </script>
+
+</form>
+{% endblock %}
+

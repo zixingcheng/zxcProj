@@ -67,13 +67,15 @@
     <Content Include="zxcPy_Form\static\scripts\respond.min.js" />
     <Content Include="zxcPy_Form\static\scripts\_references.js" />
     <Content Include="zxcPy_Form\templates\about.html" />
+    <Content Include="zxcPy_Form\templates\company_base.html" />
     <Content Include="zxcPy_Form\templates\contact.html" />
     <Content Include="zxcPy_Form\templates\index.html" />
     <Content Include="zxcPy_Form\templates\layout.html" />
     <Content Include="zxcPy_Form\templates\up.html" />
     <Content Include="zxcPy_Form\templates\upload - Copy %282%29.html" />
+    <Content Include="zxcPy_Form\templates\upload - Copy %283%29.html" />
     <Content Include="zxcPy_Form\templates\upload - Copy - Copy.html" />
-    <Content Include="zxcPy_Form\templates\upload - Copy.html" />
+    <Content Include="zxcPy_Form\templates\company_active carbon.html" />
     <Content Include="zxcPy_Form\templates\upload.html" />
     <Content Include="zxcPy_Form\static\content\upload_img.css" />
     <Content Include="zxcPy_Form\static\scripts\upload_img.js" />

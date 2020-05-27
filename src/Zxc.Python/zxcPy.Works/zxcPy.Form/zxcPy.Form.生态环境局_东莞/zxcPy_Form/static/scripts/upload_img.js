@@ -1,7 +1,4 @@
-var imgFile = []; //文件流
-var imgSrc = [];  //图片路径
-var imgName = []; //图片名字
-var indImg = -1;  //当前上传ind
+var dicImg = new Array();	//图片字典
 $(function(){
 	// 鼠标经过显示删除按钮
 	$('.content-img-list').on('mouseover','.content-img-list-item',function(){
@@ -12,48 +9,16 @@ $(function(){
 		$(this).children('a').addClass('hide');
 	});
 	// 单个图片删除
-	$(".content-img-list").on("click",'.content-img-list-item a',function(){
-	    	var index = $(this).attr("index");
-			imgSrc.splice(index, 1);
-			imgFile.splice(index, 1);
-			imgName.splice(index, 1);
-			var boxId = ".content-img-list";
-			addNewContent(boxId);
-			if(imgSrc.length<4){
-				$('.content-img .file').show();	//显示上传按钮
-			}
+	$(".content-img-list").on("click", '.content-img-list-item a', function () {
+		var parentID = $(this).parent().parent().attr("id");
+		var indImg = $(this).attr("index");
+
+		checkImgDict(parentID);
+		dicImg[parentID].splice(indImg, 1);
+
+		// 图片展示更新
+		addNewContent(parentID);
 	  });
-	// 图片上传
-	$('#upload').on('change',function(){			
-		if(imgSrc.length>=4){
-			return alert("最多只能上传4张图片");
-		}
-		var imgSize = this.files[0].size;		
-		if(imgSize>1024*1024*2){				//2M
-			return alert("上传图片不能超过1M");
-		}
-		console.log(this.files[0].type)
-		if(this.files[0].type != 'image/png' && this.files[0].type != 'image/jpeg' && this.files[0].type != 'image/gif'){
-			return alert("图片上传格式不正确");
-		}
-
-		//图片上传，及信息记录
-		indImg = imgSrc.length;
-		var imgBox = '.content-img-list';
-		var fileList = this.files;
-		for(var i = 0; i < fileList.length; i++) {
-			var imgSrcI = getObjectURL(fileList[i]);
-			imgName.push(fileList[i].name);
-			imgSrc.push(imgSrcI);
-			imgFile.push(fileList[i]);
-		}
-		if(imgSrc.length==4){		//隐藏上传按钮
-			$('.content-img .file').hide();
-		}
-		addNewContent(imgBox);
-		this.value = null;			//解决无法上传相同图片的问题
-	})
-
 	// 提交请求
 	$('#btn-submit-upload').on('click', function() {
 		// FormData上传图片
@@ -72,6 +37,41 @@ $(function(){
     })
 });
 
+// 图片上传-事件实现
+function event_uploadImg(objFile) {
+	//图片上传，及信息记录
+	var obj = "#" + objFile.id;
+	var numImg = $(obj).parent().parent().attr("maxImg");
+	var parentID = $(obj).attr("img-list-id");
+
+	checkImgDict(parentID);
+	imgSrc = dicImg[parentID];
+	if (imgSrc.length >= numImg) {
+		return alert("最多只能上传4张图片");
+	}
+
+	var fileList = objFile.files;
+	var imgSize = fileList[0].size;
+	var fileSize = $(obj).parent().parent().attr("fileSize");
+	var fileSize_Max = 1024 * 1024 * fileSize;
+	if (fileSize_Max < imgSize) {				//content-img下fileSize设置
+		return alert("上传图片不能超过1M");
+	}
+	console.log(fileList[0].type)
+	if (fileList[0].type != 'image/png' && fileList[0].type != 'image/jpeg' && fileList[0].type != 'image/gif') {
+		return alert("图片上传格式不正确");
+	}
+
+	//图片上传，及信息记录
+	for (var i = 0; i < fileList.length; i++) {
+		var imgSrcI = getObjectURL(fileList[i]);
+		dicImg[parentID].push(imgSrcI);
+	}
+
+	// 图片展示更新
+	addNewContent(parentID);
+	$(obj).value = null;			//解决无法上传相同图片的问题
+}
 //图片上传
 function uploadImg(fileTag, file) {
 	var data = new FormData();
@@ -103,21 +103,34 @@ function uploadImg(fileTag, file) {
 	});
 	return urlImg;
 }
-//图片删除
-function removeImg(obj, index) {
-	imgSrc.splice(index, 1); 
-	imgFile.splice(index, 1);
-	imgName.splice(index, 1);
-	var boxId = ".content-img-list";
-	addNewContent(boxId);
-}
 //图片展示
-function addNewContent(obj) {
-	// console.log(imgSrc)
+function addNewContent(tagID) {
+	var obj = "#" + tagID;
+	imgSrc = dicImg[tagID];
+
 	$(obj).html("");
-	for(var a = 0; a < imgSrc.length; a++) {
+	for (var a = 0; a < imgSrc.length; a++) {
 		var oldBox = $(obj).html();
-		$(obj).html(oldBox + '<li class="content-img-list-item"><img src="' + imgSrc[a]+'" alt=""><a index="'+a+'" class="hide delete-btn"><i class="ico-delete"></i></a></li>');
+		$(obj).html(oldBox + '<li class="content-img-list-item"><img src="' + imgSrc[a] + '" alt=""><a index="' + a + '" class="hide delete-btn"><i class="ico-delete"></i></a></li>');
+	}
+
+	//显隐上传按钮
+	var numImg = $(obj).parent().attr("maxImg");
+	if (imgSrc.length < numImg) {
+		$(obj).parent().children('.file').show();
+	}
+	else {
+		$(obj).parent().children('.file').hide();
+	}
+}
+
+// 检查初始img字典
+function checkImgDict(imgTag) {
+	if (dicImg.hasOwnProperty(imgTag)) {
+		//alert("dicImg exist");
+	}
+	else {
+		dicImg[imgTag] = [];
 	}
 }
 //建立一個可存取到該file的url
