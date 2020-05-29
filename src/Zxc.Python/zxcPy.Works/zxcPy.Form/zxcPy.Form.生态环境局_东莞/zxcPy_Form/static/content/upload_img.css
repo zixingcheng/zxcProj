@@ -55,7 +55,7 @@ img{vertical-align: middle;border: 0;}
 
 
 .upload-content{
-		    width: 682px;
+        width: 682px;
 		margin: 0 auto;
 	    font-size: 12px;
 	    color: #666;
@@ -149,7 +149,7 @@ img{vertical-align: middle;border: 0;}
 }
 .upload-submit{
 	    text-align: center;
-    margin-top: 50px;
+    margin-top: 15px;
 }
 .upload-submit .btn-submit-upload{
 	    display: inline-block;

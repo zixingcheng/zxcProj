@@ -19,7 +19,7 @@ from myGlobal import gol
 
 # 简易库表
 class myData_Table():
-    def __init__(self, nameDB = "zxcDB", dir = "", oneValid = False, params = {}, initAuto = True):  
+    def __init__(self, nameDB = "zxcDB", dir = "", oneValid = False, params = {"hasAliaName": False}, initAuto = True): 
         self.dir = dir              #库表路径
         self.nameDB = nameDB        #库表名
         self.fields = OrderedDict() #库表字段信息
@@ -43,9 +43,12 @@ class myData_Table():
         if(path == ""): return False
         strLines = myIO.getContents(path)
         if(len(strLines) < 1): return False
+        hasAlias = self.params.get("hasAliaName", False)
+        if(hasAlias and len(strLines) < 2): return False
 
         #提取字段信息  
         lstTemps = strLines[0].replace("\r\n", "").split(',')
+        lstFields_alias = []
         lstFields = []
         lstTypes = []
         lstIndexs = []
@@ -61,11 +64,17 @@ class myData_Table():
             if(x.count("(") == 1 and x.count(")") == 1):
                 temps = x.split("(")
                 lstFields.append(temps[0])
+                lstFields_alias.append("")
                 lstTypes.append(temps[1].replace(")", ""))
             else:
                 lstFields.append(x)
+                lstFields_alias.append("")
                 lstTypes.append("string")
-        self.Add_Fields(lstFields, lstTypes, lstIndexs)
+        #别名
+        if(hasAlias):
+            strLines.pop(0)
+            lstFields_alias = strLines[0].replace("\r\n", "").split(',')
+        self.Add_Fields(lstFields, lstTypes, lstIndexs, lstFields_alias)
 
         #提取行数据
         strLines.pop(0)
@@ -74,7 +83,7 @@ class myData_Table():
         return True
         
     # 添加字段信息集合
-    def Add_Fields(self, fieldNames = [], fieldTypes = [], isIndexs = [] ): 
+    def Add_Fields(self, fieldNames = [], fieldTypes = [], isIndexs = [] , fieldNames_alias = []): 
        if(len(fieldNames) < len(fieldTypes) or len(fieldNames) < len(isIndexs)): return False 
        fieldTypes.extend([""]*(len(fieldNames)-len(fieldTypes)))
        isIndexs.extend([""]*(len(fieldNames)-len(isIndexs)))
@@ -84,10 +93,10 @@ class myData_Table():
        for x in range(len(fieldNames)):
            if(fieldNames[x].lower() == 'id'): continue
            if(fieldNames[x].lower() == 'isdel'): continue
-           bResult = bResult and self.Add_Field(fieldNames[x], fieldTypes[x], isIndexs[x])
+           bResult = bResult and self.Add_Field(fieldNames[x], fieldTypes[x], isIndexs[x], fieldNames_alias[x])
        return bResult
     # 添加字段信息
-    def Add_Field(self, fieldName, fieldType = myIO_xlsx.myFiledype.string, isIndex = False): 
+    def Add_Field(self, fieldName, fieldType = myIO_xlsx.myFiledype.string, isIndex = False, fieldName_alias = ''): 
         # 以字典方式组织字段头
         if(fieldType == ""):
             fieldType = myIO_xlsx.myFiledype.string
@@ -98,7 +107,7 @@ class myData_Table():
         if(fieldName[:2] == '**'):
             isIndex = True
             fieldName = fieldName[2:]
-        self.fields[fieldName] = {'name': fieldName, 'type': fieldType, 'isIndex': isIndex}
+        self.fields[fieldName] = {'name': fieldName,'nameAlias': fieldName_alias, 'type': fieldType, 'isIndex': isIndex}
         self._Add_IndexField(fieldName, isIndex)
         return True
     # 修改字段信息
@@ -446,6 +455,7 @@ class myData_Table():
     def Save_DB(self, isAppend = False, isUtf = True):   
         #保存该csv文件,有同名文件时直接覆盖
         strPath = self.dir + "/" + self.nameDB + ".csv"
+        strEnt = myData.iif(isUtf, "\r\n", "\n")
 
         # 写入字段
         nCols = self._FieldsCount() + 1
@@ -455,8 +465,15 @@ class myData_Table():
             strLines += "," + myData.iif(x in self.fields_index, "**", "") + x + "(" + self.fields[x]['type'] + ")"
         strLines += ",isDel(bool)" 
 
+        # 写入字段别名
+        if(self.params.get("hasAliaName", False)):
+            strLines += strEnt
+            for x in self.fields:
+                strLines += "," + self.fields[x]['nameAlias']
+            strLines += ",isDel(bool)" 
+
+
         #循环所有格子组装数据 
-        strEnt = myData.iif(isUtf, "\r\n", "\n")
         if(isAppend == False or self._RowsCount() == 1):
             for x in self.rows:
                 strLines += strEnt + self._Trans_ToStr(self.rows[x])

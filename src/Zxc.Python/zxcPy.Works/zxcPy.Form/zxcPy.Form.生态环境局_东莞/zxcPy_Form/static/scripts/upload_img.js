@@ -1,4 +1,9 @@
-var dicImg = new Array();	//图片字典
+var dicImg = new Array();				//图片字典
+var tag_img_list_txt = "imgName_"		//图片列表绑定文本标签
+var tag_img_list = "img-list_"			//图片列表标签
+var tag_img_list_ind = "img-list-ind"	//图片列表序号标签
+var tag_maxImg = "maxImg"				//图片列表数量标签
+var tag_fileSize = "fileSize"			//图片大小标签
 $(function(){
 	// 鼠标经过显示删除按钮
 	$('.content-img-list').on('mouseover','.content-img-list-item',function(){
@@ -10,14 +15,14 @@ $(function(){
 	});
 	// 单个图片删除
 	$(".content-img-list").on("click", '.content-img-list-item a', function () {
-		var parentID = $(this).parent().parent().attr("id");
+		var tagImgLst = $(this).parent().parent().attr("id");
 		var indImg = $(this).attr("index");
 
-		checkImgDict(parentID);
-		dicImg[parentID].splice(indImg, 1);
+		checkImgDict(tagImgLst);
+		dicImg[tagImgLst].splice(indImg, 1);
 
 		// 图片展示更新
-		addNewContent(parentID);
+		refreshImgList(tagImgLst);
 	  });
 	// 提交请求
 	$('#btn-submit-upload').on('click', function() {
@@ -26,6 +31,7 @@ $(function(){
 		// formFile.append("type", type); 
 		// formFile.append("content", content); 
 		// formFile.append("mobile", mobile); 
+
 		// 遍历图片imgFile添加到formFile里面
 		$.each(imgFile, function (i, file) {
 			formFile.append('myFile', file);
@@ -41,18 +47,20 @@ $(function(){
 function event_uploadImg(objFile) {
 	//图片上传，及信息记录
 	var obj = "#" + objFile.id;
-	var numImg = $(obj).parent().parent().attr("maxImg");
-	var parentID = $(obj).attr("img-list-id");
+	var numImg = $(obj).parent().parent().attr(tag_maxImg);
+	var indLst = $(obj).parent().parent().attr(tag_img_list_ind);
+	var tagImgLst = tag_img_list + indLst
+	alert(tagImgLst)
 
-	checkImgDict(parentID);
-	imgSrc = dicImg[parentID];
+	checkImgDict(tagImgLst);
+	imgSrc = dicImg[tagImgLst];
 	if (imgSrc.length >= numImg) {
 		return alert("最多只能上传4张图片");
 	}
 
 	var fileList = objFile.files;
 	var imgSize = fileList[0].size;
-	var fileSize = $(obj).parent().parent().attr("fileSize");
+	var fileSize = $(obj).parent().parent().attr(tag_fileSize);
 	var fileSize_Max = 1024 * 1024 * fileSize;
 	if (fileSize_Max < imgSize) {				//content-img下fileSize设置
 		return alert("上传图片不能超过1M");
@@ -65,13 +73,13 @@ function event_uploadImg(objFile) {
 	//图片上传，及信息记录
 	for (var i = 0; i < fileList.length; i++) {
 		var imgSrcI = getObjectURL(fileList[i]);
-		dicImg[parentID].push(imgSrcI);
+		dicImg[tagImgLst].push(imgSrcI);
 	}
 
 	// 图片展示更新
-	addNewContent(parentID);
+	refreshImgList(tagImgLst);
 	$(obj).value = null;			//解决无法上传相同图片的问题
-}
+};
 //图片上传
 function uploadImg(fileTag, file) {
 	var data = new FormData();
@@ -104,7 +112,7 @@ function uploadImg(fileTag, file) {
 	return urlImg;
 }
 //图片展示
-function addNewContent(tagID) {
+function refreshImgList(tagID) {
 	var obj = "#" + tagID;
 	imgSrc = dicImg[tagID];
 
@@ -115,15 +123,46 @@ function addNewContent(tagID) {
 	}
 
 	//显隐上传按钮
-	var numImg = $(obj).parent().attr("maxImg");
+	var numImg = $(obj).parent().attr(tag_maxImg);
 	if (imgSrc.length < numImg) {
 		$(obj).parent().children('.file').show();
 	}
 	else {
 		$(obj).parent().children('.file').hide();
 	}
-}
 
+	//更新img绑定图片属性
+	refreshImgTxt(tagID)
+}
+//更新img绑定图片属性
+function refreshImgTxt(imgTag) {
+	//更新绑定文本框属性
+	var imgSrc = dicImg[imgTag];
+	var imgUrls = ''
+	for (var i = 0; i < imgSrc.length; i++) {
+		imgUrls = imgUrls + "," + imgSrc[i];
+	}
+	if (imgUrls.length > 0) {
+		imgUrls = imgUrls.substring(1);
+	}
+
+	//属性更新
+	var ind = imgTag.substring(tag_img_list.length)
+	$("#" + tag_img_list_txt + tagID).val(imgUrls);
+};
+
+//初始图片信息并展示
+function initImgList(imgTag, imgUrl, resetImgs = true) {
+	checkImgDict(imgTag);
+
+	imgSrc = dicImg[imgTag];
+	if (resetImgs == true) {
+		dicImg[imgTag] = [];
+	}
+	dicImg[imgTag].push(imgUrl);
+
+	refreshImgList(imgTag);
+}
 // 检查初始img字典
 function checkImgDict(imgTag) {
 	if (dicImg.hasOwnProperty(imgTag)) {

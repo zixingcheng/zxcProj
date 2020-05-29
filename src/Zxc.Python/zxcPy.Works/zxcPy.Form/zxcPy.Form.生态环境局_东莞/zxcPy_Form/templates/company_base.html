@@ -1,16 +1,18 @@
 ﻿<html>
-  <head>
-	<meta charset="UTF-8"> 
+<head>
+	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=0">
-	
-    {% if title %}
-    <title>{{title}} - elife</title>
-    {% else %}
-    <title>elife</title>
-    {% endif %}
-	
-	{% macro render_field(field, size) %}
+
+	{% if title %}
+	<title>{{title}} - elife</title>
+	{% else %}
+	<title>elife</title>
+	{% endif %}
+
+	{% macro render_field(field, size, hasTR=true, hasSearch=true) %}
+	{% if hasTR %}
 	<tr>
+		{% endif %}
 		<td>
 			<div style='overflow-y:auto;padding-top: 10px;height:40px; font-size: 18px;'>
 				{{ field.label }}：
@@ -21,6 +23,23 @@
 				{{ field(**kwargs)|safe }}
 			</div>
 		</td>
+
+		{% if hasSearch == false %}
+		<td>
+			<div id="searchform" class="searchform " padding-left="20px">
+				<svg width="5px" height="5px">
+				</svg>
+				<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" alt="search" for="srch" onclick="iconSearch(this)">
+					<title>搜索</title>
+					<g id="搜索" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+						<circle id="椭圆形" stroke="#F90FFF" stroke-width="1.5" cx="9.5" cy="9.5" r="8.5"></circle>
+						<path d="M15.5,15.5 L19.2426407,19.2426407" id="直线-2" stroke="#F90FFF" stroke-width="1.5" stroke-linecap="square"></path>
+					</g>
+				</svg>
+			</div>
+		</td>
+		{% endif %}
+
 		<td>
 			<div style='overflow-y:auto;height:40px; font-size: 8px;'>
 				{% if field.errors %}
@@ -31,15 +50,17 @@
 				{% endif %}
 			</div>
 		</td>
+	{% if hasTR %}
 	</tr>
+	{% endif %}
 	{% endmacro %}
 	{% macro render_field2(field, size) %}
 	<tr>
-	  <td>{{ field.label }}：</td>
-	  <td>{{ field(**kwargs)|safe }}</td>
+		<td>{{ field.label }}：</td>
+		<td>{{ field(**kwargs)|safe }}</td>
 	</tr>
 	{% endmacro %}
-  </head>
+</head>
   <body>                            
     {% with messages = get_flashed_messages() %}   
 		{% if messages %}		

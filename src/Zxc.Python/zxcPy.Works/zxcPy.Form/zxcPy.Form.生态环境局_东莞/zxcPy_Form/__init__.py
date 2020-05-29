@@ -9,7 +9,7 @@ Created on  张斌 2020-05-20 09:58:00
 import mySystem
 
 mySystem.Append_Us("", False)    
-import myWeb
+import myWeb, myDataDB_Company
 from myGlobal import gol 
 gol._Init()             #先必须在主模块初始化（只在Main模块需要一次即可）
 
@@ -24,5 +24,10 @@ appWeb = myWeb.myWeb("0.0.0.0", PORT, webFolder = dirBase + "/" )
 appWeb.add_Web()
 appWeb.add_API(myWeb.myAPI, '/test') 
 
-import zxcPy_Form.myWeb_Test
-#myWeb_Test.add_Webs(appWeb) 
+#载入web页面类
+import zxcPy_Form.infoCompany
+
+
+#公司信息数据初始
+dbCompany = myDataDB_Company.myDataDB_Company("dbCompany", dirBase + "/Data/DB_Company/")
+gol._Set_Value("dbCompany", dbCompany)

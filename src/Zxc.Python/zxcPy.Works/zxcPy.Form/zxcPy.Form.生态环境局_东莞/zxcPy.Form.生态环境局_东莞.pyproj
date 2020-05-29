@@ -28,9 +28,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="myData_DB.py" />
     <Compile Include="runserver.py" />
     <Compile Include="myWeb.py" />
-    <Compile Include="zxcPy_Form\myWeb_Test.py" />
+    <Compile Include="myIO_xlsx.py" />
+    <Compile Include="zxcPy_Form\infoCompany.py" />
+    <Compile Include="myDataDB_Company.py" />
     <Compile Include="zxcPy_Form\__init__.py" />
     <Compile Include="zxcPy_Form\views.py" />
   </ItemGroup>
@@ -65,6 +68,7 @@
     <Content Include="zxcPy_Form\static\scripts\modernizr-2.6.2.js" />
     <Content Include="zxcPy_Form\static\scripts\respond.js" />
     <Content Include="zxcPy_Form\static\scripts\respond.min.js" />
+    <Content Include="zxcPy_Form\static\scripts\tyshyxdm.js" />
     <Content Include="zxcPy_Form\static\scripts\_references.js" />
     <Content Include="zxcPy_Form\templates\about.html" />
     <Content Include="zxcPy_Form\templates\company_base.html" />
