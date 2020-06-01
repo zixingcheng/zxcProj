@@ -14,7 +14,7 @@ from flask import jsonify, request, flash, render_template, redirect    #导入�
 from flask_wtf import FlaskForm                                         #FlaskForm 为表单基类
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import BooleanField,IntegerField,DecimalField,StringField,TextAreaField,PasswordField,SubmitField,RadioField,SelectField,SelectMultipleField       #导入字符串字段，密码字段，提交字段
-from wtforms.validators import DataRequired,ValidationError,Email,Regexp,EqualTo,Required,NumberRange,Length
+from wtforms.validators import InputRequired,DataRequired,ValidationError,Email,Regexp,EqualTo,Required,NumberRange,Length
 from werkzeug.utils import secure_filename
 from wtforms.fields.html5 import DateField
 
@@ -37,14 +37,14 @@ class myCompanyForm(FlaskForm):
     companyPhone = StringField('电话号码', validators=[DataRequired(),Regexp("1[3578]\d{9}", message="手机格式不正确")], render_kw={"placeholder": "请输入联系电话", "style": txtStyle})
     
     companyHasProcess  = StringField('是否采用活性炭吸附工艺', [DataRequired()], render_kw={"placeholder": "请选择是否采用活性炭吸附工艺", "style": txtStyle})
-    companyNumProcess = IntegerField('活性炭吸附工艺设施套数', [DataRequired(),NumberRange(min=0, max=100)], render_kw={"placeholder": "请输入采用活性炭吸附工艺设施套数", "style": txtStyle})
-    companyRecycle = IntegerField('正常更换周期（日/次）', [DataRequired(),NumberRange(min=0, max=365)], render_kw={"placeholder": "请输入更换周期（日/次）", "style": txtStyle})
-    companyVolumeTotal = DecimalField('设计总填装量（千克）', [DataRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入设计总填装量（千克）", "style": txtStyle})
+    companyNumProcess = IntegerField('活性炭吸附工艺设施套数', [InputRequired(),NumberRange(min=-1, max=100)], render_kw={"placeholder": "请输入采用活性炭吸附工艺设施套数", "style": txtStyle})
+    companyRecycle = IntegerField('正常更换周期（日/次）', [InputRequired(),NumberRange(min=0, max=365)], render_kw={"placeholder": "请输入更换周期（日/次）", "style": txtStyle})
+    companyVolumeTotal = DecimalField('设计总填装量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入设计总填装量（千克）", "style": txtStyle})
     
     companyRedate = DateField('新活性炭更换日期', default='', format='%Y-%m-%d', render_kw={"placeholder": "请选择新活性炭更换日期", "style": txtStyle}) 
-    companyRevolume = DecimalField('新活性炭更换量（千克）', [DataRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入新活性炭更换量（千克）", "style": txtStyle})
-    companyTransferredvolume = DecimalField('已转移废活性炭量（千克）', [DataRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入已转移废活性炭量（千克）", "style": txtStyle})
-    companyNoTransferredvolume = DecimalField('暂未转移废活性炭量（千克）', [DataRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入暂未转移废活性炭量（千克）", "style": txtStyle})
+    companyRevolume = DecimalField('新活性炭更换量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入新活性炭更换量（千克）", "style": txtStyle})
+    companyTransferredvolume = DecimalField('已转移废活性炭量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入已转移废活性炭量（千克）", "style": txtStyle})
+    companyNoTransferredvolume = DecimalField('暂未转移废活性炭量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入暂未转移废活性炭量（千克）", "style": txtStyle})
     
     save = SubmitField('保存信息', render_kw={"class": "btn-submit-upload","style": "margin-left:10px"})                    # 保存按钮
     query = SubmitField('查询信息', render_kw={"class": "btn-submit-upload","style": "margin-left:10px display:block;"})    # 查询按钮--隐藏
@@ -93,7 +93,7 @@ def add_Webs(appWeb, dirBase):
                 # 组装row信息
                 pValues = []
                 if(True):
-                    pValues.append("")
+                    pValues.append("-1")
                     pValues.append(form.companyID.data)
                     pValues.append(form.companyName.data)
                     pValues.append(form.companyInStreet.data)

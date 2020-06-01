@@ -50,7 +50,6 @@ function event_uploadImg(objFile) {
 	var numImg = $(obj).parent().parent().attr(tag_maxImg);
 	var indLst = $(obj).parent().parent().attr(tag_img_list_ind);
 	var tagImgLst = tag_img_list + indLst
-	alert(tagImgLst)
 
 	checkImgDict(tagImgLst);
 	imgSrc = dicImg[tagImgLst];
@@ -147,8 +146,9 @@ function refreshImgTxt(imgTag) {
 	}
 
 	//属性更新
-	var ind = imgTag.substring(tag_img_list.length)
-	$("#" + tag_img_list_txt + tagID).val(imgUrls);
+	var tagTxt = tag_img_list_txt + imgTag.substring(tag_img_list.length)
+	$("#" + tagTxt).val(imgUrls);
+	//alert($("#" + tagTxt).val());
 };
 
 //初始图片信息并展示
@@ -159,10 +159,17 @@ function initImgList(imgTag, imgUrl, resetImgs = true) {
 	if (resetImgs == true) {
 		dicImg[imgTag] = [];
 	}
-	dicImg[imgTag].push(imgUrl);
 
+	//多图片信息兼容拆分
+	if (imgUrl.length > 0) {
+		imgUrls = imgUrl.split(',')
+		for (var item in imgUrls) {
+			if (imgUrls[item].length > 0)
+				dicImg[imgTag].push(imgUrls[item]);
+		};
+	};
 	refreshImgList(imgTag);
-}
+};
 // 检查初始img字典
 function checkImgDict(imgTag) {
 	if (dicImg.hasOwnProperty(imgTag)) {

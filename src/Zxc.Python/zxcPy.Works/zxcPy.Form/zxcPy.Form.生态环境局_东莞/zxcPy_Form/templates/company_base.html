@@ -30,7 +30,7 @@
 				<svg width="5px" height="5px">
 				</svg>
 				<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" alt="search" for="srch" onclick="iconSearch(this)">
-					<title>搜索</title>
+					<title>搜索已存在企业信息，依据企业统一信用码、企业名称进行搜索。</title>
 					<g id="搜索" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
 						<circle id="椭圆形" stroke="#F90FFF" stroke-width="1.5" cx="9.5" cy="9.5" r="8.5"></circle>
 						<path d="M15.5,15.5 L19.2426407,19.2426407" id="直线-2" stroke="#F90FFF" stroke-width="1.5" stroke-linecap="square"></path>
@@ -50,13 +50,18 @@
 				{% endif %}
 			</div>
 		</td>
-	{% if hasTR %}
+		{% if hasTR %}
 	</tr>
 	{% endif %}
 	{% endmacro %}
 	{% macro render_field2(field, size) %}
 	<tr>
 		<td>{{ field.label }}：</td>
+		<td>{{ field(**kwargs)|safe }}</td>
+	</tr>
+	{% endmacro %}
+	{% macro render_field3(field, size) %}
+	<tr>
 		<td>{{ field(**kwargs)|safe }}</td>
 	</tr>
 	{% endmacro %}

@@ -71,11 +71,11 @@ class DtTable:
     def Load_csv(self, strPath, row_start = 1, col_start = 0, all_row = True, row_field = 0, strsplit = ',', isUtf = False):
         #打开文件 
         lstLines = myIO.getContents(strPath, True, isUtf)
-        if(len(lstLines) < 2): return False 
+        if(len(lstLines) < row_start): return False 
 
         #提取字段信息   
         if(True):
-            self.dataField  = lstLines[row_field].strip().split(strsplit) 
+            self.dataField = lstLines[row_field].strip().split(strsplit) 
 
         #提取内容
         self.dataMat = []

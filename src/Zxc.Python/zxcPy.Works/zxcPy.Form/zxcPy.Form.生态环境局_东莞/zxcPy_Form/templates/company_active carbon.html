@@ -54,80 +54,82 @@
         </div>
     </div>
 
-    <!--<div class="upload-content">
+    <div class="upload-content">
         <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件2 -- 废活性炭转移凭证</h1>
-        <div class="content-img" maxImg="1" fileSize="4">
+        <div class="content-img" maxImg="1" fileSize="4" img-list-ind="2">
             <ul class="content-img-list" id="img-list_2">
             </ul>
             <div class="file">
-                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_2" img-list-id="img-list_2" onchange="event_uploadImg(this)">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_2" onchange="event_uploadImg(this)">
             </div>
         </div>
         <div class="upload-tips">
             废活性炭转移凭证，上传1张图片，支持jpg/png，单张不超过4M。
         </div>
     </div>
-
     <div class="upload-content">
         <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件3 -- 含活性炭处理工艺的废气处理设施全貌图</h1>
-        <div class="content-img" maxImg="1" fileSize="4">
+        <div class="content-img" maxImg="1" fileSize="4"  img-list-ind="3">
             <ul class="content-img-list" id="img-list_3">
             </ul>
             <div class="file">
-                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_3" img-list-id="img-list_3" onchange="event_uploadImg(this)">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_3" onchange="event_uploadImg(this)">
             </div>
         </div>
         <div class="upload-tips">
             含活性炭处理工艺的废气处理设施全貌图，上传1张图片，支持jpg/png，单张不超过4M。
         </div>
     </div>
-
     <div class="upload-content">
         <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件4 -- 处理设施中用来填装活性炭的箱体图片</h1>
-        <div class="content-img" maxImg="1" fileSize="4">
+        <div class="content-img" maxImg="1" fileSize="4" img-list-ind="4">
             <ul class="content-img-list" id="img-list_4">
             </ul>
             <div class="file">
-                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_4" img-list-id="img-list_4" onchange="event_uploadImg(this)">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_4" onchange="event_uploadImg(this)">
             </div>
         </div>
         <div class="upload-tips">
             处理设施中用来填装活性炭的箱体图片，上传1张图片，支持jpg/png，单张不超过4M。
         </div>
     </div>
-
     <div class="upload-content">
         <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件5 -- 更换活性炭时现场施工图片</h1>
-        <div class="content-img" maxImg="1" fileSize="4">
+        <div class="content-img" maxImg="1" fileSize="4" img-list-ind="5">
             <ul class="content-img-list" id="img-list_5">
             </ul>
             <div class="file">
-                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_5" img-list-id="img-list_5" onchange="event_uploadImg(this)">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_5" onchange="event_uploadImg(this)">
             </div>
         </div>
         <div class="upload-tips">
             更换活性炭时现场施工图片，上传1张图片，支持jpg/png，单张不超过4M。
         </div>
     </div>
-
     <div class="upload-content">
         <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件6 -- 填装新活性炭后箱体内部图片</h1>
-        <div class="content-img" maxImg="1" fileSize="4">
+        <div class="content-img" maxImg="1" fileSize="4" img-list-ind="6">
             <ul class="content-img-list" id="img-list_6">
             </ul>
             <div class="file">
-                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_6" img-list-id="img-list_6" onchange="event_uploadImg(this)">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_6" onchange="event_uploadImg(this)">
             </div>
         </div>
         <div class="upload-tips">
             填装新活性炭后箱体内部图片（要求能看到新换上的活性炭），上传1张图片，支持jpg/png，单张不超过4M。
         </div>
-    </div>-->
-
+    </div>
 
     <div class="upload-submit">
         {{ form.save|safe }}
         {{ form.query|safe }}
+
+        {{ render_field3(form.imgName_1, size=20) }}
+        {{ render_field3(form.imgName_2, size=20) }}
+        {{ render_field3(form.imgName_3, size=20) }}
+        {{ render_field3(form.imgName_4, size=20) }}
+        {{ render_field3(form.imgName_5, size=20) }}
+        {{ render_field3(form.imgName_6, size=20) }}
     </div>
     <br />
 
@@ -139,38 +141,66 @@
         <option value="小型">
         <option value="微型">
     </datalist>
-
     <!--活性炭工艺列表-->
     <datalist id="lstCompanyHasProcess">
         <option value="是">
         <option value="否">
     </datalist>
+    <!--镇街、村社区列表-->
+    <datalist id="lstTown"></datalist>
+    <datalist id="lstVillage"></datalist>
 
 
     <link rel="stylesheet" type="text/css" href="/static/content/upload_img.css">
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/static/scripts/division_gds_dgs.js"></script>
     <script src="/static/scripts/upload_img.js"></script>
-    <script src="/static/scripts/tyshyxdm.js"></script>
     <script type="text/javascript">
         var jsonCompany = JSON.parse("{}", null);
         $(document).ready(function () {
+            //调整镇街对应村社区列表
+            initTownList('lstTown');        //初始镇街下来列表
+            $("#companyInStreet").on('input propertychange change', function () {
+                if (this.value.length < 2) return;
+                changeVillageList(this.value, 'lstVillage');
+            });  
+
             //控件调整，绑定下拉辅助输入列表
             $("#companyID").val('{{companyID}}');
             $("#companyScale").attr("list", 'lstCompanyScales');
             $("#companyHasProcess").attr("list", 'lstCompanyHasProcess');
-
+            $("#companyInStreet").attr("list", 'lstTown');
+            $("#companyInVillage").attr("list", 'lstVillage');
+            
             //更新成功提示
             if ('{{editSucess}}' == 'True') {
                 alert("信息更新成功！")
             }
-            
-            //公司信息动态查询与更新  
+            //公司信息动态查询与更新
             if ('{{needRefresh}}' == 'True') {
                 updatInfo($("#companyID").val(), $("#companyName").val());
-            }
+            };
         });
 
-
+        //初始镇街列表
+        function initTownList(tagList) {
+            $("#" + tagList).empty();
+            var objList = document.getElementById(tagList);
+            var dictTown = getDivison_town();
+            for (var key in dictTown) {
+                objList.appendChild(new Option(key, key));
+            }
+        };
+        //调整镇街对应村社区列表
+        function changeVillageList(nameTown, tagList_village) {
+            $("#" + tagList_village).empty();
+            var objList_v = document.getElementById(tagList_village);
+            var dictTown = getDivison_town();
+            var itemsTown = dictTown[nameTown];
+            for (var item in itemsTown) {
+                objList_v.appendChild(new Option(itemsTown[item], itemsTown[item]));
+            }
+        };
         //公司信息动态查询
         function iconSearch(event) {
             updatInfo($("#companyID").val(), $("#companyName").val());
@@ -204,19 +234,15 @@
                         $("#companyNoTransferredvolume").val(jsonCompany['companyNoTransferredvolume']);
 
                         //更新匹配公司图片信息
-                        $("#imgName_1").val(jsonCompany['imgName_1']);
-                        $("#imgName_2").val(jsonCompany['imgName_2']);
-                        $("#imgName_3").val(jsonCompany['imgName_3']);
-                        $("#imgName_4").val(jsonCompany['imgName_4']);
-                        $("#imgName_5").val(jsonCompany['imgName_5']);
-                        $("#imgName_6").val(jsonCompany['imgName_6']);
+                        initImgList("img-list_1", jsonCompany['imgName_1'], true);
+                        initImgList("img-list_2", jsonCompany['imgName_2'], true);
+                        initImgList("img-list_3", jsonCompany['imgName_3'], true);
+                        initImgList("img-list_4", jsonCompany['imgName_4'], true);
+                        initImgList("img-list_5", jsonCompany['imgName_5'], true);
+                        initImgList("img-list_6", jsonCompany['imgName_6'], true);
 
-                        //initImgList("img-list_1", jsonCompany['imgName_1'], true);
-                        //initImgList("img-list_2", jsonCompany['imgName_2'], true);
-                        //initImgList("img-list_3", jsonCompany['imgName_3'], true);
-                        //initImgList("img-list_4", jsonCompany['imgName_4'], true);
-                        //initImgList("img-list_5", jsonCompany['imgName_5'], true);
-                        //initImgList("img-list_6", jsonCompany['imgName_6'], true);
+                        //调整镇街对应村社区列表
+                        changeVillageList($("#companyInStreet").val(), 'lstVillage');
                     };
                 });
             };
