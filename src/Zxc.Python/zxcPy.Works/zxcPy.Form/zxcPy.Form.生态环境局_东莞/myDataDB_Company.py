@@ -12,7 +12,7 @@ from operator import itemgetter, attrgetter
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False) 
-import myData_DB, myDebug 
+import myData, myData_DB, myDebug 
 from myGlobal import gol 
 
 
@@ -43,25 +43,48 @@ class myDataDB_Company(myData_DB.myData_Table):
         return True
     
     # 提取设置集
-    def getCompanyIDs(self, setDB = None): 
+    def getCompanyIDs(self, dataDB = None): 
         # 查询数据
-        if(setDB == None):
-            setDB = gol._Get_Value('dbCompany')
-        dictSet = setDB.Query("isDel==False" , "", True)
+        if(dataDB == None):
+            dataDB = gol._Get_Value('dbCompany')
+        dictSet = dataDB.Query("isDel==False" , "", True)
         return dictSet
     # 提取设置，指定公司名、公司代码
-    def getCompany(self, idCompany, nameCompany, isDel = False, setDB = None): 
+    def getCompany(self, idCompany, nameCompany, isDel = False, dataDB = None): 
         # 组装查询条件
         strFilter = F"isDel=={str(isDel)} && companyID=={idCompany} && companyName=={nameCompany}" 
 
         # 查询数据
-        if(setDB == None):
-            setDB = gol._Get_Value('dbCompany')
-        dictSet = setDB.Query(strFilter, "", True)
+        if(dataDB == None):
+            dataDB = gol._Get_Value('dbCompany')
+        dictData = dataDB.Query(strFilter, "", True)
 
         # 提取及返回
-        lstSet = list(dictSet.values())
-        if(len(lstSet) == 1):
-            return lstSet[0]
+        lstData = list(dictData.values())
+        if(len(lstData) == 1):
+            return lstData[0]
         return None
+    # 提取符合筛选条件的公司信息
+    def getCompanys(self, param = "", isDel = False, page = 1, per_page = 10, dataDB = None): 
+        # 组装查询条件
+        strFilter = F"isDel=={str(isDel)}"
+        if(param != ""):
+            strFilter += F" && {param}" 
+        
+        # 查询数据
+        if(dataDB == None):
+            dataDB = gol._Get_Value('dbCompany')
+        dictData = dataDB.Query(strFilter, "", True)
+        lstData = list(dictData.values())
+
+        # 提取及返回
+        numData = len(lstData)
+        start = page * per_page - per_page;
+        end = page * per_page;
+        end = myData.iif(end < numData, end, numData)
+        values = []
+        if(numData > start):
+            for x in range(start, end):
+                values.append(lstData[x])
+        return len(lstData), values
 

@@ -29,11 +29,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="myData_DB.py" />
+    <Compile Include="myData_Json.py" />
     <Compile Include="runserver.py" />
     <Compile Include="myWeb.py" />
     <Compile Include="myIO_xlsx.py" />
-    <Compile Include="zxcPy_Form\infoCompany.py" />
     <Compile Include="myDataDB_Company.py" />
+    <Compile Include="zxcPy_Form\infoCompany.py" />
     <Compile Include="zxcPy_Form\__init__.py" />
     <Compile Include="zxcPy_Form\views.py" />
   </ItemGroup>
@@ -56,6 +57,7 @@
     <Content Include="zxcPy_Form\static\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="zxcPy_Form\static\scripts\bootstrap.js" />
     <Content Include="zxcPy_Form\static\scripts\bootstrap.min.js" />
+    <Content Include="zxcPy_Form\static\scripts\division.js" />
     <Content Include="zxcPy_Form\static\scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="zxcPy_Form\static\scripts\jquery-1.10.2.js" />
     <Content Include="zxcPy_Form\static\scripts\jquery-1.10.2.min.js" />
@@ -69,8 +71,12 @@
     <Content Include="zxcPy_Form\static\scripts\respond.js" />
     <Content Include="zxcPy_Form\static\scripts\respond.min.js" />
     <Content Include="zxcPy_Form\static\scripts\tyshyxdm.js" />
+    <Content Include="zxcPy_Form\static\scripts\division_gds_dgs.js" />
+    <Content Include="zxcPy_Form\static\scripts\paging.js" />
     <Content Include="zxcPy_Form\static\scripts\_references.js" />
     <Content Include="zxcPy_Form\templates\about.html" />
+    <Content Include="zxcPy_Form\templates\_macros.html" />
+    <Content Include="zxcPy_Form\templates\company_active carbon_list.html" />
     <Content Include="zxcPy_Form\templates\company_base.html" />
     <Content Include="zxcPy_Form\templates\contact.html" />
     <Content Include="zxcPy_Form\templates\index.html" />

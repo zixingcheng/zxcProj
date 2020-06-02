@@ -8,8 +8,20 @@ Created on  张斌 2017-10-07 14:05:00
     
     Json操作，自定义Json对象，Json_Object 顺序输出，Json_Object2失败为乱序(暂留，但不使用便于知识积累)
 """ 
-import os, json
+import os, json, datetime
 from collections import OrderedDict
+
+import datetime
+import json
+ 
+
+#日期格式转换
+class DateEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj,datetime.datetime):
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            return json.JSONEncoder.default(self,obj)
 
 
 #自定义Json对象--无序失败(Dict无法实现无序)
@@ -21,7 +33,6 @@ class Json_Object2:
     def ToString(self):
         strJson = json.dumps(self, default = __serialize_instance__, indent = 4) 
         return strJson
-
 
 
 #自定义Json对象 
@@ -48,7 +59,10 @@ class Json_Object:
 
     #转换为字符串   
     def ToString(self, decode = 'unicode_escape', ispretty = True):
-        strJson = json.dumps(self._dict_, default = __serialize_instance__, indent = 4)
+        if(type(self._dict_) == list):
+            strJson = str(self._dict_)
+        else:
+            strJson = json.dumps(self._dict_, cls=DateEncoder, default = __serialize_instance__, indent = 4)
 
         #中文编码解码
         if(decode != ""):
@@ -161,8 +175,13 @@ def Trans_ToJson(objStr):
     #data = json.loads(objStr, object_hook = Json_Object2)
     data = json.loads(objStr, object_hook = OrderedDict)
     return data
+#字典转Json字符串
+def Trans_ToJson_str(dic, utf = True):
+    data = json.dumps(dic,cls=DateEncoder,ensure_ascii=(not utf))
+    return data
 
     
+
 #序列化对象实例，提供一个函数，它的输入是一个实例，返回一个可序列化的字典
 def __serialize_instance__(obj):
     #d = { '__classname__' : type(obj).__name__}
@@ -176,6 +195,8 @@ if __name__ == "__main__":
     #实例json对象
     s = '{"name":"Think","share":50, "price":12,"array" : [1,2,3,4], "array2" : [{"aa2":0},{"aa3":0}]}'
     ss = U'{"name":"Think","share":50, "price":12, "other":{"H":"a","GG":"aa","A":"aa"},"other2" : [{"aa2":0},{"aa3":0}]}'
+    dic={'name':'jack', 'create_time': datetime.datetime(2019, 3, 19, 10, 6, 6)}
+    print(json.dumps(dic,cls=DateEncoder))
 
     #无子节点顺序测试
     data = json.loads(s, object_pairs_hook = OrderedDict)

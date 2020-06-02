@@ -69,7 +69,7 @@
     </div>
     <div class="upload-content">
         <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件3 -- 含活性炭处理工艺的废气处理设施全貌图</h1>
-        <div class="content-img" maxImg="1" fileSize="4"  img-list-ind="3">
+        <div class="content-img" maxImg="1" fileSize="4" img-list-ind="3">
             <ul class="content-img-list" id="img-list_3">
             </ul>
             <div class="file">
@@ -153,6 +153,7 @@
 
     <link rel="stylesheet" type="text/css" href="/static/content/upload_img.css">
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/static/scripts/division.js"></script>
     <script src="/static/scripts/division_gds_dgs.js"></script>
     <script src="/static/scripts/upload_img.js"></script>
     <script type="text/javascript">
@@ -163,7 +164,7 @@
             $("#companyInStreet").on('input propertychange change', function () {
                 if (this.value.length < 2) return;
                 changeVillageList(this.value, 'lstVillage');
-            });  
+            });
 
             //控件调整，绑定下拉辅助输入列表
             $("#companyID").val('{{companyID}}');
@@ -171,7 +172,7 @@
             $("#companyHasProcess").attr("list", 'lstCompanyHasProcess');
             $("#companyInStreet").attr("list", 'lstTown');
             $("#companyInVillage").attr("list", 'lstVillage');
-            
+
             //更新成功提示
             if ('{{editSucess}}' == 'True') {
                 alert("信息更新成功！")
@@ -181,26 +182,7 @@
                 updatInfo($("#companyID").val(), $("#companyName").val());
             };
         });
-
-        //初始镇街列表
-        function initTownList(tagList) {
-            $("#" + tagList).empty();
-            var objList = document.getElementById(tagList);
-            var dictTown = getDivison_town();
-            for (var key in dictTown) {
-                objList.appendChild(new Option(key, key));
-            }
-        };
-        //调整镇街对应村社区列表
-        function changeVillageList(nameTown, tagList_village) {
-            $("#" + tagList_village).empty();
-            var objList_v = document.getElementById(tagList_village);
-            var dictTown = getDivison_town();
-            var itemsTown = dictTown[nameTown];
-            for (var item in itemsTown) {
-                objList_v.appendChild(new Option(itemsTown[item], itemsTown[item]));
-            }
-        };
+        
         //公司信息动态查询
         function iconSearch(event) {
             updatInfo($("#companyID").val(), $("#companyName").val());

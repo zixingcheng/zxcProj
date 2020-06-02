@@ -13,6 +13,7 @@ from datetime import timedelta
 from flask import jsonify, request, flash, render_template, redirect    #导入模块
 from flask_wtf import FlaskForm                                         #FlaskForm 为表单基类
 from flask_wtf.file import FileField, FileAllowed, FileRequired
+from flask_pagination import Pagination
 from wtforms import BooleanField,IntegerField,DecimalField,StringField,TextAreaField,PasswordField,SubmitField,RadioField,SelectField,SelectMultipleField       #导入字符串字段，密码字段，提交字段
 from wtforms.validators import InputRequired,DataRequired,ValidationError,Email,Regexp,EqualTo,Required,NumberRange,Length
 from werkzeug.utils import secure_filename
@@ -56,10 +57,11 @@ class myCompanyForm(FlaskForm):
     imgName_4 = StringField('图片_4', [], render_kw={"style": "display:none;"}) 
     imgName_5 = StringField('图片_5', [], render_kw={"style": "display:none;"}) 
     imgName_6 = StringField('图片_6', [], render_kw={"style": "display:none;"}) 
+    
 
 #集中添加所有Web
 def add_Webs(appWeb, dirBase):
-    #添加接口--查询
+    #添加接口--查询公司信息
     @appWeb.app.route('/zxcAPI/company/query')
     def companyQuery(): 
         #载入配置
@@ -85,11 +87,11 @@ def add_Webs(appWeb, dirBase):
     @appWeb.app.route('/zxcWebs/companyinfo', methods = ['GET', 'POST'])  
     @appWeb.app.route('/zxcWebs/companyinfo/<string:companyID>', methods = ['GET', 'POST'])    
     def upload_company(companyID = ""):
-        form = myCompanyForm()                      #生成form实例，给render_template渲染使用  
+        form = myCompanyForm()              #生成form实例，给render_template渲染使用  
         needRefresh = True
         editSucess = False
-        if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
-            if form.save.data:  # 保存按钮被单击 
+        if form.validate_on_submit():       #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
+            if form.save.data:              # 保存按钮被单击 
                 # 组装row信息
                 pValues = []
                 if(True):
@@ -132,10 +134,54 @@ def add_Webs(appWeb, dirBase):
                 needRefresh = False
         return render_template('company_active carbon.html', title = 'company upload', form = form, companyID = companyID, needRefresh = needRefresh, editSucess = editSucess)
 
+    
+    #添加接口--查询筛选公司列表
+    @appWeb.app.route('/zxcAPI/companys/query')
+    def companysQuery(): 
+        #载入配置
+        pageIndex = myData_Trans.To_Int(request.args.get('pageIndex', 1))
+        pageSize = myData_Trans.To_Int(request.args.get('pageSize', 15))
+
+        companyID = request.args.get('companyID', "")
+        companyName = request.args.get('companyName', "") 
+        companyInStreet = request.args.get('companyInStreet', "") 
+        companyInVillage = request.args.get('companyInVillage', "") 
+        companyScale = request.args.get('companyScale', "") 
+        companyHasProcess = request.args.get('companyHasProcess', "") 
+        
+        #组装筛选条件
+        fliter = ""
+        if(companyID != ""): fliter += " && companyID == " + companyID
+        if(companyName != ""): fliter += " && companyName == " + companyName
+        if(companyInStreet != ""): fliter += " && companyInStreet == " + companyInStreet
+        if(companyInVillage != ""): fliter += " && companyInVillage == " + companyInVillage
+        if(companyScale != ""): fliter += " && companyScale == " + companyScale
+        if(companyHasProcess != ""): 
+            fliter += " && companyHasProcess == " + str(myData.iif(companyHasProcess == "是", True, False))
+        if(fliter != ""): fliter = fliter[4:]
+        
+        #筛选
+        res = {"success": 1, "data": "", "msg": ""}
+        try:
+            dbCompany = gol._Get_Value('dbCompany')
+            totalCount, pCompanys = dbCompany.getCompanys(param = fliter, isDel = False, page = pageIndex, per_page = pageSize)
+            res['data'] = pCompanys
+            res['totalCount'] = totalCount
+        except Exception as err:
+            res['success'] = 0
+            res['msg'] = err
+        return myData_Json.Trans_ToJson_str(res)
+
+    # 添加页面--筛选公司列表页面
+    @appWeb.app.route("/zxcWebs/companyinfos/<int:page>",methods=['GET','POST'])
+    def query_companys(page=1):
+        return render_template('company_active carbon_list.html')
+
+
 
 
     @appWeb.app.route('/zxcWebs/stock/myTest', methods=['POST', 'GET'])  # 添加路由
-    def upload():
+    def upload_test2():
         if request.method == 'POST':
             f = request.files['file']
  

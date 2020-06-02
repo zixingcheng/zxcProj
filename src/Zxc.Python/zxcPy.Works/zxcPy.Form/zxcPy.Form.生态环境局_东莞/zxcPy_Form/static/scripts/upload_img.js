@@ -139,7 +139,7 @@ function refreshImgTxt(imgTag) {
 	var imgSrc = dicImg[imgTag];
 	var imgUrls = ''
 	for (var i = 0; i < imgSrc.length; i++) {
-		imgUrls = imgUrls + "," + imgSrc[i];
+		imgUrls = imgUrls + ";" + imgSrc[i];
 	}
 	if (imgUrls.length > 0) {
 		imgUrls = imgUrls.substring(1);
@@ -162,7 +162,7 @@ function initImgList(imgTag, imgUrl, resetImgs = true) {
 
 	//多图片信息兼容拆分
 	if (imgUrl.length > 0) {
-		imgUrls = imgUrl.split(',')
+		imgUrls = imgUrl.split(';')
 		for (var item in imgUrls) {
 			if (imgUrls[item].length > 0)
 				dicImg[imgTag].push(imgUrls[item]);
