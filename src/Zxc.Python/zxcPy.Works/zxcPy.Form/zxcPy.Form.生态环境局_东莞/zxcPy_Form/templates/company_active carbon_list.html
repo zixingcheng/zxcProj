@@ -80,11 +80,11 @@
             <thead>
                 <tr>
                     <th>序号</th>
-                    <th>企业全称</th>
                     <th>统一社会信用代码</th>
+                    <th>企业全称</th>
+                    <th>企业规模</th>
                     <th>所在镇街</th>
                     <th>所属村（社区）</th>
-                    <th>企业规模</th>
                     <th>活性炭吸附工艺</th>
                 </tr>
             </thead>
@@ -115,8 +115,7 @@
     <div class="data">
         <div class="params">
             <input type="button" value="导出当前页数据" class="search-btn" id="export_btn" onclick='exportData()'>
-            <label style='padding-left: 35px;' for="course_id">统一社会信用代码：</label>
-            <input type="button" value="导出全部数据" class="search-btn" id="export_btn" onclick='exportData_all()'>
+            <input type="button" value="导出全部数据" class="search-btn" id="export_all_btn" onclick='exportData_all()'>
         </div>
     </div>
 
@@ -205,11 +204,11 @@
                                         if (item['companyHasProcess']) hasProcess = "是";
                                         html += '<tr>' +
                                             '<td style="width: 5%;">' + ((pageIndex - 1) * pageSize + i + 1) + '</td>' +
+                                            '<td style="width: 10%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyID'] + '</a></td>' +
                                             '<td style="width: 15%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyName'] + '</a></td>' +
-                                            '<td style="width: 15%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyID'] + '</a></td>' +
+                                            '<td style="width: 6%;">' + item['companyScale'] + '</td>' +
                                             '<td style="width: 8%;">' + item['companyInStreet'] + '</td>' +
                                             '<td style="width: 8%;">' + item['companyInVillage'] + '</td>' +
-                                            '<td style="width: 6%;">' + item['companyScale'] + '</td>' +
                                             '<td style="width: 8%;">' + hasProcess + '</td>' +
                                             '</tr>';
                                     });
@@ -220,15 +219,21 @@
                                     pageIng.initPage(totalCount, totalPage, pageIndex); // 调用Paging实例的 initPage()方法生成分页DOM结构
                                     $('.page').show();
                                     $('.no-data').hide();
+                                    $('#export_btn').show();
+                                    $('#export_all_btn').show();
                                 } else {  //如果未查询到数据
                                     $('#data_list').html('');
                                     $('.page').hide();
                                     $('.no-data').show();
+                                    $('#export_btn').hide();
+                                    $('#export_all_btn').hide();
                                 }
                             } else {
                                 $('#data_list').html('');
                                 $('.page').hide();
                                 $('.no-data').show();
+                                $('#export_btn').hide();
+                                $('#export_all_btn').hide();
                             }
                         }
                     })

@@ -1,5 +1,5 @@
 var tableStyle =
-    ".page {font-size: 14px;background-color: transparent;width: 100%;height: 50px;line-height: 50px;display: none;}" +
+    ".page {font-size: 10px;background-color: transparent;width: 100%;height: 50px;line-height: 50px;display: none;}" +
     ".page .page-l select {width: 60px;height: 30px;}" +
     ".page .page-l .page-size-box {display: inline-block;margin-left: 20px;}" +
     ".page .page-r {float: right;padding-top: 10px;}" +
