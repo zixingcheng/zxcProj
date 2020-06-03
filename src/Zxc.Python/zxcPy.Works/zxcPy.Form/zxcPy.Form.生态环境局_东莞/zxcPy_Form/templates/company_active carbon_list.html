@@ -13,35 +13,45 @@
         }
 
         .params {
-            margin: 15px 0;
+            margin: 10px 0;
+            font-size: 13px;
         }
 
             .params input {
                 width: 150px;
-                height: 30px;
+                height: 26px;
                 box-sizing: border-box;
             }
 
             .params .search-btn {
                 float: right;
-                width: 80px;
+                width: 100px;
+                height: 30px;
                 border: 0 none;
                 background-color: #666;
                 color: #fff;
-                font-size: 14px;
+                font-size: 12px;
+                margin-left: 12px;
             }
 
         table {
-            padding-top: 50px;
             width: 100%;
             border-collapse: collapse;
             text-align: center;
         }
 
-        th, td {
+        th {
+            border: 1px solid #999;
+            height: 30px;
+            line-height: 30px;
+            font-size: 14px;
+        }
+
+        td {
             border: 1px solid #999;
             height: 26px;
             line-height: 26px;
+            font-size: 13px;
         }
 
         .no-data {
@@ -56,20 +66,21 @@
     <div class="data">
         <div class="params">
             <label left="100px" for="course_id">企业全称：</label><input type="text" id="companyName">
-            <label style='padding-left: 50px;' for="course_id">统一社会信用代码：</label><input type="text" id="companyID">
-            <label style='padding-left: 50px;' for="course_id">所在镇街：&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companyInStreet">
+            <label style='padding-left: 35px;' for="course_id">统一社会信用代码：</label><input type="text" id="companyID">
+            <label style='padding-left: 35px;' for="course_id">所在镇街：&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companyInStreet">
         </div>
         <div class="params">
             <label left="100px" for="course_id">企业规模：</label><input type="text" id="companyScale">
-            <label style='padding-left: 50px;' for="course_id">活性炭吸附工艺：&nbsp&nbsp&nbsp</label><input type="text" id="companyHasProcess">
-            <label style='padding-left: 50px;' for="course_id">所属村/社区：</label><input type="text" id="companyInVillage">
+            <label style='padding-left: 35px;' for="course_id">活性炭吸附工艺：&nbsp&nbsp&nbsp</label><input type="text" id="companyHasProcess">
+            <label style='padding-left: 35px;' for="course_id">所属村/社区：</label><input type="text" id="companyInVillage">
             <input type="button" value="查询" class="search-btn" id="search_btn">
+            <p style='height: 0px; font-size: 8px'>&nbsp</p>
         </div>
         <table>
             <thead>
                 <tr>
                     <th>序号</th>
-                    <th>企业全称</thwidth:>
+                    <th>企业全称</th>
                     <th>统一社会信用代码</th>
                     <th>所在镇街</th>
                     <th>所属村（社区）</th>
@@ -92,7 +103,7 @@
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
-                    </select>条
+                    </select> 条
                 </div>
             </div>
             <div class="page-r">
@@ -100,6 +111,15 @@
             </div>
         </div>
     </div>
+
+    <div class="data">
+        <div class="params">
+            <input type="button" value="导出当前页数据" class="search-btn" id="export_btn" onclick='exportData()'>
+            <label style='padding-left: 35px;' for="course_id">统一社会信用代码：</label>
+            <input type="button" value="导出全部数据" class="search-btn" id="export_btn" onclick='exportData_all()'>
+        </div>
+    </div>
+
 
     <!--企业规模列表-->
     <datalist id="lstCompanyScales">
@@ -123,6 +143,7 @@
     <script src="/static/scripts/division.js"></script>
     <script src="/static/scripts/division_gds_dgs.js"></script>
     <script>
+        var jsonCompanys = JSON.parse("{}", null);
         $(document).ready(function () {
             //调整镇街对应村社区列表
             initTownList('lstTown');        //初始镇街下来列表
@@ -138,6 +159,7 @@
             $("#companyInVillage").attr("list", 'lstVillage');
         });
 
+        //公司信息筛选与列表更新
         $(function () {
             var pageConfig = {            //分页参数（参数名固定不可变）
                 pageSize: 10,             //每页条数（不设置时，默认为10）
@@ -176,15 +198,15 @@
                             jsonCompanys = JSON.parse(res, null);
                             if (jsonCompanys['success'] == 1) {
                                 if (jsonCompanys['data'].length > 0) {  //如果查询到了数据
-                                    var dataList = jsonCompanys['data'];
+                                    var dataCompans = jsonCompanys['data'];
                                     var html = '';
-                                    dataList.forEach(function (item, i) {
+                                    dataCompans.forEach(function (item, i) {
                                         hasProcess = "否";
                                         if (item['companyHasProcess']) hasProcess = "是";
                                         html += '<tr>' +
                                             '<td style="width: 5%;">' + ((pageIndex - 1) * pageSize + i + 1) + '</td>' +
-                                            '<td style="width: 15%;">' + item['companyName'] + '</td>' +
-                                            '<td style="width: 8%;">' + item['companyID'] + '</td>' +
+                                            '<td style="width: 15%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyName'] + '</a></td>' +
+                                            '<td style="width: 15%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyID'] + '</a></td>' +
                                             '<td style="width: 8%;">' + item['companyInStreet'] + '</td>' +
                                             '<td style="width: 8%;">' + item['companyInVillage'] + '</td>' +
                                             '<td style="width: 6%;">' + item['companyScale'] + '</td>' +
@@ -213,6 +235,72 @@
                 });
             }
         })
+
+        //导出数据
+        function exportData() {
+            //列标题，逗号隔开，每一个逗号就是隔开一个单元格
+            let str = `统一社会信用代码,企业全称,企业规模,企业联系人,电话号码,所在镇街,所属村（社区）,详细地址,是否采用活性炭吸附工艺,采用活性炭吸附工艺设施套数,正常更换周期（日 / 次）,设计总填装量（千克）,新活性炭更换日期,新活性炭更换量（千克）,已转移废活性炭量（千克）,暂未转移废活性炭量（千克）\n`;
+
+            //增加\t为了不让表格显示科学计数法或者其他格式
+            var dataCompans = jsonCompanys['data'];
+            for (let i = 0; i < dataCompans.length; i++) {
+                str += `${dataCompans[i]["companyID"] + '\t'},`;
+                str += `${dataCompans[i]["companyName"] + '\t'},`;
+                str += `${dataCompans[i]["companyScale"] + '\t'},`;
+                str += `${dataCompans[i]["companyContacts"] + '\t'},`;
+                str += `${dataCompans[i]["companyPhone"] + '\t'},`;
+                str += `${dataCompans[i]["companyInStreet"] + '\t'},`;
+                str += `${dataCompans[i]["companyInVillage"] + '\t'},`;
+                str += `${dataCompans[i]["companyAdrr"] + '\t'},`;
+                
+                str += `${dataCompans[i]["companyHasProcess"] + '\t'},`;
+                str += `${dataCompans[i]["companyNumProcess"] + '\t'},`;
+                str += `${dataCompans[i]["companyRecycle"] + '\t'},`;
+                str += `${dataCompans[i]["companyVolumeTotal"] + '\t'},`;
+                str += `${dataCompans[i]["companyRedate"] + '\t'},`;
+                str += `${dataCompans[i]["companyRevolume"] + '\t'},`;
+                str += `${dataCompans[i]["companyTransferredvolume"] + '\t'},`;
+                str += `${dataCompans[i]["companyNoTransferredvolume"] + '\t'},`;
+                str += '\n';
+            }
+            
+            let uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(str);   //encodeURIComponent解决中文乱码
+            var link = document.createElement("a");                                     //通过创建a标签实现
+            link.href = uri;
+            link.download = "企业信息数据表.csv";                                       //对下载的文件命名
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        //导出全部数据
+        function exportData_all() {
+            $.ajax({
+                url: '/zxcAPI/companys/query/save',                         //这里就不显示接口地址
+                type: 'get',
+                data: {
+                    companyID: $('#companyID').val(),
+                    companyName: $('#companyName').val(),
+                    companyInStreet: $('#companyInStreet').val(),
+                    companyInVillage: $('#companyInVillage').val(),
+                    companyScale: $('#companyScale').val(),
+                    companyHasProcess: $('#companyHasProcess').val()
+                },
+                success: function (res) {
+                    jsonCompanys = JSON.parse(res, null);
+                    if (jsonCompanys['success'] == 1) {
+                        var link = document.createElement("a");             //通过创建a标签实现
+                        link.href = "/download/" + jsonCompanys['filefloder'] + "/" + jsonCompanys['filename']; 
+
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        alert("导出文件生成失败！");
+                    }
+                }
+            })
+        };
     </script>
 </form>
 {% endblock %}

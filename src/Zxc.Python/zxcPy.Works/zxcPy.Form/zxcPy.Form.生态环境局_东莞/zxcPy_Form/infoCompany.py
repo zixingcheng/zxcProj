@@ -48,7 +48,6 @@ class myCompanyForm(FlaskForm):
     companyNoTransferredvolume = DecimalField('暂未转移废活性炭量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入暂未转移废活性炭量（千克）", "style": txtStyle})
     
     save = SubmitField('保存信息', render_kw={"class": "btn-submit-upload","style": "margin-left:10px"})                    # 保存按钮
-    query = SubmitField('查询信息', render_kw={"class": "btn-submit-upload","style": "margin-left:10px display:block;"})    # 查询按钮--隐藏
     
     # 图片信息 
     imgName_1 = StringField('图片_1', [], render_kw={"style": "display:none;"}) 
@@ -176,6 +175,46 @@ def add_Webs(appWeb, dirBase):
     @appWeb.app.route("/zxcWebs/companyinfos/<int:page>",methods=['GET','POST'])
     def query_companys(page=1):
         return render_template('company_active carbon_list.html')
+    
+    #添加接口--保存筛选公司列表
+    @appWeb.app.route('/zxcAPI/companys/query/save')
+    def companysQuery_save(): 
+        #载入配置
+        companyID = request.args.get('companyID', "")
+        companyName = request.args.get('companyName', "") 
+        companyInStreet = request.args.get('companyInStreet', "") 
+        companyInVillage = request.args.get('companyInVillage', "") 
+        companyScale = request.args.get('companyScale', "") 
+        companyHasProcess = request.args.get('companyHasProcess', "") 
+        
+        #组装筛选条件
+        fliter = ""
+        if(companyID != ""): fliter += " && companyID == " + companyID
+        if(companyName != ""): fliter += " && companyName == " + companyName
+        if(companyInStreet != ""): fliter += " && companyInStreet == " + companyInStreet
+        if(companyInVillage != ""): fliter += " && companyInVillage == " + companyInVillage
+        if(companyScale != ""): fliter += " && companyScale == " + companyScale
+        if(companyHasProcess != ""): 
+            fliter += " && companyHasProcess == " + str(myData.iif(companyHasProcess == "是", True, False))
+        if(fliter != ""): fliter = fliter[4:]
+        
+        #筛选
+        res = {"success": 1, "data": "", "msg": ""}
+        try:
+            dbCompany = gol._Get_Value('dbCompany')
+            totalCount, pCompanys = dbCompany.getCompanys(param = fliter, isDel = False, page = 1, per_page = 99999999)
+
+            #保存
+            path = appWeb.baseDir + "/static/data/Companys/企业信息数据表.csv"
+            dbCompany.Save_as_csv(path, pCompanys, True)
+
+            res['filename'] = "企业信息数据表.csv"
+            res['filefloder'] = "Companys"
+            res['totalCount'] = totalCount
+        except Exception as err:
+            res['success'] = 0
+            res['msg'] = err
+        return myData_Json.Trans_ToJson_str(res)
 
 
 

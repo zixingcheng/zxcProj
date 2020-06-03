@@ -8,7 +8,7 @@ Created on  张斌 2018-04-04 11:00:00
     @依赖库： flask
 """
 import sys, os, string, mySystem
-from flask import Flask, Response, make_response
+from flask import Flask, Response, make_response, send_from_directory
 from flask import jsonify, request, render_template, redirect   #导入模块
 from flask_restful import reqparse, Api, Resource
 from flask_wtf import FlaskForm                                 #FlaskForm 为表单基类 
@@ -19,7 +19,7 @@ log = logging.getLogger('zxc')
 log.setLevel(logging.ERROR) 
 
 mySystem.Append_Us("", False)  
-import myIO, myThread 
+import myIO, myData_Json, myThread 
 
 
 
@@ -148,6 +148,17 @@ class myWeb(myThread.myThread):
                     path = self.imgDir
                 else:
                     path = self.imgDir + typename + "/"
+                return send_from_directory(path, filename, as_attachment=True)
+
+        # API-下载文件
+        @self.app.route('/download/<string:filename>', methods=['GET'])
+        @self.app.route('/download/<string:typename>/<string:filename>', methods=['GET'])
+        def api_download(filename, typename = 'base'):
+            if request.method == "GET":
+                if(typename == "base"): 
+                    path = self.baseDir + "/static/data/"
+                else:
+                    path = self.baseDir + "/static/data/" + typename + "/"
                 return send_from_directory(path, filename, as_attachment=True)
             
         ''' 静态文件访问的路由规则-自实现--已取消

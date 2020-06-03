@@ -122,7 +122,10 @@
 
     <div class="upload-submit">
         {{ form.save|safe }}
-        {{ form.query|safe }}
+
+        <div style="padding-top: 10px; font-size:12px;">
+            <b>注：</b>附件图片信息，可以多次传入，新活性炭更换日期没有时，选择当前日期即可。
+        </div>
 
         {{ render_field3(form.imgName_1, size=20) }}
         {{ render_field3(form.imgName_2, size=20) }}

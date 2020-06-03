@@ -488,6 +488,30 @@ class myData_Table():
                 with open(strPath, 'a+') as f:
                     f.write("\n" + strLine)    
         return True     #保存数据 
+    
+    #当前数据进行另存为csv文件   
+    def Save_as_csv(self, path, rows, isUtf = True):   
+        #保存该csv文件,有同名文件时直接覆盖
+        strEnt = myData.iif(isUtf, "\r\n", "\n")
+
+        # 写入字段
+        strLines = "ID(int)" 
+        for x in self.fields:
+            strLines += "," + myData.iif(x in self.fields_index, "**", "") + x + "(" + self.fields[x]['type'] + ")"
+        strLines += ",isDel(bool)" 
+
+        # 写入字段别名
+        if(self.params.get("hasAliaName", False)):
+            strLines += strEnt + "ID" 
+            for x in self.fields:
+                strLines += "," + self.fields[x]['nameAlias']
+            strLines += ",isDel(bool)" 
+
+        #循环所有格子组装数据 
+        for x in rows:
+            strLines += strEnt + self._Trans_ToStr(x)
+        myIO.Save_File(path, strLines, isUtf, False)
+        return True     #保存数据
 
 
 
