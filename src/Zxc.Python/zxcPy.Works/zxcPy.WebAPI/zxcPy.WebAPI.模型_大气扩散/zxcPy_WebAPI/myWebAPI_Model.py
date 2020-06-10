@@ -12,15 +12,26 @@ import sys, os, mySystem
 from flask import Flask, Response, jsonify, request                     #导入模块
 from flask_restful import reqparse, Api, Resource
 
+mySystem.Append_Us("../zxcPy_WebAPI", False, __file__)
 mySystem.Append_Us("", False)  
 import myIO, myData, myData_Json, myData_Trans, myWeb
-from zxcPy_WebAPI import * 
+from zxcPy_WebAPI import *
+import zxcPy_WebAPI.myModel
 
  
 #模型-大气扩散WebAPI
 class myAPI_Model_Atmospheric_Diffusion(myWeb.myAPI):
     def get(self, param):
-        strReturn = "参数：" + param
-        print(strReturn)
+        # 模型调用
+        pModel = zxcPy_WebAPI.myModel.myModel_Atmospheric_Diffusion()
+
+        # 模型参数初始 
+        pModel.initParam_str(param)
+        
+        # 模型运行 
+        pModel.runModel()
+        
+        # 模型结果返回 
+        strReturn = pModel.getResult()
         return strReturn
 

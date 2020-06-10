@@ -37,10 +37,12 @@
   <ItemGroup>
     <Folder Include="zxcPy_WebAPI\" />
     <Folder Include="zxcPy_WebAPI\static\" />
+    <Folder Include="zxcPy_WebAPI\static\Help\" />
     <Folder Include="zxcPy_WebAPI\templates\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+    <Content Include="zxcPy_WebAPI\static\Help\README.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

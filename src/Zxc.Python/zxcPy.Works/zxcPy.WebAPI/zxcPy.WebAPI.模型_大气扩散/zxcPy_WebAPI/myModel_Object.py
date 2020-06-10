@@ -77,12 +77,13 @@ class myObj_Wind():
 class myObj_Air():
     def __init__(self):
         self.air_Stability = ""
+        self.temperature = 23
         self.index = 0
         self.ratio_y_a = 0; self.ratio_y_r = 0
         self.ratio_z_a = 0; self.ratio_z_r = 0
 
     # 大气信息初始-稳定度
-    def initAir_Stability(self, stability, speed = 0, levelRadiation = 0):
+    def initAir_Stability(self, stability, speed = 0, levelRadiation = 0, temperature = 23):
         if(stability == "" and speed != 0):
             indSpeed = int(speed - 1.9)
             if(indSpeed < 0): indSpeed = 0
@@ -96,6 +97,7 @@ class myObj_Air():
                 self.air_Stability = airLst_Stability[self.index]
             except :
                 pass
+        self.temperature = temperature
         
     # 大气信息初始-稳定度
     def initAir_Ratio(self, distance):
@@ -171,3 +173,4 @@ if __name__ == '__main__':
     print(pWind.getWind_Speed(1, pAir))
     print(pWind.getWind_Speed(10, pAir))
     print(pWind.getWind_Speed(45, pAir))
+
