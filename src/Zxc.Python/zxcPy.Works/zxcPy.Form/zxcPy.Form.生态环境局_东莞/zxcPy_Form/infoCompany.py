@@ -13,11 +13,11 @@ from datetime import timedelta
 from flask import jsonify, request, flash, render_template, redirect    #导入模块
 from flask_wtf import FlaskForm                                         #FlaskForm 为表单基类
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from flask_pagination import Pagination
 from wtforms import BooleanField,IntegerField,DecimalField,StringField,TextAreaField,PasswordField,SubmitField,RadioField,SelectField,SelectMultipleField       #导入字符串字段，密码字段，提交字段
 from wtforms.validators import InputRequired,DataRequired,ValidationError,Email,Regexp,EqualTo,Required,NumberRange,Length
 from werkzeug.utils import secure_filename
 from wtforms.fields.html5 import DateField
+#from flask_pagination import Pagination
 
 mySystem.Append_Us("", False)  
 import myIO, myData, myData_Json, myData_Trans
@@ -57,7 +57,6 @@ class myCompanyForm(FlaskForm):
     imgName_5 = StringField('图片_5', [], render_kw={"style": "display:none;"}) 
     imgName_6 = StringField('图片_6', [], render_kw={"style": "display:none;"}) 
     
-
 #集中添加所有Web
 def add_Webs(appWeb, dirBase):
     #添加接口--查询公司信息
@@ -69,11 +68,13 @@ def add_Webs(appWeb, dirBase):
         print(company_id,company_name)
 
         dbCompany = gol._Get_Value('dbCompany')
-        pCompany = dbCompany.getCompany(company_id, company_name).copy()
+        pCompany = dbCompany.getCompany(company_id, company_name)
         if(pCompany == None):
             pCompany = dbCompany.OnCreat_RowInfo();
             pCompany['companyID'] = company_id
             pCompany['companyName'] = company_name
+        else:
+            pCompany = pCompany.copy()
 
         #修正部分信息
         pCompany['companyHasProcess'] = myData.iif(pCompany['companyHasProcess'], "是", "否")
@@ -132,6 +133,30 @@ def add_Webs(appWeb, dirBase):
             if form.save.data:
                 needRefresh = False
         return render_template('company_active carbon.html', title = 'company upload', form = form, companyID = companyID, needRefresh = needRefresh, editSucess = editSucess)
+    
+    #添加接口--删除筛选公司
+    @appWeb.app.route('/zxcAPI/companys/query/del')
+    def companysQuery_del(): 
+        #载入配置
+        companyID = request.args.get('companyID', "")
+        companyName = request.args.get('companyName', "") 
+             
+        #删除
+        res = {"success": 1, "data": "", "msg": ""}
+        try:
+            dbCompany = gol._Get_Value('dbCompany')
+            pCompany = dbCompany.getCompany(companyID, companyName)
+            if(pCompany != None):
+                pCompany["isDel"] = True
+                dbCompany.Save_DB()
+                res['data'] = "删除成功。"
+            else:
+                res['data'] = "公司信息不存在。"
+        except Exception as err:
+            res['success'] = 0
+            res['data'] = "删除失败。"
+            res['msg'] = str(err)
+        return myData_Json.Trans_ToJson_str(res)
 
     
     #添加接口--查询筛选公司列表
@@ -168,10 +193,11 @@ def add_Webs(appWeb, dirBase):
             res['totalCount'] = totalCount
         except Exception as err:
             res['success'] = 0
-            res['msg'] = err
+            res['msg'] = str(err)
         return myData_Json.Trans_ToJson_str(res)
 
     # 添加页面--筛选公司列表页面
+    @appWeb.app.route("/zxcWebs/companyinfos",methods=['GET','POST'])
     @appWeb.app.route("/zxcWebs/companyinfos/<int:page>",methods=['GET','POST'])
     def query_companys(page=1):
         return render_template('company_active carbon_list.html')
@@ -213,9 +239,9 @@ def add_Webs(appWeb, dirBase):
             res['totalCount'] = totalCount
         except Exception as err:
             res['success'] = 0
-            res['msg'] = err
+            res['msg'] = str(err)
         return myData_Json.Trans_ToJson_str(res)
-
+    
 
 
 

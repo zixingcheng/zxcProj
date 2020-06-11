@@ -28,11 +28,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="myData_DB.py" />
-    <Compile Include="myData_Json.py" />
     <Compile Include="runserver.py" />
-    <Compile Include="myWeb.py" />
-    <Compile Include="myIO_xlsx.py" />
     <Compile Include="myDataDB_Company.py" />
     <Compile Include="zxcPy_Form\infoCompany.py" />
     <Compile Include="zxcPy_Form\__init__.py" />
@@ -43,6 +39,7 @@
     <Folder Include="zxcPy_Form\static\" />
     <Folder Include="zxcPy_Form\static\content\" />
     <Folder Include="zxcPy_Form\static\fonts\" />
+    <Folder Include="zxcPy_Form\static\Help\" />
     <Folder Include="zxcPy_Form\static\scripts\" />
     <Folder Include="zxcPy_Form\templates\" />
   </ItemGroup>
@@ -55,6 +52,7 @@
     <Content Include="zxcPy_Form\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="zxcPy_Form\static\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="zxcPy_Form\static\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="zxcPy_Form\static\Help\README.txt" />
     <Content Include="zxcPy_Form\static\scripts\bootstrap.js" />
     <Content Include="zxcPy_Form\static\scripts\bootstrap.min.js" />
     <Content Include="zxcPy_Form\static\scripts\division.js" />

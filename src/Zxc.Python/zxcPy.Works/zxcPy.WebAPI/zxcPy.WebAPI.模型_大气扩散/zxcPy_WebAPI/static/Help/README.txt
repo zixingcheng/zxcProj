@@ -3,6 +3,10 @@
     
     WebAPI路径：注意替换为实际的地址和端口，param为json格式参数，参看模型参数说明。
        http://127.0.0.1:8686/zxcAPI/Model/Leak/<param>
+       http://192.168.1.200:8686/static/Help/README.txt
+       http://120.197.152.99:18686/static/Help/README.txt
+       http://120.197.152.99:18686/zxcAPI/Model/Leak/{"tag": "ADDFSDGDG", "infoLeak": {"longitude": 113.8, "latitude": 22.8, "height_leak": 45, "massrate_leak": 720, "timestart_leak": "2020-06-09 12:00:00", "chimney": {"diameter": 1, "temperature_outlet": 100, "smoke_speed_outlet": 5, "wind_speed_outlet": ""}}, "infoTarget": [{"id": "1", "longitude": 113.83, "latitude": 22.83, "height": 0}, {"id": "2", "longitude": 113.835, "latitude": 22.835, "height": 0}], "infoEnvironment": {"wind_speed": 2, "wind_direction": "SW", "wind_height": 10, "air_stability": "C", "temperature": 26, "cloudy_is": true}}
+       
 
 ## 模型参数
     

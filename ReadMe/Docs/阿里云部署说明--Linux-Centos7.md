@@ -675,18 +675,18 @@ crontabs软件包是用来安装、卸装、或列举用来驱动 cron 守护进
 ### 自写定时任务 
 
 	每周一，周四 00点 时执行命令（重启动）。
-	00 0 * * 1,3,5 sudo reboot 
+	00 0 * * 1,3,5 root sudo reboot 
 	
 	
 	每周一到周五 的9-15点 的每5分钟 时执行命令（启动脚本-行情监测）。
-	25-59/2 9-15 * * 1-5 sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
-	*/3 10-15 * * 1-5 sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
+	25-59/2 9-15 * * 1-5 root sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
+	*/3 10-15 * * 1-5 root sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
 
 	每天 的8-23点 的每2分钟 时执行命令（启动脚本-机器人、微信）。
-	*/5 8-23 * * * sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh 
+	*/5 8-23 * * * root sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh 
 	
 	每天 的0点 0分钟 每八个时执行命令（脚本自动更新）。
-	00 8,16,21 * * * sh /root/Public/myPrjs/zxcProj/ReadMe/git_zxcPy.sh
+	00 8,16,21 * * * root sh /root/Public/myPrjs/zxcProj/ReadMe/git_zxcPy.sh
 	
 	命令： crontab -e
 	*/1 8-23 * * * python /root/Public/UpLoad/Temp/hello.py

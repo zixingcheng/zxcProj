@@ -61,6 +61,15 @@
             text-align: center;
             color: #aaa;
         }
+        .typecut {
+            float: right;
+            width: 100%;
+        }
+        .typecut:hover
+        {
+            background-color:#ccc;
+            cursor:pointer;
+        }
     </style>
 
     <div class="data">
@@ -114,8 +123,8 @@
 
     <div class="data">
         <div class="params">
-            <input type="button" value="导出当前页数据" class="search-btn" id="export_btn" onclick='exportData()'>
             <input type="button" value="导出全部数据" class="search-btn" id="export_all_btn" onclick='exportData_all()'>
+            <input type="button" value="导出当前页数据" class="search-btn" id="export_btn" onclick='exportData()'>
         </div>
     </div>
 
@@ -202,8 +211,10 @@
                                     dataCompans.forEach(function (item, i) {
                                         hasProcess = "否";
                                         if (item['companyHasProcess']) hasProcess = "是";
-                                        html += '<tr>' +
-                                            '<td style="width: 5%;">' + ((pageIndex - 1) * pageSize + i + 1) + '</td>' +
+                                        html += '<tr>' +                                            
+                                            '<td style="width: 5%;">'
+                                            + '<div class="typecut"  onmouseover = "cutover(this)" onclick = "doCut(this)" onmouseout = "cutout(this)" >'+ ((pageIndex - 1) * pageSize + i + 1) +'</div >'
+                                            + '</td>' +
                                             '<td style="width: 10%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyID'] + '</a></td>' +
                                             '<td style="width: 15%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyName'] + '</a></td>' +
                                             '<td style="width: 6%;">' + item['companyScale'] + '</td>' +
@@ -240,6 +251,42 @@
                 });
             }
         })
+
+        //数据信息移除
+        function cutover(div) {
+            $(div).html("删除 " + $(div).html());
+        };
+        function cutout(div) {
+            $(div).html($(div).html().replace("删除 ",''));
+        };
+        function doCut(div) {
+            var tr = $(div).parents("tr");                                 //获取当前行的Tr
+            var ind = $(div).html().replace("删除 ", '');
+            var company_id = tr.find("td").eq(1).children("a").html();
+            var compan_name = tr.find("td").eq(2).children("a").html();
+            if (!confirm("是否删除序号(" + ind +")数据？企业信息如下：\r\n\r\n企业全称：" + compan_name + "\r\n统一社会信用代码：" + company_id)) {
+                return false;
+            }
+
+            //删除数据
+            $.ajax({
+                url: '/zxcAPI/companys/query/del',                         //这里就不显示接口地址
+                type: 'get',
+                data: {
+                    companyID: company_id,
+                    companyName: compan_name
+                },
+                success: function (res) {
+                    jsonCompanys = JSON.parse(res, null);
+                    if (jsonCompanys['success'] == 1) {
+                        alert(jsonCompanys['data']);
+                        window.location.reload();
+                    } else {
+                        alert(jsonCompanys['data']);
+                    }
+                }
+            })
+        };
 
         //导出数据
         function exportData() {

@@ -185,7 +185,7 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
             self.modeState = 2
         except Exception as err:
             self.modeState = -2
-            self.modelResult['err'] = err
+            self.modelResult['err'] = str(err)
         finally:
             self.modeRunning = False
             self.modelResult['success'] = myData.iif(self.modeState == 2, 1, 0)
@@ -231,7 +231,7 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
             print(self.modeState, str(Cxyz))
         except Exception as err:
             self.modeState = -2
-            self.modelResult['err'] = err
+            self.modelResult['err'] = str(err)
         finally:
             self.modeRunning = False
             self.modelResult['success'] = myData.iif(self.modeState == 2, 1, 0)
