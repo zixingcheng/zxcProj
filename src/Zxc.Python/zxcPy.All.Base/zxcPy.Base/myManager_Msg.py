@@ -12,7 +12,7 @@ import myEnum, myData, myData_Trans, myDebug, myIO, myWeb_urlLib, myMQ_Rabbit #,
 
 #定义消息类型枚举
 myMsgType = myEnum.enum('TEXT', 'PICTURE', 'VOICE', 'VIDEO', 'NOTE')
-myMsgPlat = myEnum.enum('robot', 'wx')
+myMsgPlat = myEnum.enum('robot', 'wx', 'usrWin')
 
 #自定义消息对象
 class myMsg():
@@ -292,6 +292,7 @@ gol._Set_Setting('bufferMsgs', myMsgs("zxc", "zxc", "", ""))    #实例 消息�
 gol._Set_Setting('manageMsgs', myManager_Msg())                 #实例 消息管理器并初始消息api及消息队列 
 gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "")    #不使用api回调
 gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "", usrHelper = 'filehelper')    #不使用api回调
+gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.usrWin, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_usrWin'), msgUrl_API = "")          #不使用api回调
 
 
 if __name__ == '__main__':

@@ -134,6 +134,10 @@ if __name__ == '__main__':
     # strText = Speech_Recognition(dir + "Voices/audio.wav", out_debug=True)
     # print("you said: " + strText)
 
+    
+    # strText = ORC(dir + "Images/Task_2.jpg", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
+    # print(strText['wordText'].replace("\n", "\r\n"))
+
     # ORC识别-自定义模板
     strText = ORC(dir + "Images/Test5.jpg", "49a1e68d3cd776bec750b8718a479bfa", out_debug=True)
     print("you image: \n" + str(strText))

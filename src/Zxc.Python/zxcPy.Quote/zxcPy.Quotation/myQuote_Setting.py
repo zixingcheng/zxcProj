@@ -23,7 +23,7 @@ class myQuote_Setting():
         self.isValid = False            #设置是否生效
         self.setStr = ''                #完整设置
         self.mark = ''                  #备注说明
-        self.msgUsers = {}              #消息发送用户字典(用户名：平台)  
+        self.msgUsers = {}              #消息发送用户字典(用户名：平台)
     #是否为空
     def IsNull(self): 
         return len(self.msgUsers) == 0

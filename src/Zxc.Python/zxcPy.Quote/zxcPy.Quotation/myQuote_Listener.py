@@ -11,7 +11,7 @@ import sys, os, mySystem
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/Quote_Listener')
 mySystem.Append_Us("", False) 
-import myQuote_Data, myManager_Msg
+import myData, myQuote_Data, myManager_Msg
 
 #初始全局消息管理器
 from myGlobal import gol 
@@ -42,7 +42,29 @@ class Quote_Listener:
             msg = self.OnCreatMsgInfo(x, strMsg, quoteDatas.data.time, plat=usrPlat)
             if(self.pMMsg != None):
                 self.pMMsg.OnHandleMsg(msg, usrPlat, True, nSleep)   #推送至消息处理器处理(使用消息校正)
+        self.OnHandleMsg_desk(quoteDatas)                            #消息处理-桌面
         return True
+    #消息处理-桌面
+    def OnHandleMsg_desk(self, quoteDatas):
+        #涨跌标识    
+        tag = quoteDatas.data.name
+        dValue_N = quoteDatas.data.priceRiseFall * 100
+        strTag0 = myData.iif(dValue_N >=0, "涨", "跌")
+        strTag0 = myData.iif(dValue_N ==0, "平", strTag0) 
+        strMsg = strTag0 + str(round(dValue_N,2)) + "%" 
+        for x in self.pSet.msgUsers:
+            #生成用户消息
+            if(x != "@*股票监测--大盘行情" and x != "@*股票监测--自选行情" and x != "@*测试群"):
+                continue
+            usrPlat = self.pSet.msgUsers[x]
+            if(usrPlat != "wx"): continue
+
+            msg = self.OnCreatMsgInfo(x, strMsg, quoteDatas.data.time, plat='wx')            
+            msg['typeCmd'] = 'quote'
+            msg['infCmd'] = {"tag": tag, "value": dValue_N, "msg": strMsg}            
+            if(self.pMMsg != None):
+                self.pMMsg.usePrint = True
+                self.pMMsg.OnHandleMsg(msg, "usrWin", True)       #推送消息(桌面)
     #创建新消息
     def OnCreatMsgInfo(self, to_user, text, time = '', type = "TEXT", plat = 'wx'):
         if(self.pMMsg != None):
