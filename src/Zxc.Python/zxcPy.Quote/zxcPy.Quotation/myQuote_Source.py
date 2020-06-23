@@ -17,11 +17,15 @@ mySystem.Append_Us("", False)
 import myData_Trans, myDebug, myIO
 import myQuote_Data, myManager_Bill
 from myGlobal import gol 
+gol._Init()                         #先必须在主模块初始化（只在Main模块需要一次即可）
+
 
 #行情来源
 class Quote_Source:
     def __init__(self, params = "", type = ''):
         self.type = type
+        self.paramsDict = {}
+        self.paramsList = []
         if(params == ""): params = self._getDefault_Param()
         self.params = params
         self.datas = {}
@@ -46,7 +50,16 @@ class Quote_Source:
             for x in keys:
                 pSet = pSets._Find(x) 
                 if(pSet != None and pSet.IsEnable()):
-                    lstParam.append(pSet.setTag)
+                    if(pSet.stockInfo.source_set == self.type):
+                        lstParam.append(pSet.setTag)
+                    else:
+                        lstParam2 = self.paramsDict.get(pSet.stockInfo.source_set, None)
+                        if(lstParam2 == None):
+                            self.paramsDict[pSet.stockInfo.source_set] = [] 
+                            lstParam2 = self.paramsDict.get(pSet.stockInfo.source_set, None)
+                        lstParam2.append(pSet.stockInfo.source_code)
+            self.paramsDict[self.type] = lstParam 
+            self.lstParam = lstParam
             strParams = myData_Trans.Tran_ToStr(lstParam)
             return strParams
     def _Stoped(self):
@@ -68,7 +81,7 @@ class Quote_Source:
             listener.OnRecvQuote(quoteDatas)
     
     #查询行情信息(返回n条)
-    def query(self, checkTime = True, nReturn = 0): 
+    def query(self, checkTime = True, nReturn = 0, parms = None): 
         if(checkTime):
             if(self.checkTime() == False): return None
         pass 
@@ -221,13 +234,10 @@ def mainStart():
         gol._Set_Value('quoteSourceThread', thrdQuote)
 def mainSource():
     #初始全局行情对象
+    import mySource_Control
     from myGlobal import gol 
-    gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
-    if(gol._Get_Setting('quoteSource', None)== None):
-        #示例数据监控(暂只支持单源，多源需要调整完善)
-        import mySource_Sina_Stock
-        pQuote = mySource_Sina_Stock.Source_Sina_Stock() 
-
+    pQuote = gol._Get_Value('quoteSource', None)
+    if(pQuote != None):
         #添加监听对象
         import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor
         pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
@@ -237,7 +247,7 @@ def mainSource():
         #    pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
 
         gol._Set_Value('quoteSource', pQuote)    #实例 行情对象
-        return pQuote
+    return pQuote
 
 
 

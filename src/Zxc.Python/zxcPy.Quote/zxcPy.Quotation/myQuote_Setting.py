@@ -50,7 +50,8 @@ class myQuote_Settings():
 
         #更新信息
         if(self.stockInfo != None):
-            self.setTag = self.stockInfo.extype + self.stockInfo.code_id     
+            if(self.stockInfo.source_set == ""):
+                self.setTag = self.stockInfo.extype + self.stockInfo.code_id     
             self.isIndex = self.stockInfo.IsIndex()
         return True
     #是否可用

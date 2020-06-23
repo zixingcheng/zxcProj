@@ -344,7 +344,7 @@ class myDataDB_StockRisk(myData_DB.myData_Table):
         
         # 获取均值
         nTimes = myData.iif(dictSet['标的名称'].count('50ETF') == 1, 10000, 1)
-        stockSource = gol._Get_Value('quoteSource_API', None)
+        stockSource = gol._Get_Value('quoteSource_API_JqData', None)
         avgs = [0, 0, -1, -1, -1, -1]
         if(avg5):
             avg5s = stockSource.getPrice_avg_day(stockID, 5, False, end_date)
@@ -779,7 +779,7 @@ if __name__ == "__main__":
 
     # 期权交易测试
     date = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d")
-    pSource = gol._Get_Value('quoteSource_API', None)
+    pSource = gol._Get_Value('quoteSource_API_JqData', None)
     if(1 == 2):
         print("当天3000的期权信息：")
         opt = pSource.getOptInfo(-3000, "", 0)

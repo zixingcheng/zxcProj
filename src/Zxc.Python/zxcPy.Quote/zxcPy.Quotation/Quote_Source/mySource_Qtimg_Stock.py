@@ -21,7 +21,7 @@ mySystem.Append_Us("", True)
 
 #行情源--新浪--Stock
 class QuoteSourceSina(Quote_Source):
-    def queryStock(self, checkTime = True, nReturn = 0):     
+    def queryStock(self, checkTime = True, nReturn = 0, parms = None):     
         host="http://hq.sinajs.cn/list="
         url = host + self.stocks
         req = urllib.request.Request(url)

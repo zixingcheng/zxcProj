@@ -4,7 +4,7 @@ Created on  张斌 2019-08-28 14:58:00
     @author: zhang bin
     @email:  zhangbin@gsafety.com
 
-    监听--源基类-聚宽 
+    监听--源基类-聚宽 API
 """
 import sys, os, mySystem 
 import jqdatasdk
@@ -18,28 +18,12 @@ from myGlobal import gol
 from jqdatasdk import *
 
 
+
 #行情源--聚宽API
 class Source_JQData_API():
     def __init__(self, params = ""):
-        # myQuote_Source.Quote_Source.__init__(self, params, 'Stock')     #设置类型
         pass
 
-    #查询行情
-    def query(self, checkTime = True, nReturn = 0):  
-        # 未实现
-        return True 
-
-    #生成数据对象--未完成
-    def newData(self):
-        return myData_Stock.Data_Stock()
-    #生成数据对象--未完成
-    def newData_ByInfo(self, dataInfo, checkTime = True):     
-        return None
-    #生成数据集对象--未完成
-    def newDatas(self, data, interval):
-        return myData_Stock.Datas_Stock(data, interval)
-
-    
     # 提取所有标的信息
     def getSecurities(self, types=['stock'], data=None):
         return get_all_securities(types, data)
@@ -157,18 +141,17 @@ class Source_JQData_API():
         dictValue['avg'] = dictValue['money'] / dictValue['volume']
         return dictValue
 
-
     
 #缓存全局对象
-gol._Set_Value('quoteSource_API', Source_JQData_API())  #实例 行情对象
-myDebug.Debug(jqdatasdk.get_query_count())              #打印当日可请求条数
+gol._Set_Value('quoteSource_API_JqData', Source_JQData_API())   #实例 行情对象
+myDebug.Debug(jqdatasdk.get_query_count())                      #打印当日可请求条数
 
 
 
 #主启动程序
 if __name__ == "__main__": 
     # 提取标的信息
-    pSource = gol._Get_Value('quoteSource_API', None)
+    pSource = gol._Get_Value('quoteSource_API_JqData', None)
     print(pSource.getOptInfos())
     print(pSource.getSecurities())
     print(pSource.getSecurities('index'))

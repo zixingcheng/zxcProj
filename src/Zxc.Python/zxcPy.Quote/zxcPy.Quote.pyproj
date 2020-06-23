@@ -43,6 +43,8 @@
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Rise_Fall_asInt.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_StaticsM5.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Printer.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Control.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Source\mySource_JQData_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Qtimg_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Sina_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_JQData_API.py" />

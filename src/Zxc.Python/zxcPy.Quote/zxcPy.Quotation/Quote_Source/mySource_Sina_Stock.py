@@ -15,15 +15,17 @@ mySystem.m_strFloders.append('/zxcPy.Quotation/Quote_Data')
 mySystem.Append_Us("", False)    
 import myData_Trans
 import myQuote_Data, myData_Stock, myQuote_Listener, myQuote_Source  
+from myGlobal import gol   
+
 
 
 #行情源--新浪--Stock
 class Source_Sina_Stock(myQuote_Source.Quote_Source):
     def __init__(self, params = ""):
-        myQuote_Source.Quote_Source.__init__(self, params, 'Stock')     #设置类型
+        myQuote_Source.Quote_Source.__init__(self, params, '')     #设置类型
 
     #查询行情
-    def query(self, checkTime = True, nReturn = 0):    
+    def query(self, checkTime = True, nReturn = 0, parms = None):    
         #新浪Stock接口查询
         host="http://hq.sinajs.cn/list="
         url = host + self.params
@@ -124,7 +126,13 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
     #生成数据集对象
     def newDatas(self, data, interval):
         return myData_Stock.Datas_Stock(data, interval)
-   
+  
+    
+#缓存全局对象
+gol._Set_Value('quoteSource_Sina', Source_Sina_Stock())  #实例 行情对象
+
+
+
 #主启动程序
 if __name__ == "__main__":
     # sh000001,sh601939,sh601288,sh600919,sh600718

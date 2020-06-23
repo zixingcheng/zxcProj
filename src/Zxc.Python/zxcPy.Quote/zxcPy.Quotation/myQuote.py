@@ -16,11 +16,13 @@ import myData_Trans, myDebug, myIO, myIO_xlsx
 import mySource_JQData_API
 
 exInfos = {'XSHG': "上海证券交易所", 'XSHE': "深圳证券交易所"}
-stockTypes = {'stock': "股票", 'index': "指数", 'etf': "ETF基金"}
+stockTypes = {'stock': "股票", 'index': "指数", 'etf': "ETF基金", 'opt': "期权"}
+
+
 
 #股票信息
 class myStock_Info():
-    def __init__(self, extype, code, code_name, code_name_En, type = "Stock", area = "CN", exName = "", extype2 = ''): 
+    def __init__(self, extype, code, code_name, code_name_En, type = "Stock", area = "CN", exName = "", extype2 = '', source_set = '', source_code = ''): 
         self.extype = extype                #股票交易所代码: 
         self.extype2 = extype2              #股票交易所代码
         self.exName = exName                #股票交易所名称       
@@ -28,6 +30,8 @@ class myStock_Info():
         self.code_name = code_name          #股票名称  
         if(code_name_En == ""): code_name_En = myData_Trans.Tran_ToStr_FirstLetters(code_name, True)
         self.code_name_En = code_name_En    #数据名称首字母
+        self.source_set = source_set        #数据源名称
+        self.source_code = source_code      #数据源对应的代码
         
         self.tradeStatus = 1                #状态（1：正常，0：停牌）
         self.type = type                    #数据类型
@@ -44,12 +48,13 @@ class myStock_Info():
     def CheckInfo(self): 
         if(self.exName == ''):
             self.exName = exInfos.get(self.extype, '未知')
-        if(self.extype == "XSHE"):
-            self.extype = 'sz'
-            self.area = 'CN'
-        elif(self.extype == "XSHG"):
-            self.extype = 'sh'
-            self.area = 'CN'
+        if(self.source_set == ''):
+            if(self.extype == "XSHE"):
+                self.extype = 'sz'
+                self.area = 'CN'
+            elif(self.extype == "XSHG"):
+                self.extype = 'sh'
+                self.area = 'CN'
         return True
     
     # 提取板块
@@ -59,7 +64,7 @@ class myStock_Info():
     def getIndustries(self, name='zjw'): 
         if(self.IsIndex()): return []
 
-        quoteSource = gol._Get_Value('quoteSource_API', None)  #数据源操作对象
+        quoteSource = gol._Get_Value('quoteSource_API_JqData', None)  #数据源操作对象
         security = self.getID()
         datas = quoteSource.getIndustrys(security)
         return [datas[security][name]['industry_name']]
@@ -80,9 +85,9 @@ class myStock:
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.Dir_Base = os.path.abspath(os.path.join(strDir, ".."))  
         self.Path_Stock = self.Dir_Base + "/Setting/Setting_Stock.csv"
-        self.setFields = ['extype', 'code', 'code_name', 'code_name_En', 'type', 'area', 'exName', 'extype2']
+        self.setFields = ['extype', 'code', 'code_name', 'code_name_En', 'type', 'area', 'exName', 'extype2', 'source_set', 'source_code']
 
-        self.quoteSource = gol._Get_Value('quoteSource_API', None)  #数据源操作对象
+        self.quoteSource = gol._Get_Value('quoteSource_API_JqData', None)  #数据源操作对象
         self.lstStock = []
         self._init_Updata()         #更新配置信息
         self._Init()                #初始配置信息等
@@ -112,6 +117,8 @@ class myStock:
                 pDatas.append('')
                 pDatas.append(exInfos.get(pDatas[0], '未知'))
                 pDatas.append(pDatas[0])
+                pDatas.append("")
+                pDatas.append("")
                  
                 if(pDatas[0] == "XSHE"):
                     pDatas[0] = 'sz'
@@ -135,12 +142,18 @@ class myStock:
                 pDatas.append(x['display_name'])
                 pDatas.append(myData_Trans.Tran_ToStr_FirstLetters(x['display_name'], True))
                 pDatas.append(x['type'])
-                pDatas.append('CN')
-                if(pDatas[0] == "XSHE"):
-                    pDatas.append('深圳证券交易所')
-                elif(pDatas[0] == "XSHG"):
-                    pDatas.append('上海证券交易所')
+                pDatas.append('')
+                pDatas.append(exInfos.get(pDatas[0], '未知'))
                 pDatas.append(pDatas[0])
+                pDatas.append("JqDataAPI")
+                pDatas.append(x['name'])
+                
+                if(pDatas[0] == "XSHE"):
+                    pDatas[0] = 'sz'
+                    pDatas[5] = 'CN'
+                elif(pDatas[0] == "XSHG"):
+                    pDatas[0] = 'sh'
+                    pDatas[5] = 'CN'
                 data_list.append(pDatas)
             self._Init_Default(data_list)
             
@@ -159,7 +172,7 @@ class myStock:
         #转换为功能权限对象集
         for dtRow in dtSetting.dataMat:
             if(len(dtRow) < len(self.setFields)): continue
-            pSet = myStock_Info(dtRow[0], dtRow[1], dtRow[2], dtRow[3], dtRow[4], dtRow[5], dtRow[6], dtRow[7])
+            pSet = myStock_Info(dtRow[0], dtRow[1], dtRow[2], dtRow[3], dtRow[4], dtRow[5], dtRow[6], dtRow[7], dtRow[8], dtRow[9])
             self._Index(pSet)               #索引设置信息 
     #初始默认配置
     def _Init_Default(self,data_list):
@@ -203,6 +216,7 @@ class myStock:
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Value('setsStock', myStock())
+
 
 
 #主启动程序
