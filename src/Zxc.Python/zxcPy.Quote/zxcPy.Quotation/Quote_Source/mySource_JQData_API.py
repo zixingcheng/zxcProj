@@ -71,6 +71,43 @@ class Source_JQData_API():
         value = opt.run_query(optInfo)
         if(len(value) != 1): return None
         return {'id': value['id'][0], 'code': value['code'][0], 'trading_code': value['trading_code'][0], 'name': value['name'][0]}
+    # 查询期权信息-所有，当日的
+    def getOptInfos(self, nameETF = "510050.XSHG", month_Delta = 1):
+        # 前一日ETF价格
+        infoETF = self.getPrice_bars(nameETF, 1)
+        if(len(infoETF['close']) != 1): return []
+        
+        # 初始偏移值
+        price = int(infoETF['close'][0] * 10) * 100
+        price_1 = 0; price_0 = 0;
+        rangeDelta = [price]
+        for x in range(1,15):
+            price_1 = myData.iif(price_1 + price >= 3100, price_1 - 100, price_1 - 50)
+            price_0 = myData.iif(price_0 + price >= 3000, price_0 + 100, price_0 + 50)
+
+            rangeDelta.append(price_1 + price)
+            rangeDelta.append(-price_1 - price)
+            rangeDelta.append(price_0 + price)
+            rangeDelta.append(-price_0 - price)
+        rangeDelta.sort()
+
+        # 提取所有月份
+        infos = []
+        for x in range(0, month_Delta):   
+            if(self.getOptInfo(price, "", x) == None): continue
+
+            # 提取所有值
+            for xx in rangeDelta:  
+                optInfo = self.getOptInfo(xx, "", x)
+                if(optInfo == None): continue
+
+                # 组装返回信息
+                info = {}
+                info['name'] = optInfo['code']
+                info['display_name'] = optInfo['name']
+                info['type'] = 'opt'
+                infos.append(info)
+        return infos
 
     # 查询价格信息，指定日期范围、数据频率
     # fields:['open', ' close', 'low', 'high', 'volume', 'money', 'factor', 'high_limit',' low_limit', 'avg', ' pre_close', 'paused']
@@ -132,6 +169,7 @@ myDebug.Debug(jqdatasdk.get_query_count())              #打印当日可请求�
 if __name__ == "__main__": 
     # 提取标的信息
     pSource = gol._Get_Value('quoteSource_API', None)
+    print(pSource.getOptInfos())
     print(pSource.getSecurities())
     print(pSource.getSecurities('index'))
 

@@ -123,6 +123,25 @@ class myStock:
                 # pDatas.append(data['name'])
                 # pDatas.append(data['start_date'])
                 # pDatas.append(data['end_date'])
+
+            #期权信息
+            opts = []
+            opts_300ETF = self.quoteSource.getOptInfos("510050.XSHG", 12)
+            opts = opts + opts_300ETF
+            for x in opts:
+                pDatas = []
+                pDatas.append(x['name'].split('.')[1])
+                pDatas.append(x['name'].split('.')[0])
+                pDatas.append(x['display_name'])
+                pDatas.append(myData_Trans.Tran_ToStr_FirstLetters(x['display_name'], True))
+                pDatas.append(x['type'])
+                pDatas.append('CN')
+                if(pDatas[0] == "XSHE"):
+                    pDatas.append('深圳证券交易所')
+                elif(pDatas[0] == "XSHG"):
+                    pDatas.append('上海证券交易所')
+                pDatas.append(pDatas[0])
+                data_list.append(pDatas)
             self._Init_Default(data_list)
             
             #组合输出结果
