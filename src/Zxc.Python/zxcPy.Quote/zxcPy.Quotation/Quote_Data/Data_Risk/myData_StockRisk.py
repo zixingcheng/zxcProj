@@ -15,7 +15,7 @@ from decimal import Decimal
 mySystem.Append_Us("../Prjs", False, __file__)
 mySystem.Append_Us("../../../zxcPy.Quotation", False, __file__)
 mySystem.Append_Us("../../../zxcPy.Quotation/Quote_Source", False, __file__)
-mySystem.Append_Us("../../../zxcPy.Quotation/Quote_Data/Data_Algorithm", False, __file__)
+mySystem.Append_Us("../../../zxcPy.Quotation/Quote_Data/Data_Risk", False, __file__)
 mySystem.Append_Us("", False) 
 import myEnum, myIO, myIO_xlsx, myData, myData_DB, myData_Trans, myManager_Msg, myDebug #myQuote_Setting
 import myQuote, myData_Monitor_Risk
@@ -288,18 +288,19 @@ class myDataDB_StockRisk(myData_DB.myData_Table):
                 datas[x]['isDel'] = True
         return True
     # 检查是否相同--继承需重写  
-    def _IsSame(self, rowInfo, rowInfo_Base): 
-        if(super()._IsSame(rowInfo, rowInfo_Base)): return True
+    def _IsSame(self, rowInfo, rowInfo_Base, tableName = ""): 
+        res, sameID = super()._IsSame(rowInfo, rowInfo_Base, tableName)
+        if(res): return res, sameID
 
         # 必须ID相同、是否删除相同
         if(rowInfo['ID'] > 0):
-            if(rowInfo['ID'] != rowInfo_Base['ID']): return False
-        if(rowInfo['isDel'] != rowInfo_Base['isDel']): return False
+            if(rowInfo['ID'] != rowInfo_Base['ID']): return False, sameID
+        if(rowInfo['isDel'] != rowInfo_Base['isDel']): return False, sameID
         if(rowInfo['用户名'] == rowInfo_Base['用户名'] and rowInfo['用户标签'] == rowInfo_Base['用户标签']):
             if(rowInfo['标的编号'] == rowInfo_Base['标的编号']):
                 if (rowInfo['日期'] - rowInfo_Base['日期']).days < 1024:
-                    return True
-        return False
+                    return True, rowInfo_Base['ID']
+        return False, sameID
             
     # 更新
     def _Updata(self, x, rowInfo, bSave = False, bCheck = True): 
@@ -361,10 +362,10 @@ class myDataDB_StockRisk(myData_DB.myData_Table):
         # 初始风险监测对象
         pSet = mySet_StockRisk(dictSet)
         if(nTimes == 10000):    # 修正期权默认设置
-            pSet.stopProfit = 0.06          #止盈线，默认为6%
+            pSet.stopProfit = 0.1           #止盈线，默认为6%
             pSet.stopLoss = 0.06            #止损线，默认为-2%  
-            pSet.stopProfit_Retreat = 0.03  #止盈回撤，默认为1%, 超过止盈线以上则为2倍
-            pSet.stopLoss_Retreat = 0.02    #止损回撤，默认为1%
+            pSet.stopProfit_Retreat = 0.05  #止盈回撤，默认为1%, 超过止盈线以上则为2倍
+            pSet.stopLoss_Retreat = 0.03    #止损回撤，默认为1%
         pRisk = myMonitor_StockRisk(avgs[0], avgs[1], avgs[2], avgs[3], avgs[4], avgs[5])
         pRisk.initSet(pSet, setDB)
         pRisk.saveSet()
@@ -516,7 +517,7 @@ class myMonitor_StockRisk():
     # 消息处理
     def handleMsg(self, strTitle):
         #发送消息
-        if(False):
+        if(True):
             if(True):
                 if(strTitle != ""):
                     if(self.msgManger == None): self.msgManger = gol._Get_Setting('manageMsgs')
@@ -525,6 +526,7 @@ class myMonitor_StockRisk():
                     msg["msgType"] = "TEXT"
                     msg["usrPlat"] = "wx"
                     msg["msg"] = strTitle
+                    self.msgManger.usePrint = False
                     self.msgManger.OnHandleMsg(msg, '', True)   #必须check
     # 交易处置
     def handleTrade(self, price, numSell, bSave_Auto = False):
@@ -585,7 +587,7 @@ class myMonitor_StockRisk():
                     strReutrn += F", 浮盈超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止盈线上移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
                 else:
                     strTag = myData.iif(isBreakLimit, "突破新低", "阶段新低")
-                    strReutrn += F", 浮亏超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止损线上移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strReutrn += F", 浮亏超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止损线下移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
         else:
             if(isStopProfit):   
                 if(self.setRisk.stopProfit_Dynamic == False):
@@ -658,9 +660,10 @@ class myStockRisk_Control():
         #添加-区分买入卖出
         pRisk = self.getRisk(usrID, usrTag, stockID, stockName, False)
         if(stockNum > 0):
-            strR = self.riskDB.Add_Row(dictSet, True)
-            myDebug.Debug(strR)
             if(pRisk == None):
+                strR = self.riskDB.Add_Row(dictSet, True)
+                myDebug.Debug(strR)
+
                 #添加记录信息
                 pRisk = self.initRiskSet(dictSet['用户名'], dictSet['用户标签'], dictSet['标的编号'], dictSet['标的名称'], False)
                 
@@ -671,20 +674,34 @@ class myStockRisk_Control():
                     self.dictRisk[dictSet['标的编号']] = dictRisk
             else:
                 setRisk = self.riskDB.getSet(usrID, usrTag, stockID, isDel = False, setDB = pRisk.setDB)
-                pSet = mySet_StockRisk(dictSet)
+                pSet = mySet_StockRisk(setRisk)
+                pSet.Trans_FromDict(dictSet)
                 pRisk.initSet(pSet, pRisk.setDB)
+
+                strR = self.riskDB.Add_Row(pSet.Trans_ToDict(), True)
+                myDebug.Debug(strR)
+            pRisk.handleMsg(F"{stockName}: {stockPrice} 元, 买入 {stockNum}股.")
         elif(stockNum < 0):
             if(pRisk != None):
                 pRisk.updataTrade(stockPrice, stockNum, dictSet['日期'])
+                pRisk.handleMsg(F"{stockName}: {stockPrice} 元, 卖出 {stockNum}股.")
     # 提取风控对象
-    def getRisk(self, usrID, usrTag, stockID, stockName, bCheck = True):  
+    def getRisk(self, usrID, usrTag, stockID, stockName, bCheck = True, isOption = False, month_Delta = 0):  
         #解析正确股票信息
         if(bCheck):
-            stocks = self.stockSet._Find(stockID, stockName, "****")
-            if(len(stocks) == 1):
-                pStock = stocks[0]
-                stockID = pStock.code_id + "." + pStock.extype2
-                stockName = pStock.code_name
+            if(isOption == False):
+                stocks = self.stockSet._Find(stockID, stockName, "****")
+                if(len(stocks) == 1):
+                    pStock = stocks[0]
+                    stockID = pStock.code_id + "." + pStock.extype2
+                    stockName = pStock.code_name
+            else:
+                #期权
+                opt = pSource.getOptInfo(stockID, "", month_Delta)
+                if(opt == None): return None
+                
+                stockID = opt['code']
+                stockName = opt['name']
 
         #提取
         dictRisk = self.dictRisk.get(stockID, None)
@@ -718,14 +735,13 @@ if __name__ == "__main__":
     pRisks = gol._Get_Value('zxcRisk_Control')
     
     # 添加买入及测试信息 sz,002547,春兴精工,CXJG,stock,CN,深圳证券交易所,XSHE
-    pRisks.addRiskSet('茶叶一主号','','002547',"", 8, 10000, '2019-08-27 11:11:00', {}) 
-    pRisks.addRiskSet('茶叶一主号','','300033',"", 96.943, 700, '2019-08-27 11:11:00', {}) 
-    pRisks.addRiskSet('茶叶一主号','','10001832.XSHG',"50ETF购12月3000", 210.0, 20, '2019-10-23 09:31:00', {}) 
-    pRisks.addRiskSet('茶叶一主号','','10002033.XSHG',"50ETF购12月2900", 300, 10, '2019-10-23 09:31:00', {}) 
+    #pRisks.addRiskSet('茶叶一主号','','600332',"", 32, 10000, '2019-08-27 11:11:00', {}) 
+    #pRisks.addRiskSet('茶叶一主号','','300033',"", 96.943, 700, '2019-08-27 11:11:00', {}) 
+    #pRisks.addRiskSet('茶叶一主号','','10001832.XSHG',"50ETF购12月3000", 210.0, 20, '2019-10-23 09:31:00', {}) 
 
 
     # 添加行数据
-    if(1==1):
+    if(1==2):
         #print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '600001.XSHG', '标的名称': "邯郸钢铁", '标的均价': '10.3', '标的数量': 5000, '止盈线': 0.08, '日期': '2019-08-27 11:11:00'}, True))
         pRisks.addRiskSet('茶叶一主号','','600001',"测试股票", 10.3, 5000, '2019-08-27 11:11:00', {})  
         pRisks.addRiskSet('茶叶一主号','','600001',"测试股票", 9.7, 5000, '2019-08-27 11:12:00', {})  
@@ -741,7 +757,7 @@ if __name__ == "__main__":
         pRisk = pRisks.getRisk('茶叶一主号', '', '600001.XSHG', '')
         pRisk.notifyQuotation(12)
         pRisk.notifyQuotation(11.7)     #回撤 
-        pRisks.addRiskSet('茶叶一主号','','600001',"", 11.7, -10000, '2019-08-27 11:18:00', {})  
+        #pRisks.addRiskSet('茶叶一主号','','600001',"", 11.7, -10000, '2019-08-27 11:18:00', {})  
         pRisk.notifyQuotation(12.7)      
         pRisk.notifyQuotation(13.3)      
         pRisk.notifyQuotation(10.4)     #回撤
@@ -762,65 +778,84 @@ if __name__ == "__main__":
         pRisk.notifyQuotation(10.3)     
 
     # 期权交易测试
+    date = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d")
     pSource = gol._Get_Value('quoteSource_API', None)
     if(1 == 2):
         print("当天3000的期权信息：")
-        pSource = gol._Get_Value('quoteSource_API', None)
-        sources = pSource.getPrice(security='10001832.XSHG',frequency='1m',start_date='2019-11-29 09:30:00',end_date='2019-11-29 15:00:00')
-    
+        opt = pSource.getOptInfo(-3000, "", 0)
+        sources = pSource.getPrice(security=opt['code'],frequency='1m',start_date=date+ " 09:00:00",end_date=date+ " 15:00:00")
+        print(opt)
+
         # 添加买入及测试信息
-        print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '10001832.XSHG', '标的名称': "50ETF购12月3000", '标的均价': '210', '标的数量': 10, '日期': '2019-10-14 09:31:00'}, True))
+        code = opt['code']
+        print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': code, '标的名称': opt['name'], '标的均价': '2200', '标的数量': 10, '日期': date+' 09:31:00'}, True))
     
-        pRisk = pDB.getTradeRisk('茶叶一主号', '', '10001832.XSHG', True)
+        pRisk = pDB.getTradeRisk('茶叶一主号', '', code, True)
         for x in range(0, len(sources)):
              pRisk.notifyQuotation(sources['high'][x] * 10000)    
-
         print()
         
     # 期权交易测试-实时模拟
-    if(1 == 2):
+    if(1 == 1):
         #初始风险对象
-        pRisk_300033 = pRisks.getRisk('茶叶一主号', '','300033', "", True)
-        pRisk_3000 = pRisks.getRisk('茶叶一主号', '','10001832.XSHG', "", True)
-        pRisk_3100 = pRisks.getRisk('茶叶一主号', '','10002033.XSHG', "", True)
+        pRisks_List = []
+        opt = pSource.getOptInfo(3000, "", 0)
+        pRisks.addRiskSet('茶叶一主号','',opt['code'],opt['name'], 343, 20, '2019-10-23 09:31:00', {}) 
+        pRisk_2750 = pRisks.getRisk('茶叶一主号', '',opt['code'], "", True)
+        pRisks_List.append(pRisk_2750)
 
         #消息初始 
         pMMsg = gol._Get_Setting('manageMsgs')
         msg = pMMsg.OnCreatMsg()
-        msg["usrName"] = "@*股票风控监测群"
+        msg["usrName"] = "@*测试群"
         msg["msgType"] = "TEXT"
         msg["usrPlat"] = "wx"
 
         #循环
         #dtTime = myData_Trans.Tran_ToDatetime("2019-10-23 09:30:00", "%Y-%m-%d %H:%M:%S")
         num = 1
+        data = {'time' : "0", 'high' : 0, 'low' : 100000, 'data' : 0}
+        time_s = 0
         while(True):
             #时间参数
-            #dtTime += datetime.timedelta(minutes=1)
+            #dtTime += datetime.timedelta(minutes=1) 
             dtNow = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d %H:%M")
-            dtStart = myData_Trans.Tran_ToDatetime(dtNow + ":00", "%Y-%m-%d %H:%M:%S")
+            dtNow = "2020-06-23 14:00"
+            time_s = myData.iif(data['time'] != dtNow , 0, time_s + 10)
+            dtStart = myData_Trans.Tran_ToDatetime(dtNow + F":{time_s}", "%Y-%m-%d %H:%M:%S")
             dtNext = myData_Trans.Tran_ToDatetime(dtNow + ":59", "%Y-%m-%d %H:%M:%S")
-        
+                               
             #提取当前期权价格
-            sources_300033 = pSource.getPrice(security='300033.XSHE',frequency='1m',start_date=dtStart,end_date=dtNext)
-            sources_3000 = pSource.getPrice(security='10001832.XSHG',frequency='1m',start_date=dtStart,end_date=dtNext)
-            sources_3100 = pSource.getPrice(security='10002033.XSHG',frequency='1m',start_date=dtStart,end_date=dtNext)
-            if(len(sources_3100) < 1): continue
+            for x in pRisks_List:
+                sources_ = pSource.getPrice(security=x.setRisk.stockID,frequency='1m',start_date=dtStart,end_date=dtNext)
+                if(len(sources_) < 1): continue 
+                if(sources_['money'][0] <= 0): continue 
             
-            priceAvg_300033 = sources_300033['money'][0] / sources_300033['volume'][0]
-            priceAvg_3000 = sources_3000['money'][0] / sources_3000['volume'][0]
-            priceAvg_3100 = sources_3100['money'][0] / sources_3100['volume'][0]
-            print(priceAvg_300033, priceAvg_3000, priceAvg_3100, "---", dtStart)
+                priceAvg_ = sources_['money'][0] / sources_['volume'][0]
+                print(x.setRisk.stockName, priceAvg_, "---", dtStart)
+                
+                # 初始分钟级数据
+                if(data['time'] != dtNow):
+                    data = {'time' : dtNow, 'high' : sources_['high'][0], 'low' : sources_['low'][0], 'data' : priceAvg_}
+                    value = priceAvg_
+                    time_s = 0
+                else:
+                    if(sources_['low'][0] < data['low']):
+                        data['low'] = sources_['low'][0] * 10000
+                        value = data['low'] 
+                    elif(sources_['high'][0] > data['high']):
+                        data['high'] = sources_['high'][0] * 10000
+                        value = data['high'] 
+                    else:
+                        data['data'] = priceAvg_
+                        value = priceAvg_
 
-            #风险调用
-            bSave = myData.iif(num % 5 == 0, True, False)
-            pRisk.notifyRisk(priceAvg_300033, '300033.XSHE', "", bSave)
-            pRisk.notifyRisk(priceAvg_3000, '10001832.XSHG', "", bSave)
-            pRisk.notifyRisk(priceAvg_3100, '10002033.XSHG', "", bSave)
+                #风险调用
+                bSave = myData.iif(num % 5 == 0, True, False)
+                x.notifyQuotation(value, bSave)
 
-            #延时5秒     
-            time.sleep(10)
-        
+                #延时5秒     
+                time.sleep(10)
 
     #需要调整盈利对比，实际利润变动，不可靠
     print()

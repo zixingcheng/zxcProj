@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{f001c86f-593e-40cb-8491-9e93c8630403}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>zxcPy.Quotation\Quote_Data\Data_Algorithm\myData_Monitor_Risk.py</StartupFile>
+    <StartupFile>zxcPy.Quotation\Quote_Data\Data_Risk\myData_Monitor_Risk.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -29,10 +29,11 @@
     <Compile Include="zxcPy.Quotation\myQuote_Source.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Setting.py" />
     <Compile Include="zxcPy.Quotation\myQuote.py" />
-    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myData_Monitor_Risk.py" />
-    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myData_Monitor.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Risk\myData_DB.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Risk\myData_Monitor_Risk.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Risk\myData_Monitor.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
-    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myStockRisk.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Risk\myData_StockRisk.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myDataDB_StockTradeRisk.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Trade\myData_Trade.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\myData_Stock.py" />
@@ -51,6 +52,7 @@
     <Folder Include="Data\" />
     <Folder Include="Data\DB_Trade\" />
     <Folder Include="Data\DB_Trade\Stock_Bills\" />
+    <Folder Include="zxcPy.Quotation\Quote_Data\Data_Risk\" />
     <Folder Include="zxcPy.Trade\" />
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="Setting\" />

@@ -87,6 +87,8 @@ class myData_Table():
        if(len(fieldNames) < len(fieldTypes) or len(fieldNames) < len(isIndexs)): return False 
        fieldTypes.extend([""]*(len(fieldNames)-len(fieldTypes)))
        isIndexs.extend([""]*(len(fieldNames)-len(isIndexs)))
+       for x in range(len(fieldNames_alias), len(fieldNames)):
+           fieldNames_alias.append(fieldNames[x])
 
        #循环添加
        bResult = True
@@ -332,7 +334,7 @@ class myData_Table():
         keys = self.rows.keys()
         for x in keys:
             rowInfo_Base = self.rows[x]
-            if(self._IsSame(rowInfo, rowInfo_Base)[0]): 
+            if(self._IsSame(rowInfo, rowInfo_Base,tableName)[0]): 
                 # 修改
                 if(updata):
                     self._Updata(x, rowInfo)
@@ -346,7 +348,7 @@ class myData_Table():
         sameID = -1
         if(rowInfo.get('ID', "") != ""):
             if(rowInfo['ID'] > 0):  # 给定序号时，序号必须相同
-                if(rowInfo['ID'] != rowInfo_Base['ID']): return False, sameID
+                if(rowInfo['ID'] != rowInfo_Base['ID']): return False, rowInfo['ID']
         else:
             rowInfo["ID"] = -1
             return False, sameID
