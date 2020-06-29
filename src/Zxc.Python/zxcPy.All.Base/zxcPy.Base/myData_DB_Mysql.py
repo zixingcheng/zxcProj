@@ -163,10 +163,15 @@ class myData_Table(myData_DB.myData_Table):
     def _Find(self, id, tableName = ""): 
         return self.pySql._Query(F"id={id}", tableName = tableName)
 
-    # 提取当前编号(最大编号+1) --忽略       
+    # 提取当前编号(最大编号+1) 
     def _Get_ID(self, tableName = ""):
-        pass        # sql操作以配置文件为准，简化操作
-        return -1 
+        fliter = F"select max(id) as maxid from {tableName};"
+        rs = self.pySql.query(fliter)
+        if(len(rs) == 0 or rs[0]['maxid'] == None): 
+            return 1
+
+        id = myData_Trans.To_Int(rs[0]['maxid'], 0)
+        return id + 1
     # 检查是否已经存在 --重写
     def _Check(self, rowInfo, updata = False, tableName = ""): 
         #提取字段信息

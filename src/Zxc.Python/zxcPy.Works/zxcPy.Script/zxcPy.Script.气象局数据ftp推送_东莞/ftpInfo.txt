@@ -1,0 +1,12 @@
+
+# FTP配置信息-东莞市气象局
+    Host = "10.152.35.111"      
+    Port = 8021
+    User = "ftpUser"             
+    UserPW = "dgsqxjFTP!@#456"   
+	
+# FTP配置信息-东莞市政数局
+    Host = "19.104.44.141"      
+    Port = 9010
+    User = "qixiang"        
+    UserPW = "qixtglptxiang"  
