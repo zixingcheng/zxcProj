@@ -20,11 +20,12 @@ from myGlobal import gol
 gol._Init()                         #先必须在主模块初始化（只在Main模块需要一次即可）
 
 
+
 #行情来源
 class Quote_Source:
     def __init__(self, params = "", type = ''):
         self.type = type
-        self.paramsDict = {}
+        self.paramsSet = {}
         self.paramsList = []
         if(params == ""): params = self._getDefault_Param()
         self.params = params
@@ -50,17 +51,17 @@ class Quote_Source:
             for x in keys:
                 pSet = pSets._Find(x) 
                 if(pSet != None and pSet.IsEnable()):
+                    lstSets = self.paramsSet.get(pSet.stockInfo.source_set, None)
+                    if(lstSets == None):
+                        self.paramsSet[pSet.stockInfo.source_set] = [] 
+                        lstSets = self.paramsSet.get(pSet.stockInfo.source_set, None)
+                    lstSets.append(pSet)
+
+                    #记录设置编号
                     if(pSet.stockInfo.source_set == self.type):
                         lstParam.append(pSet.setTag)
-                    else:
-                        lstParam2 = self.paramsDict.get(pSet.stockInfo.source_set, None)
-                        if(lstParam2 == None):
-                            self.paramsDict[pSet.stockInfo.source_set] = [] 
-                            lstParam2 = self.paramsDict.get(pSet.stockInfo.source_set, None)
-                        lstParam2.append(pSet.stockInfo.source_code)
-            self.paramsDict[self.type] = lstParam 
-            self.lstParam = lstParam
-            strParams = myData_Trans.Tran_ToStr(lstParam)
+            self.paramsList = lstParam
+            strParams = myData_Trans.Tran_ToStr(lstParam).replace(".", '')
             return strParams
     def _Stoped(self):
         keys = self.datas.keys()

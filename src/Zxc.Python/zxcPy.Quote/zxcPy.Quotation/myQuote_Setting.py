@@ -50,8 +50,7 @@ class myQuote_Settings():
 
         #更新信息
         if(self.stockInfo != None):
-            if(self.stockInfo.source_set == ""):
-                self.setTag = self.stockInfo.extype + self.stockInfo.code_id     
+            self.setTag = self.stockInfo.extype + "." + self.stockInfo.code_id
             self.isIndex = self.stockInfo.IsIndex()
         return True
     #是否可用
@@ -121,7 +120,7 @@ class myQuote_Sets():
 
         #初始设置集
         ids = strSets[0].split('.')
-        pSet = self._Find("", ids[0] + ids[1])
+        pSet = self._Find("", ids[0] + "." + ids[1])
         if(pSet == None):
             pSet = myQuote_Settings(ids[0], ids[1], "", "")
             self._Index(pSet)
@@ -299,6 +298,7 @@ def _Find(setName, setTag = '', bCreatAuto = False):
             pSet = myQuote_Setting(setTag, setName)
         return pSet
     return None
+
 
 
 #主启动程序

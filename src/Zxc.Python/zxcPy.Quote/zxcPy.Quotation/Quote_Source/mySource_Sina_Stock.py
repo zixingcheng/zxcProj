@@ -27,6 +27,8 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
     #查询行情
     def query(self, checkTime = True, nReturn = 0, parms = None):    
         #新浪Stock接口查询
+            # 新浪财经50ETF期权和上交所300ETF期权行情接口
+            # https://blog.csdn.net/u013781175/article/details/54374798
         host="http://hq.sinajs.cn/list="
         url = host + self.params
         req = urllib.request.Request(url)

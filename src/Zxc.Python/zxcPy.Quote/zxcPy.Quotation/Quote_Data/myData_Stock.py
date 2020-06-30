@@ -60,35 +60,35 @@ class Data_Stock(myQuote_Data.Quote_Data):
 
     #序列化
     def toString(self):
-        return self.name + '(' + self.id + ')' \
-            + ', openPrice=' + self.openPrice \
-            + ', preClose=' + self.preClose \
-            + ', lastPrice=' + self.lastPrice  \
-            + ', highPrice=' + self.highPrice  \
-            + ', lowPrice=' + self.lowPrice  \
-            + ', buyPrice=' + self.buyPrice  \
-            + ', sellPrice=' + self.sellPrice  \
-            + ', tradeValume=' + self.tradeValume  \
-            + ', buy1Volume=' + self.buy1Volume  \
-            + ', buy1Price=' + self.buy1Price \
-            + ', buy2Volume=' + self.buy2Volume \
-            + ', buy2Price=' + self.buy2Price \
-            + ', buy3Volume=' + self.buy3Volume \
-            + ', buy3Price=' + self.buy3Price \
-            + ', buy4Volume=' + self.buy4Volume \
-            + ', buy4Price=' + self.buy4Price \
-            + ', buy5Volume=' + self.buy5Volume \
-            + ', buy5Price=' + self.buy5Price \
-            + ', sell1Volume=' + self.sell1Volume  \
-            + ', sell1Price=' + self.sell1Price  \
-            + ', sell2Volume=' + self.sell2Volume  \
-            + ', sell2Price=' + self.sell2Price  \
-            + ', sell3Volume=' + self.sell3Volume  \
-            + ', sell3Price=' + self.sell3Price  \
-            + ', sell4Volume=' + self.sell4Volume  \
-            + ', sell4Price=' + self.sell4Price  \
-            + ', sell5Volume=' + self.sell5Volume  \
-            + ', sell5Price=' + self.sell5Price  \
+        return self.name + '(' + self.idTag + ')' \
+            + ', openPrice=' + str(self.openPrice) \
+            + ', preClose=' + str(self.preClose) \
+            + ', lastPrice=' + str(self.lastPrice)  \
+            + ', highPrice=' + str(self.highPrice)  \
+            + ', lowPrice=' + str(self.lowPrice)  \
+            + ', buyPrice=' + str(self.buyPrice)  \
+            + ', sellPrice=' + str(self.sellPrice)  \
+            + ', tradeValume=' + str(self.tradeValume)  \
+            + ', buy1Volume=' + str(self.buy1Volume)  \
+            + ', buy1Price=' + str(self.buy1Price) \
+            + ', buy2Volume=' + str(self.buy2Volume) \
+            + ', buy2Price=' + str(self.buy2Price) \
+            + ', buy3Volume=' + str(self.buy3Volume) \
+            + ', buy3Price=' + str(self.buy3Price) \
+            + ', buy4Volume=' + str(self.buy4Volume) \
+            + ', buy4Price=' + str(self.buy4Price) \
+            + ', buy5Volume=' + str(self.buy5Volume) \
+            + ', buy5Price=' + str(self.buy5Price) \
+            + ', sell1Volume=' + str(self.sell1Volume)  \
+            + ', sell1Price=' + str(self.sell1Price)  \
+            + ', sell2Volume=' + str(self.sell2Volume)  \
+            + ', sell2Price=' + str(self.sell2Price)  \
+            + ', sell3Volume=' + str(self.sell3Volume)  \
+            + ', sell3Price=' + str(self.sell3Price)  \
+            + ', sell4Volume=' + str(self.sell4Volume)  \
+            + ', sell4Price=' + str(self.sell4Price)  \
+            + ', sell5Volume=' + str(self.sell5Volume)  \
+            + ', sell5Price=' + str(self.sell5Price)  \
             + ', date=' + self.date  \
             + ', time=' + self.time
     
@@ -100,33 +100,33 @@ class Data_Stock(myQuote_Data.Quote_Data):
     #序列化--csv行信息
     def toCSVString(self):
         return '\n' + self.date + " " + self.time  \
-            + ',' + self.lastPrice  \
-            + ',' + self.highPrice  \
-            + ',' + self.lowPrice  \
-            + ',' + self.buyPrice  \
-            + ',' + self.sellPrice  \
-            + ',' + self.tradeValume  \
-            + ',' + self.tradeTurnover \
-            + ',' + self.buy1Volume  \
-            + ',' + self.buy2Volume  \
-            + ',' + self.buy3Volume \
-            + ',' + self.buy4Volume \
-            + ',' + self.buy5Volume \
-            + ',' + self.buy1Price \
-            + ',' + self.buy2Price \
-            + ',' + self.buy3Price \
-            + ',' + self.buy4Price \
-            + ',' + self.buy5Price \
-            + ',' + self.sell1Volume  \
-            + ',' + self.sell2Volume  \
-            + ',' + self.sell3Volume  \
-            + ',' + self.sell4Volume  \
-            + ',' + self.sell5Volume  \
-            + ',' + self.sell1Price  \
-            + ',' + self.sell2Price  \
-            + ',' + self.sell3Price  \
-            + ',' + self.sell4Price  \
-            + ',' + self.sell5Price
+            + ',' + str(self.lastPrice)  \
+            + ',' + str(self.highPrice)  \
+            + ',' + str(self.lowPrice)  \
+            + ',' + str(self.buyPrice)  \
+            + ',' + str(self.sellPrice)  \
+            + ',' + str(self.tradeValume)  \
+            + ',' + str(self.tradeTurnover) \
+            + ',' + str(self.buy1Volume)  \
+            + ',' + str(self.buy2Volume)  \
+            + ',' + str(self.buy3Volume) \
+            + ',' + str(self.buy4Volume) \
+            + ',' + str(self.buy5Volume) \
+            + ',' + str(self.buy1Price) \
+            + ',' + str(self.buy2Price) \
+            + ',' + str(self.buy3Price) \
+            + ',' + str(self.buy4Price) \
+            + ',' + str(self.buy5Price) \
+            + ',' + str(self.sell1Volume)  \
+            + ',' + str(self.sell2Volume)  \
+            + ',' + str(self.sell3Volume)  \
+            + ',' + str(self.sell4Volume)  \
+            + ',' + str(self.sell5Volume)  \
+            + ',' + str(self.sell1Price)  \
+            + ',' + str(self.sell2Price)  \
+            + ',' + str(self.sell3Price)  \
+            + ',' + str(self.sell4Price)  \
+            + ',' + str(self.sell5Price)
     
     #转换为值组
     def toValueList(self):
@@ -135,38 +135,72 @@ class Data_Stock(myQuote_Data.Quote_Data):
            return self.dataList
         self.dataList = [] 
         self.dataList.append(dtNow)                                      #时间
-        self.dataList.append(myData_Trans.To_Float(self.lastPrice))      #最后价格
-        self.dataList.append(myData_Trans.To_Float(self.highPrice))      #最高价格
-        self.dataList.append(myData_Trans.To_Float(self.lowPrice))       #最低价格 
-        self.dataList.append(myData_Trans.To_Float(self.buyPrice))       #买价
-        self.dataList.append(myData_Trans.To_Float(self.sellPrice))      #卖价
-        self.dataList.append(myData_Trans.To_Float(self.tradeValume))    #成交量
-        self.dataList.append(myData_Trans.To_Float(self.tradeTurnover))  #成交额
+        if(type(self.lastPrice) == str):
+            self.dataList.append(myData_Trans.To_Float(self.lastPrice))      #最后价格
+            self.dataList.append(myData_Trans.To_Float(self.highPrice))      #最高价格
+            self.dataList.append(myData_Trans.To_Float(self.lowPrice))       #最低价格 
+            self.dataList.append(myData_Trans.To_Float(self.buyPrice))       #买价
+            self.dataList.append(myData_Trans.To_Float(self.sellPrice))      #卖价
+            self.dataList.append(myData_Trans.To_Float(self.tradeValume))    #成交量
+            self.dataList.append(myData_Trans.To_Float(self.tradeTurnover))  #成交额
         
-        self.dataList.append(myData_Trans.To_Float(self.buy1Volume))     #买1-5量
-        self.dataList.append(myData_Trans.To_Float(self.buy2Volume))   
-        self.dataList.append(myData_Trans.To_Float(self.buy3Volume))   
-        self.dataList.append(myData_Trans.To_Float(self.buy4Volume))   
-        self.dataList.append(myData_Trans.To_Float(self.buy5Volume))  
-        self.dataList.append(myData_Trans.To_Float(self.buy1Price))      #买1-5价格
-        self.dataList.append(myData_Trans.To_Float(self.buy2Price))   
-        self.dataList.append(myData_Trans.To_Float(self.buy3Price))   
-        self.dataList.append(myData_Trans.To_Float(self.buy4Price))   
-        self.dataList.append(myData_Trans.To_Float(self.buy5Price))   
+            self.dataList.append(myData_Trans.To_Float(self.buy1Volume))     #买1-5量
+            self.dataList.append(myData_Trans.To_Float(self.buy2Volume))   
+            self.dataList.append(myData_Trans.To_Float(self.buy3Volume))   
+            self.dataList.append(myData_Trans.To_Float(self.buy4Volume))   
+            self.dataList.append(myData_Trans.To_Float(self.buy5Volume))  
+            self.dataList.append(myData_Trans.To_Float(self.buy1Price))      #买1-5价格
+            self.dataList.append(myData_Trans.To_Float(self.buy2Price))   
+            self.dataList.append(myData_Trans.To_Float(self.buy3Price))   
+            self.dataList.append(myData_Trans.To_Float(self.buy4Price))   
+            self.dataList.append(myData_Trans.To_Float(self.buy5Price))   
         
-        self.dataList.append(myData_Trans.To_Float(self.sell1Volume))    #卖1-5量
-        self.dataList.append(myData_Trans.To_Float(self.sell2Volume))   
-        self.dataList.append(myData_Trans.To_Float(self.sell3Volume))   
-        self.dataList.append(myData_Trans.To_Float(self.sell4Volume))   
-        self.dataList.append(myData_Trans.To_Float(self.sell5Volume))  
-        self.dataList.append(myData_Trans.To_Float(self.sell1Price))     #卖1-5价格
-        self.dataList.append(myData_Trans.To_Float(self.sell2Price))   
-        self.dataList.append(myData_Trans.To_Float(self.sell3Price))   
-        self.dataList.append(myData_Trans.To_Float(self.sell4Price))   
-        self.dataList.append(myData_Trans.To_Float(self.sell5Price))   
+            self.dataList.append(myData_Trans.To_Float(self.sell1Volume))    #卖1-5量
+            self.dataList.append(myData_Trans.To_Float(self.sell2Volume))   
+            self.dataList.append(myData_Trans.To_Float(self.sell3Volume))   
+            self.dataList.append(myData_Trans.To_Float(self.sell4Volume))   
+            self.dataList.append(myData_Trans.To_Float(self.sell5Volume))  
+            self.dataList.append(myData_Trans.To_Float(self.sell1Price))     #卖1-5价格
+            self.dataList.append(myData_Trans.To_Float(self.sell2Price))   
+            self.dataList.append(myData_Trans.To_Float(self.sell3Price))   
+            self.dataList.append(myData_Trans.To_Float(self.sell4Price))   
+            self.dataList.append(myData_Trans.To_Float(self.sell5Price))   
 
-        self.priceOpen = myData_Trans.To_Float(self.openPrice)           #开盘价格
-        self.priceBase = myData_Trans.To_Float(self.preClose)            #前一收盘价格
+            self.priceOpen = myData_Trans.To_Float(self.openPrice)           #开盘价格
+            self.priceBase = myData_Trans.To_Float(self.preClose)            #前一收盘价格
+        else:
+            self.dataList.append((self.lastPrice))      #最后价格
+            self.dataList.append((self.highPrice))      #最高价格
+            self.dataList.append((self.lowPrice))       #最低价格 
+            self.dataList.append((self.buyPrice))       #买价
+            self.dataList.append((self.sellPrice))      #卖价
+            self.dataList.append((self.tradeValume))    #成交量
+            self.dataList.append((self.tradeTurnover))  #成交额
+        
+            self.dataList.append((self.buy1Volume))     #买1-5量
+            self.dataList.append((self.buy2Volume))   
+            self.dataList.append((self.buy3Volume))   
+            self.dataList.append((self.buy4Volume))   
+            self.dataList.append((self.buy5Volume))  
+            self.dataList.append((self.buy1Price))      #买1-5价格
+            self.dataList.append((self.buy2Price))   
+            self.dataList.append((self.buy3Price))   
+            self.dataList.append((self.buy4Price))   
+            self.dataList.append((self.buy5Price))   
+        
+            self.dataList.append((self.sell1Volume))    #卖1-5量
+            self.dataList.append((self.sell2Volume))   
+            self.dataList.append((self.sell3Volume))   
+            self.dataList.append((self.sell4Volume))   
+            self.dataList.append((self.sell5Volume))  
+            self.dataList.append((self.sell1Price))     #卖1-5价格
+            self.dataList.append((self.sell2Price))   
+            self.dataList.append((self.sell3Price))   
+            self.dataList.append((self.sell4Price))   
+            self.dataList.append((self.sell5Price))   
+
+            self.priceOpen = self.openPrice           #开盘价格
+            self.priceBase = self.preClose            #前一收盘价格
         self.priceRiseFall = self.dataList[1] / self.priceBase - 1       #涨跌幅 
         return self.dataList
     #由值组转换

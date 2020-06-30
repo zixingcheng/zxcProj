@@ -36,6 +36,7 @@ class Quote_Listener:
 
         #通知处理
         self.pSet = quoteDatas.setting.GetSetting(self.nameAlias)
+        if(self.pSet == None): return False
         for x in self.pSet.msgUsers:
             #生成用户消息
             usrPlat = self.pSet.msgUsers[x]

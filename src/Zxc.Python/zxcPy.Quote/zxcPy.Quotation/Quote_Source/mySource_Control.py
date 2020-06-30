@@ -38,7 +38,7 @@ class Source_Control(myQuote_Source.Quote_Source):
     #查询行情
     def query(self, checkTime = True, nReturn = 0, parms = None): 
         if(parms == None):
-            self.pQuotes['SinaAPI'].query(checkTime, nReturn)
+            #self.pQuotes['SinaAPI'].query(checkTime, nReturn)
             self.pQuotes['JqDataAPI'].query(checkTime, nReturn)
         else:
             api = self.pQuotes.get(parms.get('typeAPI', ''), None)
@@ -62,7 +62,9 @@ gol._Set_Value('quoteSource', Source_Control())   #实例 行情对象
 
 #主启动程序
 if __name__ == "__main__":
+    import myListener_Printer
     pSource = Source_Control()
+    pSource.addListener(myListener_Printer.Quote_Listener_Printer())
     
     # 单独查询，不纪录
     qd = pSource.query(False, 1) 

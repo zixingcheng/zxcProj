@@ -524,7 +524,7 @@ class myDataDB_StockTradeRisk(myData_DB.myData_Table):
         
         #获取均值
         nTimes = myData.iif(dictSet['标的名称'].count('50ETF') == 1, 10000, 1)
-        stockSource = gol._Get_Value('quoteSource_API', None)
+        stockSource = gol._Get_Value('quoteSource_API_JqData', None)
         avgs = [0, 0, -1, -1, -1, -1]
         if(avg5):
             avg5s = stockSource.getPrice_avg_day(stockID, 5, False, end_date)
@@ -707,7 +707,7 @@ if __name__ == "__main__":
         pRisk.notifyQuotation(10.4)     #回撤
         pRisk.notifyQuotation(10.6)
         pRisk.notifyQuotation(10.7)     
-        pRisk.notifyQuotation(10.9)
+        pRisk.notifyQuotation(10.9)     #阶段反弹新高，需细分处理反弹
         pRisk.notifyQuotation(10.8)     #回撤
         pRisk.notifyQuotation(10.75)     
         pRisk.notifyQuotation(10.8)     
@@ -722,10 +722,10 @@ if __name__ == "__main__":
         pRisk.notifyQuotation(10.3)     
 
     # 期权交易测试
-    pSource = gol._Get_Value('quoteSource_API', None)
+    pSource = gol._Get_Value('quoteSource_API_JqData', None)
     if(1 == 2):
         print("当天3000的期权信息：")
-        pSource = gol._Get_Value('quoteSource_API', None)
+        pSource = gol._Get_Value('quoteSource_API_JqData', None)
         sources = pSource.getPrice(security='10001945.XSHG',frequency='1m',start_date='2019-10-14 09:30:00',end_date='2019-10-14 15:00:00')
     
         # 添加买入及测试信息
@@ -738,7 +738,7 @@ if __name__ == "__main__":
         print()
         
     # 期权交易测试-实时模拟
-    if(1 == 1):
+    if(1 == 2):
         #初始风险对象
         pRisk_300033 = pRisk.getRiskSet('茶叶一主号', '300033', "", True)
         pRisk_3000 = pRisk.getRiskSet('茶叶一主号', '10001965.XSHG', "", True)
