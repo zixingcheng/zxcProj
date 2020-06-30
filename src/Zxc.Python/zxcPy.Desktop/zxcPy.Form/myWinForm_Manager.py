@@ -15,15 +15,15 @@ mySystem.Append_Us("/zxcPy.APIs", False, __file__)
 mySystem.Append_Us("", False)    
 import myData, myData_Trans, myIO, myDebug, myError
 import myMQ_Rabbit, myManager_Msg
-import myWinForm_QT
+import myWinForm_QT, myWinForm_Set
 from myGlobal import gol 
 
 
 
 # 透明悬浮窗口-行情
 class myWinForm_Quote(myWinForm_QT.myWinForm):
-    def __init__(self, type = "", name = "", parent=None, icoUrl = "", imgDir = "", alpha = 0.8, randomXY = True, autoMove = True, typeMove = 0, range = [200,900,200,650]):  
-        super(myWinForm_Quote, self).__init__(type, name, parent, icoUrl, imgDir, alpha, randomXY, autoMove, typeMove, range)
+    def __init__(self, type = "", name = "", parent=None, icoUrl = "", imgDir = "", alpha = 0.8, randomXY = True, autoMove = True, typeMove = 0, range = [200,900,200,650], pos = [300, 300, 99, 99]):  
+        super(myWinForm_Quote, self).__init__(type, name, parent, icoUrl, imgDir, alpha, randomXY, autoMove, typeMove, range, pos)
     #初始窗口
     def _initForm_urs(self, msg):
         # 临时调整窗口信息
@@ -59,38 +59,47 @@ class myWinForm_Manager():
         strDir, strName = myIO.getPath_ByFile(__file__)
         self.baseDir = os.path.abspath(os.path.join(strDir, ".."))  
         self.imgDir = self.baseDir + "/Data/Images/imgQuote/"
+        self.setWinForm = gol._Get_Value('zxcWinForm_Control', None)
     #初始窗口集（缓存备用，避免线程问题）
     def _initForms(self, type, tag, indMin = 0, indMax = 10, x = 300, y = 300, w = 86, h = 86, randomXY = False, rangeRect = None, saveXY = False, isShow = False):
         #初始行情窗口备用
-        for x in range(indMin, indMax):
-            self._initForm(type, tag + "_" + str(x), "", x, y, w, h, rangeRect, randomXY, saveXY, isShow)
-
+        for xx in range(indMin, indMax):
+            self._initForm(type, tag + "_" + str(xx), "", x, y, w, h, rangeRect, randomXY, saveXY, isShow)
     #初始窗口
     def _initForm(self, type, tag, icoUrl = "", x = 300, y = 300, w = 86, h = 86, rangeRect = None, randomXY = False, saveXY = False, isShow = True):
         frm = self._findForm(type, tag)
         if(frm == None):             
             #显示窗口
-            self._showForm(type, tag, icoUrl, randomXY, rangeRect, isShow)
+            pos = [x, y, w, h]
+            _tag = self._getTag(type, tag) 
+            pSet = self.setWinForm.getSet("", "", _tag)
+            if(pSet != None):
+                pos = pSet.formPos
+                saveXY = pSet.formRePos
+                randomXY = False
+            self._showForm(type, tag, icoUrl, randomXY, rangeRect, pos, isShow, saveXY)
         pass
+
     #显示窗口   
-    def _showForm_thrd(self, type, tag, icoUrl, randomXY, rangeRect): 
+    def _showForm_thrd(self, type, tag, icoUrl, randomXY, rangeRect, isShow, saveXY = False): 
         randomXY = True
-        thrdForm = threading.Thread(target = self._showForm, args=(type, tag, icoUrl, randomXY, rangeRect))
+        thrdForm = threading.Thread(target = self._showForm, args=(type, tag, icoUrl, randomXY, rangeRect, isShow, saveXY))
         thrdForm.setDaemon(False)
         thrdForm.start() 
     #显示窗口-线程 
-    def _showForm(self, type, tag, icoUrl, randomXY, rangeRect, isShow): 
+    def _showForm(self, type, tag, icoUrl, randomXY, rangeRect, pos, isShow, saveXY = False): 
         _tag = self._getTag(type, tag) 
         if(type == "quote"):
-            frm = myWinForm_Quote(type, _tag, icoUrl=icoUrl, imgDir=self.imgDir, randomXY=randomXY, range=rangeRect)
+            frm = myWinForm_Quote(type, _tag, icoUrl=icoUrl, imgDir=self.imgDir, randomXY=randomXY, range=rangeRect, pos=pos)
         else:
-            frm = myWinForm_QT.myWinForm(type, _tag, icoUrl=icoUrl, imgDir=self.imgDir, randomXY=randomXY, range=rangeRect, parent=None)
+            frm = myWinForm_QT.myWinForm(type, _tag, icoUrl=icoUrl, imgDir=self.imgDir, randomXY=randomXY, range=rangeRect, pos=pos, parent=None)
 
         #窗体必须显示出来，否则窗体会卡死
         frm.initHwnd("", icoUrl, isShow)
+        frm.savePos = saveXY
         frm.show()
         if(isShow):
-            self.manager[_tag] = frm
+            self.manager[frm.name] = frm
         self.managerTemp.append(frm)
     #查询窗体
     def _findForm(self, type, tag, autoCreate = False, autoChange = False):
@@ -123,6 +132,12 @@ class myWinForm_Manager():
         frm = self._findForm(type, tag, autoChange = True)
         if(frm != None):
             frm.initHwnd(strText, icoUrl)
+
+            #记录窗体信息
+            if(frm.savePos):
+                pSet = self.setWinForm.getSet("", "", frm.name)
+                if(pSet == None or (pSet.formPos[0] != frm.x and pSet.formPos[1] != frm.y)):
+                    self.setWinForm.initSet("", "", frm.name, type, formRange = frm.rangHwnd, formPos = [frm.x, frm.y, frm.w, frm.h], formRePos = frm.savePos, remark = '')
         return frm
     #创建消息队列 
     def init_MQ(self, bStart = False):
@@ -215,8 +230,8 @@ if __name__ == '__main__':
     #初始窗体管理器
     app = myWinForm_QT._initApp()
     frmManager = myWinForm_Manager(True)
-    frmManager._initForms("quote", "Tag", 0, 10, 600, 600, True)
-    frmManager._initForms("", "Tag", 0, 10, 600, 600, True)
+    frmManager._initForms("quote", "Tag", 0, 10, 600, 600, randomXY = True)
+    frmManager._initForms("", "Tag", 0, 10, 600, 600, randomXY = True)
    
     #消息模拟线程   
     def _thrdSet_Msg(): 

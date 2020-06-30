@@ -412,6 +412,7 @@ class myData_Table():
             return self._Trans_Value_Datetime(value)
         elif(utype == "list"):
             if(type(value) == list): return value
+            if(value == None): return []
             if(value.count("~*^") > 0):
                 data = list(json.loads(value.replace("~*^", ",")))
                 return data

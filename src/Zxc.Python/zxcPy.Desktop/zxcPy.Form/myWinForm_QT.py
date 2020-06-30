@@ -18,7 +18,7 @@ from PyQt5.QtCore import Qt, QRectF
 
 # 透明悬浮窗口
 class myWinForm(QWidget):
-    def __init__(self, type = "", name = "", parent=None, icoUrl = "", imgDir = "", alpha = 0.8, randomXY = True, autoMove = True, typeMove = 0, range = [200,900,200,650]):  
+    def __init__(self, type = "", name = "", parent=None, icoUrl = "", imgDir = "", alpha = 0.8, randomXY = True, autoMove = True, typeMove = 0, range = [200,900,200,650], pos = [300, 300, 99, 99]):  
         random.seed(a=None, version=2)
         super(myWinForm, self).__init__(parent)
 
@@ -36,11 +36,12 @@ class myWinForm(QWidget):
         self.typeMove = typeMove    #移动模式
         self.alive = False          #是否激活
         self.rangHwnd = range       #限定范围
+        self.savePos = range        #记忆位置
         self.hitCode = 0            #命中码，简易密码组合以激活窗体
         self.isUsed = False         #是否使用中
         self.text = ""              #窗口显示内容
         self.moveX = 0; self.moveY = 0; 
-        self._initForm()
+        self._initForm(pos[0], pos[1], pos[2], pos[3])
         
     #随机窗口位置
     def _randomXY(self):
@@ -90,6 +91,9 @@ class myWinForm(QWidget):
         painter.setFont(QFont('Decorative', 7))     # QFont.Bold
         rect = QRectF(self.w/4,self.h/2,self.w/3*2,self.h/2)
         painter.drawText(rect, Qt.AlignCenter, self.text)  
+
+        self.x = self.pos().x()
+        self.y = self.pos().y()
     #重载鼠标进入控件事件 
     def enterEvent(self, event):
         self.alive = True; self.hitCode = 1
@@ -152,6 +156,7 @@ class myWinForm(QWidget):
             self.alpha_now = self.alpha
             self.setWindowOpacity(self.alpha_now)      # 设置窗口透明度
             self._active_usr(event)                    # 自定鼠标单击-激活，便于重载操作
+            self.savePos = True
     #鼠标单击-激活--自定义
     def _active_usr(self, event):
         pass

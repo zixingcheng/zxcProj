@@ -21,6 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="zxcPy.Form\myWinForm_Set.py" />
     <Compile Include="zxcPy.Form\myWinForm_Manager.py" />
     <Compile Include="zxcPy.Form\myWinForm_Manager_Test.py" />
     <Compile Include="zxcPy.Form\myWinForm_QT.py" />

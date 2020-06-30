@@ -25,6 +25,7 @@ class myWinForm():
         self.typeMove = typeMove    #移动模式
         self.alive = False          #是否激活
         self.rangHwnd = range       #限定范围
+        self.savePos = range        #记忆位置
         self.hitCode = 0            #命中码，简易密码组合以激活窗体
         self.moveX = 0; self.moveY = 0
         
@@ -108,11 +109,12 @@ class myWinForm():
         self.hWnd.geometry("+%s+%s" % (x, y))
     #鼠标单击-激活
     def _active(self, event):
-        print(self.hitCode)
+        #print(self.hitCode)
         if(self.hitCode == 0.5):
             self.alpha_now = 0.8
             self.hWnd.attributes('-alpha', self.alpha_now)
-            self.initHwnd("逮着你了！")
+            self.savePos = True
+            #self.initHwnd("逮着你了！")
 
     #初始窗口
     def initHwnd(self, strText = '', x = 300, y = 300, w = 86, h = 86):
