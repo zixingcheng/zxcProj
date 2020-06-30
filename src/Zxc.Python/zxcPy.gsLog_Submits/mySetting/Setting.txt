@@ -1,4 +1,0 @@
-第一列为提示，第二列为对应信息，以tab分隔
-Url	http://192.168.29.31:7003/ams
-User	zhangbin
-UserPw	zxc123
