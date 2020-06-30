@@ -1,0 +1,65 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>15a0a06f-3917-46fd-b1d4-f3a7530a0a94</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>自动提交日报.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>PythonApplication1</Name>
+    <RootNamespace>PythonApplication1</RootNamespace>
+    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="myFunction\" />
+    <Folder Include="myFunction\__pycache__\" />
+    <Folder Include="mySetting\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="myFunction\__pycache__\myDataSet.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myData_Trans.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myEnum.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myIO.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\mySetting_Note.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myWebFun.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myWebFun_gsafety.cpython-35.pyc" />
+    <Content Include="myFunction\__pycache__\myWebFun_gsafety_prj.cpython-35.pyc" />
+    <Content Include="mySetting\Note_Now.md" />
+    <Content Include="mySetting\Prj_Dict.csv" />
+    <Content Include="mySetting\Setting.txt" />
+    <Content Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="myFunction\mySetting_Note.py" />
+    <Compile Include="myFunction\myWork_gdMSLT_SA.py" />
+    <Compile Include="myFunction\myWork_gdMSLT.py" />
+    <Compile Include="myFunction\myWebFun_gdsafety.py" />
+    <Compile Include="myFunction\myWebFun_gsafety.py" />
+    <Compile Include="myFunction\myWebFun_gsafety_prj.py" />
+    <Compile Include="自动提交日报.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.7" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>
