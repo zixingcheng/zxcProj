@@ -29,7 +29,6 @@
     <Compile Include="zxcPy.Quotation\myQuote_Source.py" />
     <Compile Include="zxcPy.Quotation\myQuote_Setting.py" />
     <Compile Include="zxcPy.Quotation\myQuote.py" />
-    <Compile Include="zxcPy.Quotation\Quote_Data\Data_Risk\myData_DB.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Risk\myData_Monitor_Risk.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Risk\myData_Monitor.py" />
     <Compile Include="zxcPy.Quotation\Quote_Data\Data_Algorithm\myAcceleration.py" />
@@ -44,6 +43,7 @@
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_StaticsM5.py" />
     <Compile Include="zxcPy.Quotation\Quote_Listener\myListener_Printer.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Control.py" />
+    <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Sina_API.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_JQData_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Qtimg_Stock.py" />
     <Compile Include="zxcPy.Quotation\Quote_Source\mySource_Sina_Stock.py" />

@@ -38,8 +38,8 @@ class Source_Control(myQuote_Source.Quote_Source):
     #查询行情
     def query(self, checkTime = True, nReturn = 0, parms = None): 
         if(parms == None):
-            #self.pQuotes['SinaAPI'].query(checkTime, nReturn)
-            self.pQuotes['JqDataAPI'].query(checkTime, nReturn)
+            self.pQuotes['SinaAPI'].query(checkTime, nReturn)
+            #self.pQuotes['JqDataAPI'].query(checkTime, nReturn)
         else:
             api = self.pQuotes.get(parms.get('typeAPI', ''), None)
             if(api != None):

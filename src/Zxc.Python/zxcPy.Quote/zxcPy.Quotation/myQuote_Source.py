@@ -14,7 +14,7 @@ mySystem.Append_Us("/Quote_Source", False, __file__)
 mySystem.Append_Us("/Quote_Listener", False, __file__)
 mySystem.Append_Us("../../zxcPy.Robot/zxcPy.Robot/Prjs/Base", False, __file__)
 mySystem.Append_Us("", False)    
-import myData_Trans, myDebug, myIO
+import myData_Trans, myData, myDebug, myIO
 import myQuote_Data, myManager_Bill
 from myGlobal import gol 
 gol._Init()                         #先必须在主模块初始化（只在Main模块需要一次即可）
@@ -59,7 +59,7 @@ class Quote_Source:
 
                     #记录设置编号
                     if(pSet.stockInfo.source_set == self.type):
-                        lstParam.append(pSet.setTag)
+                        lstParam.append(myData.iif(pSet.stockInfo.source_code == "", pSet.setTag, pSet.stockInfo.source_code))
             self.paramsList = lstParam
             strParams = myData_Trans.Tran_ToStr(lstParam).replace(".", '')
             return strParams

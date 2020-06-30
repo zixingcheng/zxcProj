@@ -13,9 +13,9 @@ import pandas as pd
 mySystem.Append_Us("/Quote_Source", False, __file__)
 mySystem.Append_Us("", False)    
 import myData_Trans, myDebug, myIO, myIO_xlsx
-import mySource_JQData_API
+import mySource_JQData_API, mySource_Sina_API
 
-exInfos = {'XSHG': "上海证券交易所", 'XSHE': "深圳证券交易所"}
+exInfos = {'XSHG': "上海证券交易所", 'XSHE': "深圳证券交易所", 'sh': "上海证券交易所", 'sz': "深圳证券交易所"}
 stockTypes = {'stock': "股票", 'index': "指数", 'etf': "ETF基金", 'opt': "期权"}
 
 
@@ -88,6 +88,7 @@ class myStock:
         self.setFields = ['extype', 'code', 'code_name', 'code_name_En', 'type', 'area', 'exName', 'extype2', 'source_set', 'source_code']
 
         self.quoteSource = gol._Get_Value('quoteSource_API_JqData', None)  #数据源操作对象
+        self.quoteSource_2 = gol._Get_Value('quoteSource_API_Sina', None)  #数据源操作对象
         self.lstStock = []
         self._init_Updata()         #更新配置信息
         self._Init()                #初始配置信息等
@@ -131,6 +132,7 @@ class myStock:
                 # pDatas.append(data['start_date'])
                 # pDatas.append(data['end_date'])
 
+            '''
             #期权信息
             opts = []
             opts_300ETF = self.quoteSource.getOptInfos("510050.XSHG", 12)
@@ -154,6 +156,26 @@ class myStock:
                 elif(pDatas[0] == "XSHG"):
                     pDatas[0] = 'sh'
                     pDatas[5] = 'CN'
+                data_list.append(pDatas)
+                '''
+                
+            #期权信息
+            opts = []
+            opts_300ETF = self.quoteSource_2.getOptInfos("50ETF", extype = "sh")
+            opts_300ETF = opts_300ETF + self.quoteSource_2.getOptInfos("300ETF", extype = "sh")
+            opts = opts + opts_300ETF
+            for x in opts:
+                pDatas = []
+                pDatas.append(x['name'].split('.')[1])
+                pDatas.append(x['name'].split('.')[0])
+                pDatas.append(x['display_name'])
+                pDatas.append(myData_Trans.Tran_ToStr_FirstLetters(x['display_name'], True))
+                pDatas.append(x['type'])
+                pDatas.append('CN')
+                pDatas.append(exInfos.get(pDatas[0], '未知'))
+                pDatas.append(x['extype2'])
+                pDatas.append("")
+                pDatas.append(x['source_code'])
                 data_list.append(pDatas)
             self._Init_Default(data_list)
             
