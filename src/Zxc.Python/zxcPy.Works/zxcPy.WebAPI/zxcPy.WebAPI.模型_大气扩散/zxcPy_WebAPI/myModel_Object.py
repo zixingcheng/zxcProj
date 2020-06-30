@@ -135,8 +135,9 @@ class myObj_Sun():
     # 太阳信息初始
     def initSun_Infos(self, longitude, latitude, dtTime, numCloud):
         month = dtTime.month
-        day = int(dtTime.day / 10)
-        theta = sunLst_Inclination[day * 12 + month - 1]
+        dayRange = int(dtTime.day / 10)
+        if(dayRange > 2): dayRange = 2
+        theta = sunLst_Inclination[dayRange * 12 + month - 1]
         self.angle_Inclination = theta
         self.angle_elevation = math.asin(math.sin(math.radians(longitude)) 
                                          * math.sin(math.radians(theta)) 
