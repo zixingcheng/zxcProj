@@ -14,7 +14,6 @@ import mySystem
 mySystem.Append_Us("/zxcPy.Form", False, __file__)
 mySystem.Append_Us("", False)    
 from myGlobal import gol  
-import myWinForm_QT, myWinForm_Manager
 
 
 
@@ -24,13 +23,13 @@ if __name__ == '__main__':
     if(gol._Run_Lock(__file__) == False):
        exit(0)
 
-       
     
     #初始窗体管理器
+    import myWinForm_QT, myWinForm_Manager
     app = myWinForm_QT._initApp()
     frmManager = myWinForm_Manager.myWinForm_Manager(True)
-    frmManager._initForms("quote", "Tag", 0, 10, 600, 600, True)
-    frmManager._initForms("", "Tag", 0, 10, 600, 600, True)
+    frmManager._initForms("quote", "Tag", 0, 10, 600, 600, 86, 86, randomXY = True)
+    frmManager._initForms("", "Tag", 0, 10, 600, 600, 86, 86, randomXY = True)
    
     #消息模拟线程   
     def _thrdSet_Msg(): 

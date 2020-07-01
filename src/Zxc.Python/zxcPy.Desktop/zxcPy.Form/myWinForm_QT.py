@@ -36,13 +36,14 @@ class myWinForm(QWidget):
         self.typeMove = typeMove    #移动模式
         self.alive = False          #是否激活
         self.rangHwnd = range       #限定范围
-        self.savePos = range        #记忆位置
+        self.savePos = False        #记忆位置
         self.hitCode = 0            #命中码，简易密码组合以激活窗体
         self.isUsed = False         #是否使用中
         self.text = ""              #窗口显示内容
         self.moveX = 0; self.moveY = 0; 
+        self.funActive = None
         self._initForm(pos[0], pos[1], pos[2], pos[3])
-        
+
     #随机窗口位置
     def _randomXY(self):
         if(self.rangHwnd == None):
@@ -50,34 +51,36 @@ class myWinForm(QWidget):
         self.x = random.randint(self.rangHwnd[0], self.rangHwnd[1])
         self.y = random.randint(self.rangHwnd[2], self.rangHwnd[3])
     #初始窗口
-    def _initForm(self, x = 300, y = 300, w = 99, h = 99):
+    def _initForm(self, x = 300, y = 300, w = 99, h = 99, new = True):
         #记录位置大小
         self.x = x;  self.y = y
         self.w = w; self.h = h
-        if(self.randomXY): self._randomXY()
+        self.moveX = self.x; self.moveY = self.y; 
         #print(self.x, self.y)
 
         #初始窗口
-        self.setWindowTitle("不规则窗体的实现例子")
-        self.setWindowFlag(Qt.FramelessWindowHint)          # 设置无边框
-        self.setWindowFlag(Qt.Tool)                         # 设置无边框
-        self.setWindowFlag(Qt.WindowStaysOnTopHint)         # 窗口置顶
-        self.setWindowOpacity(0.8)                          # 设置窗口透明度
-        self.setAttribute(Qt.WA_TranslucentBackground)      # 设置窗口背景透明
-        self.setHidden(True)                                # 设置窗口隐藏
-        self.resize(self.w, self.h)
-        self.setGeometry(self.x, self.y, self.w, self.h)
-        self._initForm_urs(None)                            # 自定义窗口设置，便于重载界面
+        if(new == True):
+            if(self.randomXY): self._randomXY()
+            self.setWindowTitle(self.name)
+            self.setWindowFlag(Qt.FramelessWindowHint)          # 设置无边框
+            self.setWindowFlag(Qt.Tool)                         # 设置无边框
+            self.setWindowFlag(Qt.WindowStaysOnTopHint)         # 窗口置顶
+            self.setWindowOpacity(0.8)                          # 设置窗口透明度
+            self.setAttribute(Qt.WA_TranslucentBackground)      # 设置窗口背景透明
+            self.setHidden(True)                                # 设置窗口隐藏
+            self.resize(self.w, self.h)
+            self.setGeometry(self.x, self.y, self.w, self.h)
+            self._initForm_urs(None)                            # 自定义窗口设置，便于重载界面
 
-        #遮掩蒙板
-        #self.pix = QBitmap(self.icoUrl)
-        #self.resize(self.pix.size())
-        #self.setMask(self.pix)
-        #self.dragPosition = None
-        #print(self.pix.size())
+            #遮掩蒙板
+            #self.pix = QBitmap(self.icoUrl)
+            #self.resize(self.pix.size())
+            #self.setMask(self.pix)
+            #self.dragPosition = None
+            #print(self.pix.size())
 
-        # 窗口背景透明渐变-线程方式
-        self._thrdSet_Alpha()
+            # 窗口背景透明渐变-线程方式
+            self._thrdSet_Alpha()
     #初始窗口--自定义
     def _initForm_urs(self, msg):
         pass
@@ -135,7 +138,7 @@ class myWinForm(QWidget):
         self.moveX = None
         self.moveY = None
     #初始窗口信息
-    def initHwnd(self, strText = '', icoUrl = "", isShow = True, infCmd = None):
+    def initHwnd(self, strText = '', icoUrl = "", isShow = True, infCmd = None, pos = []):
         self.icoUrl = icoUrl                         # 图标
         self.text = strText
         if(infCmd != None):
@@ -150,6 +153,22 @@ class myWinForm(QWidget):
         self.update()
         pass
     
+    # 消息装饰函数，用于传递外部重写方法，便于后续调用      
+    def active_register(self, type = ""):
+        def _fun_register(fn): 
+            # 按消息类型记录
+            self.funActive = fn
+            return fn
+        return _fun_register
+    # 回调装饰函数，封装触发消息，并回调
+    def active_reply(self):
+        # 提取消息类型对应的装饰函数
+        if(self.funActive != None):
+            try:
+                r = self.funActive() 
+            except :
+                pass
+
     #鼠标单击-激活
     def _active(self, event):
         if(self.hitCode == 0.5):
@@ -157,6 +176,7 @@ class myWinForm(QWidget):
             self.setWindowOpacity(self.alpha_now)      # 设置窗口透明度
             self._active_usr(event)                    # 自定鼠标单击-激活，便于重载操作
             self.savePos = True
+            self.active_reply()
     #鼠标单击-激活--自定义
     def _active_usr(self, event):
         pass

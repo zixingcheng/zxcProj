@@ -8,6 +8,7 @@ Created on  张斌 2020-05-15 11:00:00
     @依赖库： pyqt5
 """
 import sys, ast, os, time, threading
+import win32con, win32gui
 import mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
@@ -41,6 +42,8 @@ class myWinForm_Quote(myWinForm_QT.myWinForm):
 
             #按照行情匹配图标
             value = myData_Trans.To_Int(str(infCmd.get("value", "")))
+            if(value < -10): value = -10
+            if(value > 10): value = 10
             self.icoUrl = myData.iif(value >= 0, "Rise-", "Fall-") + str(abs(value)) + ".png"
             self.strText = infCmd.get("msg", strText)
             super().initHwnd(self.strText, self.icoUrl, isShow)
@@ -71,12 +74,6 @@ class myWinForm_Manager():
         if(frm == None):             
             #显示窗口
             pos = [x, y, w, h]
-            _tag = self._getTag(type, tag) 
-            pSet = self.setWinForm.getSet("", "", _tag)
-            if(pSet != None):
-                pos = pSet.formPos
-                saveXY = pSet.formRePos
-                randomXY = False
             self._showForm(type, tag, icoUrl, randomXY, rangeRect, pos, isShow, saveXY)
         pass
 
@@ -92,8 +89,18 @@ class myWinForm_Manager():
         if(type == "quote"):
             frm = myWinForm_Quote(type, _tag, icoUrl=icoUrl, imgDir=self.imgDir, randomXY=randomXY, range=rangeRect, pos=pos)
         else:
-            frm = myWinForm_QT.myWinForm(type, _tag, icoUrl=icoUrl, imgDir=self.imgDir, randomXY=randomXY, range=rangeRect, pos=pos, parent=None)
+            frm = myWinForm_QT.myWinForm(type, _tag, icoUrl=icoUrl, imgDir=self.imgDir, randomXY=randomXY, range=rangeRect, pos=pos, parent=None)            
 
+        # 装饰函数，处理监测到的上升、下降、拐点
+        @frm.active_register()
+        def Reply_Active(): 
+             #记录窗体信息
+            if(frm.savePos):
+                pSet = self.setWinForm.getSet("", "", frm.tag)
+                if(pSet == None or (pSet.formPos[0] != frm.x and pSet.formPos[1] != frm.y)):
+                    self.setWinForm.initSet("", "", frm.tag, type, formRange = frm.rangHwnd, formPos = [frm.x, frm.y, frm.w, frm.h], formRePos = frm.savePos, remark = '')
+                    myDebug.Debug(F"记录窗体({winFrom.name})位置", pSet.formPos[0], ",", pSet.formPos[1])
+        
         #窗体必须显示出来，否则窗体会卡死
         frm.initHwnd("", icoUrl, isShow)
         frm.savePos = saveXY
@@ -121,6 +128,27 @@ class myWinForm_Manager():
                     if(x.isUsed == False and x.type == type):
                         winFrom = x; winFrom.tag = _tag
                         self.manager[_tag] = winFrom
+                        
+                        #提取配置信息，并还原
+                        pSet = self.setWinForm.getSet("", "", winFrom.tag)
+                        if(pSet != None):
+                            if(pSet.formRePos):
+                                pos = pSet.formPos
+                                hwndForm = win32gui.FindWindow("Qt5QWindowToolSaveBits", winFrom.name)
+                                if(hwndForm > 0):
+                                    #移动窗体，还原记忆位置，SetWindowPos方法单次不一定成功，多次校检操作
+                                    myDebug.Debug(F"还原窗体({winFrom.name})位置", pos[0], ",", pos[1])
+                                    while(winFrom.x != pos[0] and winFrom.y != pos[1]):
+                                        winFrom._initForm(pos[0], pos[1], pos[2], pos[3], False)
+                                        win32gui.SetWindowPos(hwndForm, 
+                                                              win32con.HWND_TOPMOST,
+                                                              pos[0],  # x位置
+                                                              pos[1],  # y位置
+                                                              pos[2],  # 宽
+                                                              pos[3],  # 高
+                                                              win32con.SWP_SHOWWINDOW) 
+                                        #myDebug.Debug(winFrom.x, ",", winFrom.y)
+                                winFrom.savePos = pSet.formRePos
                         break;
         return winFrom
     #提取标签
@@ -132,12 +160,6 @@ class myWinForm_Manager():
         frm = self._findForm(type, tag, autoChange = True)
         if(frm != None):
             frm.initHwnd(strText, icoUrl)
-
-            #记录窗体信息
-            if(frm.savePos):
-                pSet = self.setWinForm.getSet("", "", frm.name)
-                if(pSet == None or (pSet.formPos[0] != frm.x and pSet.formPos[1] != frm.y)):
-                    self.setWinForm.initSet("", "", frm.name, type, formRange = frm.rangHwnd, formPos = [frm.x, frm.y, frm.w, frm.h], formRePos = frm.savePos, remark = '')
         return frm
     #创建消息队列 
     def init_MQ(self, bStart = False):
@@ -230,8 +252,8 @@ if __name__ == '__main__':
     #初始窗体管理器
     app = myWinForm_QT._initApp()
     frmManager = myWinForm_Manager(True)
-    frmManager._initForms("quote", "Tag", 0, 10, 600, 600, randomXY = True)
-    frmManager._initForms("", "Tag", 0, 10, 600, 600, randomXY = True)
+    frmManager._initForms("quote", "Tag", 0, 10, 600, 600, 86, 86, randomXY = True)
+    frmManager._initForms("", "Tag", 0, 10, 600, 600, 86, 86, randomXY = True)
    
     #消息模拟线程   
     def _thrdSet_Msg(): 
