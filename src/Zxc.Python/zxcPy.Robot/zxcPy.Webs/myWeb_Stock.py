@@ -30,8 +30,8 @@ class stockQueryForm(FlaskForm):
 # 股票行情监测设置页面
 class stockQuoteSetForm(FlaskForm):  
     #商品信息
-    stockID = StringField('股票代码', [DataRequired(),Length(min=4, max=10)], render_kw={"placeholder": "请输入股票代码"})  
-    stockName = StringField('股票名称', [DataRequired(),Length(min=2, max=12)], render_kw={"placeholder": "请输入股票名称/首字母"})
+    stockID = StringField('股票代码', [DataRequired(),Length(min=4, max=12)], render_kw={"placeholder": "请输入股票代码"})  
+    stockName = StringField('股票名称', [DataRequired(),Length(min=2, max=16)], render_kw={"placeholder": "请输入股票名称/首字母"})
      
     monitorUsrID = StringField('微信账户', [DataRequired()], default="") 
     save = SubmitField('新增监测', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
