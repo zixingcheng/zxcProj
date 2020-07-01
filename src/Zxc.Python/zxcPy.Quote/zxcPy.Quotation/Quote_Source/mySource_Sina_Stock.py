@@ -63,7 +63,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
                         lstReturn.append(qd)
                         nNum= nNum - 1
             except Exception as e:
-                #Error(e)
+                myDebug.Error(str(e))
                 pass
         if(nReturn>0): return lstReturn
         if(nResult > 0): 
@@ -90,7 +90,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
                 #                    标的证券类型，标的股票，期权合约简称，振幅(38)，最高价，最低价，成交量，成交额，分红调整标志，昨结算价，认购认沽标志，
                 #                    到期日，剩余天数，虚实值标志，内在价值，时间价值
                 qd.id = stkid[7:] 
-                qd.idTag = stkid
+                qd.idTag = "sh." + qd.id
                 qd.rawline = info
                 qd.buyPrice = vargs[1]
                 qd.lastPrice = vargs[2]
@@ -133,7 +133,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
                 #                    买价位四,买数量五,买价位五,卖数量一,卖价位一,卖数量二,卖价位二,卖数量三,卖价位三,卖数量四,
                 #                    卖价位四,卖数量五,卖价位五,行情日期,行情时间,停牌状态
                 qd.id = stkid[2:] 
-                qd.idTag = stkid
+                qd.idTag = "sh." + qd.id
                 qd.rawline = info
                 qd.name = vargs[0]
                 qd.openPrice = vargs[1]
