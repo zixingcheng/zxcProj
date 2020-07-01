@@ -49,7 +49,7 @@ class myAPI_Quote_Set(myWeb.myAPI):
             if(pSource != None and pSets != None):
                 if(removeSet == False):
                     editInfo = myData_Trans.Tran_ToDict(request.args.get('editInfo', "{}"))
-                    if(pSets._Edit(pStock.extype, pStock.code_id, "", editInfo)):
+                    if(pSets._Edit(pStock.extype, pStock.code_id, pStock.code_name, editInfo)):
                         pSource.params = pSource._getDefault_Param()
                         pMsg['text'] = strTag + " --设置已成功修改。" 
                         bResult = True
@@ -57,7 +57,7 @@ class myAPI_Quote_Set(myWeb.myAPI):
                 else:
                     usrID = request.args.get('usrID', '') 
                     usrPlat = request.args.get('usrPlat', 'wx')
-                    if(pSets._Remove(pStock.extype, pStock.code_id, "", usrID)):
+                    if(pSets._Remove(pStock.extype, pStock.code_id, pStock.code_name, usrID)):
                         pSource.params = pSource._getDefault_Param()
                         pMsg['text'] = strTag + " --设置已成功移除。" 
                         bResult = True

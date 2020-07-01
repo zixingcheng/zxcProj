@@ -91,6 +91,7 @@ class myQuote_Sets():
         self.setList = {}           #设置集(按名称索引)
         self.setList_Tag = {}       #设置集--(按Tag索引)
         self.setUsers = {}          #设置用户信息集
+        self.funChanges = {}
 
         #初始根目录信息
         strDir, strName = myIO.getPath_ByFile(__file__)
@@ -255,12 +256,14 @@ class myQuote_Sets():
             pSet = strSets[x]            
             strSet = x + "," + str(pSet.get("isValid",False)) + "," + pSet.get("setStr","") + "," + str(pSet.get("msgUsers","")).replace(',', '，') + "," + pSet.get("mark", "")
             bResult = bResult and self._Init_BySet_str(exType + "." + code_id + "," + code_name + ",,,," + strSet)
-        if(bResult): self._Save()
+        if(bResult): 
+            self.change_reply()
+            self._Save()
         return bResult   
     # 设置移除
     def _Remove(self, exType, code_id, code_name, usrID):
-        bResult = True
-        pSet = self._Find(code_name, exType + code_id)
+        bResult = False
+        pSet = self._Find(code_name, exType + "." + code_id)
         if(pSet != None):
             bResult = pSet.RemoveSetting(usrID)
             if(bResult): 
@@ -274,15 +277,37 @@ class myQuote_Sets():
                         self._Index_User_remove(pSet, "老婆")
                         self._Refresh(pSet, "老婆") 
 
-        if(bResult): self._Save()
+        if(bResult): 
+            self.change_reply()
+            self._Save()
         return bResult    
     # 设置更新--移除多余
     def _Refresh(self, pSet, usrID):
-        #for x in pSet.settings.keys():
-        #    if(len(pSet.settings[x].msgUsers) == 0):
-        #        pSet.settings.pop(x)  #报错
+        lstRemoves = []
+        for x in pSet.settings.keys():
+            if(len(pSet.settings[x].msgUsers) == 0):
+                lstRemoves.append(x)
+        for x in lstRemoves:
+            pSet.settings.pop(x)  #报错
         pUser = self.setUsers.get(usrID, {})
-
+        
+    # 消息装饰函数，用于传递外部重写方法，便于后续调用      
+    def change_register(self, type):
+        def _fun_register(fn): 
+            # 按消息类型记录
+            self.funChanges[type] = fn
+            return fn
+        return _fun_register
+    # 回调装饰函数，封装触发消息，并回调
+    def change_reply(self):
+        # 提取消息类型对应的装饰函数
+        for x in self.funChanges.keys():
+            funChange = self.funChanges[x]
+            if(funChange != None):
+                try:
+                    r = funChange(x) 
+                except:
+                    pass 
 
 #初始全局消息管理器
 from myGlobal import gol 

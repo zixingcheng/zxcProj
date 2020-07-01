@@ -27,8 +27,6 @@ class Quote_Source:
         self.type = type
         self.paramsSet = {}
         self.paramsList = []
-        if(params == ""): params = self._getDefault_Param()
-        self.params = params
         self.datas = {}
         self.datasNow = None
         self.listeners = []
@@ -37,6 +35,17 @@ class Quote_Source:
         self._initSetting()       #初始设置
         self.isClosed = False     #是否关闭
         self.setTime()            #设置(时效) 
+        
+        self.pSets = gol._Get_Value('setsQuote')
+        if(params == ""): params = self._getDefault_Param()
+        self.params = params
+
+        # 装饰函数，处理监测到的上升、下降、拐点
+        @self.pSets.change_register(type)
+        def Reply_Change(type): 
+            if(type == self.type):
+                self.params = self._getDefault_Param()
+            pass
     def _initSetting(self):
         #初始根目录信息
         strDir, strName = myIO.getPath_ByFile(__file__)
@@ -44,12 +53,13 @@ class Quote_Source:
         Dir_DataDB = Dir_Base + "/Data/DB_Trade/" 
         gol._Set_Setting('manageBills_Stock', myManager_Bill.myManager_Bill(Dir_DataDB ))     #实例 交易管理器   
     def _getDefault_Param(self):  #默认配置
-        pSets = gol._Get_Value('setsQuote')
-        if(pSets != None):
-            keys = pSets.setList.keys()
+        if(self.pSets != None):
+            self.paramsSet = {}
+            self.paramsList = []
+            keys = self.pSets.setList.keys()
             lstParam = []
             for x in keys:
-                pSet = pSets._Find(x) 
+                pSet = self.pSets._Find(x) 
                 if(pSet != None and pSet.IsEnable()):
                     lstSets = self.paramsSet.get(pSet.stockInfo.source_set, None)
                     if(lstSets == None):
