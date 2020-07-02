@@ -35,10 +35,10 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
         key = quoteDatas.name
 
         #通知处理
-        strMsg = self.DoRecvQuote(dValue_N, key, quoteDatas.datasS_M.data, quoteDatas.setting.isIndex)
+        strMsg = self.DoRecvQuote(dValue_N, key, quoteDatas.datasS_M.data, quoteDatas.setting)
         if(strMsg != ""):
             self.OnHandleMsg(quoteDatas, strMsg)
-    def DoRecvQuote(self, dValue_N, key, data, bIndex): 
+    def DoRecvQuote(self, dValue_N, key, data, pSet): 
         strTag_suffix = ""
         value = self.values.get(key, None)
         nTim_M = -1
@@ -64,7 +64,8 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
          
         #涨跌超限值
         deltaV = self.deltaV
-        if(bIndex): deltaV = self.deltaV / 2                #提高一倍精度
+        if(pSet.isIndex): deltaV = self.deltaV / 2                  #提高一倍精度
+        if(pSet.stockInfo.type == 'opt'): deltaV = self.deltaV * 5  #降低五倍精度
         if(abs(dDelta) >= deltaV):
             #涨跌幅达到间隔值整数倍, 计算记录新值
             nTimes = int(dDelta / deltaV)
@@ -115,7 +116,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             
             #组装返回结果
             #strMsg = "创业板指: 10000.34, 涨+10.01%;\n99分钟涨幅: 10.5%, 涨幅新高."
-            strMsg = data.getMsg_str(bIndex) 
+            strMsg = data.getMsg_str(pSet.isIndex) 
             if(len(strMsg) < 24):       #定长度格式修正
                 strMsg += " " * (24 - len(strMsg)) 
 
@@ -123,7 +124,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
                 strMsg += "\n" + strTag + strTag_suffix
             return strMsg
         return ""
-    #检查最大最小N天
+    #检查最大最小N天--需完善
     def CheckDays_MaxMin(self, dValue, key, bMax = True):
         pDatas_S = gol._Get_Value('datas_Stics_D_' + key, None)    #全局统计信息
         if(pDatas_S == None): return ""
