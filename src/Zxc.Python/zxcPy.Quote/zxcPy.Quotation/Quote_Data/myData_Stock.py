@@ -246,13 +246,19 @@ class Data_Stock(myQuote_Data.Quote_Data):
         return True
          
     #获取播报消息 
-    def getMsg_str(self, bIndex = False):
+    def getMsg_str(self, pSet = None):
         lstValue = self.toValueList()
         strValue = str(round(lstValue[1], 2))
         
+        bIndex = False
+        bOpt = False
+        if(pSet != None):
+            bIndex = pSet.isIndex 
+            bOpt = pSet.stockInfo.type == 'opt'
         nDigit = myData.iif(bIndex, 3, 2)
         strUnit = myData.iif(bIndex, "", "元")
-        strMsg = self.name + ": " + str(round(lstValue[1], nDigit)) + strUnit
+        price = myData.iif(bOpt == False, lstValue[1], lstValue[1] * 10000)
+        strMsg = self.name + ": " + str(round(price, nDigit)) + strUnit
            
         #涨跌标识    
         dValue_N = self.priceRiseFall

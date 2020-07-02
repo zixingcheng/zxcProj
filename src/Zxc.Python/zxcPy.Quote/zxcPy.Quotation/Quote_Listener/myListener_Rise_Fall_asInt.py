@@ -116,7 +116,7 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             
             #组装返回结果
             #strMsg = "创业板指: 10000.34, 涨+10.01%;\n99分钟涨幅: 10.5%, 涨幅新高."
-            strMsg = data.getMsg_str(pSet.isIndex) 
+            strMsg = data.getMsg_str(pSet) 
             if(len(strMsg) < 24):       #定长度格式修正
                 strMsg += " " * (24 - len(strMsg)) 
 

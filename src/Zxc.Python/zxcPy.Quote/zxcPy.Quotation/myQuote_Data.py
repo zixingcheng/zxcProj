@@ -71,7 +71,7 @@ class Quote_Data:
         datetime = self.getTime(bMinute)
         return myData_Trans.Tran_ToDatetime_str(datetime)
     #获取播报消息 
-    def getMsg_str(self, bIndex = False):
+    def getMsg_str(self, pSet = None):
         pass 
 
     #输出

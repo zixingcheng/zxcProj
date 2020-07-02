@@ -203,7 +203,7 @@ class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
             strTemp = pMonitor.checkValue(dValue_N)
             if(strTemp != ""):
                 #通知处理,组装返回结果
-                strMsg_str = quoteDatas.data.getMsg_str(bIsIndex)
+                strMsg_str = quoteDatas.data.getMsg_str(quoteDatas.setting)
                 for x in range(0, pMonitor.warnTimes):
                     strMsg = strMsg_str + "\n定点监测: " + strTemp 
                     self.OnHandleMsg(quoteDatas, strMsg, 5 * x )    # 多次延时提醒

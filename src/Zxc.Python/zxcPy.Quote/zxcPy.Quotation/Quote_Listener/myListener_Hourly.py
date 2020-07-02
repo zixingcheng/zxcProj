@@ -44,7 +44,7 @@ class Quote_Listener_Hourly(myQuote_Listener.Quote_Listener):
                 lstValue[strTime] = dValue_N                    #记录值
 
                 #组装返回结果
-                strMsg = quoteDatas.data.getMsg_str(quoteDatas.setting.isIndex)
+                strMsg = quoteDatas.data.getMsg_str(quoteDatas.setting)
                 strMsg += "\n整点播报: " + strTime + "."
         #通知处理
         self.OnHandleMsg(quoteDatas, strMsg)
