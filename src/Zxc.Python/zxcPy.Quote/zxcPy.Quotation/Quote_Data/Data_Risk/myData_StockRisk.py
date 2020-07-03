@@ -63,8 +63,9 @@ class mySet_StockRisk():
         self.stopLoss_goon = False      #正止损状态
         self.logOperates = []           #操盘记录
         self.sumOperates = 0            #操盘记录数，用于更新统计判断
+        self.date = ""                  #建仓日期
 
-        self.datetime = datetime.datetime.now()  
+        self.logDatetime = datetime.datetime.now() 
         self.remark = ""                #备注
         self.valid = True               #是否有效
         self.dictSets = {}              #字典型设置信息
@@ -105,12 +106,13 @@ class mySet_StockRisk():
         dictSets['当前浮盈'] = round(self.profitNow, 4)
         dictSets['止盈状态'] = self.stopProfit_goon
         dictSets['止损状态'] = self.stopLoss_goon
-
-        dictSets['日期'] = self.datetime
+        
+        dictSets['建仓日期'] = myData.iif(self.date !="", self.date, myData_Trans.Tran_ToDatetime_str(self.logDatetime, "%Y-%m-%d"))
         dictSets['isDel'] = not self.valid 
         dictSets['备注'] = self.remark
         dictSets['操作日志'] = self.logOperates
         dictSets['操作统计数'] = self.sumOperates
+        dictSets['操作时间'] = self.logDatetime
         return self.dictSets
     # 转换为对象，由字典结构
     def Trans_FromDict(self, dictSets, canLog = True):  
@@ -126,8 +128,8 @@ class mySet_StockRisk():
         #交易信息必须存在
         if(dictSets == None): return False
         bExsit = False; index = -1
-        strTime = dictSets.get('日期', "")
-        if(type(strTime) != str): strTime = myData_Trans.Tran_ToDatetime_str(dictSets['日期'], "%Y-%m-%d %H:%M:%S")
+        strTime = dictSets.get('操作时间', "")
+        if(type(strTime) != str): strTime = myData_Trans.Tran_ToDatetime_str(dictSets['操作时间'], "%Y-%m-%d %H:%M:%S")
         for x in self.logOperates:
             index += 1
             if(x['时间'] == strTime):
@@ -144,15 +146,18 @@ class mySet_StockRisk():
         stockNum_temp = myData_Trans.To_Float(str(dictSets.get("标的数量", 0)))
         stockAvg_temp = myData_Trans.To_Float(str(dictSets.get("标的均价", 0)))
         stockPosition_temp = myData_Trans.To_Float(str(dictSets.get("标的仓位", 1)))
-        if(stockNum_temp == 0 or stockNum_temp == 0): return False
+        if(stockNum_temp == 0 or stockNum_temp == 0): return False        
+        
+        self.logDatetime = dictSets.get("操作时间", self.logDatetime)
+        if(type(self.logDatetime) == str):
+            self.logDatetime = myData_Trans.Tran_ToDatetime(self.logDatetime, "%Y-%m-%d %H:%M:%S")
 
-        self.datetime = dictSets.get("日期", self.datetime)
         self.remark = dictSets.get("备注", self.remark)
         self.isDel = dictSets.get('isDel', not self.valid)  
 
         if(canLog):
             #提取时间
-            strTime = self.datetime
+            strTime = self.logDatetime
             if(type(strTime) != str): strTime = myData_Trans.Tran_ToDatetime_str(strTime, "%Y-%m-%d %H:%M:%S")
 
             #存在则更新
@@ -207,6 +212,10 @@ class mySet_StockRisk():
         self.stopProfit_goon = dictSets.get("止盈状态", self.stopProfit_goon)
         self.stopLoss_goon = dictSets.get("止损状态", self.stopLoss_goon)
         
+        self.date = dictSets.get("建仓日期", self.date)
+        if(self.date == ""):
+            self.date = myData_Trans.Tran_ToDatetime_str(self.logDatetime, "%Y-%m-%d")
+
         #操盘记录数不一致，更新统计判断
         if(self.sumOperates != len(self.logOperates)):
             self.Static_Profit(self.priceNow)
@@ -266,7 +275,7 @@ class myDataDB_StockRisk(myData_DB.myData_Table):
         if(dir == ""):
             strDir, strName = myIO.getPath_ByFile(__file__)
             self.Dir_Base = os.path.abspath(os.path.join(strDir, "../../.."))  
-            self.Dir_DataDB = self.Dir_Base + "/Data/DB_Trade/Stock_Risks/"
+            self.Dir_DataDB = self.Dir_Base + "/Data/DB_Risks/"
             myIO.mkdir(self.Dir_DataDB, False) 
         super().__init__(nameDB, self.Dir_DataDB, True) 
         
@@ -297,8 +306,8 @@ class myDataDB_StockRisk(myData_DB.myData_Table):
             if(rowInfo['ID'] != rowInfo_Base['ID']): return False, sameID
         if(rowInfo['isDel'] != rowInfo_Base['isDel']): return False, sameID
         if(rowInfo['用户名'] == rowInfo_Base['用户名'] and rowInfo['用户标签'] == rowInfo_Base['用户标签']):
-            if(rowInfo['标的编号'] == rowInfo_Base['标的编号']):
-                if (rowInfo['日期'] - rowInfo_Base['日期']).days < 1024:
+            if(rowInfo['标的编号'] == rowInfo_Base['标的编号'] and rowInfo['建仓日期'] == rowInfo_Base['建仓日期']):
+                if (rowInfo['操作时间'] - rowInfo_Base['操作时间']).days < 365:
                     return True, rowInfo_Base['ID']
         return False, sameID
             
@@ -469,7 +478,7 @@ class myMonitor_StockRisk():
     def updataTrade(self, strokPrice, stockNum, strTime = ""):
         #复制当前设置
         rowInfo = {'ID': self.setRisk.ID,'用户名': self.setRisk.usrID,'用户标签': self.setRisk.usrTag, '标的编号': self.setRisk.stockID, '标的名称': self.setRisk.stockName, '标的均价': strokPrice, '标的数量': stockNum}
-        if(strTime != ""): rowInfo['日期'] = strTime
+        if(strTime != ""): rowInfo['操作时间'] = strTime
         strR = str(rowInfo)
         
         #添加卖出信息
@@ -639,7 +648,7 @@ class myStockRisk_Control():
         return pRisk
         
     # 添加设置(stockNum < 0代表卖出)
-    def addRiskSet(self, usrID, usrTag, stockID, stockName, stockPrice, stockNum, time = "", dictSet = {}):  
+    def addRiskSet(self, usrID, usrTag, stockID, stockName, stockPrice, stockNum, time = "", dateTag = "", dictSet = {}):  
         dictSet['用户名'] = usrID  
         dictSet['用户标签'] = usrTag
         
@@ -655,7 +664,8 @@ class myStockRisk_Control():
         dictSet['标的名称'] = stockName
         dictSet['标的均价'] = stockPrice
         dictSet['标的数量'] = stockNum
-        dictSet['日期'] = myData.iif(time != "", time, myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d %H:%M:%S"))
+        dictSet['建仓日期'] = dateTag
+        dictSet['操作时间'] = myData.iif(time != "", time, myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d %H:%M:%S"))
 
         #添加-区分买入卖出
         pRisk = self.getRisk(usrID, usrTag, stockID, stockName, False)
@@ -683,7 +693,7 @@ class myStockRisk_Control():
             pRisk.handleMsg(F"{stockName}: {stockPrice} 元, 买入 {stockNum}股.")
         elif(stockNum < 0):
             if(pRisk != None):
-                pRisk.updataTrade(stockPrice, stockNum, dictSet['日期'])
+                pRisk.updataTrade(stockPrice, stockNum, dictSet['操作时间'])
                 pRisk.handleMsg(F"{stockName}: {stockPrice} 元, 卖出 {stockNum}股.")
     # 提取风控对象
     def getRisk(self, usrID, usrTag, stockID, stockName, bCheck = True, isOption = False, month_Delta = 0):  
@@ -723,7 +733,7 @@ class myStockRisk_Control():
 from myGlobal import gol 
 gol._Init()                 # 先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Value('zxcDB_StockRisk', myDataDB_StockRisk())     #实例 股票收益库对象 
-gol._Get_Value('zxcDB_StockRisk').Add_Fields(['用户名', '用户标签', '标的编号', '标的名称', '标的均价', '标的数量', "标的仓位", "手续费率", '边界限制','定量监测','监测间隔','止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段止盈','阶段止损','当前浮盈','止盈状态','止损状态', '日期', '备注', '操作统计数', '操作日志'], ['string','string','string','string','float','int','float','float','bool','bool','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','float','float','bool','bool','datetime','string','int','list'], [])
+gol._Get_Value('zxcDB_StockRisk').Add_Fields(['用户名', '用户标签', '标的编号', '标的名称', '标的均价', '标的数量', "标的仓位", "手续费率", '边界限制','定量监测','监测间隔','止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段止盈','阶段止损','当前浮盈','止盈状态','止损状态', '建仓日期', '操作时间', '备注', '操作统计数', '操作日志'], ['string','string','string','string','float','int','float','float','bool','bool','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','float','float','bool','bool','string','datetime','string','int','list'], [])
 gol._Set_Value('zxcRisk_Control', myStockRisk_Control())    #实例 风险控制操作类 
 
 
@@ -735,16 +745,16 @@ if __name__ == "__main__":
     pRisks = gol._Get_Value('zxcRisk_Control')
     
     # 添加买入及测试信息 sz,002547,春兴精工,CXJG,stock,CN,深圳证券交易所,XSHE
-    #pRisks.addRiskSet('茶叶一主号','','600332',"", 32, 10000, '2019-08-27 11:11:00', {}) 
-    #pRisks.addRiskSet('茶叶一主号','','300033',"", 96.943, 700, '2019-08-27 11:11:00', {}) 
-    #pRisks.addRiskSet('茶叶一主号','','10001832.XSHG',"50ETF购12月3000", 210.0, 20, '2019-10-23 09:31:00', {}) 
+    #pRisks.addRiskSet('茶叶一主号','','600332',"", 32, 10000, '2019-08-27 11:11:00', "", {}) 
+    #pRisks.addRiskSet('茶叶一主号','','300033',"", 96.943, 700, '2019-08-27 11:11:00', "", {}) 
+    #pRisks.addRiskSet('茶叶一主号','','10001832.XSHG',"50ETF购12月3000", 210.0, 20, '2019-10-23 09:31:00', "", {}) 
 
 
     # 添加行数据
     if(1==2):
         #print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': '600001.XSHG', '标的名称': "邯郸钢铁", '标的均价': '10.3', '标的数量': 5000, '止盈线': 0.08, '日期': '2019-08-27 11:11:00'}, True))
-        pRisks.addRiskSet('茶叶一主号','','600001',"测试股票", 10.3, 5000, '2019-08-27 11:11:00', {})  
-        pRisks.addRiskSet('茶叶一主号','','600001',"测试股票", 9.7, 5000, '2019-08-27 11:12:00', {})  
+        pRisks.addRiskSet('茶叶一主号','','600001',"测试股票", 10.3, 5000, '2019-08-27 11:11:00', "", {})  
+        pRisks.addRiskSet('茶叶一主号','','600001',"测试股票", 9.7, 5000, '2019-08-27 11:12:00', "", {})  
         
         # 查询数据
         dictSet = pDB.Query("isDel==False && 用户名==茶叶一主号 && 标的编号==600001.XSHG", "", True)
@@ -757,7 +767,7 @@ if __name__ == "__main__":
         pRisk = pRisks.getRisk('茶叶一主号', '', '600001.XSHG', '')
         pRisk.notifyQuotation(12)
         pRisk.notifyQuotation(11.7)     #回撤 
-        #pRisks.addRiskSet('茶叶一主号','','600001',"", 11.7, -10000, '2019-08-27 11:18:00', {})  
+        #pRisks.addRiskSet('茶叶一主号','','600001',"", 11.7, -10000, '2019-08-27 11:18:00', "", {})  
         pRisk.notifyQuotation(12.7)      
         pRisk.notifyQuotation(13.3)      
         pRisk.notifyQuotation(10.4)     #回撤
@@ -788,7 +798,7 @@ if __name__ == "__main__":
 
         # 添加买入及测试信息
         code = opt['code']
-        print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': code, '标的名称': opt['name'], '标的均价': '2200', '标的数量': 10, '日期': date+' 09:31:00'}, True))
+        print(pDB.Add_Row({'用户名': '茶叶一主号', '标的编号': code, '标的名称': opt['name'], '标的均价': '2200', '标的数量': 10, '建仓日期': date, '操作时间': date+' 09:31:00'}, True))
     
         pRisk = pDB.getTradeRisk('茶叶一主号', '', code, True)
         for x in range(0, len(sources)):
@@ -800,7 +810,9 @@ if __name__ == "__main__":
         #初始风险对象
         pRisks_List = []
         opt = pSource.getOptInfo(3000, "", 0)
-        pRisks.addRiskSet('茶叶一主号','',opt['code'],opt['name'], 343, 20, '2019-10-23 09:31:00', {}) 
+        pRisks.addRiskSet('茶叶一主号','',opt['code'],opt['name'], 343, 20, '2019-10-24 08:59:00', "", {}) 
+        pRisks.addRiskSet('茶叶一主号','',opt['code'],opt['name'], 343, 20, '2019-10-24 09:59:00', "", {}) 
+        pRisks.addRiskSet('茶叶一主号','',opt['code'],opt['name'], 343, 20, '2019-10-25 09:59:00', "2019-10-25", {}) 
         pRisk_2750 = pRisks.getRisk('茶叶一主号', '',opt['code'], "", True)
         pRisks_List.append(pRisk_2750)
 

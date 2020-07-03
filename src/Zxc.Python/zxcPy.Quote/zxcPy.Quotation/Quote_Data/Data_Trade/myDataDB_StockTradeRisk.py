@@ -447,7 +447,7 @@ class myDataDB_StockTradeRisk(myData_DB.myData_Table):
         if(dir == ""):
             strDir, strName = myIO.getPath_ByFile(__file__)
             self.Dir_Base = os.path.abspath(os.path.join(strDir, "../../.."))  
-            self.Dir_DataDB = self.Dir_Base + "/Data/DB_Trade/Stock_Risks/"
+            self.Dir_DataDB = self.Dir_Base + "/Data/DB_Risks/"
             myIO.mkdir(self.Dir_DataDB, False) 
         super().__init__(nameDB, self.Dir_DataDB, True) 
         
