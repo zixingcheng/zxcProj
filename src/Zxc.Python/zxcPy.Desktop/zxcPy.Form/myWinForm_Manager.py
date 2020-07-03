@@ -99,7 +99,7 @@ class myWinForm_Manager():
                 pSet = self.setWinForm.getSet("", "", frm.tag)
                 if(pSet == None or (pSet.formPos[0] != frm.x and pSet.formPos[1] != frm.y)):
                     self.setWinForm.initSet("", "", frm.tag, type, formRange = frm.rangHwnd, formPos = [frm.x, frm.y, frm.w, frm.h], formRePos = frm.savePos, remark = '')
-                    myDebug.Debug(F"记录窗体({winFrom.name})位置", pSet.formPos[0], ",", pSet.formPos[1])
+                    myDebug.Debug(F"记录窗体({frm.name})位置", pSet.formPos[0], ",", pSet.formPos[1])
         
         #窗体必须显示出来，否则窗体会卡死
         frm.initHwnd("", icoUrl, isShow)
@@ -118,7 +118,7 @@ class myWinForm_Manager():
                 winFrom = self.manager.get(_tag, None)
             elif(autoChange):
                # 去除空闲窗体记录
-                for x in self.manager.keys():
+                for x in list(self.manager.keys()):
                     frm = self.manager[x]
                     if(frm.isUsed == False):
                         self.manager.pop(x)
@@ -188,7 +188,7 @@ class myWinForm_Manager():
     #消息检查修正--消息队列方式 
     def checkMsg(self, strMsg):  
         try:
-            myDebug.Debug("接收队列消息window::", strMsg)  
+            myDebug.Debug("\r\n接收队列消息window::", strMsg)  
             msgR = ast.literal_eval(strMsg) 
             
             #时间校检, 十分钟内缓存数据有效(过早时间数据忽略)
@@ -223,6 +223,7 @@ class myWinForm_Manager():
     #处理窗口信息-行情
     def handelMsg_Quote(self, typeCmd, tagCmd, infCmd, msg):
         #提取窗体
+        myDebug.Debug(F"处理行情({tagCmd})",  ": ", infCmd)
         frm = self.initHwnd(typeCmd, tagCmd, "", "")
         if(frm != None):
             infCmd['typeCmd'] = typeCmd

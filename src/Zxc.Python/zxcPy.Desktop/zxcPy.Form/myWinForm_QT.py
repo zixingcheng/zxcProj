@@ -7,12 +7,16 @@ Created on  张斌 2020-05-15 11:00:00
     透明移动悬浮窗口, 图标文字 基于pyqt5
     @依赖库： pyqt5
 """
-import time, threading, random
+import time, threading, random, mySystem
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QLabel
 from PyQt5.QtGui import QPixmap, QPainter, QCursor, QBitmap, QColor, QFont, QPalette
 from PyQt5.QtCore import Qt, QRectF
+
+#引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
+mySystem.Append_Us("", False)    
+import myDebug, myError
 
 
 
@@ -97,6 +101,11 @@ class myWinForm(QWidget):
 
         self.x = self.pos().x()
         self.y = self.pos().y()
+
+        #位置变化校检
+        if(self.moveX != self.x or self.moveY !=self.y):
+            self.moveX = self.x; self.moveY =self.y;
+            self.active_reply()
     #重载鼠标进入控件事件 
     def enterEvent(self, event):
         self.alive = True; self.hitCode = 1
@@ -166,7 +175,8 @@ class myWinForm(QWidget):
         if(self.funActive != None):
             try:
                 r = self.funActive() 
-            except :
+            except Exception as ex:
+                myError.Error(ex)  
                 pass
 
     #鼠标单击-激活

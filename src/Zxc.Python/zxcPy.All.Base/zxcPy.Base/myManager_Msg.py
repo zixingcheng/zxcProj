@@ -91,13 +91,13 @@ class myManager_Msg():
             self.thrd_Handle.setDaemon(False)
             self.thrd_Handle.start()
     #初始API、消息队列    
-    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = None, usrHelper = ''):
+    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = None, usrHelper = '', isAuto_ack = False):
         if(plat == None or plat == ""): return 
         self.usrNameSelfs[plat] = usrHelper      #自定义的特殊用户名(特殊发送目标)
 
         #消息队列
         if(msgMQ_Sender != None): 
-            msgMQ_Sender.Init_Queue(msgMQ_Sender.nameQueue, True)           #消息持久化设置
+            msgMQ_Sender.Init_Queue(msgMQ_Sender.nameQueue, True, isAuto_ack)           #消息持久化设置
             self.usrMQs[plat] = msgMQ_Sender
             
         #消息回调API
@@ -290,9 +290,9 @@ from myGlobal import gol
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Setting('bufferMsgs', myMsgs("zxc", "zxc", "", ""))    #实例 消息缓存
 gol._Set_Setting('manageMsgs', myManager_Msg())                 #实例 消息管理器并初始消息api及消息队列 
-gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "")    #不使用api回调
+gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "")                        #不使用api回调
 gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "", usrHelper = 'filehelper')    #不使用api回调
-gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.usrWin, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_usrWin'), msgUrl_API = "")          #不使用api回调
+gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.usrWin, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_usrWin'), msgUrl_API = "", isAuto_ack = True)   #不使用api回调
 
 
 if __name__ == '__main__':
