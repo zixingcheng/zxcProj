@@ -18,6 +18,7 @@ mySystem.Append_Us("", False)
 class myData_Monitor():
     def __init__(self, name, saveData=True, valueDelta=0.0025, valueMax=0, valueMin=0, valueLast=0, valueBase=0):
         self.functionDict = {}          # 缓存外部装饰函数，用于回调
+        self.name = name
         self.saveData = saveData
         self.fixedHit = True
         self.dataNum = 0

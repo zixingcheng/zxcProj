@@ -93,6 +93,7 @@ class myData_Table():
        #循环添加
        bResult = True
        for x in range(len(fieldNames)):
+           if(fieldNames[x].lower() == ''): continue
            if(fieldNames[x].lower() == 'id'): continue
            if(fieldNames[x].lower() == 'isdel'): continue
            bResult = bResult and self.Add_Field(fieldNames[x], fieldTypes[x], isIndexs[x], fieldNames_alias[x])
