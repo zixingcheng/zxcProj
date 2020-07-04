@@ -32,6 +32,7 @@ class myData_Monitor():
         self.valueMax = self.iif(valueMax == 0, -999999, valueMax); self.valueMax_last = -999999
         self.valueMin = self.iif(valueMin == 0, 999999, valueMin); self.valueMin_last = 999999
         self.valueIndexs = [0] * 5      # 依次：valueLast、valueMax_last、valueMin_last、valueMax、valueMin
+        sys.setrecursionlimit(10000)    # 默认的递归深度是1000, 这里设置大一些
         
     # 消息装饰函数，用于传递外部重写方法，便于后续调用      
     def msg_register(self, monitorType = ["RAISE", "FALL", "BREAK"]):

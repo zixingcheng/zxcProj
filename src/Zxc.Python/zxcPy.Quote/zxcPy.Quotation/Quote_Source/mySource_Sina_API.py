@@ -15,7 +15,7 @@ import urllib, urllib.request
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类 
 mySystem.Append_Us("", False)    
-import myData_Trans, myData_Json, myDebug
+import myData, myData_Trans, myData_Json, myDebug
 from myGlobal import gol   
 
 
@@ -83,6 +83,34 @@ class Source_Sina_API():
             infos.append(info)
         return infos
     
+    # 查询价格信息，指定日期范围、数据频率
+    # fields:['open', ' close', 'low', 'high', 'volume', 'money', 'factor', 'high_limit',' low_limit', 'avg', ' pre_close', 'paused']
+    def getPrice(self, security, start_date="", end_date="", frequency='daily', fields=None, skip_paused=True, count=None):
+        # 同步参数
+        dateTime = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d")
+        start_date = myData.iif(start_date == "", dateTime + " 09:00:00", start_date)
+        end_date = myData.iif(end_date == "", dateTime + " 13:00:00", end_date)
+        
+        # 查询数据
+        host="http://hq.sinajs.cn/list="
+        url = host + security
+
+        req = urllib.request.Request(url)
+        res_data = urllib.request.urlopen(req)
+        res = res_data.read().decode(encoding = "gbk")
+
+        values = res.split('=')
+        stkid = values[0][11:]
+        info = values[1][1:len(values[1])-4]
+        vargs = info.split(',')
+            
+        # 区分股票与期权
+        if(stkid.count('CON_OP') == 1):
+            value = float(vargs[2])
+        else:
+            value = float(vargs[3])
+        return value
+
 #缓存全局对象
 gol._Set_Value('quoteSource_API_Sina', Source_Sina_API())   #实例 行情对象
 
@@ -94,4 +122,4 @@ if __name__ == "__main__":
     pSource = gol._Get_Value('quoteSource_API_Sina', None)
     print(pSource.getOptInfos(nameETF = "50ETF", month_Delta = 1))
     
- 
+    print(pSource.getPrice('CON_OP_10002535', start_date="", end_date="", frequency='daily', fields=None, skip_paused=True, count=None))

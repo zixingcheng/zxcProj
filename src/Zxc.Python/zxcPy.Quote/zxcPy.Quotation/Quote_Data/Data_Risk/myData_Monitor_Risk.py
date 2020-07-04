@@ -33,7 +33,13 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
         self.stopLoss = -0.02               #止损线，默认为-2%
         self.stopLoss_Retreat = 0.01        #止损回撤，默认为1% 
         self.stopLoss_goon = False          #是否止损中
-        self.profitMin_Stage = 9999999; self.profitMin_Stage_last = 9999999        
+        self.profitMin_Stage = 9999999; self.profitMin_Stage_last = 9999999     
+        
+        self.stockID = ""                   #标的编号
+        self.stockName = ""                 #标的名称
+        self.stockDate = ""                 #标的建仓日期
+        self.usrID = ""                     #归属用户名
+        self.usrTag = ""                    #归属用户标识
         self.init_riskSets(riskSets)
     # 初始风险策略参数
     def init_riskSets(self, riskSets = {}):
@@ -47,6 +53,12 @@ class myData_Monitor_Risk(myData_Monitor.myData_Monitor):
         self.stopLoss = riskSets.get("stopLoss", self.stopLoss)                                     #止损线，默认为-2%
         self.stopLoss_Retreat = riskSets.get("stopLoss_Retreat", self.stopLoss_Retreat)             #止损回撤，默认为1% 
         self.stopLoss_goon = riskSets.get("stopLoss_goon", self.stopLoss_goon)                      #是否止损中
+        
+        self.stockID = riskSets.get("stockID", self.stockID)                                        #标的编号
+        self.stockName = riskSets.get("stockName", self.stockName)                                  #标的名称
+        self.stockDate = riskSets.get("stockDate", self.stockDate)                                  #标的建仓日期
+        self.usrID = riskSets.get("usrID", self.usrID)                                              #归属用户名
+        self.usrTag = riskSets.get("usrTag", self.usrTag)                                           #归属用户标识
         
     # 自定义处理
     def handle_user(self, msg):

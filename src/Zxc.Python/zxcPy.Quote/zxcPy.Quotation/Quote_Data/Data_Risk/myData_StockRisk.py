@@ -444,6 +444,12 @@ class myMonitor_StockRisk():
         self.riskMonitor.profitMin_Stage = self.setRisk.profitMin               #最小浮盈 
         self.riskMonitor.profitMax_Stage_last = self.setRisk.profitMax_Stage    #阶段止盈位
         self.riskMonitor.profitMin_Stage_last = self.setRisk.profitMin_Stage    #阶段止损位 
+        
+        self.riskMonitor.stockID = setRisk.stockID                          #标的编号
+        self.riskMonitor.stockName = setRisk.stockName                      #标的名称
+        self.riskMonitor.stockDate = setRisk.usrID                          #标的建仓日期
+        self.riskMonitor.usrID = setRisk.usrTag                             #归属用户名
+        self.riskMonitor.usrTag = setRisk.date                              #归属用户标识
         #self.riskMonitor.init_riskSets()
 
         # 装饰函数，处理监测到的上升、下降、拐点
@@ -534,7 +540,8 @@ class myMonitor_StockRisk():
                 if(strTitle != ""):
                     if(self.msgManger == None): self.msgManger = gol._Get_Setting('manageMsgs')
                     msg = self.msgManger.OnCreatMsg()
-                    msg["usrName"] = "@*股票风控监测群"
+                    msg["usrName"] = self.setRisk.usrID
+                    msg["usrID"] = self.setRisk.usrTag
                     msg["msgType"] = "TEXT"
                     msg["usrPlat"] = "wx"
                     msg["msg"] = strTitle
@@ -586,31 +593,32 @@ class myMonitor_StockRisk():
         strMaxStage = str(Decimal((self.setRisk.profitMax_Stage * 100)).quantize(Decimal('0.00'))) + "%"#阶段浮盈-前高
         
         #触发止盈止损
-        strReutrn = F"{self.setRisk.stockName}: {strPrice}"
+        strReutrn = F"{self.setRisk.stockName}: {strPrice}.\r\n风控监测: "
         if(isHit):
             if(isNewLimit == False):    #第一次触发
                 if(isStopProfit):   
-                    strReutrn += F", 浮盈超 {strProfitNow}, 触发止盈.\r\n操作策略: 启动动态止盈.\r\n策略收益: {strProfit}."
+                    strReutrn += F"浮盈超 {strProfitNow}, 触发止盈.\r\n操作策略: 启动动态止盈.\r\n策略收益: {strProfit}."
                 else:
-                    strReutrn += F", 浮亏超 {strProfitNow}, 触发止损.\r\n操作策略: 启动动态止损.\r\n策略收益: {strProfit}."
+                    strReutrn += F"浮亏超 {strProfitNow}, 触发止损.\r\n操作策略: 启动动态止损.\r\n策略收益: {strProfit}."
             else:                       #再一次触发                
                 if(isStopProfit):  
                     strTag = myData.iif(isBreakLimit, "突破新高", "阶段新高")
-                    strReutrn += F", 浮盈超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止盈线上移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strReutrn += F"浮盈超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止盈线上移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
                 else:
                     strTag = myData.iif(isBreakLimit, "突破新低", "阶段新低")
-                    strReutrn += F", 浮亏超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止损线下移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strReutrn += F"浮亏超 {strProfitNow}, {strTag}.\r\n操作策略: 动态止损线下移.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
         else:
             if(isStopProfit):   
                 if(self.setRisk.stopProfit_Dynamic == False):
-                    strReutrn += F", 浮盈超 {strProfitNow}.\r\n操作策略: 建议止盈, 操作 全仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strReutrn += F"浮盈超 {strProfitNow}.\r\n操作策略: 建议止盈, 操作 全仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
                 else:
-                    strReutrn += F", 回撤逾 {strRetreat}.\r\n操作策略: 建议止盈, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strReutrn += F"回撤逾 {strRetreat}.\r\n操作策略: 建议止盈, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
             else:
                 if(self.setRisk.stopLoss_Dynamic == False):
-                    strReutrn += F", 浮亏超 {strProfitNow}.\r\n操作策略: 建议止损, 操作 全仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strReutrn += F"浮亏超 {strProfitNow}.\r\n操作策略: 建议止损, 操作 全仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
                 else:
-                    strReutrn += F", 亏损逾 {strRetreat}.\r\n操作策略: 建议止损, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+                    strReutrn += F"亏损逾 {strRetreat}.\r\n操作策略: 建议止损, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
+        strReutrn +=  F"\r\n建仓日期: {self.setRisk.date}."
         myDebug.Debug(strReutrn.replace("\r\n", ""))
         
         #交易处置
@@ -745,8 +753,12 @@ class myStockRisk_Control():
         dictRisk = self.dictRisk.get(stockID, None)
         if(dictRisk != None):
             for x in dictRisk:
-                pRisk = dictRisk[x]
-                pRisk.notifyQuotation(price, bSave_Auto)
+                #提取所有用户信息集
+                pRisks_usr = dictRisk[x]
+                for xx in pRisks_usr:
+                    pRisk = pRisks_usr[xx]
+                    pRisk.notifyQuotation(price, bSave_Auto)
+                    pass
 
 
 
@@ -836,10 +848,8 @@ if __name__ == "__main__":
         pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", {}) 
         pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 09:59:00', "", {}) 
         pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", {}) 
-        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-25 09:59:00', "2019-10-25", {}) 
+        pRisks.addRiskSet('@*股票风控监测群','',optCode,pStock.code_name, 343, 20, '2019-10-25 09:59:00', "2019-10-25", {}) 
         pRisk_2750 = pRisks.getRisk('茶叶一主号', '',optCode, "", True)
-    def getRisk(self, usrID, usrTag, stockID, stockName, bCheck = True, dateTag = '', isOption = False, month_Delta = 0):  
-
         pRisks_List.append(pRisk_2750)
 
         #消息初始 
@@ -854,7 +864,7 @@ if __name__ == "__main__":
         num = 1
         data = {'time' : "0", 'high' : 0, 'low' : 100000, 'data' : 0}
         time_s = 0
-        while(True):
+        while(False):
             #时间参数
             #dtTime += datetime.timedelta(minutes=1) 
             dtNow = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d %H:%M")
@@ -862,7 +872,7 @@ if __name__ == "__main__":
             time_s = myData.iif(data['time'] != dtNow , 0, time_s + 10)
             dtStart = myData_Trans.Tran_ToDatetime(dtNow + F":{time_s}", "%Y-%m-%d %H:%M:%S")
             dtNext = myData_Trans.Tran_ToDatetime(dtNow + ":59", "%Y-%m-%d %H:%M:%S")
-                               
+
             #提取当前期权价格
             for x in pRisks_List:
                 sources_ = pSource.getPrice(security=x.setRisk.stockID.split('.')[1] + '.XSHG',frequency='1m',start_date=dtStart,end_date=dtNext)
@@ -894,6 +904,10 @@ if __name__ == "__main__":
 
                 #延时5秒     
                 time.sleep(10)
+                
+        price = pSource2.getPrice(security=pStock.source_code)
+        pRisks.notifyRisk(600, optCode, pStock.code_name, False)
+        pRisks.notifyRisk(price * 10000, optCode, pStock.code_name, False)
 
     #需要调整盈利对比，实际利润变动，不可靠
     print()
