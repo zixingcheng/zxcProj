@@ -24,9 +24,32 @@ class myQuote_Setting():
         self.setStr = ''                #完整设置
         self.mark = ''                  #备注说明
         self.msgUsers = {}              #消息发送用户字典(用户名：平台)
+        self.setDicts = {}              #
     #是否为空
     def IsNull(self): 
         return len(self.msgUsers) == 0
+    #由字符串初始
+    def InitBystr(self, strSets): 
+        #底层属性提取
+        if(len(strSets) > 9): 
+            self.monitorTag = strSets[5]
+            self.isValid = myData_Trans.To_Bool(strSets[6])
+            self.setStr = strSets[7].replace('，', ',')
+            self.mark = strSets[9]
+            msgUsers = myData_Trans.Tran_ToDict(strSets[8].replace('，', ','))
+            for x in msgUsers:
+                self.msgUsers[x] = msgUsers[x]
+                self._msgUsersCheck(x, msgUsers)        #特殊同步设置
+
+            #处理详情设置
+            if(len(self.setStr) > 2):
+                self.setDicts = myData_Trans.Tran_ToDict(self.setStr)
+        return ""
+    #用户信息调整
+    def _msgUsersCheck(self, name, msgUsers): 
+        # 特殊同步设置
+        if(name == "茶叶一主号"):
+            self.msgUsers["老婆"] = msgUsers[name]
     #配置字符串
     def ToString(self): 
         return ""
@@ -131,24 +154,16 @@ class myQuote_Sets():
             monitorTag = strSets[5]
             pSetting = pSet.settings.get(monitorTag, None)
             if(pSetting == None):
-                if(monitorTag == "整点播报" or monitorTag == "涨跌监测"):   #特殊类型处理
+                if(monitorTag in ["整点播报","涨跌监测","风控监测"]):   #特殊类型处理
+                    pSetting = myQuote_Setting(monitorTag)
+                elif(monitorTag == "风控监测"):                         #特殊类型处理
                     pSetting = myQuote_Setting(monitorTag)
                 else:
                     pSetting = None
                     return False
 
             #底层属性提取
-            pSetting.monitorTag = monitorTag
-            pSetting.isValid = myData_Trans.To_Bool(strSets[6])
-            pSetting.setStr = strSets[7]
-            pSetting.mark = strSets[9]
-            msgUsers = myData_Trans.Tran_ToDict(strSets[8].replace('，', ','))
-            for x in msgUsers:
-                pSetting.msgUsers[x] = msgUsers[x]
-                
-                # 特殊同步设置
-                if(x == "茶叶一主号"):
-                    pSetting.msgUsers["老婆"] = msgUsers[x]
+            pSetting.InitBystr(strSets) 
             pSet.AddSetting(pSetting)
             self._Index_User(pSet)
             return True
@@ -177,7 +192,7 @@ class myQuote_Sets():
 
                 pValues.append(pSetting.monitorTag)
                 pValues.append(pSetting.isValid)
-                pValues.append(pSetting.setStr)
+                pValues.append(str(pSetting.setStr).replace(',', '，'))
                 pValues.append(str(pSetting.msgUsers).replace(',', '，'))
                 pValues.append(pSetting.mark)
                 dtSetting.dataMat.append(pValues)

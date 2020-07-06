@@ -38,8 +38,9 @@ class stockQuoteSetForm(FlaskForm):
     remove = SubmitField('移除监测')    # 移除按钮
 
     # Checkbox类型，加上default='checked'即默认是选上的
-    monitorRise_Fall = BooleanField('涨跌监测', default='checked',validators=[DataRequired()])
+    monitorRise_Fall = BooleanField('涨跌监测', default='checked')
     monitorHourly = BooleanField('整点播报', default='checked',validators=[DataRequired()]) 
+    monitorRisk = BooleanField('风控监测', default='checked') 
     
     exType = StringField('交易所代码', [DataRequired()], render_kw={"style": "display:none;"}) 
     code_id = StringField('股票代码', [DataRequired()],  render_kw={"style": "display:none;"}) 
@@ -116,6 +117,7 @@ def add_Webs(pWeb):
                 #    usrIDs["老婆"] = plat
                 editInfo[form.monitorHourly.label.text] = {'isValid': form.monitorHourly.data, 'msgUsers': usrIDs, 'mark' :""}
                 editInfo[form.monitorRise_Fall.label.text] = {'isValid': form.monitorRise_Fall.data, 'msgUsers': usrIDs, 'mark' :""}
+                editInfo[form.monitorRisk.label.text] = {'isValid': form.monitorRisk.data, 'msgUsers': usrIDs, 'mark' :""}
 
                 strPath = 'stock/QuoteSet?extype=' + form.exType.data + "&code_id=" + form.code_id.data + "&code_name=" + "&editInfo=" + str(editInfo)  #+ form.code_name.data
             elif form.remove.data:  # 移除按钮被单击
