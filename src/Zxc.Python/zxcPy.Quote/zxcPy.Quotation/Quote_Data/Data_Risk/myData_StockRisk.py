@@ -30,6 +30,7 @@ class mySet_StockRisk():
         self.usrTag = ""
         self.stockID = ""           #标的编号
         self.stockName = ""         #标的名称
+        self.stockType = "stock"    #标的类型
         self.stockAvg = 0           #标的均价-所有买入 
         self.stockNum = 0           #标的数量
         self.sumStock_Trade = 0     #更新交易数量-买卖
@@ -79,6 +80,7 @@ class mySet_StockRisk():
         dictSets['用户标签'] = self.usrTag
         dictSets['标的编号'] = self.stockID
         dictSets['标的名称'] = self.stockName
+        dictSets['标的类型'] = self.stockType
         dictSets['标的均价'] = round(self.stockAvg, 4)
         dictSets['标的数量'] = self.stockNum
         dictSets['标的仓位'] = round(self.stockPosition, 4)
@@ -137,11 +139,12 @@ class mySet_StockRisk():
                 
 
         #解析信息
-        self.ID = dictSets.get('ID',-1)
-        self.usrID = dictSets['用户名']
-        self.usrTag = dictSets.get('用户标签',"")
-        self.stockID = dictSets.get('标的编号',"")
-        self.stockName = dictSets.get('标的名称',"")  
+        self.ID = dictSets.get('ID',self.ID)
+        self.usrID = dictSets.get('用户名',self.usrID)
+        self.usrTag = dictSets.get('用户标签',self.usrTag)
+        self.stockID = dictSets.get('标的编号',self.stockID)
+        self.stockName = dictSets.get('标的名称',self.stockName)  
+        self.stockType = dictSets.get('标的类型',self.stockType)  
 
         stockNum_temp = myData_Trans.To_Float(str(dictSets.get("标的数量", 0)))
         stockAvg_temp = myData_Trans.To_Float(str(dictSets.get("标的均价", 0)))
@@ -425,7 +428,7 @@ class myMonitor_StockRisk():
         # 初始风险数据监测类及配置
         #if(setRisk.priceMin == 0): setRisk.priceMin = setRisk.priceNow
         #if(setRisk.priceMax == 0): setRisk.priceMax = setRisk.priceNow
-        name = setRisk.stockID + "_" + setRisk.usrID + "_" + setRisk.usrTag + "_" + setRisk.date
+        name = setRisk.stockID + "_" + str(setRisk.usrID) + "_" + setRisk.usrTag + "_" + setRisk.date
         self.riskMonitor = myData_Monitor_Risk.myData_Monitor_Risk(name, True, valueMin=setRisk.priceMin, valueMax=setRisk.priceMax, valueLast=setRisk.priceNow, valueBase=setRisk.priceCost, valueDelta=setRisk.deltaProfit)
         
         self.riskMonitor.fixedHit = setRisk.fixHit                          #定量监测
@@ -447,9 +450,9 @@ class myMonitor_StockRisk():
         
         self.riskMonitor.stockID = setRisk.stockID                          #标的编号
         self.riskMonitor.stockName = setRisk.stockName                      #标的名称
-        self.riskMonitor.stockDate = setRisk.usrID                          #标的建仓日期
-        self.riskMonitor.usrID = setRisk.usrTag                             #归属用户名
-        self.riskMonitor.usrTag = setRisk.date                              #归属用户标识
+        self.riskMonitor.stockDate = setRisk.date                           #标的建仓日期
+        self.riskMonitor.usrID = setRisk.usrID                              #归属用户名
+        self.riskMonitor.usrTag = setRisk.usrTag                            #归属用户标识
         #self.riskMonitor.init_riskSets()
 
         # 装饰函数，处理监测到的上升、下降、拐点
@@ -554,6 +557,7 @@ class myMonitor_StockRisk():
             self.updataTrade(price, -numSell)
         else:
             self.setRisk.Static_Profit(price)  #收益统计
+            self.saveSet();
         return True
 
     # 提取股票交易建议信息
@@ -640,13 +644,7 @@ class myStockRisk_Control():
             pRisk = self.initRiskSet(pSet['用户名'], pSet['用户标签'], pSet['标的编号'], pSet['标的名称'], pSet['建仓日期'], False)
 
             #缓存
-            dictRisk = self.dictRisk.get(pSet['标的编号'], {})
-            dictRisk_usr = dictRisk.get(pSet['用户名'], {})
-            if(len(dictRisk_usr) == 0):
-                dictRisk[pSet['用户名']] = dictRisk_usr
-            dictRisk_usr[pSet['建仓日期']] = pRisk
-            if(len(dictRisk) == 1):
-                self.dictRisk[pSet['标的编号']] = dictRisk
+            self._buffer_RiskSet(pSet, pRisk)
     # 初始风控设置
     def initRiskSet(self, usrID, usrTag, stockID, stockName, stockDate, bCheck = True):  
         #解析正确股票信息
@@ -660,6 +658,16 @@ class myStockRisk_Control():
         #提取风险对象
         pRisk = self.riskDB.getTradeRisk(usrID, usrTag, stockID, stockDate, True)
         return pRisk
+    # 缓存风控设置
+    def _buffer_RiskSet(self, pSet, pRisk):  
+        if(pSet != None):
+            dictRisk = self.dictRisk.get(pSet['标的编号'], {})
+            dictRisk_usr = dictRisk.get(pSet['用户名'], {})
+            if(len(dictRisk_usr) == 0):
+                dictRisk[pSet['用户名']] = dictRisk_usr
+            dictRisk_usr[pSet['建仓日期']] = pRisk
+            if(len(dictRisk) == 1):
+                self.dictRisk[pSet['标的编号']] = dictRisk
         
     # 添加设置(stockNum < 0代表卖出)
     def addRiskSet(self, usrID, usrTag, stockID, stockName, stockPrice, stockNum, time = "", dateTag = "", dictSet = {}):  
@@ -686,30 +694,28 @@ class myStockRisk_Control():
         pRisk = self.getRisk(usrID, usrTag, stockID, stockName, False, dateTag)
         if(stockNum > 0):
             if(pRisk == None):
-                strR = self.riskDB.Add_Row(dictSet, True)
+                strR = self.riskDB.Add_Row(dictSet.copy(), True)
                 myDebug.Debug(strR)
 
                 #添加记录信息
                 pRisk = self.initRiskSet(dictSet['用户名'], dictSet['用户标签'], dictSet['标的编号'], dictSet['标的名称'], dictSet['建仓日期'], False)
                 
                 #缓存
-                dictRisk = self.dictRisk.get(dictSet['标的编号'], {})
-                dictRisk[dictSet['用户名'] + "_" + dictSet['用户标签']] = pRisk
-                if(len(dictRisk) == 1):
-                    self.dictRisk[dictSet['标的编号']] = dictRisk
+                self._buffer_RiskSet(dictSet, pRisk)
             else:
                 setRisk = self.riskDB.getSet(usrID, usrTag, stockID, dateTag, isDel = False, setDB = pRisk.setDB)
                 pSet = mySet_StockRisk(setRisk)
                 pSet.Trans_FromDict(dictSet)
                 pRisk.initSet(pSet, pRisk.setDB)
 
-                strR = self.riskDB.Add_Row(pSet.Trans_ToDict(), True)
+                dictInfo = pSet.Trans_ToDict()
+                strR = self.riskDB.Add_Row(dictInfo, True)
                 myDebug.Debug(strR)
-            pRisk.handleMsg(F"{stockName}: {stockPrice} 元, 买入 {stockNum}股.")
+            pRisk.handleMsg(F"{stockName} (开仓) : \r\n操作信息: 买入 {stockNum} 股, 均价: {stockPrice} 元.\r\n建仓日期: {dateTag}.\r\n买入时间: {dictSet['操作时间']}.")
         elif(stockNum < 0):
             if(pRisk != None):
                 pRisk.updataTrade(stockPrice, stockNum, dictSet['操作时间'])
-                pRisk.handleMsg(F"{stockName}: {stockPrice} 元, 卖出 {stockNum}股.")
+                pRisk.handleMsg(F"{stockName} (平仓) : \r\n操作信息: 卖出 {stockNum} 股, 均价: {stockPrice} 元..\r\n建仓日期: {dateTag}.\r\n卖出时间: {dictSet['操作时间']}.")
     # 提取风控对象集
     def getRisks(self, usrID, usrTag, stockID, stockName, bCheck = True):  
         #解析正确股票信息
@@ -766,7 +772,7 @@ class myStockRisk_Control():
 from myGlobal import gol 
 gol._Init()                 # 先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Value('zxcDB_StockRisk', myDataDB_StockRisk())     #实例 股票收益库对象 
-gol._Get_Value('zxcDB_StockRisk').Add_Fields(['用户名', '用户标签', '标的编号', '标的名称', '标的均价', '标的数量', "标的仓位", "手续费率", '边界限制','定量监测','监测间隔','止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段止盈','阶段止损','当前浮盈','止盈状态','止损状态', '建仓日期', '操作时间', '备注', '操作统计数', '操作日志'], ['string','string','string','string','float','int','float','float','bool','bool','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','float','float','bool','bool','string','datetime','string','int','list'], [])
+gol._Get_Value('zxcDB_StockRisk').Add_Fields(['用户名', '用户标签', '标的编号', '标的名称', '标的类型', '标的均价', '标的数量', "标的仓位", "手续费率", '边界限制','定量监测','监测间隔','止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段止盈','阶段止损','当前浮盈','止盈状态','止损状态', '建仓日期', '操作时间', '备注', '操作统计数', '操作日志'], ['string','string','string','string','string','float','int','float','float','bool','bool','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','float','float','bool','bool','string','datetime','string','int','list'], [])
 gol._Set_Value('zxcRisk_Control', myStockRisk_Control())    #实例 风险控制操作类 
 
 
@@ -845,10 +851,12 @@ if __name__ == "__main__":
         pRisks_List = []
         pStock = pRisks.stockSet._Find("", "50ETF购7月3000", "****")[0]
         optCode = "sh." + pStock.code_id
-        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", {}) 
-        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 09:59:00', "", {}) 
-        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", {}) 
-        pRisks.addRiskSet('@*股票风控监测群','',optCode,pStock.code_name, 343, 20, '2019-10-25 09:59:00', "2019-10-25", {}) 
+        
+        dicParam = {"边界限制": True,"定量监测": False, "监测间隔": 0.01,"止盈线": 0.20, "止损线": -0.05, "动态止盈": True, "动态止损": True, "止盈回撤": 0.01, "止盈比例": 0.20, "止损回撤": 0.01, "止损比例": 0.20 }
+        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", dicParam) 
+        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 393, 20, '2019-10-24 09:59:00', "", dicParam) 
+        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", dicParam) 
+        pRisks.addRiskSet('@*股票风控监测群','',optCode,pStock.code_name, 343, 20, '2019-10-25 09:59:00', "2019-10-25", dicParam) 
         pRisk_2750 = pRisks.getRisk('茶叶一主号', '',optCode, "", True)
         pRisks_List.append(pRisk_2750)
 
