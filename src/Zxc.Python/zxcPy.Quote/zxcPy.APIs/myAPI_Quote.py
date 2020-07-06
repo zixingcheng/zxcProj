@@ -97,7 +97,29 @@ class myAPI_Quote_SetQuery(myWeb.myAPI):
         pMsg['result'] = len(lstExtypes) > 0
         pMsg['text'] = jsonStocks
         return pMsg
-
+    
+#API-行情设置详情查询
+class myAPI_Quote_SetInfoQuery(myWeb.myAPI):
+    def get(self):
+        exType=request.args.get('exType', "")
+        stockID=request.args.get('stockID', "")
+        stockName=request.args.get('stockName', "")
+        pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
+        
+        #初始返回组
+        jsonInfo = {}
+        pSets = gol._Get_Value('setsQuote', None)
+        pSet = pSets._Find(stockName, exType + '.' + stockID)
+        if(pSet != None):
+            pMsg['result'] = True
+            pParams = {}
+            for xx in pSet.settings:
+                pParams[xx] = pSet.settings[xx].isValid
+            jsonInfo["设置状态"] = pParams
+        else:
+            pMsg['result'] = False
+        pMsg['text'] = jsonInfo
+        return pMsg
 
     
 #初始行情对象
@@ -114,7 +136,7 @@ def add_APIs(pWeb):
     # 创建Web API
     pWeb.add_API(myAPI_Quote_Set, '/zxcAPI/robot/stock/QuoteSet')
     pWeb.add_API(myAPI_Quote_SetQuery, '/zxcAPI/robot/stock/QuoteSet/Query')
-    
+    pWeb.add_API(myAPI_Quote_SetInfoQuery, '/zxcAPI/robot/stock/QuoteSetInfo/Query')
 
     
 #行数监测线程 

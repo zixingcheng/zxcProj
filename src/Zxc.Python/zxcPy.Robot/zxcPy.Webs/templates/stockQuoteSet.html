@@ -60,27 +60,28 @@
 							$("#exType").val(items_ex[item]); 				
 							$("#code_id").val(items[item]); 			
 							$("#code_name").val(items_name[item]); 		
-							
+
 							<!--提交按钮状态修改-->
 							if(isSetedStock(items_name[item]))
 							{
 								$("#save").val('更新设置'); 
 								$("#remove").attr("disabled", false); 
 							};
+                            refreshInfo_set($("#stockID").val(), $("#stockName").val());
 							return;
 						};
 					};  
 				}; 
 				$("#save").val('新增监测'); 
 				$("#remove").attr("disabled", true); 		
-				$("#exType").val(""); $("#code_id").val(""); $("#code_name").val(""); 
+                $("#exType").val(""); $("#code_id").val(""); $("#code_name").val("");
 				
 				if(codeID == "" & codeName == ""){
 					jsonStocks = dataStocks_set;
 				}
 				else{
 					$.get('/zxcAPI/robot/stock/query',  {code_id: codeID, code_name: codeName}, function(data){   
-						jsonStocks = JSON.parse(data, null);  
+                        jsonStocks = JSON.parse(data, null);
 					});		 
 				};
 				if(jsonStocks != null){
@@ -112,6 +113,23 @@
 					};
 				};
 				return isSeted;
+			};
+			
+			<!--提取并设置配置信息-->
+			function refreshInfo_set(codeTag, codeName) {
+                if (codeTag == "" || codeName == ""){
+					return;
+				}
+
+                $.get('/zxcAPI/robot/stock/quoteset_info/query', { stockName: codeName, stockTag: codeTag }, function (data) {
+                    jsonStocks = JSON.parse(data, null);
+                });
+				if (jsonStocks != null) {
+                    $("#monitorHourly").attr("checked", jsonStocks["设置状态"]['整点播报']);
+                    $("#monitorRise_Fall").attr("checked", jsonStocks["设置状态"]['涨跌监测']);
+                    $("#monitorRisk").attr("checked", jsonStocks["设置状态"]['风控监测']);
+				}
+				return;
 			};
 			
 			<!--控件调整，绑定下拉辅助输入列表-->
