@@ -88,9 +88,10 @@ class Quote_Listener:
         pass
     #功能是否可用
     def IsEnable(self, quoteDatas):
+        self.pSet = quoteDatas.setting.GetSetting(self.nameAlias)
         if(self.pSet != None):
             return self.pSet.isValid
-        return True
+        return False
 
 
 #主启动程序

@@ -250,10 +250,11 @@ def mainSource():
     pQuote = gol._Get_Value('quoteSource', None)
     if(pQuote != None):
         #添加监听对象
-        import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor
+        import myListener_Printer, myListener_Rise_Fall_asInt, myListener_Hourly, myListener_FixedMonitor, myListener_Risk_Control
         pQuote.addListener(myListener_Printer.Quote_Listener_Printer())
         pQuote.addListener(myListener_Hourly.Quote_Listener_Hourly())
         pQuote.addListener(myListener_Rise_Fall_asInt.Quote_Listener_Rise_Fall_asInt())
+        pQuote.addListener(myListener_Risk_Control.Quote_Listener_Risk_Control())
         #for x in pSets.setUsers:
         #    pQuote.addListener(myListener_FixedMonitor.Quote_Listener_FixedMonitor(x))
 
