@@ -188,6 +188,15 @@ class myData_Table():
             #保存--排序
             if(bSave and self.Save_DB(bAppend, True)):
                 return "添加成功，信息如下：\n" + self._Trans_ToStr_Title(rowInfo) 
+    # 删除行
+    def Del_Row(self, rowID, bSave = True, tableName = ""):
+        # 检查可用性
+        if(self.rows.get(rowID, None) == None): return
+        self.rows[rowID]['isDel'] = True
+         
+        #保存--排序
+        if(bSave and self.Save_DB(False, True)):
+            return "删除成功，信息如下：\n" + self._Trans_ToStr_Title(self.rows[rowID]) 
     # 总行数
     def _RowsCount(self, tableName = ""): 
         return len(self.rows)

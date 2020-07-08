@@ -109,6 +109,7 @@ class mySet_StockRisk():
         dictSets['止盈状态'] = self.stopProfit_goon
         dictSets['止损状态'] = self.stopLoss_goon
         
+        self.date = self.date.replace("'", "")
         dictSets['建仓日期'] = myData.iif(self.date !="", self.date, myData_Trans.Tran_ToDatetime_str(self.logDatetime, "%Y-%m-%d"))
         dictSets['isDel'] = not self.valid 
         dictSets['备注'] = self.remark
@@ -215,7 +216,7 @@ class mySet_StockRisk():
         self.stopProfit_goon = dictSets.get("止盈状态", self.stopProfit_goon)
         self.stopLoss_goon = dictSets.get("止损状态", self.stopLoss_goon)
         
-        self.date = dictSets.get("建仓日期", self.date)
+        self.date = dictSets.get("建仓日期", self.date).replace("'", "")
         if(self.date == ""):
             self.date = myData_Trans.Tran_ToDatetime_str(self.logDatetime, "%Y-%m-%d")
 
@@ -376,7 +377,7 @@ class myDataDB_StockRisk(myData_DB.myData_Table):
 
         # 初始风险监测对象
         pSet = mySet_StockRisk(dictSet)
-        if(nTimes == 10000):    # 修正期权默认设置
+        if(nTimes == 90000):    # 修正期权默认设置
             pSet.stopProfit = 0.1           #止盈线，默认为6%
             pSet.stopLoss = 0.06            #止损线，默认为-2%  
             pSet.stopProfit_Retreat = 0.05  #止盈回撤，默认为1%, 超过止盈线以上则为2倍
@@ -498,7 +499,7 @@ class myMonitor_StockRisk():
         self.setRisk.Trans_FromDict(rowInfo) 
         self.setRisk.Static_Profit(strokPrice)  #收益统计
         self.saveSet()                          #保存修改
-        self.handleMsg(strR)      
+        #self.handleMsg(strR)      
 
     # 通知接收新行情
     def notifyQuotation(self, price, bSave_Auto = True):
@@ -682,6 +683,21 @@ class myStockRisk_Control():
                 stockID = pStock.extype + "." + pStock.code_id
                 stockName = pStock.code_name
 
+                #调整期权默认设置
+                if(pStock.type == 'opt'):
+                    if(dictSet.get('止盈线', 0) == 0):
+                        dictSet['监测间隔'] = 0.01
+                        dictSet['止盈线'] = 0.06
+                        dictSet['止盈回撤'] = 0.025
+                        dictSet['止盈比例'] = 0.2
+                        dictSet['动态止盈'] = True
+                    if(dictSet.get('止损线', 0) == 0):
+                        dictSet['监测间隔'] = 0.01
+                        dictSet['止损线'] = -0.06
+                        dictSet['止损回撤'] = 0.025
+                        dictSet['止损比例'] = 0.2
+                        dictSet['动态止损'] = True       
+
         dictSet['标的编号'] = stockID
         dictSet['标的名称'] = stockName
         dictSet['标的均价'] = stockPrice
@@ -691,6 +707,7 @@ class myStockRisk_Control():
         dateTag = dictSet['建仓日期'] 
 
         #添加-区分买入卖出
+        pMsg = ""
         pRisk = self.getRisk(usrID, usrTag, stockID, stockName, False, dateTag)
         if(stockNum > 0):
             if(pRisk == None):
@@ -711,11 +728,19 @@ class myStockRisk_Control():
                 dictInfo = pSet.Trans_ToDict()
                 strR = self.riskDB.Add_Row(dictInfo, True)
                 myDebug.Debug(strR)
-            pRisk.handleMsg(F"{stockName} (开仓) : \r\n操作信息: 买入 {stockNum} 股, 均价: {stockPrice} 元.\r\n建仓日期: {dateTag}.\r\n买入时间: {dictSet['操作时间']}.")
+            pMsg = F"{stockName} (开仓) : \r\n操作信息: 买入 {stockNum} 股, 均价: {stockPrice} 元.\r\n建仓日期: {dateTag}.\r\n买入时间: {dictSet['操作时间']}."
+            pRisk.handleMsg(pMsg)
         elif(stockNum < 0):
             if(pRisk != None):
                 pRisk.updataTrade(stockPrice, stockNum, dictSet['操作时间'])
-                pRisk.handleMsg(F"{stockName} (平仓) : \r\n操作信息: 卖出 {stockNum} 股, 均价: {stockPrice} 元..\r\n建仓日期: {dateTag}.\r\n卖出时间: {dictSet['操作时间']}.")
+                pMsg = F"{stockName} (平仓) : \r\n操作信息: 卖出 {stockNum} 股, 均价: {stockPrice} 元..\r\n建仓日期: {dateTag}.\r\n卖出时间: {dictSet['操作时间']}."
+                pRisk.handleMsg(pMsg)
+        else:
+            if(dictSet['removeSet'] == True):
+                if(pRisk != None):
+                    pRisk.setRisk.valid = False
+                    self.riskDB.Del_Row(pRisk.setRisk.ID)
+        return pMsg
     # 提取风控对象集
     def getRisks(self, usrID, usrTag, stockID, stockName, bCheck = True):  
         #解析正确股票信息
@@ -763,7 +788,8 @@ class myStockRisk_Control():
                 pRisks_usr = dictRisk[x]
                 for xx in pRisks_usr:
                     pRisk = pRisks_usr[xx]
-                    pRisk.notifyQuotation(price, bSave_Auto)
+                    if(pRisk.setRisk.valid):
+                        pRisk.notifyQuotation(price, bSave_Auto)
                     pass
 
 
@@ -772,7 +798,7 @@ class myStockRisk_Control():
 from myGlobal import gol 
 gol._Init()                 # 先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Value('zxcDB_StockRisk', myDataDB_StockRisk())     #实例 股票收益库对象 
-gol._Get_Value('zxcDB_StockRisk').Add_Fields(['用户名', '用户标签', '标的编号', '标的名称', '标的类型', '标的均价', '标的数量', "标的仓位", "手续费率", '边界限制','定量监测','监测间隔','止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止盈比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段止盈','阶段止损','当前浮盈','止盈状态','止损状态', '建仓日期', '操作时间', '备注', '操作统计数', '操作日志'], ['string','string','string','string','string','float','int','float','float','bool','bool','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','float','float','bool','bool','string','datetime','string','int','list'], [])
+gol._Get_Value('zxcDB_StockRisk').Add_Fields(['用户名', '用户标签', '标的编号', '标的名称', '标的类型', '标的均价', '标的数量', "标的仓位", "手续费率", '边界限制','定量监测','监测间隔','止盈线', '动态止盈', '止盈回撤', '止盈比例', '止损线', '动态止损', '止损回撤', '止损比例', '最高价格', '成本价格', '当前价格', '卖出均价','阶段止盈','阶段止损','当前浮盈','止盈状态','止损状态', '建仓日期', '操作时间', '备注', '操作统计数', '操作日志'], ['string','string','string','string','string','float','int','float','float','bool','bool','float','float','bool','float','float','float','bool','float','float','float','float','float','float','float','float','float','bool','bool','string','datetime','string','int','list'], [])
 gol._Set_Value('zxcRisk_Control', myStockRisk_Control())    #实例 风险控制操作类 
 
 
@@ -852,10 +878,11 @@ if __name__ == "__main__":
         pStock = pRisks.stockSet._Find("", "50ETF购7月3000", "****")[0]
         optCode = "sh." + pStock.code_id
         
-        dicParam = {"边界限制": True,"定量监测": False, "监测间隔": 0.01,"止盈线": 0.20, "止损线": -0.05, "动态止盈": True, "动态止损": True, "止盈回撤": 0.01, "止盈比例": 0.20, "止损回撤": 0.01, "止损比例": 0.20 }
+        dicParam = {"边界限制": True,"定量监测": False, "监测间隔": 0.01,"止盈线": 0.16, "止损线": -0.05, "动态止盈": True, "动态止损": True, "止盈回撤": 0.01, "止盈比例": 0.20, "止损回撤": 0.01, "止损比例": 0.20 }
         pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", dicParam) 
         pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 393, 20, '2019-10-24 09:59:00', "", dicParam) 
-        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", dicParam) 
+        #dicParam['removeSet'] = True
+        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 0, '2019-10-24 08:59:00', "", dicParam) 
         pRisks.addRiskSet('@*股票风控监测群','',optCode,pStock.code_name, 343, 20, '2019-10-25 09:59:00', "2019-10-25", dicParam) 
         pRisk_2750 = pRisks.getRisk('茶叶一主号', '',optCode, "", True)
         pRisks_List.append(pRisk_2750)

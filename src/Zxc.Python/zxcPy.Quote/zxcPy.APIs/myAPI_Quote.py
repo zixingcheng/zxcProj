@@ -14,10 +14,11 @@ from flask import jsonify, request, flash, render_template, redirect    #导入�
 mySystem.Append_Us("../zxcPy.APIs", False, __file__)
 mySystem.Append_Us("../zxcPy.Quotation", False, __file__)
 mySystem.Append_Us("../zxcPy.Quotation/Quote_Data", False, __file__)
+mySystem.Append_Us("../zxcPy.Quotation/Quote_Data/Data_Risk", False, __file__)
 mySystem.Append_Us("../zxcPy.Quotation/Quote_Source", False, __file__)
 mySystem.Append_Us("../zxcPy.Quotation/Quote_Listener", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myDebug, myData_Trans, myData_Json, myQuote_Source, myQuote_Setting
+import myWeb, myDebug, myData, myData_Trans, myData_Json, myQuote_Source, myQuote_Setting, myData_StockRisk
 from myGlobal import gol   
 
 
@@ -120,8 +121,51 @@ class myAPI_Quote_SetInfoQuery(myWeb.myAPI):
             pMsg['result'] = False
         pMsg['text'] = jsonInfo
         return pMsg
-
     
+#API-行情设置-风控
+class myAPI_Quote_Set_Risk(myWeb.myAPI):
+    def get(self):
+        #提取股票信息
+        pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
+        pRisks = gol._Get_Value('zxcRisk_Control', None)
+        bResult = True
+        
+        # 组装参数并添加
+        #dicParam = {"边界限制": True,"定量监测": False, "监测间隔": 0.01,"止盈线": 0.20, "止损线": -0.05, "动态止盈": True, "动态止损": True, "止盈回撤": 0.01, "止盈比例": 0.20, "止损回撤": 0.01, "止损比例": 0.20 }
+        usrID = request.args.get('usrID', '') 
+        usrTag = request.args.get('usrTag', '') 
+        code_id = request.args.get('code_id', "")
+        code_name = request.args.get('code_name', "") 
+        removeSet = myData_Trans.To_Bool(request.args.get('removeSet', False))
+        paramInfo = myData_Trans.Tran_ToDict(request.args.get('setInfo', "{}"))
+        paramInfo['removeSet'] = removeSet
+
+        dtTrade = request.args.get('time', "")
+        dateTag = request.args.get('dateTag', "")
+        stockPrice = myData_Trans.To_Float(request.args.get('stockPrice', 0))
+        stockNum = myData_Trans.To_Int(request.args.get('stockNum', 0))
+        if(stockPrice == 0 or stockNum == 0): 
+            bResult = False; pMsg['text'] = "股价、数量不能为0."
+        strR = pRisks.addRiskSet(usrID, usrTag, code_id, code_name, stockPrice, stockNum, dtTrade, dateTag, paramInfo)
+        
+        #解析参数
+        strTag = "风控设置："+ code_name +"\n      "
+        if(bResult):
+            if(removeSet == False):
+                if(stockPrice == 0 or stockNum == 0): 
+                    pMsg['text'] = strTag + " --设置已成功修改参数信息." 
+                else:
+                    trade = myData.iif(stockNum >0, "买入", "卖出")
+                    pMsg['text'] = strTag + F" --设置已成功添加操作信息, {trade} {str(abs(stockNum))} 股, 价格: {stockPrice} 元." 
+                bResult = True
+            else:
+                pMsg['text'] = strTag + " --设置已成功移除." 
+                bResult = True
+        pMsg['result'] = bResult 
+        if(bResult == ""):  pMsg['text'] =  strTag + "操作失败！"
+        return pMsg
+
+
 #初始行情对象
 def init_Quote():     
     #全局对象提取
@@ -137,6 +181,8 @@ def add_APIs(pWeb):
     pWeb.add_API(myAPI_Quote_Set, '/zxcAPI/robot/stock/QuoteSet')
     pWeb.add_API(myAPI_Quote_SetQuery, '/zxcAPI/robot/stock/QuoteSet/Query')
     pWeb.add_API(myAPI_Quote_SetInfoQuery, '/zxcAPI/robot/stock/QuoteSetInfo/Query')
+    
+    pWeb.add_API(myAPI_Quote_Set_Risk, '/zxcAPI/robot/stock/QuoteSetRisk')
 
     
 #行数监测线程 
