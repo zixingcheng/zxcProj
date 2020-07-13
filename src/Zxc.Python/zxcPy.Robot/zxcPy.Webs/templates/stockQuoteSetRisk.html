@@ -1,0 +1,216 @@
+﻿<!-- extend from base layout -->
+<!doctype html>
+{% extends "base.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
+
+{% block content %} 
+  {% from "base.html" import render_field2 %}
+<form action="" method="post" name="stockQuoteSet" style="margin-left:10px;margin-top:10px">
+	<h1 style="margin-left:160px">风控监测设置 </h1>
+	{{ form.hidden_tag() }}
+
+	<style>
+		.data {
+			width: 350px;
+		}
+
+		.params {
+			margin: 10px 0;
+			font-size: 13px;
+		}
+
+			.params input {
+				width: 150px;
+				height: 26px;
+				box-sizing: border-box;
+			}
+
+			.params .search-btn {
+				float: right;
+				width: 100px;
+				height: 30px;
+				border: 0 none;
+				background-color: #666;
+				color: #fff;
+				font-size: 12px;
+				margin-left: 12px;
+			}
+
+		.table {
+			width: 100%;
+			border-collapse: collapse;
+			text-align: center;
+			margin-left: 10px;
+		}
+
+		th {
+			border: 1px solid #999;
+			height: 30px;
+			line-height: 30px;
+			font-size: 14px;
+		}
+
+		.td {
+			border: 1px solid #999;
+			height: 26px;
+			line-height: 26px;
+			font-size: 13px;
+		}
+
+		.no-data {
+			display: none;
+			height: 80px;
+			line-height: 80px;
+			text-align: center;
+			color: #aaa;
+		}
+
+		.typecut {
+			float: right;
+			width: 100%;
+		}
+
+			.typecut:hover {
+				background-color: #ccc;
+				cursor: pointer;
+			}
+	</style>
+
+	<div style="margin-left:16px;">
+		<table>
+			{{ render_field2(form.stockID, size=20) }}
+			{{ render_field2(form.stockName, size=20) }}
+			{{ render_field2(form.stockDate, size=20) }}
+
+			{{ render_field2(form.stockPrice, size=20) }}
+			{{ render_field2(form.stockNum, size=20) }}
+			{{ render_field2(form.monitorUsrID, size=20) }}
+
+		</table>
+	</div>
+	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p>
+	<datalist id="lstDateTags"></datalist>
+
+	<div style="margin-left:10px; width: 300px;">
+		<p style="margin-left:10px"><B>交易记录：</B></p>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th>数量</th>
+					<th>均价</th>
+					<th>时间</th>
+				</tr>
+			</thead>
+			<tbody id="data_list"></tbody>
+		</table>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript">
+        var jsonRisks_set = JSON.parse("{}", null);
+		$(document).ready(function () {
+            $.ajax({
+                url: '/zxcAPI/robot/stock/quoteset_risk/query',
+                type: 'get',
+                data: {
+                    usrID: '{{usrName_Nick}}',
+                    stockTag: '{{code_id}}',
+                    stockName: '{{code_name}}'
+                },
+                success: function (res) {
+                    jsonRisks_set = JSON.parse(res, null);
+					if (jsonRisks_set['success'] == 1) {
+                        lstDateTags = jsonRisks_set['data']['dataTags']
+                        //window.location.reload();
+
+						//更新dateTag列表
+						var items = jsonRisks_set['data']['dataTags'];
+						if (items != false) {
+							$("#lstDateTags").empty();
+							var objDateTags = document.getElementById('lstDateTags');
+							for (var item in items) {
+                                objDateTags.appendChild(new Option(items[item], items[item]));
+							};
+						};
+                    } else {
+                        //alert(jsonRisks_set['data']);
+                    }
+                }
+			});
+
+            $("#stockDate").on('change', function () {
+                if (this.value.length < 2) return;
+                refreshInfo_set(this.value);
+			});  
+
+
+			<!--提取并设置配置信息-->
+			function refreshInfo_set(dateTag) {
+                bExist = true;
+				if (jsonRisks_set == null) { bExist = false; };
+
+                pRisk = jsonRisks_set['data']['setInfos'][dateTag]
+                if (pRisk == null) { bExist = false; };
+				if (bExist) {
+					$("#stockDate").val(dateTag);
+					$("#stockPrice").val(pRisk['标的均价']);
+					$("#stockNum").val(pRisk['标的数量']);
+
+					//更新同步交易信息
+					updaTradeinfos(dateTag);
+				}
+				return;
+			};
+			
+			<!--更新同步交易信息-->
+			function updaTradeinfos(dateTag) {
+                bExist = true;
+				if (jsonRisks_set == null) { bExist = false; };
+
+				pTradeinfos = null;
+				if (bExist) {
+					pRisk = jsonRisks_set['data']['setInfos'][dateTag]
+					if (pRisk == null) {
+						bExist = false;
+					}
+					else
+					{
+						pTradeinfos = pRisk['操作日志']
+						if (pTradeinfos == null) { bExist = false; };
+					};
+				};
+
+				//更新数据界面
+				if (bExist) {
+					ind = 1;
+					var html = '';
+					for (var item in pTradeinfos) {
+						html += '<tr>' +
+								'<td class="td"">' + ind + '</td>' +
+								'<td class="td"">' + pTradeinfos[item]['股数'] + '</td>' +	
+								'<td class="td"">' + pTradeinfos[item]['股价'] + '</td>' +
+								'<td class="td"">' + pTradeinfos[item]['时间'] + '</td>' +
+								'<tr>';
+						ind = ind + 1;
+						$('#data_list').html(html);
+					};
+				};
+			};
+
+
+			<!--控件调整，绑定下拉辅助输入列表-->
+			$("#stockDate").attr("list",'lstDateTags');
+            $("#stockDate").attr("autocomplete", 'off');
+
+            $("#stockID").attr("disabled", 'disabled');
+            $("#stockID").val('{{code_id}}');
+            $("#stockName").attr("disabled", 'disabled');
+            $("#stockName").val('{{code_name}}');
+
+            $("#monitorUsrID").attr("disabled", 'disabled');
+			$("#monitorUsrID").val('{{usrName_Nick}}-{{usrPlat}}');
+		});
+	</script>
+
+</form>
+{% endblock %}

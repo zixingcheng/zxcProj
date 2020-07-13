@@ -73,7 +73,7 @@ class mySet_StockRisk():
         self.Trans_FromDict(dictSets, False)
 
     # 转换为字典结构
-    def Trans_ToDict(self, dictSets = None):  
+    def Trans_ToDict(self, dictSets = None, useTimestr = False):  
         if(dictSets == None): dictSets = self.dictSets
         dictSets['ID'] = self.ID
         dictSets['用户名'] = self.usrID
@@ -116,6 +116,12 @@ class mySet_StockRisk():
         dictSets['操作日志'] = self.logOperates
         dictSets['操作统计数'] = self.sumOperates
         dictSets['操作时间'] = self.logDatetime
+
+        if(useTimestr):
+            if(type(dictSets['操作时间']) == datetime.datetime):
+                dictSets['操作时间_str'] = myData_Trans.Tran_ToDatetime_str(self.logDatetime, "%Y-%m-%d %H:%M:%S")
+            else:
+                dictSets['操作时间_str'] = dictSets['操作时间']
         return self.dictSets
     # 转换为对象，由字典结构
     def Trans_FromDict(self, dictSets, canLog = True):  
@@ -653,7 +659,7 @@ class myStockRisk_Control():
             stocks = self.stockSet._Find(stockID, stockName, "****")
             if(len(stocks) == 1):
                 pStock = stocks[0]
-                stockID = pStock.code_id + "." + pStock.extype2
+                stockID = pStock.extype + "." + pStock.code_id
                 stockName = pStock.code_name 
 
         #提取风险对象
@@ -748,7 +754,7 @@ class myStockRisk_Control():
             stocks = self.stockSet._Find(stockID, stockName, "****")
             if(len(stocks) == 1):
                 pStock = stocks[0]
-                stockID = pStock.code_id + "." + pStock.extype2
+                stockID = pStock.extype + "." + pStock.code_id
                 stockName = pStock.code_name 
 
         #提取
@@ -763,7 +769,7 @@ class myStockRisk_Control():
                 stocks = self.stockSet._Find(stockID, stockName, "****")
                 if(len(stocks) == 1):
                     pStock = stocks[0]
-                    stockID = pStock.code_id + "." + pStock.extype2
+                    stockID = pStock.extype + "." + pStock.code_id
                     stockName = pStock.code_name
             else:
                 #期权
@@ -882,7 +888,7 @@ if __name__ == "__main__":
         pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 20, '2019-10-24 08:59:00', "", dicParam) 
         pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 393, 20, '2019-10-24 09:59:00', "", dicParam) 
         #dicParam['removeSet'] = True
-        pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 0, '2019-10-24 08:59:00', "", dicParam) 
+        #pRisks.addRiskSet('茶叶一主号','',optCode,pStock.code_name, 343, 0, '2019-10-24 08:59:00', "", dicParam) 
         pRisks.addRiskSet('@*股票风控监测群','',optCode,pStock.code_name, 343, 20, '2019-10-25 09:59:00', "2019-10-25", dicParam) 
         pRisk_2750 = pRisks.getRisk('茶叶一主号', '',optCode, "", True)
         pRisks_List.append(pRisk_2750)

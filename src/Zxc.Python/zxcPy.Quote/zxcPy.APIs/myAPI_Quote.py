@@ -164,6 +164,38 @@ class myAPI_Quote_Set_Risk(myWeb.myAPI):
         pMsg['result'] = bResult 
         if(bResult == ""):  pMsg['text'] =  strTag + "操作失败！"
         return pMsg
+    
+#API-行情设置-风控
+class myAPI_Quote_SetQuery_Risk(myWeb.myAPI):
+    def get(self):
+        pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
+        usrID = request.args.get('usrID', '') 
+        usrTag = request.args.get('usrTag', '') 
+        code_id = request.args.get('code_id', "")
+        code_name = request.args.get('code_name', "")
+        
+        #初始返回组
+        lstDate_Tag = []
+        lstInfos = {}
+
+        #查询及组装
+        pRisks = gol._Get_Value('zxcRisk_Control', None)
+        dictRisks = pRisks.getRisks(usrID, usrTag, code_id, code_name, bCheck = True)
+        if(dictRisks != None):
+            for x in dictRisks:
+                pRisk = dictRisks[x]
+                lstDate_Tag.append(x)
+                dictSet = pRisk.setRisk.Trans_ToDict().copy()
+                dictSet['操作时间'] = myData_Trans.Tran_ToDatetime_str(dictSet['操作时间'], "%Y-%m-%d %H:%M:%S")
+                lstInfos[x] = dictSet
+         
+        jsonSetinfo = {}
+        jsonSetinfo["dataTags"] = lstDate_Tag
+        jsonSetinfo["setInfos"] = lstInfos
+
+        pMsg['result'] = len(lstDate_Tag) > 0
+        pMsg['text'] = jsonSetinfo
+        return pMsg
 
 
 #初始行情对象
@@ -183,6 +215,7 @@ def add_APIs(pWeb):
     pWeb.add_API(myAPI_Quote_SetInfoQuery, '/zxcAPI/robot/stock/QuoteSetInfo/Query')
     
     pWeb.add_API(myAPI_Quote_Set_Risk, '/zxcAPI/robot/stock/QuoteSetRisk')
+    pWeb.add_API(myAPI_Quote_SetQuery_Risk, '/zxcAPI/robot/stock/QuoteSetRisk/Query')
 
     
 #行数监测线程 

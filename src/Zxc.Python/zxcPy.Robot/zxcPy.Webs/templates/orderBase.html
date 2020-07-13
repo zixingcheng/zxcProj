@@ -11,15 +11,19 @@
 	
 	{% macro render_field(field, size) %}
 	<tr>
-	  <td>{{ field.label }}：</td>
-	  <td>{{ field(**kwargs)|safe }}</td>
-	  <td>{% if field.errors %} 
-		{% for error in field.errors %}
-		  <li><span style="color: red;">[{{ error }}]</span></li> 
-		{% endfor %} 
-		{% else %} 
-		{% endif %}
-	  </td>
+		<td>{{ field.label }}：</td>
+		<td>{{ field(**kwargs)|safe }}</td>
+
+		<td>
+			<div style='overflow-y:auto;height:40px; font-size: 8px;'>
+				{% if field.errors %}
+				{% for error in field.errors %}
+				<li><span style="color: red;">[{{ error }}]</span></li>
+				{% endfor %}
+				{% else %}
+				{% endif %}
+			</div>
+		</td>
 	</tr>
 	{% endmacro %}
   </head>

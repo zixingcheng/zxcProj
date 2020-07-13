@@ -12,7 +12,7 @@ import sys, os, string, mySystem
 from flask import jsonify, request, flash, render_template, redirect    #导入模块
 from flask_wtf import FlaskForm                                         #FlaskForm 为表单基类
 from wtforms import BooleanField,IntegerField,DecimalField,StringField,TextAreaField,PasswordField,SubmitField,RadioField,DateField,SelectField,SelectMultipleField       #导入字符串字段，密码字段，提交字段
-from wtforms.validators import DataRequired,ValidationError,Email,Regexp,EqualTo,Required,NumberRange,Length
+from wtforms.validators import InputRequired,DataRequired,ValidationError,Email,Regexp,EqualTo,Required,NumberRange,Length
 
 mySystem.Append_Us("", False)  
 mySystem.Append_Us("../zxcPy.Robot/Roots", False, __file__)
@@ -33,8 +33,9 @@ class stockQuoteSetForm(FlaskForm):
     stockID = StringField('股票代码', [DataRequired(),Length(min=4, max=12)], render_kw={"placeholder": "请输入股票代码"})  
     stockName = StringField('股票名称', [DataRequired(),Length(min=2, max=16)], render_kw={"placeholder": "请输入股票名称/首字母"})
      
-    monitorUsrID = StringField('微信账户', [DataRequired()], default="") 
-    save = SubmitField('新增监测', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
+    monitorUsrID = StringField('微信账户', default="") 
+    save = SubmitField('新增监测', render_kw={"class": "form-control","style": "margin-left:10px"})         # 保存按钮
+    addRisk = SubmitField('新增风控', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
     remove = SubmitField('移除监测')    # 移除按钮
 
     # Checkbox类型，加上default='checked'即默认是选上的
@@ -45,6 +46,41 @@ class stockQuoteSetForm(FlaskForm):
     exType = StringField('交易所代码', [DataRequired()], render_kw={"style": "display:none;"}) 
     code_id = StringField('股票代码', [DataRequired()],  render_kw={"style": "display:none;"}) 
     code_name = StringField('股票名称', [DataRequired()],  render_kw={"style": "display:none;"}) 
+    
+# 股票行情风控设置页面
+class stockQuoteSetRiskForm(FlaskForm):  
+    #商品信息
+    stockID = StringField('股票代码', render_kw={"placeholder": "请输入股票代码"})  
+    stockName = StringField('股票名称', render_kw={"placeholder": "请输入股票名称/首字母"})
+    stockDate = StringField('建仓日期', [Length(min=2, max=16)], render_kw={"placeholder": "请选择建仓日期"})
+    monitorUsrID = StringField('微信账户', default="") 
+    
+    stockPrice = DecimalField('标的价格', [DataRequired(),NumberRange(min=0, max=999999)], render_kw={"placeholder": "请输入买卖标的价格"})
+    stockNum = IntegerField('标的数量', [DataRequired(),NumberRange(min=0, max=100000)], render_kw={"placeholder": "请输入买卖标的数量，负数为卖出"})
+    
+    #fixHit = BooleanField('定量监测', default='unchecked')
+    #limitHit = BooleanField('边界监测', default='checked')
+    #stopProfit_Dynamic = BooleanField('动态止盈', default='checked')
+    #stopLoss_Dynamic = BooleanField('动态止损', default='checked')
+
+    #deltaProfit = DecimalField('监测间隔', [NumberRange(min=0.0025, max=10)], render_kw={"placeholder": "请输入数据监测触发最小间隔"})
+    #stopProfit = DecimalField('止盈阈值', [NumberRange(min=0.01, max=100)], render_kw={"placeholder": "请输入止盈线阈值"})
+    #stopLoss = DecimalField('止损阈值', [NumberRange(min=-10.0, max=-0.01)], render_kw={"placeholder": "请输入止损线阈值"})
+
+    #stopProfit_Retreat = DecimalField('止盈回撤', [NumberRange(min=0.005, max=0.20)], render_kw={"placeholder": "请输入止盈回撤阈值"})
+    #stopLoss_Retreat = DecimalField('止损回撤', [NumberRange(min=0.005, max=0.20)], render_kw={"placeholder": "请输入止损回撤阈值"})
+       
+    #stopProfit_Trade = DecimalField('止盈比例', [NumberRange(min=0.05, max=1)], render_kw={"placeholder": "请输入止盈交易比例"})
+    #stopLoss_Trade = DecimalField('止损比例', [NumberRange(min=0.05, max=1)], render_kw={"placeholder": "请输入止损交易比例"})
+       
+    save = SubmitField('新增风控', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
+    remove = SubmitField('移除风控')    # 移除按钮
+    #code_id = StringField('股票代码', render_kw={"style": "display:none;"}) 
+    #code_name = StringField('股票名称', render_kw={"style": "display:none;"}) 
+
+    #dicParam = {"边界限制": True,"定量监测": False, "监测间隔": 0.01,"止盈线": 0.20, "止损线": -0.05, "动态止盈": True, "动态止损": True, "止盈回撤": 0.01, "止盈比例": 0.20, "止损回撤": 0.01, "止损比例": 0.20 }
+       
+        
 
 #集中添加所有Web
 def add_Webs(pWeb):      
@@ -120,7 +156,6 @@ def add_Webs(pWeb):
         jsonRetrun = myData_Json.Json_Object(jsonRes['text'])
         return jsonRetrun.ToString() 
 
-
     #添加页面--股票行情监测设置
     @pWeb.app.route('/zxcWebs/stock/quoteset/<usrID>/<plat>', methods = ['GET', 'POST'])    
     def stockQuoteSet(usrID, plat):
@@ -153,4 +188,64 @@ def add_Webs(pWeb):
             #结果处理 
             return jsonRes['text']
         return render_template('stockQuoteSet.html', title = 'Stock QuoteSet', form = form, usrName_Nick = usrID, usrPlat = plat)
+    
 
+    #添加接口--股票设置查询 
+    @pWeb.app.route('/zxcAPI/robot/stock/quoteset_risk/query')
+    def stockSetQuery_risk(): 
+        #载入配置
+        usrID = request.args.get('usrID', "")
+        stockName = request.args.get('stockName', "") 
+        stockTag = request.args.get('stockTag', "")
+
+        #筛选
+        res = {"success": 1, "data": "", "msg": ""}
+        try:
+            #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"    #实际网络地址在阿里云有问题，原因未明
+            strUrl = "http://127.0.0.1:8669/zxcAPI/robot"
+            strPath = F'stock/QuoteSetRisk/Query?usrID={usrID}&code_id={stockTag}&code_name={stockName}'
+        
+            #设置查询接口执行
+            pWeb = myWeb_urlLib.myWeb(strUrl, bPrint=False)
+            strReturn = pWeb.Do_API_get(strPath, "zxcAPI-py")
+            print("查询结果：\n", strUrl, "--\n", strReturn, "\n")
+            jsonRes = myData_Json.Trans_ToJson(strReturn)
+
+            res['data'] = jsonRes['text']
+        except Exception as err:
+            res['success'] = 0
+            res['msg'] = str(err)
+        return myData_Json.Trans_ToJson_str(res)
+
+    #添加页面--股票行情监测设置
+    @pWeb.app.route('/zxcWebs/stock/quotesetrisk/<usrID>/<plat>', methods = ['GET', 'POST'])    
+    def stockQuoteSet_risk(usrID, plat):
+        #载入配置
+        stockName = request.args.get('code_name', "") 
+        stockID = request.args.get('code_id', "")
+        stockDate = request.args.get('dateTag', "")
+
+        form = stockQuoteSetRiskForm()              #生成form实例，给render_template渲染使用  
+        if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
+            #添加订单  
+            #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"
+            strUrl = "http://127.0.0.1:8669/zxcAPI/robot"                #实际网络地址在阿里云有问题，原因未明
+            if form.save.data:  # 保存按钮被单击 
+                editInfo = {}
+                
+                # 特殊同步
+                usrIDs = { usrID : plat}
+                #editInfo[form.monitorRisk.label.text] = {'isValid': form.monitorRisk.data, 'msgUsers': usrIDs, 'mark' :""}
+
+                strPath = F'stock/QuoteSetRisk?usrID={usrID}&code_id={stockID}&code_name={stockName}&dateTag={form.stockDate.data}&removeSet=False&stockPrice={form.stockPrice.data}&stockNum={form.stockNum.data}' #&setInfo=' + "{}"
+            elif form.remove.data:  # 移除按钮被单击
+                strPath = F'stock/QuoteSetRisk?usrID={usrID}&code_id={stockID}&code_name={stockName}&dateTag={form.stockDate.data}&removeSet=True'
+            
+            #修改接口执行
+            pWeb = myWeb_urlLib.myWeb(strUrl, bPrint=False)
+            strReturn = pWeb.Do_API_get(strPath, "zxcAPI-py")
+            jsonRes = myData_Json.Trans_ToJson(strReturn)
+
+            #结果处理 
+            return jsonRes['text']
+        return render_template('stockQuoteSetRisk.html', title = 'Stock QuoteSetRisk', form = form, usrName_Nick = usrID, usrPlat = plat, code_id = stockID, code_name = stockName)
