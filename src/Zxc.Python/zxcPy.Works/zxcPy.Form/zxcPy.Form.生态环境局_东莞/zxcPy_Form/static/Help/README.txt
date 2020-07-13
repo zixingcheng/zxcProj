@@ -17,9 +17,11 @@ python ~/App/Company-DGS/zxcPy.Form.生态环境局_东莞/runserver.py
 	*/5 8-23 * * * root python /run/media/root/_Data/App/Model-DGS/zxcPy.WebAPI.模型_大气扩散/runserver.py
 
 	
-	service crond reload	//重新载入配置
-	service crond restart	//重启服务 
-	service crond status    //查看crontab服务状态
+	service crond reload			//重新载入配置
+	service crond restart			//重启服务 
+	service crond status			//查看crontab服务状态
+
+	tail -f /var/spool/mail/root	//任务执行日志
 
 
 	其他操作命令：

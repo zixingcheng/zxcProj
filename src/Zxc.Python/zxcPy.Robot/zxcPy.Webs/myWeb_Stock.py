@@ -58,21 +58,20 @@ class stockQuoteSetRiskForm(FlaskForm):
     stockPrice = DecimalField('标的价格', [DataRequired(),NumberRange(min=0, max=999999)], render_kw={"placeholder": "请输入买卖标的价格"})
     stockNum = IntegerField('标的数量', [DataRequired(),NumberRange(min=0, max=100000)], render_kw={"placeholder": "请输入买卖标的数量，负数为卖出"})
     
-    #fixHit = BooleanField('定量监测', default='unchecked')
-    #limitHit = BooleanField('边界监测', default='checked')
-    #stopProfit_Dynamic = BooleanField('动态止盈', default='checked')
-    #stopLoss_Dynamic = BooleanField('动态止损', default='checked')
-
-    #deltaProfit = DecimalField('监测间隔', [NumberRange(min=0.0025, max=10)], render_kw={"placeholder": "请输入数据监测触发最小间隔"})
-    #stopProfit = DecimalField('止盈阈值', [NumberRange(min=0.01, max=100)], render_kw={"placeholder": "请输入止盈线阈值"})
-    #stopLoss = DecimalField('止损阈值', [NumberRange(min=-10.0, max=-0.01)], render_kw={"placeholder": "请输入止损线阈值"})
-
-    #stopProfit_Retreat = DecimalField('止盈回撤', [NumberRange(min=0.005, max=0.20)], render_kw={"placeholder": "请输入止盈回撤阈值"})
-    #stopLoss_Retreat = DecimalField('止损回撤', [NumberRange(min=0.005, max=0.20)], render_kw={"placeholder": "请输入止损回撤阈值"})
+    fixHit = BooleanField('定量监测', default='unchecked')
+    limitHit = BooleanField('边界监测', default='checked')
+    deltaProfit = DecimalField('监测间隔', [NumberRange(min=0.0001, max=10)], render_kw={"placeholder": "请输入数据监测触发最小间隔"})
+    
+    stopProfit_Dynamic = BooleanField('动态止盈', default='checked')
+    stopProfit = DecimalField('止盈线', [NumberRange(min=0.01, max=100)], render_kw={"placeholder": "请输入止盈线阈值"})
+    stopProfit_Retreat = DecimalField('止盈回撤', [NumberRange(min=0.005, max=0.20)], render_kw={"placeholder": "请输入止盈回撤阈值"})
+    stopProfit_Trade = DecimalField('止盈比例', [NumberRange(min=0.05, max=1)], render_kw={"placeholder": "请输入止盈交易比例"})
        
-    #stopProfit_Trade = DecimalField('止盈比例', [NumberRange(min=0.05, max=1)], render_kw={"placeholder": "请输入止盈交易比例"})
-    #stopLoss_Trade = DecimalField('止损比例', [NumberRange(min=0.05, max=1)], render_kw={"placeholder": "请输入止损交易比例"})
-       
+    stopLoss_Dynamic = BooleanField('动态止损', default='checked')
+    stopLoss = DecimalField('止损线', [NumberRange(min=-10.0, max=-0.01)], render_kw={"placeholder": "请输入止损线阈值"})
+    stopLoss_Retreat = DecimalField('止损回撤', [NumberRange(min=0.005, max=0.20)], render_kw={"placeholder": "请输入止损回撤阈值"})
+    stopLoss_Trade = DecimalField('止损比例', [NumberRange(min=0.05, max=1)], render_kw={"placeholder": "请输入止损交易比例"})
+    
     save = SubmitField('新增风控', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
     remove = SubmitField('移除风控')    # 移除按钮
     #code_id = StringField('股票代码', render_kw={"style": "display:none;"}) 
@@ -225,7 +224,19 @@ def add_Webs(pWeb):
         stockID = request.args.get('code_id', "")
         stockDate = request.args.get('dateTag', "")
 
-        form = stockQuoteSetRiskForm()              #生成form实例，给render_template渲染使用  
+        form = stockQuoteSetRiskForm()              #生成form实例，给render_template渲染使用 
+        if(True):
+            if(form.deltaProfit.data == None or form.deltaProfit.data == 0):
+                form.deltaProfit.data = 0.0025
+            if(form.stopProfit.data == None):
+                form.stopProfit.data = 0.06
+                form.stopProfit_Retreat.data = 0.01
+                form.stopProfit_Trade.data = 0.2
+            if(form.stopLoss.data == None):
+                form.stopLoss.data = -0.02 
+                form.stopLoss_Retreat.data = 0.01
+                form.stopLoss_Trade.data = 0.2
+                
         if form.validate_on_submit():               #调用form实例里面的validate_on_submit()功能，验证数据是否安全，如是返回True，默认返回False
             #添加订单  
             #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"

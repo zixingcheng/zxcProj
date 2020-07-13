@@ -746,6 +746,8 @@ class myStockRisk_Control():
                 if(pRisk != None):
                     pRisk.setRisk.valid = False
                     self.riskDB.Del_Row(pRisk.setRisk.ID)
+                    pMsg = F"{stockName} (已删除) : \r\n建仓日期: {dateTag}."
+                    pRisk.handleMsg(pMsg)
         return pMsg
     # 提取风控对象集
     def getRisks(self, usrID, usrTag, stockID, stockName, bCheck = True):  

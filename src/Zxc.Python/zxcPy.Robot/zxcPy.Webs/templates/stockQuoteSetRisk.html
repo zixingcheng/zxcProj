@@ -5,9 +5,7 @@
 {% block content %} 
   {% from "base.html" import render_field2 %}
 <form action="" method="post" name="stockQuoteSet" style="margin-left:10px;margin-top:10px">
-	<h1 style="margin-left:160px">风控监测设置 </h1>
 	{{ form.hidden_tag() }}
-
 	<style>
 		.data {
 			width: 350px;
@@ -75,6 +73,7 @@
 			}
 	</style>
 
+	<h1 style="margin-left:30px">风控监测设置 </h1>
 	<div style="margin-left:16px;">
 		<table>
 			{{ render_field2(form.stockID, size=20) }}
@@ -87,8 +86,29 @@
 
 		</table>
 	</div>
+
 	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p>
 	<datalist id="lstDateTags"></datalist>
+
+	<div style="margin-left:16px;">
+		<p style="margin-left:10px"><B>监测设置：</B></p>
+		<table>
+			{{ render_field2(form.fixHit, size=20) }}
+			{{ render_field2(form.limitHit, size=20) }}
+			{{ render_field2(form.deltaProfit, size=20) }}
+
+			{{ render_field2(form.stopProfit_Dynamic, size=20) }}
+			{{ render_field2(form.stopProfit, size=20) }}
+			{{ render_field2(form.stopProfit_Retreat, size=20) }}
+			{{ render_field2(form.stopProfit_Trade, size=20) }}
+
+			{{ render_field2(form.stopLoss_Dynamic, size=20) }}
+			{{ render_field2(form.stopLoss, size=20) }}
+			{{ render_field2(form.stopLoss_Retreat, size=20) }}
+			{{ render_field2(form.stopLoss_Trade, size=20) }}
+
+		</table>
+	</div>
 
 	<div style="margin-left:10px; width: 300px;">
 		<p style="margin-left:10px"><B>交易记录：</B></p>
@@ -141,7 +161,32 @@
             $("#stockDate").on('change', function () {
                 if (this.value.length < 2) return;
                 refreshInfo_set(this.value);
-			});  
+			});
+
+			$("#stopProfit_Dynamic").on('change', function () {
+                if ($("#stopProfit_Dynamic").prop("checked")) {
+                    $('#stopProfit').attr("disabled", false);
+                    $('#stopProfit_Trade').attr("disabled", false);
+                    $('#stopProfit_Retreat').attr("disabled", false);
+				}
+                else {
+                    $("#stopProfit").attr("disabled", 'disabled');
+                    $("#stopProfit_Trade").attr("disabled", 'disabled');
+                    $("#stopProfit_Retreat").attr("disabled", 'disabled');
+				};
+            });
+            $("#stopLoss_Dynamic").on('change', function () {
+                if ($("#stopLoss_Dynamic").prop("checked")) {
+                    $('#stopLoss').attr("disabled", false);
+                    $('#stopLoss_Trade').attr("disabled", false);
+                    $('#stopLoss_Retreat').attr("disabled", false);
+                }
+                else {
+                    $("#stopLoss").attr("disabled", 'disabled');
+                    $("#stopLoss_Trade").attr("disabled", 'disabled');
+                    $("#stopLoss_Retreat").attr("disabled", 'disabled');
+                };
+            });
 
 
 			<!--提取并设置配置信息-->
@@ -156,12 +201,27 @@
 					$("#stockPrice").val(pRisk['标的均价']);
 					$("#stockNum").val(pRisk['标的数量']);
 
+                    $("#fixHit").attr("checked", pRisk['定量监测']);
+                    $("#limitHit").attr("checked", pRisk['边界监测']);
+					$("#deltaProfit").val(pRisk['监测间隔']);
+                    if ($("#deltaProfit").val() == "0.00") { $("#deltaProfit").val(0.0025); };
+
+                    $("#stopProfit_Dynamic").attr("checked", pRisk['动态止盈']);
+                    $("#stopProfit").val(pRisk['止盈线']);
+                    $("#stopProfit_Retreat").val(pRisk['止盈回撤']);
+                    $("#stopProfit_Trade").val(pRisk['止盈比例']);
+
+                    $("#stopLoss_Dynamic").attr("checked", pRisk['动态止损']);
+                    $("#stopLoss").val(pRisk['止损线']);
+                    $("#stopLoss_Retreat").val(pRisk['止损回撤']);
+                    $("#stopLoss_Trade").val(pRisk['止损比例']);
+
 					//更新同步交易信息
 					updaTradeinfos(dateTag);
 				}
 				return;
 			};
-			
+
 			<!--更新同步交易信息-->
 			function updaTradeinfos(dateTag) {
                 bExist = true;
@@ -187,7 +247,7 @@
 					for (var item in pTradeinfos) {
 						html += '<tr>' +
 								'<td class="td"">' + ind + '</td>' +
-								'<td class="td"">' + pTradeinfos[item]['股数'] + '</td>' +	
+								'<td class="td"">' + pTradeinfos[item]['股数'] + '</td>' +
 								'<td class="td"">' + pTradeinfos[item]['股价'] + '</td>' +
 								'<td class="td"">' + pTradeinfos[item]['时间'] + '</td>' +
 								'<tr>';
@@ -209,6 +269,7 @@
 
             $("#monitorUsrID").attr("disabled", 'disabled');
 			$("#monitorUsrID").val('{{usrName_Nick}}-{{usrPlat}}');
+            $("#deltaProfit").val(0.0025);
 		});
 	</script>
 

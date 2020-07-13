@@ -142,9 +142,9 @@ class myAPI_Quote_Set_Risk(myWeb.myAPI):
 
         dtTrade = request.args.get('time', "")
         dateTag = request.args.get('dateTag', "")
-        stockPrice = myData_Trans.To_Float(request.args.get('stockPrice', 0))
-        stockNum = myData_Trans.To_Int(request.args.get('stockNum', 0))
-        if(stockPrice == 0 or stockNum == 0): 
+        stockPrice = myData_Trans.To_Float(str(request.args.get('stockPrice', 0)))
+        stockNum = myData_Trans.To_Int(str(request.args.get('stockNum', 0)))
+        if(removeSet == False and (stockPrice == 0 or stockNum == 0)): 
             bResult = False; pMsg['text'] = "股价、数量不能为0."
         strR = pRisks.addRiskSet(usrID, usrTag, code_id, code_name, stockPrice, stockNum, dtTrade, dateTag, paramInfo)
         
@@ -184,10 +184,11 @@ class myAPI_Quote_SetQuery_Risk(myWeb.myAPI):
         if(dictRisks != None):
             for x in dictRisks:
                 pRisk = dictRisks[x]
-                lstDate_Tag.append(x)
-                dictSet = pRisk.setRisk.Trans_ToDict().copy()
-                dictSet['操作时间'] = myData_Trans.Tran_ToDatetime_str(dictSet['操作时间'], "%Y-%m-%d %H:%M:%S")
-                lstInfos[x] = dictSet
+                if(pRisk.setRisk.valid):
+                    lstDate_Tag.append(x)
+                    dictSet = pRisk.setRisk.Trans_ToDict().copy()
+                    dictSet['操作时间'] = myData_Trans.Tran_ToDatetime_str(dictSet['操作时间'], "%Y-%m-%d %H:%M:%S")
+                    lstInfos[x] = dictSet
          
         jsonSetinfo = {}
         jsonSetinfo["dataTags"] = lstDate_Tag
