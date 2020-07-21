@@ -74,58 +74,73 @@
 	</style>
 
 	<h1 style="margin-left:30px">风控监测设置 </h1>
-	<div style="margin-left:16px;">
-		<table>
-			{{ render_field2(form.stockID, size=20) }}
-			{{ render_field2(form.stockName, size=20) }}
-			{{ render_field2(form.stockDate, size=20) }}
+	<div style="margin-left:16px;vertical-align:top;">
+		<div style="float:left; margin-left:6px;">
+			<table>
+				{{ render_field2(form.stockID, size=20) }}
+				{{ render_field2(form.stockName, size=20) }}
+				{{ render_field2(form.stockDate, size=20) }}
 
-			{{ render_field2(form.stockPrice, size=20) }}
-			{{ render_field2(form.stockNum, size=20) }}
-			{{ render_field2(form.monitorUsrID, size=20) }}
-
-		</table>
+				{{ render_field2(form.stockPrice, size=20) }}
+				{{ render_field2(form.stockNum, size=20) }}
+				{{ render_field2(form.monitorUsrID, size=20) }}
+			</table>
+			<div style="clear:both;margin-top:0px;">
+				<p style="margin-left:100px;">{{ form.remove|safe }} {{ form.save|safe }}</p>
+				<datalist id="lstDateTags"></datalist>
+			</div>
+		</div>
+		<div style="float:left; width: 300px; vertical-align:top;margin-left:6px;">
+			<!---<p style="margin-left:10px"><B>交易记录：</B></p>-->
+			<table class="table">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>数量</th>
+						<th>均价</th>
+						<th>时间</th>
+					</tr>
+				</thead>
+				<tbody id="data_list"></tbody>
+			</table>
+		</div>
+		<div style="clear:both;"></div>
 	</div>
 
-	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p>
-	<datalist id="lstDateTags"></datalist>
+	<div style="margin-left: 16px;vertical-align:top;">
+		<p style="margin-left:6px"><B>监测设置：</B></p>
+		<div style="float:left; margin-left:6px;">
+			<table>
+				{{ render_field2(form.fixHit, size=20) }}
+				{{ render_field2(form.limitHit, size=20) }}
+				{{ render_field2(form.deltaProfit, size=20) }}
+			</table>
+		</div>
+		<div style="clear:both;"></div>
+	</div>
 
-	<div style="margin-left:16px;">
-		<p style="margin-left:10px"><B>监测设置：</B></p>
-		<table>
-			{{ render_field2(form.fixHit, size=20) }}
-			{{ render_field2(form.limitHit, size=20) }}
-			{{ render_field2(form.deltaProfit, size=20) }}
-
+	<div style="margin-left:16px;vertical-align:top;">
+		<div style="clear:both;margin-top:0px;">
+			<p style="margin-left:6px"><B>风控设置：</B></p>
+		</div>
+		<table style="float:left;margin-left:6px;">
 			{{ render_field2(form.stopProfit_Dynamic, size=20) }}
 			{{ render_field2(form.stopProfit, size=20) }}
 			{{ render_field2(form.stopProfit_Retreat, size=20) }}
 			{{ render_field2(form.stopProfit_Trade, size=20) }}
-
+		</table>
+		<table style="float:left;margin-left:6px;">
 			{{ render_field2(form.stopLoss_Dynamic, size=20) }}
 			{{ render_field2(form.stopLoss, size=20) }}
 			{{ render_field2(form.stopLoss_Retreat, size=20) }}
 			{{ render_field2(form.stopLoss_Trade, size=20) }}
-
 		</table>
+		<div style="clear:both;"></div>
 	</div>
 
-	<div style="margin-left:10px; width: 300px;">
-		<p style="margin-left:10px"><B>交易记录：</B></p>
-		<table class="table">
-			<thead>
-				<tr>
-					<th>序号</th>
-					<th>数量</th>
-					<th>均价</th>
-					<th>时间</th>
-				</tr>
-			</thead>
-			<tbody id="data_list"></tbody>
-		</table>
-	</div>
 
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
+	<script src="/static/JS/jquery-3.3.1.min.js"></script>
 	<script type="text/javascript">
         var jsonRisks_set = JSON.parse("{}", null);
 		$(document).ready(function () {
@@ -138,6 +153,7 @@
                     stockName: '{{code_name}}'
                 },
                 success: function (res) {
+                    alert("asda");
                     jsonRisks_set = JSON.parse(res, null);
 					if (jsonRisks_set['success'] == 1) {
                         lstDateTags = jsonRisks_set['data']['dataTags']
