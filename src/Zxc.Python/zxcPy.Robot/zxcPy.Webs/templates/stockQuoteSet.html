@@ -8,16 +8,17 @@
 	<h1 style="margin-left:30px">股票监测设置 </h1>
 	{{ form.hidden_tag() }}
 
-	<table>
-		{{ render_field2(form.stockID, size=20) }}
-		{{ render_field2(form.stockName, size=20) }}
+<table>
+	{{ render_field2(form.stockID, size=20) }}
+	{{ render_field2(form.stockName, size=20) }}
 
-		{{ render_field2(form.monitorHourly, size=20) }}
-		{{ render_field2(form.monitorRise_Fall, size=20) }}
-		{{ render_field2(form.monitorRisk, size=20) }}
+	{{ render_field2(form.monitorHourly, size=20) }}
+	{{ render_field2(form.monitorRise_Fall, size=20) }}
+	{{ render_field2(form.monitorRisk, size=20) }}
+	<tbody id="data_herf"></tbody>
 
-		{{ render_field2(form.monitorUsrID, size=20) }}
-	</table>
+	{{ render_field2(form.monitorUsrID, size=20) }}
+</table>
 	<p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p>
 
 	<td>{{ form.exType|safe }}{{ form.code_id|safe }}{{ form.code_name|safe }}</td>
@@ -46,7 +47,10 @@
 			});
 			$("#stockName").on('input propertychange change',function () {
 				updatStocks('', this.value);
-			});
+            });
+			$("#monitorRisk").on('change', function () {
+				riskHerf_set(false);
+            });
 
 			<!--动态查询股票信息-->
 			function updatStocks(codeID, codeName)	{
@@ -68,7 +72,7 @@
 							{
 								$("#save").val('更新设置');
 								$("#remove").attr("disabled", false);
-							};
+                            };
                             refreshInfo_set($("#stockID").val(), $("#stockName").val());
 							return;
 						};
@@ -77,6 +81,7 @@
 				$("#save").val('新增监测');
 				$("#remove").attr("disabled", true);
                 $("#exType").val(""); $("#code_id").val(""); $("#code_name").val("");
+                riskHerf_set(false);
 
 				if(codeID == "" & codeName == ""){
 					jsonStocks = dataStocks_set;
@@ -123,15 +128,38 @@
 					return;
 				}
 
-                $.get('/zxcAPI/robot/stock/quoteset_info/query', { stockName: codeName, stockTag: codeTag }, function (data) {
-                    jsonStocks = JSON.parse(data, null);
-                });
-				if (jsonStocks != null) {
-                    $("#monitorHourly").attr("checked", jsonStocks["设置状态"]['整点播报']);
-                    $("#monitorRise_Fall").attr("checked", jsonStocks["设置状态"]['涨跌监测']);
-                    $("#monitorRisk").attr("checked", jsonStocks["设置状态"]['风控监测']);
-				}
+                $.ajax({
+                    url: '/zxcAPI/robot/stock/quoteset_info/query',
+                    type: 'get',
+                    data: {
+                        stockTag: codeTag,
+                        stockName: codeName
+                    },
+                    success: function (res) {
+                        jsonStocks_set = JSON.parse(res, null);
+                        if (jsonStocks_set['success'] == 1) {
+                            dataSet = jsonStocks_set['data']["设置状态"];
+                            $("#monitorHourly").attr("checked", dataSet['整点播报']);
+                            $("#monitorRise_Fall").attr("checked", dataSet['涨跌监测']);
+                            $("#monitorRisk").attr("checked", dataSet['风控监测']);
+                            riskHerf_set(dataSet['风控监测']);
+                        } else {
+                            //alert(jsonRisks_set['data']);
+                        }
+                    }
+				});
 				return;
+			};
+            function riskHerf_set(hasRisk) {
+				var html = '';
+                if (hasRisk) {
+                    if ($("#stockID").val() != '') {
+                        html += '<div style="position: absolute;top: 215px;left: 160px;">';
+                        html += '<a href="/zxcWebs/stock/quotesetrisk/{{usrName_Nick}}/{{usrPlat}}?code_id=' + $("#stockID").val() + '&code_name=' + $("#stockName").val() + '">风控设置</a>';
+						html += '</div>'
+                    };
+                }
+                $('#data_herf').html(html);
 			};
 
 			<!--控件调整，绑定下拉辅助输入列表-->
