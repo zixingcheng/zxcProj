@@ -324,14 +324,14 @@ if __name__ == '__main__':
    msg = pMMsg.OnCreatMsg()
    msg["msgType"] = "TEXT"
    msg["usrPlat"] = "wx"
-   msg["usrName"] = "@*股票风控监测群"
+   msg["usrName"] = "@*风控监测--期权"
    msg["msg"] = "测试消息py--延时"
    pMMsg.OnHandleMsg(msg, '', False, 5)
 
    msg = pMMsg.OnCreatMsg()
    msg["msgType"] = "TEXT"
    msg["usrPlat"] = "wx"
-   msg["usrName"] = "@*股票风控监测群"
+   msg["usrName"] = "@*风控监测--股票"
    msg["msg"] = "测试股票: 10.37 元, 回撤逾1.4%.\r\n操作策略: 建议止盈, 操作2.0成仓, 卖出2000股.\r\n策略收益: 7.0%, 总收益 9.0%, 涨幅前高 10.5%, 最高13.5%."
    pMMsg.OnHandleMsg(msg, '', False, 5)
    

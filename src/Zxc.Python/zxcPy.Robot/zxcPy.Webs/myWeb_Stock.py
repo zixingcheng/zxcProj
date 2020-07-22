@@ -231,6 +231,14 @@ def add_Webs(pWeb):
         stockName = request.args.get('code_name', "") 
         stockID = request.args.get('code_id', "")
         stockDate = request.args.get('dateTag', "")
+        
+        #纠正风控账户名
+        if(usrID == '@*股票监测--自选行情'): 
+            usrID = '@*风控监测--股票'
+        if(usrID == '@*股票监测--期权行情'): 
+            usrID = '@*风控监测--期权'
+        if(usrID.count('股票监测') == 1): 
+            usrID = usrID.replace('股票监测', '风控监测')
 
         form = stockQuoteSetRiskForm()              #生成form实例，给render_template渲染使用 
         if(True):

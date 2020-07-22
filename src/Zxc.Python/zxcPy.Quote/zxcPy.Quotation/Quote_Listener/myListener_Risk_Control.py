@@ -27,16 +27,17 @@ class Quote_Listener_Risk_Control(myQuote_Listener.Quote_Listener):
     #处理接收信息
     def OnRecvQuote(self, quoteDatas): 
         #设置有效检查
-        #if(self.IsEnable(quoteDatas)== False): return
+        if(self.IsEnable(quoteDatas)== False): return
         
         #提取值
         dValue_N = quoteDatas.datasS_M.dataS_Min_Now.dataS.getRise_Fall(0)  #当前涨跌幅
         key = quoteDatas.name
 
         #通知处理
-        strMsg = self.DoRecvQuote(dValue_N, key, quoteDatas.datasS_M.data, quoteDatas.setting)
-        if(strMsg != ""):
-            self.OnHandleMsg(quoteDatas, strMsg)
+        msgs = self.DoRecvQuote(dValue_N, key, quoteDatas.datasS_M.data, quoteDatas.setting)
+        if(len(msgs) > 0):
+            self.OnHandleMsgs(quoteDatas, msgs)
+            pass
     def DoRecvQuote(self, dValue_N, key, data, pSet): 
         strTag_suffix = ""
         price = data.value
@@ -44,8 +45,8 @@ class Quote_Listener_Risk_Control(myQuote_Listener.Quote_Listener):
             price = price * 10000           # 期权行情值修正
         
         #调用风险监测
-        self.pRisks.notifyRisk(price, pSet.setTag, pSet.stockInfo.code_name, False)
-        return "" 
+        msgs = self.pRisks.notifyRisk(price, pSet.setTag, pSet.stockInfo.code_name, False, pSet)
+        return msgs 
     
 
 

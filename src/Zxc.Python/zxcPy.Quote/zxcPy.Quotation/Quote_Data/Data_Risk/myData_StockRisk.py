@@ -471,7 +471,9 @@ class myMonitor_StockRisk():
         # 装饰函数，处理监测到的上升、下降、拐点
         @self.riskMonitor.msg_register(["RISK"])
         def Reply_Risk(msg): 
-            self.handleRisk(msg, self.riskMonitor.saveData)
+            dictMsg = self.handleRisk(msg, self.riskMonitor.saveData)
+            if(dictMsg != None):
+                self.msgs.append(dictMsg)
             #print(msg)
             pass
 
@@ -509,9 +511,10 @@ class myMonitor_StockRisk():
 
     # 通知接收新行情
     def notifyQuotation(self, price, bSave_Auto = True):
+        self.msgs = []
         self.riskMonitor.saveData = bSave_Auto
         self.riskMonitor.add_data(price)
-        return 
+        return self.msgs
         
     # 风险处置
     def handleRisk(self, msg, bSave_Auto = True):
@@ -540,8 +543,7 @@ class myMonitor_StockRisk():
                     strTitle = self.getTitleMark(self.priceNow, True, not riskInfo['hitPoint'], False, False)
                 else:
                     strTitle = self.getTitleMark(self.priceNow, False, False, False, False)
-        self.handleMsg(strTitle)            
-        return strTitle
+        return self.handleMsg(strTitle)            
     # 消息处理
     def handleMsg(self, strTitle):
         #发送消息
@@ -555,8 +557,10 @@ class myMonitor_StockRisk():
                     msg["msgType"] = "TEXT"
                     msg["usrPlat"] = "wx"
                     msg["msg"] = strTitle
-                    self.msgManger.usePrint = False
-                    self.msgManger.OnHandleMsg(msg, '', True)   #必须check
+                    #self.msgManger.usePrint = False
+                    #self.msgManger.OnHandleMsg(msg, '', True)   #必须check
+                    return msg
+        return None
     # 交易处置
     def handleTrade(self, price, numSell, bSave_Auto = False):
         #自动更新交易记录
@@ -630,6 +634,12 @@ class myMonitor_StockRisk():
                 else:
                     strReutrn += F"亏损逾 {strRetreat}.\r\n操作策略: 建议止损, 操作 {strTrade}仓, 卖出 {strSell}.\r\n策略收益: {strProfit}, 当前浮盈: {strProfitNow}, 涨幅前高 {strMaxStage}, 最高 {strMax}."
         strReutrn +=  F"\r\n建仓日期: {self.setRisk.date}."
+        
+        #尾部标签
+        #strTag = "  --zxcRobot(Stock)  " + myData_Trans.Tran_ToDatetime_str(None, "%H:%M:%S")
+        #if(len(strTag) < 36):
+        #    strTag = (36 - len(strTag)) * " " + strTag
+        #strReutrn += "\r\n" + strTag
         myDebug.Debug(strReutrn.replace("\r\n", ""))
         
         #交易处置
@@ -787,18 +797,36 @@ class myStockRisk_Control():
         return dictRisks_usr.get(dateTag, None) 
 
     #通知接收新行情
-    def notifyRisk(self, price, stockID, stockName, bSave_Auto = True):
+    def notifyRisk(self, price, stockID, stockName, bSave_Auto = True, pSet = None):
         #提取设置字典
+        msgs = []
         dictRisk = self.dictRisk.get(stockID, None)
         if(dictRisk != None):
-            for x in dictRisk:
+            #提取设置用户信息
+            lstUsers = list(pSet.settings['风控监测'].msgUsers.keys())
+            for x in lstUsers:
                 #提取所有用户信息集
-                pRisks_usr = dictRisk[x]
+                pRisks_usr = dictRisk.get(x, None)
+                if(pRisks_usr == None):
+                    #纠正风控账户名
+                    usrID = x
+                    if(usrID == '@*股票监测--自选行情'): 
+                        usrID = '@*风控监测--股票'
+                    if(usrID == '@*股票监测--期权行情'): 
+                        usrID = '@*风控监测--期权'
+                    if(usrID.count('股票监测') == 1): 
+                        usrID = usrID.replace('股票监测', '风控监测')
+                    pRisks_usr = dictRisk.get(usrID, None)
+                    if(pRisks_usr == None): 
+                        continue
+
+                #循环所有数据
                 for xx in pRisks_usr:
                     pRisk = pRisks_usr[xx]
                     if(pRisk.setRisk.valid):
-                        pRisk.notifyQuotation(price, bSave_Auto)
-                    pass
+                        msgs += pRisk.notifyQuotation(price, bSave_Auto)
+                pass
+        return msgs
 
 
 

@@ -45,6 +45,19 @@ class Quote_Listener:
                 self.pMMsg.OnHandleMsg(msg, usrPlat, True, nSleep)   #推送至消息处理器处理(使用消息校正)
         self.OnHandleMsg_desk(quoteDatas)                            #消息处理-桌面
         return True
+    def OnHandleMsgs(self, quoteDatas, lstMsgs, nSleep = 0):
+        if(quoteDatas.autoSave == False): return False          #屏蔽旧数据处理
+
+        #通知处理
+        self.pSet = quoteDatas.setting.GetSetting(self.nameAlias)
+        if(self.pSet == None): return False
+        for x in lstMsgs:
+            #生成用户消息
+            usrPlat = x["usrPlat"]
+            msg = self.OnCreatMsgInfo(x['usrName'], x["msg"], quoteDatas.data.time, plat=usrPlat)
+            if(self.pMMsg != None):
+                self.pMMsg.OnHandleMsg(msg, usrPlat, True, nSleep)   #推送至消息处理器处理(使用消息校正)
+        return True
     #消息处理-桌面
     def OnHandleMsg_desk(self, quoteDatas):
         #涨跌标识    
@@ -74,8 +87,8 @@ class Quote_Listener:
 
         #尾部标签
         strTag = "  --zxcRobot(Stock)  " + time
-        if(len(strTag) < 32):
-            strTag = (32 - len(strTag)) * " " + strTag
+        if(len(strTag) < 34):
+            strTag = (34 - len(strTag)) * " " + strTag
 
         #更新 
         msg["usrName"] = to_user
