@@ -231,7 +231,8 @@ class myQuote_Sets():
 
     #设置索引
     def _Index(self, pSet): 
-        if(self._Find("", pSet.setTag)!=None):return
+        if(pSet.setTag == ""): return
+        if(self._Find("", pSet.setTag)!=None): return
         self.sets.append(pSet)
         self.setList[pSet.stockInfo.code_name] = pSet
         self._Index_User(pSet)
