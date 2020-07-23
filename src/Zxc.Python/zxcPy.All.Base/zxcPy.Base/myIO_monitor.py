@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Created on  张斌 2020-07-22 20:30:00 
+    @author: zhang bin
+    @email:  zhangbin@gsafety.com
+
+    文件变动信息监测
+"""
 import os, sys, time, threading
 import win32file
 import win32con
@@ -13,7 +21,7 @@ ACTIONS = {
 FILE_LIST_DIRECTORY = 0x0001
 
 
-# FTP自动下载、自动上传脚本，可以递归目录操作
+# 文件变动信息监测
 class myMonitor_File:
     def __init__(self, localFolder):
         self.functionDict = {}

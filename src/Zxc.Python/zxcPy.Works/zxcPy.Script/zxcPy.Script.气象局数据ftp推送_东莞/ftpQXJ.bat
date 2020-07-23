@@ -1,4 +1,4 @@
-python D:\ftpScript\runftp.py
+python D:\ftpScript\runFTP.py
 
 pause
 :: http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/

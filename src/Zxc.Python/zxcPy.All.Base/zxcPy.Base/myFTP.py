@@ -10,6 +10,7 @@ Created on  张斌 2020-05-21 16:30:00
 import os, sys, time, datetime, socket, threading
 from ftplib import FTP
 from myIO_monitor import myMonitor_File
+import myProcess_monitor
 
 
 # FTP自动下载、自动上传脚本，可以递归目录操作
@@ -208,16 +209,18 @@ class myFTP:
     def delete_files(self, days = -5):
         file_list = [self.localFolder, self.logDir]     # 文件夹列表
         today = datetime.datetime.now()                 # 获取当前时间
-        offset = datetime.timedelta(days=days)          # 计算偏移量,前3天
-        re_date = (today + offset)                      # 获取想要的日期的时间,即前3天时间
-        re_date_unix = time.mktime(re_date.timetuple()) # 前3天时间转换为时间戳
+        offset = datetime.timedelta(days=days)          # 计算偏移量,前n天
+        re_date = (today + offset)                      # 获取想要的日期的时间,即前n天时间
+        re_date_unix = time.mktime(re_date.timetuple()) # 前n天时间转换为时间戳
+        reF_date = (today + offset * 6)                  # 获取想要的日期的时间,即前n*5天时间
+        reF_date_unix = time.mktime(re_date.timetuple()) # 前n*5天时间转换为时间戳
 
         try:
             while file_list:                            # 判断列表是否为空
                 path = file_list.pop()                  # 删除列表最后一个元素，并返回给 
                 for item in os.listdir(path):           # 遍历列表 
-                    pathFile = os.path.join(path, item)    # 组合绝对路径 
-                    if os.path.isfile(pathFile):           # 判断绝对路径是否为文件
+                    pathFile = os.path.join(path, item) # 组合绝对路径 
+                    if os.path.isfile(pathFile):        # 判断绝对路径是否为文件
                         # 比较时间戳,文件修改时间小于等于3天前
                         if os.path.getmtime(pathFile) <= re_date_unix:
                             fileName = os.path.basename(pathFile).lower()
@@ -229,8 +232,9 @@ class myFTP:
                     else:
                         if not os.listdir(pathFile):  # 判断目录是否为空
                             # 若目录为空，则删除，并递归到上一级目录，如若也为空，则删除，依此类推
-                            os.removedirs(pathFile)
-                            self.debug_print('删除空目录{}'.format(pathFile))
+                            if os.path.getmtime(pathFile) <= reF_date_unix:
+                                os.removedirs(pathFile)
+                                self.debug_print('删除空目录{}'.format(pathFile))
                         else:
                             # 为文件夹时,添加到列表中。再次循环。
                             file_list.append(pathFile)
@@ -241,7 +245,7 @@ class myFTP:
     
 # FTP自动下载、自动上传脚本，自动监测文件夹变动执行上传         
 class myFTP_Monitor:
-    def __init__(self, host, port, username, password, localDir, dataFolder, limitH = 10):
+    def __init__(self, host, port, username, password, localDir, dataFolder, limitH = 12):
         self.my_ftp = myFTP(host, port, localDir)
         self.username = username
         self.password = password
@@ -253,11 +257,10 @@ class myFTP_Monitor:
         self.timesDT = 0                #时间变化
         self.timesDT_total = 0          #时间变化-总，控制退出 
         self.timeSleep = 6              #时间-休眠
-        self.timesLimit_total_S = limitH * 3600          
-
+        self.timesLimit_total_S = limitH * 3600     
+        
         # 监测本地文件变化，然后执行上传
         self.fileMonitor = myMonitor_File(self.localDir)
-        
         # 装饰函数，文件变动触发
         @self.fileMonitor.changes_register()
         def Reply(params): 
@@ -307,7 +310,7 @@ class myFTP_Monitor:
     
     # 开始监测    
     def startWatch(self):
-        self.fileMonitor.startWatch()    # 上传文件，并开始监测
+        self.fileMonitor.startWatch()    #上传文件，并开始监测
 
         # 本地文件夹变动计数器监测
         self.isRuning = True
@@ -348,6 +351,13 @@ class myFTP_Monitor:
 
 
 if __name__ == "__main__":
+    #单例运行检测
+    from myGlobal import gol  
+    gol._Init()             #先必须在主模块初始化（只在Main模块需要一次即可）
+    #单例运行检测
+    if(gol._Run_Lock(__file__) == False):
+       exit(0)
+
     # FTP配置信息-市气象局
     # Host = "10.152.35.111"      
     # Port = 8021
@@ -377,5 +387,9 @@ if __name__ == "__main__":
     dataFloder = 'Data'
     
     # 初始Ftp
+    print(F"Start:: myFTP({str(os.getpid())})")
     pFTP_Monitor = myFTP_Monitor(Host, Port, User, UserPW, localDir, dataFloder)
     pFTP_Monitor.startWatch()
+
+    monitor = myProcess_monitor.myProcess_monitor(5)
+    monitor.initReg(__file__, "* * * * * ")                    #每天任一分钟 时执行命令

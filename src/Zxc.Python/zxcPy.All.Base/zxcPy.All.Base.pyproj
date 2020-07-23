@@ -5,7 +5,7 @@
     <ProjectGuid>91159e89-71e7-4dac-9414-10b79ace9cc6</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>zxcPy.Install\Install.py</StartupFile>
+    <StartupFile>zxcPy.Base\myProcess_monitor.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -27,8 +27,15 @@
   <ItemGroup>
     <Compile Include="mySystem.py" />
     <Compile Include="zxcPy.Base\myAI_Baidu.py" />
+    <Compile Include="zxcPy.Base\myAliPay.py" />
+    <Compile Include="zxcPy.Base\myProcess_monitor_copy.py" />
+    <Compile Include="zxcPy.Base\myRegistry.py" />
+    <Compile Include="zxcPy.Base\myProcess_monitor.py" />
+    <Compile Include="zxcPy.Base\Demo.py.py" />
     <Compile Include="zxcPy.Base\myData_DB_Mysql.py" />
     <Compile Include="zxcPy.Base\myChat.py" />
+    <Compile Include="zxcPy.Base\myIO_monitor.py" />
+    <Compile Include="zxcPy.Base\myFTP.py" />
     <Compile Include="zxcPy.Base\myPyMysql.py" />
     <Compile Include="zxcPy.Base\myIO_md.py" />
     <Compile Include="zxcPy.Base\myIO_docx.py" />

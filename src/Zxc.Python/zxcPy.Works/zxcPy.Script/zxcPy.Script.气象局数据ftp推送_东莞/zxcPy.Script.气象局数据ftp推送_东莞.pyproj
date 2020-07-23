@@ -27,9 +27,7 @@
     <Content Include="ftpQXJ.bat" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="myFTP.py" />
-    <Compile Include="myIO_monitor.py" />
-    <Compile Include="runftp.py" />
+    <Compile Include="runFTP.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
