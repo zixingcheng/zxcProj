@@ -105,6 +105,7 @@ class myAPI_Quote_SetInfoQuery(myWeb.myAPI):
         exType=request.args.get('exType', "")
         stockID=request.args.get('stockID', "")
         stockName=request.args.get('stockName', "")
+        usrID=request.args.get('usrID', "")
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
         
         #初始返回组
@@ -115,7 +116,8 @@ class myAPI_Quote_SetInfoQuery(myWeb.myAPI):
             pMsg['result'] = True
             pParams = {}
             for xx in pSet.settings:
-                pParams[xx] = pSet.settings[xx].isValid
+                pSetting = pSet.settings[xx]
+                pParams[xx] = pSetting.IsValid(usrID)
             jsonInfo["设置状态"] = pParams
         else:
             pMsg['result'] = False

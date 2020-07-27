@@ -69,6 +69,8 @@ class myRobot_Updata():
             self.usrMMsg.OnHandleMsg(msg) 
         
 myUpdata = myRobot_Updata()     # 机器人功能--更新消息类 
+
+
 #主启动程序
 if __name__ == "__main__": 
     #机器人功能--更新消息类 

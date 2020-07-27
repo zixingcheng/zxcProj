@@ -28,20 +28,41 @@ class myQuote_Setting():
     #是否为空
     def IsNull(self): 
         return len(self.msgUsers) == 0
+    #是否有效（方便保留设置）
+    def IsValid(self, usrName): 
+        usrSet = self.msgUsers.get(usrName, None)
+        if(usrSet == None): return False
+        if(type(usrSet) != list): return False
+        if(len(usrSet) < 2): return False
+        return usrSet[1]
     #由字符串初始
     def InitBystr(self, strSets): 
         #底层属性提取
         if(len(strSets) > 9): 
             self.monitorTag = strSets[5]
-            self.isValid = myData_Trans.To_Bool(strSets[6])
+            self.isValid = myData_Trans.To_Bool(strSets[6])     #该处设置会按用进行校检，全部为False时无效
             self.setStr = strSets[7].replace('，', ',')
             self.mark = strSets[9]
             msgUsers = myData_Trans.Tran_ToDict(strSets[8].replace('，', ','))
             for x in msgUsers:
+                #修正格式问题[plat,isvalid]
+                if(type(msgUsers[x]) == str):
+                    msgUsers[x] = msgUsers[x].split(',')
+                if(type(msgUsers[x]) == list):
+                    if(len(msgUsers[x]) < 2):
+                        msgUsers[x] += [True] * (2 - len(msgUsers[x]))
+                    if(type(msgUsers[x][1]) == str):
+                        msgUsers[x][1] = myData_Trans.To_Bool(msgUsers[x][1])
                 self.msgUsers[x] = msgUsers[x]
-                self._msgUsersCheck(x, msgUsers)        #特殊同步设置
+                self._msgUsersCheck(x, msgUsers)                #特殊同步设置
+                
+            #校检有效性
+            isNotValid = True
+            for x in self.msgUsers:
+                isNotValid = isNotValid and not(self.msgUsers[x][1])
+            self.isValid = not isNotValid
 
-            #处理详情设置
+            #处理详情设置(详情暂移除，试用msgUsers列表参数)
             if(len(self.setStr) > 2):
                 self.setDicts = myData_Trans.Tran_ToDict(self.setStr)
         return ""
@@ -193,7 +214,7 @@ class myQuote_Sets():
                 pValues.append(pSetting.monitorTag)
                 pValues.append(pSetting.isValid)
                 pValues.append(str(pSetting.setStr).replace(',', '，'))
-                pValues.append(str(pSetting.msgUsers).replace(',', '，'))
+                pValues.append(str(pSetting.msgUsers).replace(',', '，').replace(' ', ''))
                 pValues.append(pSetting.mark)
                 dtSetting.dataMat.append(pValues)
 
@@ -348,11 +369,11 @@ if __name__ == "__main__":
 
     #修改测试
     editInfo = {}
-    editInfo["整点播报"] = {'isValid': True, 'setStr': '', 'msgUsers': {'@*测试群':'wx','茶叶一主号':'wx'}, 'mark':'测试设置' }
-    editInfo["涨跌监测"] = {'isValid': True, 'setStr': '', 'msgUsers': {'@*测试群':'wx'}, 'mark':'测试设置' }
+    editInfo["整点播报"] = {'isValid': True, 'setStr': '', 'msgUsers': {'@*测试群': 'wx, False','茶叶一主号':'wx'}, 'mark':'测试设置' }
+    editInfo["涨跌监测"] = {'isValid': True, 'setStr': '', 'msgUsers': {'@*测试群': ['wx']}, 'mark':'测试设置' }
     pSets._Edit("sh", "000001", "", editInfo)
-    editInfo["整点播报"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号':'wx'}, 'mark':'测试设置' }
-    editInfo["涨跌监测"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号':'wx'}, 'mark':'测试设置' }
+    editInfo["整点播报"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号': ['wx']}, 'mark':'测试设置' }
+    editInfo["涨跌监测"] = {'isValid': True, 'setStr': '', 'msgUsers': {'茶叶一主号': ['wx']}, 'mark':'测试设置' }
     pSets._Edit("sh", "000001", "", editInfo)
 
     #查找指定用户全部设置

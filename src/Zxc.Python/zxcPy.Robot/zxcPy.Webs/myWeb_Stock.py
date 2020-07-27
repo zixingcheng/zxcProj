@@ -35,12 +35,12 @@ class stockQuoteSetForm(FlaskForm):
      
     monitorUsrID = StringField('微信账户', default="") 
     save = SubmitField('新增监测', render_kw={"class": "form-control","style": "margin-left:10px"})         # 保存按钮
-    addRisk = SubmitField('新增风控', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
     remove = SubmitField('移除监测')    # 移除按钮
 
     # Checkbox类型，加上default='checked'即默认是选上的
+    # monitorVaild = BooleanField('设置有效', default='checked') 
     monitorRise_Fall = BooleanField('涨跌监测', default='checked')
-    monitorHourly = BooleanField('整点播报', default='checked',validators=[DataRequired()]) 
+    monitorHourly = BooleanField('整点播报', default='checked') 
     monitorRisk = BooleanField('风控监测', default='checked') 
     
     exType = StringField('交易所代码', [DataRequired()], render_kw={"style": "display:none;"}) 
@@ -74,12 +74,8 @@ class stockQuoteSetRiskForm(FlaskForm):
     
     save = SubmitField('新增风控', render_kw={"class": "form-control","style": "margin-left:10px"})      # 保存按钮
     remove = SubmitField('移除风控')    # 移除按钮
-    #code_id = StringField('股票代码', render_kw={"style": "display:none;"}) 
-    #code_name = StringField('股票名称', render_kw={"style": "display:none;"}) 
-
     #dicParam = {"边界限制": True,"定量监测": False, "监测间隔": 0.01,"止盈线": 0.20, "止损线": -0.05, "动态止盈": True, "动态止损": True, "止盈回撤": 0.01, "止盈比例": 0.20, "止损回撤": 0.01, "止损比例": 0.20 }
        
-        
 
 #集中添加所有Web
 def add_Webs(pWeb):      
@@ -139,14 +135,15 @@ def add_Webs(pWeb):
     def stockSetQuery_info(): 
         #载入配置
         stockName = request.args.get('stockName', "") 
-        stockTag = request.args.get('stockTag', "")
-        
+        stockTag = request.args.get('stockTag', "").split('.')
+        usrID = request.args.get('usrID', "")
+
         #筛选
         res = {"success": 1, "data": "", "msg": ""}
         try:
             #strUrl = "http://" + request.remote_addr + ":8669/zxcAPI/robot"    #实际网络地址在阿里云有问题，原因未明
             strUrl = "http://127.0.0.1:8669/zxcAPI/robot"
-            strPath = 'stock/QuoteSetInfo/Query?stockName=' + stockName + "&stockTag=" + stockTag
+            strPath = 'stock/QuoteSetInfo/Query?stockName=' + stockName + "&exType=" + stockTag[0] + "&stockID=" + stockTag[1] + "&usrID=" + usrID
              
             #设置查询接口执行
             pWeb = myWeb_urlLib.myWeb(strUrl, bPrint=False)
@@ -174,15 +171,14 @@ def add_Webs(pWeb):
                 editInfo = {}
                 
                 # 特殊同步
-                usrIDs = { usrID : plat}
+                #usrIDs = { usrID : plat + "，" + 有效性}
                 #if(usrID == '茶叶一主号' or usrID == '老婆'): 
                 #    usrIDs["茶叶一主号"] = plat
                 #    usrIDs["老婆"] = plat
-                editInfo[form.monitorHourly.label.text] = {'isValid': form.monitorHourly.data, 'msgUsers': usrIDs, 'mark' :""}
-                editInfo[form.monitorRise_Fall.label.text] = {'isValid': form.monitorRise_Fall.data, 'msgUsers': usrIDs, 'mark' :""}
-                editInfo[form.monitorRisk.label.text] = {'isValid': form.monitorRisk.data, 'msgUsers': usrIDs, 'mark' :""}
-
-                strPath = 'stock/QuoteSet?extype=' + form.exType.data + "&code_id=" + form.code_id.data + "&code_name=" + "&editInfo=" + str(editInfo)  #+ form.code_name.data
+                editInfo[form.monitorHourly.label.text] = {'msgUsers': { usrID : plat + "，" + str(form.monitorHourly.data)}, 'mark' :""}
+                editInfo[form.monitorRise_Fall.label.text] = {'msgUsers': { usrID : plat + "，" + str(form.monitorRise_Fall.data)}, 'mark' :""}
+                editInfo[form.monitorRisk.label.text] = {'msgUsers': { usrID : plat + "，" + str(form.monitorRisk.data)}, 'mark' :""}
+                strPath = F'stock/QuoteSet?extype={form.exType.data}&code_id={form.code_id.data}&code_name={form.code_name.data}&editInfo={str(editInfo)}'  #+ form.code_name.data
             elif form.remove.data:  # 移除按钮被单击
                 strPath = 'stock/QuoteSet?extype=' + form.exType.data + "&code_id=" + form.code_id.data + "&code_name=" + "&removeSet=True" + "&usrID=" + usrID 
             
@@ -196,7 +192,7 @@ def add_Webs(pWeb):
         return render_template('stockQuoteSet.html', title = 'Stock QuoteSet', form = form, usrName_Nick = usrID, usrPlat = plat)
     
 
-    #添加接口--股票设置查询 
+    #添加接口--股票风控设置查询 
     @pWeb.app.route('/zxcAPI/robot/stock/quoteset_risk/query')
     def stockSetQuery_risk(): 
         #载入配置
@@ -224,7 +220,7 @@ def add_Webs(pWeb):
             res['msg'] = str(err)
         return myData_Json.Trans_ToJson_str(res)
 
-    #添加页面--股票行情监测设置
+    #添加页面--股票风控监测设置
     @pWeb.app.route('/zxcWebs/stock/quotesetrisk/<usrID>/<plat>', methods = ['GET', 'POST'])    
     def stockQuoteSet_risk(usrID, plat):
         #载入配置

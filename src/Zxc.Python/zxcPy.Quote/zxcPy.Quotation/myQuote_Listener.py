@@ -39,7 +39,10 @@ class Quote_Listener:
         if(self.pSet == None): return False
         for x in self.pSet.msgUsers:
             #生成用户消息
-            usrPlat = self.pSet.msgUsers[x]
+            usrSet = self.pSet.msgUsers[x]
+            if(usrSet[1] == False): continue
+
+            usrPlat = usrSet[0]
             msg = self.OnCreatMsgInfo(x, strMsg, quoteDatas.data.time, plat=usrPlat)
             if(self.pMMsg != None):
                 self.pMMsg.OnHandleMsg(msg, usrPlat, True, nSleep)   #推送至消息处理器处理(使用消息校正)
