@@ -133,6 +133,18 @@ class myProcess_monitor:
             pid = self.getPID(x)
             if(pid != ""):
                 self.dictMonitors[x]['pid'] = pid
+    #获取进程号PID
+    def getPID_byName(self, name = 'cmd.exe'):   
+        self.pids = psutil.pids() 
+        pids = []
+        for x in self.pids:
+            try:
+                p = psutil.Process(x)
+                if(p.name() == name):
+                    pids.append(x)
+            except :
+                pass
+        return pids
     # 时间前缀
     def getTimeTag(self):
         strTime = datetime.datetime.strftime(datetime.datetime.now(), "%m-%d %H:%M:%S")   
@@ -149,7 +161,10 @@ class myProcess_monitor:
             pid = int(self.dictMonitors[name]['pid'])
             if(pid in self.pids):
                 p = psutil.Process(pid)
-                return
+                try:
+                    return
+                except :
+                    pass
 
             #处理不存在
             if(self.checkTIMES(name)):
@@ -241,9 +256,12 @@ class myProcess_monitor:
                     print(self.getTimeTag() + F"INFO:: 重启进程({pidNew}：{name})失败！\r\n")
                     bSucess = False 
             if(bSucess):
+                time.sleep(2)
+                self.cleanProcess()         #删除空cmd进程
                 print(self.getTimeTag() + F"INFO:: 已重启进程({pidNew}：{name})\r\n")
             self.reg.setValue(name + "_STATE", "0", self.reg.key); self.getSTATE(name);
-    
+     
+
     # 开始监测
     def start(self):
         if(self.isMonitor == False): return 
@@ -277,6 +295,13 @@ class myProcess_monitor:
             self.funChange = fn
         return _change
     
+    #删除进程P
+    def cleanProcess(self, name = 'cmd.exe'):  
+        pids = self.getPID_byName(name)
+        for x in pids:
+            os.system('taskkill.exe /pid:' + str(x) + ' -f')
+        pass
+
 
 if __name__ == '__main__':
     #单例运行检测

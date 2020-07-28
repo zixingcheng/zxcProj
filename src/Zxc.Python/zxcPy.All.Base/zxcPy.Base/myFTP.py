@@ -28,7 +28,7 @@ class myFTP:
         self.logFile = self.logDir + '/Logs/log_{}.txt'.format(datetime.datetime.strftime(datetime.datetime.now(), "%Y_%m_%d"))
         self.log_file = open(self.logFile, "a")
         self.file_list = []
-        self.delete_files()                   # 保留三天内的文件
+        self.delete_files()                     # 保留三天内的文件
     # FTP 登录
     def login(self, username, password):
         try:
@@ -175,7 +175,7 @@ class myFTP:
     def deal_error(self, e):
         log_str = '发生错误: %s' % e
         self.write_log(log_str)
-        sys.exit()
+        #sys.exit()
     # 记录日志
     def write_log(self, log_str):
         time_now = time.localtime()
@@ -258,6 +258,7 @@ class myFTP_Monitor:
         self.timesDT_total = 0          #时间变化-总，控制退出 
         self.timeSleep = 6              #时间-休眠
         self.timesLimit_total_S = limitH * 3600     
+        self.running = False
         
         # 监测本地文件变化，然后执行上传
         self.fileMonitor = myMonitor_File(self.localDir)
@@ -323,8 +324,8 @@ class myFTP_Monitor:
         self.thrd_Handle.stop()
     # 监测-线程实现
     def thrdWatch(self):
-        running = True
-        while(running):
+        self.running = True
+        while(self.running):
             try:
                 # 监测到有变动时执行上传-线程方式
                 if(self.timesChange > 0):
@@ -345,9 +346,11 @@ class myFTP_Monitor:
 
                 # 超过总时间时退出
                 if(self.timesDT_total > self.timesLimit_total_S):
-                    running = False
+                    self.running = False
                 self.my_ftp.debug_print("脚本已运行" + str(self.timesDT_total / 60) + "分钟")
             time.sleep(self.timeSleep)
+        self.my_ftp.debug_print("脚本已退出！")
+        os.system('taskkill.exe /pid:' + str(os.getpid()) + ' -f')
 
 
 if __name__ == "__main__":
@@ -356,8 +359,8 @@ if __name__ == "__main__":
     gol._Init()             #先必须在主模块初始化（只在Main模块需要一次即可）
     #单例运行检测
     if(gol._Run_Lock(__file__) == False):
-       exit(0)
-
+        exit(0)
+        
     # FTP配置信息-市气象局
     # Host = "10.152.35.111"      
     # Port = 8021
@@ -391,5 +394,5 @@ if __name__ == "__main__":
     pFTP_Monitor = myFTP_Monitor(Host, Port, User, UserPW, localDir, dataFloder)
     pFTP_Monitor.startWatch()
 
-    monitor = myProcess_monitor.myProcess_monitor(5)
-    monitor.initReg(__file__, "* * * * * ")                    #每天任一分钟 时执行命令
+    #monitor = myProcess_monitor.myProcess_monitor(5)
+    #monitor.initReg(__file__, "* * * * * ")                    #每天任一分钟 时执行命令

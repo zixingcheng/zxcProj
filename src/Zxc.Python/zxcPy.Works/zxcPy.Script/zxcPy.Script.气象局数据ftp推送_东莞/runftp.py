@@ -6,7 +6,7 @@ Created on  张斌 2020-05-20 09:58:00
 
     Ftp Server --脚本启动，单例
 """ 
-import os, mySystem 
+import os, time, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("", False)  
@@ -38,3 +38,10 @@ if __name__ == '__main__':
 
     monitor = myProcess_monitor.myProcess_monitor(5)
     monitor.initReg(__file__, "* * * * * ")                    #每天任一分钟 时执行命令
+
+    while(pFTP_Monitor.running):
+        time.sleep(1)
+    monitor = None
+    pFTP_Monitor = None
+    exit(0)
+     
