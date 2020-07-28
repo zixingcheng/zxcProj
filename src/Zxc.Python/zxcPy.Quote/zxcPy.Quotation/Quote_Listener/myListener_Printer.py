@@ -24,7 +24,7 @@ class Quote_Listener_Printer(myQuote_Listener.Quote_Listener):
         #输出统计信息
         pData = quoteDatas.data
         pData_S = quoteDatas.datasS_M.dataS_Day
-        myDebug.Debug(pData.name, "Price: ",pData.lastPrice, ",Price_A: ", round(pData_S.average,4),  ",Valume: ", pData_S.tradeVolume_End)
+        myDebug.Debug(pData.name, "Price：",pData.lastPrice, ",Price_A：", round(pData_S.average,4),  ",Valume：", pData_S.tradeVolume_End)
 
         #输出数据信息
         pData.Print()

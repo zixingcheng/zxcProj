@@ -258,7 +258,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
         nDigit = myData.iif(bIndex, 3, 2)
         strUnit = myData.iif(bIndex, "", "元")
         price = myData.iif(bOpt == False, lstValue[1], lstValue[1] * 10000)
-        strMsg = self.name + ": " + str(round(price, nDigit)) + strUnit
+        strMsg = self.name + "：" + str(round(price, nDigit)) + strUnit
            
         #涨跌标识    
         dValue_N = self.priceRiseFall

@@ -206,6 +206,8 @@ class myStock:
     #查找 
     def _Find(self, code_id, code_name = '', code_nameEN = '', exType = "", nReturn = 10):
         if(code_nameEN == ""): code_nameEN = myData_Trans.Tran_ToStr_FirstLetters(code_name, True)
+        if(code_id.count('.') == 1): 
+            infos = code_id.split('.'); code_id = infos[1]; exType = infos[0];
         length = len(code_id)
         length_name = len(code_name)
         length_nameEN = len(code_nameEN)

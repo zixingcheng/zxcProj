@@ -248,17 +248,17 @@ class myObj_Trade():
     def ToTitlestr(self, nSpace = 0, isSimple = False, usrOrderType = "", tradeTarget = "", tradeType = "", tradeTypeTarget = ""): 
         if(isSimple == False):
             strSpace = " " * nSpace
-            strTrade = strSpace + "编号: " + str(self.infoID) + "\n"
-            strTrade += strSpace + "用户名: " + self.usrID + "\n"
-            strTrade += strSpace + "交易类型: " + self.usrOrderType + "\n"
-            strTrade += strSpace + "标的信息: " + self.targetID + "  " + self.targetName + "\n"
+            strTrade = strSpace + "编号：" + str(self.infoID) + "\n"
+            strTrade += strSpace + "用户名：" + self.usrID + "\n"
+            strTrade += strSpace + "交易类型：" + self.usrOrderType + "\n"
+            strTrade += strSpace + "标的信息：" + self.targetID + "  " + self.targetName + "\n"
             if(self.usrOrderType not in myTradeAppetite):
-                strTrade += strSpace + "交易金额: " + str(round(self.tradeMoney, 2)) + "元 \n" 
-                strTrade += strSpace + "交易价格: " + str(round(self.targetPrice, 2)) + "元 \n"
+                strTrade += strSpace + "交易金额：" + str(round(self.tradeMoney, 2)) + "元 \n" 
+                strTrade += strSpace + "交易价格：" + str(round(self.targetPrice, 2)) + "元 \n"
             else: 
-                strTrade += strSpace + "预期价格: " + str(round(self.targetPrice, 2)) + "元 \n"
-            strTrade += strSpace + "账单时间: " + myData_Trans.Tran_ToDatetime_str(self.tradeTime, "%Y-%m-%d") + "\n"
-            strTrade += strSpace + "备注: " + self.remark 
+                strTrade += strSpace + "预期价格：" + str(round(self.targetPrice, 2)) + "元 \n"
+            strTrade += strSpace + "账单时间：" + myData_Trans.Tran_ToDatetime_str(self.tradeTime, "%Y-%m-%d") + "\n"
+            strTrade += strSpace + "备注：" + self.remark 
         else:
             strTrade = self.tradeParty
             if(trade.usrOrderType not in myTradeAppetite):

@@ -608,7 +608,7 @@ class myMonitor_StockRisk():
         strMaxStage = str(Decimal((self.setRisk.profitMax_Stage * 100)).quantize(Decimal('0.00'))) + "%"#阶段浮盈-前高
         
         #触发止盈止损
-        strReutrn = F"{self.setRisk.stockName}: {strPrice}.\r\n风控监测: "
+        strReutrn = F"{self.setRisk.stockName}：{strPrice}.\r\n风控监测："
         if(isHit):
             if(isNewLimit == False):    #第一次触发
                 if(isStopProfit):   

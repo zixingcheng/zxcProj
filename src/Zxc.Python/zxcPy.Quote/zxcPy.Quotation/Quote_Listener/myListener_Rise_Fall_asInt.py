@@ -92,9 +92,9 @@ class Quote_Listener_Rise_Fall_asInt(myQuote_Listener.Quote_Listener):
             strDelta = str(round(nTimes * deltaV * 100, 2)) + "%"
             if(dDelta > 0):
                 #涨
-                strTag = strTag_M + "涨超: " + strDelta 
+                strTag = strTag_M + "涨超：" + strDelta 
             else:
-                strTag = strTag_M + "跌逾: " + strDelta 
+                strTag = strTag_M + "跌逾：" + strDelta 
 
             #涨跌反转标识 
             if(dValue_N >= 0 and dValue >= 0):

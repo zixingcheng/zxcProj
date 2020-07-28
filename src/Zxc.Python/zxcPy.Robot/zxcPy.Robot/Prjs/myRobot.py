@@ -61,7 +61,7 @@ class myRobot():
         if(groupName != ""): self.enableGroups[groupName] = True
 
     #消息处理接口
-    def Done(self, Text, msgID = "", msgType = "TEXT", usrID = "", usrName = "zxcRobot",  usrNameNick = '', usrPlat = '', idGroup = '', nameGroup = "", nameSelf = ''):
+    def Done(self, Text, msgID = "", msgType = "TEXT", usrID = "", usrName = "zxcRobot",  usrNameNick = '', usrPlat = 'wx', idGroup = '', nameGroup = "", nameSelf = ''):
         #消息处理  
         usrInfo = self.usrMMsg.OnCreatMsg_UsrInfo(usrID, usrName, usrNameNick, usrPlat, idGroup, nameGroup, nameSelf)
         return self.Done_ByDict(Text, msgID, msgType, usrInfo)
@@ -75,8 +75,6 @@ class myRobot():
                 if(self.isNoOwner):
                     if(usrInfo.get('usrNameSelf', "") == self.usrName): 
                         return None     #开启者除外 
-                    
-                print(self.prjName, Text)
                 strReturn = self._Done(Text, msgID, msgType, usrInfo)
             else:
                 return None
@@ -167,7 +165,7 @@ class myRobot():
             self.usrID = usrInfo.get('usrID', "")       #功能所属用户ID(启动者)
             self.usrName = usrInfo.get('usrName', "")   #功能所属用户名称(启动者)
             strReturn = self.doTitle + "功能" + "--已开启\n\t" + self._Title_User_Opened() + "(" + str(self.tStart) + ")"
-        myDebug.Print(strReturn)
+        myDebug.Print(strReturn + "\n")
         return strReturn
     def _Title_User_Opened(self): 
             return ""

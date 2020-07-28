@@ -143,7 +143,7 @@ class myRobot_StockAppetite(myRobot.myRobot):
             if(len(lstR) < 1):
                 return "@" + usrName + " 收益信息记录失败！当前收益率：" + dictInfos['收益率'] + "."
             dicRand = lstR[0]
-            strRank = " 您的收益排名: 第 " + dicRand['ranking'] + ", 收益率: " + dicRand['profit'] + " "
+            strRank = " 您的收益排名：第 " + dicRand['ranking'] + ", 收益率：" + dicRand['profit'] + " "
             return "@" + usrName + " " + strRank
         return ""
     
@@ -153,7 +153,7 @@ class myRobot_StockAppetite(myRobot.myRobot):
         strReturn = "消息命令提示："
         strReturn += self.perfix + "@￥帮助：输出所有命令说明"
         strReturn += self.perfix + "@￥：输入君弘APP截图自己记录." 
-        strReturn += "\n命令参数以空格区分，如：\"@￥ 帮助\""
+        strReturn += "\n命令参数以空格区分，如：\"@￥帮助\""
         return strReturn
         
 """ IORC接口有调用总限制，改为通用文件进行匹配解析

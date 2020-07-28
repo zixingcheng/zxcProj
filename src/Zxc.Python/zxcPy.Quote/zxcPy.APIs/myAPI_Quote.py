@@ -148,17 +148,23 @@ class myAPI_Quote_Set_Risk(myWeb.myAPI):
         stockNum = myData_Trans.To_Int(str(request.args.get('stockNum', 0)))
         if(removeSet == False and (stockPrice == 0 or stockNum == 0)): 
             bResult = False; pMsg['text'] = "股价、数量不能为0."
-        strR = pRisks.addRiskSet(usrID, usrTag, code_id, code_name, stockPrice, stockNum, dtTrade, dateTag, paramInfo)
+        if(usrID == "" and usrTag == ""): 
+            bResult = False; pMsg['text'] = "用户信息不能为空."
+        if(bResult):
+            strR = pRisks.addRiskSet(usrID, usrTag, code_id, code_name, stockPrice, stockNum, dtTrade, dateTag, paramInfo)
         
         #解析参数
-        strTag = "风控设置："+ code_name +"\n      "
+        strTag = "风控设置："+ code_name +"\n"
         if(bResult):
             if(removeSet == False):
                 if(stockPrice == 0 or stockNum == 0): 
-                    pMsg['text'] = strTag + " --设置已成功修改参数信息." 
+                    pMsg['text'] = strTag + " --已成功修改参数信息." 
                 else:
                     trade = myData.iif(stockNum >0, "买入", "卖出")
-                    pMsg['text'] = strTag + F" --设置已成功添加操作信息, {trade} {str(abs(stockNum))} 股, 价格: {stockPrice} 元." 
+                    if(stockNum % 100 == 0):
+                        pMsg['text'] = strTag + F"新增{trade}：{str(abs(stockNum))} 股.\n{trade}均价：{stockPrice} 元/股)." 
+                    else:
+                        pMsg['text'] = strTag + F"新增{trade}：{str(abs(stockNum))} 张.\n{trade}均价：{stockPrice} 元/张." 
                 bResult = True
             else:
                 pMsg['text'] = strTag + " --设置已成功移除." 

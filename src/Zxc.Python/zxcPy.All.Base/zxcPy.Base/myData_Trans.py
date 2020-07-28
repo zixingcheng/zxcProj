@@ -157,6 +157,18 @@ def Tran_ToDatetime(strTime, strFormat="%Y-%m-%d %H:%M:%S"):
         return datetime.datetime.now() 
     dtDatetime = datetime.datetime.strptime(strTime, strFormat)   
     return dtDatetime
+# 月第几周周几转datetime
+def Tran_ToDatetime_byWeekday(Datetime = None, monthWeeks = 4, weekDay = 3):
+    if(Datetime == None):
+        Datetime = datetime.datetime.now()
+    dtStart = datetime.date(Datetime.year, Datetime.month, 1)
+    weekdayS = dtStart.weekday()
+    if(weekdayS <= 2):
+        days = (monthWeeks - 1) * 7 + weekDay - weekdayS - 1
+    else:
+        days = monthWeeks * 7 + weekDay - weekdayS - 1
+    dtLast = dtStart + datetime.timedelta(days=days)
+    return dtLast
 
 # datetime转字符串
 def Tran_ToDatetime_str(Datetime = None, strFormat="%Y-%m-%d %H:%M:%S"):
@@ -327,3 +339,6 @@ if __name__ == '__main__':
     dt = Tran_ToTime_byInt(timestamp)
     print (Tran_ToTime_str(dt))
     
+    #月第几周周几
+    dtLast = Tran_ToDatetime_byWeekday(None, 4, 3)
+    pass

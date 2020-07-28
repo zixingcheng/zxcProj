@@ -70,10 +70,10 @@ class myListener_Fixed():
                 #超高限
                 if(self.isPercentage == False):                 #固定价格 
                     valuePer_M = (self.monitorValue - self.monitorValue_Base) / self.monitorValue_Base - self.poundage
-                    strReturn = str(self.monitorValue) + "元, 设定已达成.\n" + strSufixPre + "实际涨幅: " +  str(round(valuePer * 100, 2))  + "%." 
+                    strReturn = str(self.monitorValue) + "元, 设定已达成.\n" + strSufixPre + "实际涨幅：" +  str(round(valuePer * 100, 2))  + "%." 
                 else:   #固定比例
                     valuePer_M = self.monitorValue
-                    strReturn = str(round(self.monitorValue * 100, 2)) + "%, 设定已达成.\n" + strSufixPre + "实际涨幅: " + str(round(valuePer * 100, 2))  + "%."
+                    strReturn = str(round(self.monitorValue * 100, 2)) + "%, 设定已达成.\n" + strSufixPre + "实际涨幅：" + str(round(valuePer * 100, 2))  + "%."
 
                 #成交建议
                 if(True):
@@ -107,10 +107,10 @@ class myListener_Fixed():
                 #超低限
                 if(self.isPercentage == False):                 #固定价格 
                     valuePer_M = (self.monitorValue - self.monitorValue_Base) / self.monitorValue_Base - self.poundage
-                    strReturn = str(self.monitorValue) + "元, 设定已达成.\n" + strSufixPre + "实际跌幅: " +  str(round(valuePer * 100, 2))  + "%."
+                    strReturn = str(self.monitorValue) + "元, 设定已达成.\n" + strSufixPre + "实际跌幅：" +  str(round(valuePer * 100, 2))  + "%."
                 else:   #固定比例
                     valuePer_M = self.monitorValue
-                    strReturn = str(round(self.monitorValue * 100, 2)) + "%, 设定已达成.\n" + strSufixPre + "实际跌幅: " + str(round(valuePer * 100, 2))  + "%."
+                    strReturn = str(round(self.monitorValue * 100, 2)) + "%, 设定已达成.\n" + strSufixPre + "实际跌幅：" + str(round(valuePer * 100, 2))  + "%."
                     
                 #成交建议
                 if(True):
@@ -138,7 +138,7 @@ class myListener_Fixed():
         #详情信息
         self.lastValue = round((value + self.poundage + 1) * self.monitorValue_Base, 2)     #实际价格   
         if(self.tradeNum > 0):
-            strReturn += "\n" + strSufixPre + "交易量价: " +  str(round(self.tradeNum, 0)) + "股, " + str(self.monitorValue_Base) + "元.\n" + strSufixPre + "交易时间: " + self.tradeTime + "."
+            strReturn += "\n" + strSufixPre + "交易量价：" +  str(round(self.tradeNum, 0)) + "股, " + str(self.monitorValue_Base) + "元.\n" + strSufixPre + "交易时间：" + self.tradeTime + "."
         strReturn += "\n交易建议：" 
         strReturn += "\n" + strSufixPre + strSuggest2
         strReturn += "\n" + strSufixPre + strSuggest
@@ -205,7 +205,7 @@ class Quote_Listener_FixedMonitor(myQuote_Listener.Quote_Listener):
                 #通知处理,组装返回结果
                 strMsg_str = quoteDatas.data.getMsg_str(quoteDatas.setting)
                 for x in range(0, pMonitor.warnTimes):
-                    strMsg = strMsg_str + "\n定点监测: " + strTemp 
+                    strMsg = strMsg_str + "\n定点监测：" + strTemp 
                     self.OnHandleMsg(quoteDatas, strMsg, 5 * x )    # 多次延时提醒
                     print(strMsg)
 
