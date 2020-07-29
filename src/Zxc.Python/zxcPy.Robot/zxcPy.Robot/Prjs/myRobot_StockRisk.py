@@ -88,8 +88,16 @@ class myRobot_StockRisk(myRobot.myRobot):
 
             pStock = lstStock[0]
             code_id = pStock.extype + '.' + pStock.code_id
-            usrID = usrInfo.get('groupName', '')
-            if(usrID == ""): usrID = usrInfo.get('usrNameNick', '')
+            usrID = "@*" + usrInfo.get('groupName', '')
+            if(usrID == "@*"): usrID = usrInfo.get('usrNameNick', '')
+            
+            #纠正风控账户名
+            if(usrID == '@*股票监测--自选行情'): 
+                usrID = '@*风控监测--股票'
+            if(usrID == '@*股票监测--期权行情'): 
+                usrID = '@*风控监测--期权'
+            if(usrID.count('股票监测') == 1): 
+                usrID = usrID.replace('股票监测', '风控监测')
             stockDate = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d")
 
             #组装设置请求参数
@@ -121,7 +129,7 @@ class myRobot_StockRisk(myRobot.myRobot):
         if(length < 2): return ""
 
         if(Text[length-1:] == usrWord):
-            if(myData_Trans.Is_Numberic(Text[length-2:1]) == False):
+            if(myData_Trans.Is_Numberic(Text[0:length-1])):
                 return Text.replace(usrWord, "").strip()
         return "" 
     #修正期权名称
