@@ -139,10 +139,10 @@
                     success: function (res) {
                         jsonStocks_set = JSON.parse(res, null);
                         if (jsonStocks_set['success'] == 1) {
-                            dataSet = jsonStocks_set['data']["设置状态"];
-                            $("#monitorHourly").attr("checked", dataSet['整点播报']);
-                            $("#monitorRise_Fall").attr("checked", dataSet['涨跌监测']);
-                            $("#monitorRisk").attr("checked", dataSet['风控监测']);
+							dataSet = jsonStocks_set['data']["设置状态"];
+                            $("#monitorHourly").attr("checked", ("整点播报" in dataSet) ? dataSet['整点播报'] : false);
+                            $("#monitorRise_Fall").attr("checked", ("涨跌监测" in dataSet) ? dataSet['涨跌监测'] : false);
+                            $("#monitorRisk").attr("checked", ("风控监测" in dataSet) ? dataSet['风控监测'] : false);
 							riskHerf_set(dataSet['风控监测']);
                         } else {
                             //alert(jsonRisks_set['data']);

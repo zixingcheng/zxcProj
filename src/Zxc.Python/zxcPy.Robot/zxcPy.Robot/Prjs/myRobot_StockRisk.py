@@ -92,17 +92,18 @@ class myRobot_StockRisk(myRobot.myRobot):
             if(usrID == "@*"): usrID = usrInfo.get('usrNameNick', '')
             
             #纠正风控账户名
-            if(usrID == '@*股票监测--自选行情'): 
-                usrID = '@*风控监测--股票'
-            if(usrID == '@*股票监测--期权行情'): 
-                usrID = '@*风控监测--期权'
-            if(usrID.count('股票监测') == 1): 
-                usrID = usrID.replace('股票监测', '风控监测')
+            usrID_risk = usrID
+            if(usrID_risk == '@*股票监测--自选行情'): 
+                usrID_risk = '@*风控监测--股票'
+            if(usrID_risk == '@*股票监测--期权行情'): 
+                usrID_risk = '@*风控监测--期权'
+            if(usrID_risk.count('股票监测') == 1): 
+                usrID_risk = usrID_risk.replace('股票监测', '风控监测')
             stockDate = myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d")
 
             #组装设置请求参数
             strUrl = "http://127.0.0.1:8669/zxcAPI/robot"                #实际网络地址在阿里云有问题，原因未明
-            strPath = F'stock/QuoteSetRisk?usrID={usrID}&code_id={code_id}&code_name={pStock.code_name}&dateTag={stockDate}&removeSet=False&stockPrice={stockPrice}&stockNum={stockNum}' #&setInfo=' + "{}"
+            strPath = F'stock/QuoteSetRisk?usrID={usrID_risk}&code_id={code_id}&code_name={pStock.code_name}&dateTag={stockDate}&removeSet=False&stockPrice={stockPrice}&stockNum={stockNum}' #&setInfo=' + "{}"
             
             #修改接口执行
             pWeb = myWeb_urlLib.myWeb(strUrl, bPrint=False)
