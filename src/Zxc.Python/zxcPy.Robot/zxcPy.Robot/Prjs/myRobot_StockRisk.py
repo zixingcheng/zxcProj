@@ -80,9 +80,9 @@ class myRobot_StockRisk(myRobot.myRobot):
             codeID = self.CheckName_set(cmds[0].strip())
             codeName = ""
             if(len(cmds) > 1): codeName = self.CheckName_set(cmds[1].strip())
-            lstStock = pStocks._Find(codeID, codeName, "***")
+            lstStock = pStocks._Find(codeID, codeName, "***", useFuzzy = False)
             if(len(lstStock) != 1):
-                lstStock = pStocks._Find(codeName, codeID, "***")
+                lstStock = pStocks._Find(codeName, codeID, "***", useFuzzy = False)
                 if(len(lstStock) != 1):
                     return "股票代码、名称检索结果不唯一，无法操作！"
 
@@ -140,6 +140,8 @@ class myRobot_StockRisk(myRobot.myRobot):
             optType = '沽'
         elif(stockName.count('购') == 1): 
             optType = '购'
+        else:
+            return stockName
 
         #解析期权名称信息
         nameInfos = stockName.split(optType)
@@ -204,6 +206,7 @@ if __name__ == "__main__":
     #myDebug.Debug(pRisk.Done("@￥*帮助")['msg'])
     #myDebug.Debug(pRisk.Done("@￥*风控 sh.10002626 50ETF沽8月3400 20股 1140元", usrNameNick = '茶叶一主号')['msg'])
     #pRisk.Done("@￥*风控  50沽8月3300 20股 1140元", usrNameNick = '茶叶一主号')
+    pRisk.Done("@￥*风控 白云山 3000股 34.11元", usrNameNick = '茶叶一主号')
     pRisk.Done("@￥*风控 50沽3300 20股 1140元", usrNameNick = '茶叶一主号')
     print()
 

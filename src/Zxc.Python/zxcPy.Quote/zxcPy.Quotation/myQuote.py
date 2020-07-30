@@ -204,7 +204,7 @@ class myStock:
         pass
 
     #查找 
-    def _Find(self, code_id, code_name = '', code_nameEN = '', exType = "", nReturn = 10):
+    def _Find(self, code_id, code_name = '', code_nameEN = '', exType = "", nReturn = 10, useFuzzy = True):
         if(code_nameEN == ""): code_nameEN = myData_Trans.Tran_ToStr_FirstLetters(code_name, True)
         if(code_id.count('.') == 1): 
             infos = code_id.split('.'); code_id = infos[1]; exType = infos[0];
@@ -222,7 +222,7 @@ class myStock:
                             continue
             
             if(length_name > 0):
-                if(x.code_name[0: length_name] == code_name or x.code_name.find(code_name)>=0):   #等长、模糊匹配
+                if(x.code_name == code_name or (useFuzzy and x.code_name.find(code_name)>=0)):   #等长、模糊匹配
                     if(len(lstR) < nReturn): 
                         lstR.append(x)
                         continue
