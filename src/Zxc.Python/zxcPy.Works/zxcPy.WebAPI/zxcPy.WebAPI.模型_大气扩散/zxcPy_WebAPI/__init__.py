@@ -21,8 +21,8 @@ gol._Set_Setting("serverBaseDir", dirBase)
 
 
 #初始Web程序
-appWeb = myWeb.myWeb("0.0.0.0", PORT, webFolder = dirBase + "/" )
+appWeb = myWeb.myWeb("0.0.0.0", PORT, bDebug = False, threaded = True, processes = 10, webFolder = dirBase + "/" )
+
 
 #启用-模型-大气扩散WebAPI
 appWeb.add_API(myWebAPI_Model.myAPI_Model_Atmospheric_Diffusion, '/zxcAPI/Model/Leak/<param>')
-

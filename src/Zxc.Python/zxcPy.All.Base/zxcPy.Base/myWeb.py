@@ -62,11 +62,13 @@ class myWeb_Config():
         SECRET_KEY = 'you-will-never-guess'
 #Web接口类
 class myWeb(myThread.myThread): 
-    def __init__(self, hostIP = "0.0.0.0", nPort = 5000, bDebug = True, webFolder = './'):
+    def __init__(self, hostIP = "0.0.0.0", nPort = 5000, bDebug = True, webFolder = './', threaded = False, processes = 5):
         super().__init__("", 0) # 必须调用
         self.host = hostIP
         self.port = nPort
         self.debug = bDebug 
+        self.threaded = threaded 
+        self.processes = processes 
         self.baseDir = webFolder
         self.imgDir = self.baseDir + "/static/images/"
 
@@ -193,8 +195,9 @@ class myWeb(myThread.myThread):
     #运行
     def run(self, use_reloader=False): 
         #官方启动方式参见：http://flask.pocoo.org/docs/0.12/quickstart/#a-minimal-application
-        self.app.run(host = self.host, port = self.port, debug = self.debug, use_reloader = use_reloader)  
-
+        self.app.run(host = self.host, port = self.port, debug = self.debug, threaded = self.threaded, processes = self.processes, use_reloader = use_reloader)  
+        
+         
 
 # RESTfulAPI的参数解析 -- put / post参数解析
 parser = reqparse.RequestParser()
