@@ -704,7 +704,7 @@ git 更新脚本：
 	sh /root/Public/myPrjs/zxcProj/ReadMe/git_zxcPy.sh
 
 启动脚本
-	sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh	(Robot+Weixin)
+	sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh	(Robot + Weixin)
 	sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh		(Qoute)
 	 
 

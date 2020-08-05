@@ -29,6 +29,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
         #新浪Stock接口查询
         host="http://hq.sinajs.cn/list="
         url = host + self.params
+        print("查询ID列表：", self.params)
         if(parms != None):
             if(parms.get('queryIDs', None) != None):
                 url = host + parms['queryIDs']
