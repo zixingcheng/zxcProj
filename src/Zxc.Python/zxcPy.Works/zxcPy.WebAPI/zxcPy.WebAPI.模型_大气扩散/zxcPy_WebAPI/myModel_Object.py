@@ -131,6 +131,7 @@ class myObj_Sun():
         self.angle_Inclination = 0
         self.angle_elevation = 0
         self.level_Radiation = 0
+        self.numCloud = ""
 
     # 太阳信息初始
     def initSun_Infos(self, longitude, latitude, dtTime, numCloud):
@@ -144,7 +145,9 @@ class myObj_Sun():
                                          + math.cos(math.radians(longitude)) 
                                          * math.cos(math.radians(theta)) 
                                          * math.cos(math.radians(15 * dtTime.hour + latitude - 300)))
+        
         #radiation level
+        self.numCloud = numCloud
         isNight = dtTime.hour <= 6 or dtTime.hour >= 18
         indCloud = myData.iif(numCloud == "多云", 1, 0)
         indElevation = 0

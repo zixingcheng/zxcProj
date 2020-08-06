@@ -30,6 +30,7 @@
     <Compile Include="runserver.py" />
     <Compile Include="zxcPy_WebAPI\myModel_Object.py" />
     <Compile Include="zxcPy_WebAPI\myModel.py" />
+    <Compile Include="zxcPy_WebAPI\myTest_WebAPI.py" />
     <Compile Include="zxcPy_WebAPI\myWebAPI_Model.py" />
     <Compile Include="zxcPy_WebAPI\__init__.py" />
   </ItemGroup>

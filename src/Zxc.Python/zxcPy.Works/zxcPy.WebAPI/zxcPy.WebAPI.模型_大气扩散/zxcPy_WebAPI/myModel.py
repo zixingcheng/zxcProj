@@ -50,6 +50,7 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
         self.infoTargets = []
         self.dtLeak = myData_Trans.Tran_ToDatetime("")
         self.hasChimney = False
+        self.hasLog = True
      
     # 初始参数信息-dict参数串
     def initParam(self, param):
@@ -117,7 +118,7 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
         self.wind.initWind(wind_direction, wind_speed, wind_height, self.dtLeak, -1)
         self.sun.initSun_Infos(self.longitude_Leak, self.latitude_Leak, self.dtLeak, myData.iif(cloudy_is, "多云", ""))
         self.air.initAir_Stability(air_Stability, self.wind.wind_Speed, self.sun.level_Radiation, temperature)
-
+        
         #记录参数及标识状态
         self.modelParam = param
         self.modeState = 0
@@ -181,16 +182,18 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
                 # 组装返回结果
                 res = {"id": id, "concentration": Cxyz}
                 self.modelResult['data']['results'].append(res)
-
+                self._log(id, longitude_Target, latitude_Target, z, Cxyz, deltaXY, deltaX, deltaY)
             self.modeState = 2
         except Exception as err:
             self.modeState = -2
             self.modelResult['err'] = str(err)
+            self._log(id, longitude_Target, latitude_Target, z, u, -1, deltaXY, deltaX, deltaY)
         finally:
             self.modeRunning = False
             self.modelResult['success'] = myData.iif(self.modeState == 2, 1, 0)
             return self.modeState == 2
-    # 模型运行
+
+    # 模型运行--测试用
     def _getCxyz(self):
         try: 
             # 参数提取
@@ -273,6 +276,34 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
         elif(Qh < 1700 or T_delta < 35):
             H_delta = 2 * (1.5 * Vs * D + 0.01 * Qh) / U
         return H_delta
+    # 记录日志
+    def _log(self, id_Target, lon, lat, height, Q, deltaXY, deltaX, deltaY):
+        if(self.hasLog == False): return
+
+        #保存数据
+        strDir, strName = myIO.getPath_ByFile(__file__)
+        strPath =  strDir + "/static/Log"
+
+        headStr = ""
+        if(os.path.exists(strPath) == False):
+            myIO.mkdir(strPath) 
+        strPath =  strPath + "/" + myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d") + ".csv"
+        if(os.path.exists(strPath) == False):
+            headStr = "id_Target, concentration, height, tag, longitude_Leak, latitude_Leak, height_Leak, massrate_Leak, speed, direction, windH, temperature, cloudy_is, chimney_diameter, chimney_temperature_outlet, chimney_temperature_outlet, chimney_wind_speed_outlet, dtTimestr, lon, lat, deltaXY, deltaX, deltaY"
+            
+        #文件追加数据内容
+        with open(strPath, 'a+') as f:
+            if(headStr != ""):
+                f.write(headStr) 
+               
+            dtTimestr = myData_Trans.Tran_ToDatetime_str(self.dtLeak)
+            if(self.hasChimney):
+                infoChimney = F'{self.chimney_diameter},{self.chimney_temperature_outlet},{self.chimney_temperature_outlet},{self.chimney_wind_speed_outlet}'
+            else:
+                infoChimney = F',,,'
+            strLine = F'{id_Target},{Q},{height},{self.tag},{self.longitude_Leak},{self.latitude_Leak},{self.height_Leak},{self.massrate_Leak},{self.wind.wind_Speed},{self.wind.wind_Direction_Alias},{self.wind.wind_Height},{self.air.temperature},{self.sun.numCloud},{infoChimney},{dtTimestr},{lon},{lat},{deltaXY},{deltaX},{deltaY}'
+            f.write("\n" + strLine) 
+        return True 
 
     # 模型结果提取
     def getResult(self):

@@ -9,7 +9,7 @@ Created on  张斌 2020-06-08 10:58:00
 import sys, os, mySystem
 
 #导入模块
-from flask import Flask, Response, jsonify, request                     #导入模块
+from flask import Flask, Response, jsonify, request, _request_ctx_stack                     #导入模块
 from flask_restful import reqparse, Api, Resource
 
 mySystem.Append_Us("../zxcPy_WebAPI", False, __file__)
@@ -24,6 +24,7 @@ class myAPI_Model_Atmospheric_Diffusion(myWeb.myAPI):
     def get(self, param):
         # 模型调用
         pModel = zxcPy_WebAPI.myModel.myModel_Atmospheric_Diffusion()
+        #print(_request_ctx_stack._local.__ident_func__())
 
         # 模型参数初始 
         pModel.initParam_str(param)
