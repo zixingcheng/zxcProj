@@ -9,7 +9,7 @@ Created on  张斌 2020-06-08 10:58:00
 import sys, os, math, mySystem
 
 mySystem.Append_Us("", False)  
-import myIO, myData, myData_Json, myData_Trans
+import myIO, myData, myData_Json, myData_Trans, myData_Geometry
 import myModel_Object
 
  
@@ -43,7 +43,10 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
         self.wind = myModel_Object.myObj_Wind()
         self.air = myModel_Object.myObj_Air()
         self.sun = myModel_Object.myObj_Sun()
+        self.lineLeak = False
+        self.longitude_Leaks = []
         self.longitude_Leak = 0
+        self.latitude_Leaks = []
         self.latitude_Leak = 0
         self.height_Leak = 0
         self.massrate_Leak = 0
@@ -110,10 +113,18 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
             if(temperature == ""): errLst.append('temperature') 
             if(cloudy_is == ""): errLst.append('cloudy_is') 
         
+        # 多经纬度校正
+        if(type(self.longitude_Leak) == list or type(self.latitude_Leak) == list):
+            if(len(self.longitude_Leak) != len(self.latitude_Leak)):
+                errLst.append('longitude'); errLst.append('latitude');
+            self.longitude_Leaks = self.longitude_Leak; self.latitude_Leaks = self.latitude_Leak;
+            self.longitude_Leak = self.longitude_Leaks[0]; self.latitude_Leak = self.latitude_Leaks[0];
+            self.lineLeak = True
+
         #参数检查
         if(len(errLst) > 0):
             return False
-        
+
         #初始环境对象
         self.wind.initWind(wind_direction, wind_speed, wind_height, self.dtLeak, -1)
         self.sun.initSun_Infos(self.longitude_Leak, self.latitude_Leak, self.dtLeak, myData.iif(cloudy_is, "多云", ""))
@@ -131,6 +142,13 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
     
     # 模型运行
     def runModel(self):
+        if(self.modeRunning): return False
+        if(self.lineLeak):
+            return self._runModel_line()
+        else:
+            return self._runModel()
+    # 模型运行(点对多点)
+    def _runModel(self):
         if(self.modeRunning): return False
         self.modeRunning = True
         try:
@@ -192,6 +210,40 @@ class myModel_Atmospheric_Diffusion(myModel_Base):
             self.modeRunning = False
             self.modelResult['success'] = myData.iif(self.modeState == 2, 1, 0)
             return self.modeState == 2
+    # 模型运行(线对多点)
+    def _runModel_line(self):
+        # 拆分线点，密集处理
+        points = []; breakDic = 1 / 111000 * 30;
+        for x in range(0, len(self.longitude_Leaks)):
+            points.append(self.longitude_Leaks[x])
+            points.append(self.latitude_Leaks[x])
+        _breakPoints, _points = myData_Geometry.breakLines(points, breakDic, 0)
+
+        # 计算所有线点
+        massrate_Leak = self.massrate_Leak; modelResult = None;
+        lineLength = myData_Geometry.distanceLine(_points); sumLength = 0;
+        for x in range(0, len(_points) - 2, 2):
+            length = myData_Geometry.distance(_points[x], _points[x + 1], _points[x + 2], _points[x + 3])
+            self.massrate_Leak = length / lineLength * massrate_Leak;
+            self.longitude_Leak = _points[x];
+            self.latitude_Leak = _points[x + 1];
+            #sumLength += length; print(length, sumLength, self.massrate_Leak);
+
+            self._runModel()
+            if(modelResult == None): 
+                modelResult = self.modelResult.copy()
+            else:
+                for x in modelResult['data']['results']:
+                    id = x['id']; value = x['concentration'];
+                    for xx in self.modelResult['data']['results']:
+                        if(id == xx['id']):
+                            value += xx['concentration']; 
+                            continue;
+                    x['concentration'] = value;
+                modelResult['msg'] += self.modelResult['msg']
+                modelResult['err'] += self.modelResult['err']
+                modelResult['success'] *= self.modelResult['success']
+        self.modelResult = modelResult
 
     # 模型运行--测试用
     def _getCxyz(self):
@@ -354,7 +406,17 @@ if __name__ == '__main__':
     jsonParam = myData_Json.Trans_ToJson_str(param)
     pModel.initParam_str(jsonParam)
 
+    #pModel.runModel()
+    #print(pModel.getResult())
+
+    
+    # 模型参数初始-线
+    param["infoLeak"]["longitude"] = [113.8,113.8008]
+    param["infoLeak"]["latitude"] = [22.8,22.80066]
+    param["infoLeak"]["massrate_leak"] = 10720
+    
+    jsonParam = myData_Json.Trans_ToJson_str(param)
+    pModel.initParam_str(jsonParam)
+
     pModel.runModel()
     print(pModel.getResult())
-
-

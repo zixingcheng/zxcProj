@@ -15,13 +15,13 @@ gol._Init()             #先必须在主模块初始化（只在Main模块需要
 
 
 #提取端口号(环境变量)
-HOST, PORT, dirBase = myWeb.get_InfoServer(__file__, 'SERVER_HOST', 'SERVER_PORT', 8686)  
+HOST, PORT, dirBase = myWeb.get_InfoServer(__file__, 'SERVER_HOST', 'SERVER_PORT', 9035)  
 gol._Set_Setting("serverUrl", "http://" + HOST + ":" + str(PORT))
 gol._Set_Setting("serverBaseDir", dirBase)
 
 
 #初始Web程序
-appWeb = myWeb.myWeb("0.0.0.0", PORT, bDebug = False, threaded = False, processes = 1, webFolder = dirBase + "/" )
+appWeb = myWeb.myWeb("0.0.0.0", PORT, bDebug = False, threaded = True, processes = 1, webFolder = dirBase + "/" )
 
 
 #启用-模型-大气扩散WebAPI

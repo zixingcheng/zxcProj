@@ -62,7 +62,7 @@ class myWeb_Config():
         SECRET_KEY = 'you-will-never-guess'
 #Web接口类
 class myWeb(myThread.myThread): 
-    def __init__(self, hostIP = "0.0.0.0", nPort = 5000, bDebug = True, webFolder = './', threaded = False, processes = 5):
+    def __init__(self, hostIP = "0.0.0.0", nPort = 5000, bDebug = True, webFolder = './', threaded = False, processes = 1):
         super().__init__("", 0) # 必须调用
         self.host = hostIP
         self.port = nPort

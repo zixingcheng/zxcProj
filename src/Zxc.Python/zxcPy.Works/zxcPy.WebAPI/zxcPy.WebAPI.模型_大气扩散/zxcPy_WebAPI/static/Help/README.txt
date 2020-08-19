@@ -6,6 +6,7 @@
        http://192.168.1.200:8686/static/Help/README.txt
        http://120.197.152.99:18686/static/Help/README.txt
        http://120.197.152.99:18686/zxcAPI/Model/Leak/{"tag": "ADDFSDGDG", "infoLeak": {"longitude": 113.8, "latitude": 22.8, "height_leak": 45, "massrate_leak": 720, "timestart_leak": "2020-06-09 12:00:00", "chimney": {"diameter": 1, "temperature_outlet": 100, "smoke_speed_outlet": 5, "wind_speed_outlet": ""}}, "infoTarget": [{"id": "1", "longitude": 113.83, "latitude": 22.83, "height": 0}, {"id": "2", "longitude": 113.835, "latitude": 22.835, "height": 0}], "infoEnvironment": {"wind_speed": 2, "wind_direction": "SW", "wind_height": 10, "air_stability": "C", "temperature": 26, "cloudy_is": true}}
+       http://127.0.0.1:9035/zxcAPI/Model/Leak/{"tag": "ADDFSDGDG", "infoLeak": {"longitude": [113.8,113.8008], "latitude": [22.8,22.80066], "height_leak": 45, "massrate_leak": 10720, "timestart_leak": "2020-06-09 12:00:00", "chimney": {"diameter": 1, "temperature_outlet": 100, "smoke_speed_outlet": 5, "wind_speed_outlet": ""}}, "infoTarget": [{"id": "1", "longitude": 113.83, "latitude": 22.83, "height": 0}, {"id": "2", "longitude": 113.835, "latitude": 22.835, "height": 0}], "infoEnvironment": {"wind_speed": 2, "wind_direction": "SW", "wind_height": 10, "air_stability": "C", "temperature": 26, "cloudy_is": true}}
        
 
 ## 模型参数
@@ -14,8 +15,8 @@
     param = { 
                 "tag": "ADDFSDGDG",                                             //计算标识，用于异步调用信息拾取，--非必须参数
                 "infoLeak": { 
-                                    "longitude": 113.8,                         //泄漏处经度
-                                    "latitude": 22.8,                           //泄漏处纬度
+                                    "longitude": 113.8,                         //泄漏处经度, 可以为线[113.8,113.8008]
+                                    "latitude": 22.8,                           //泄漏处纬度, 可以为线[22.8,22.80066]
                                     "height_leak": 45,                          //泄漏处高度(m)，> 0     
                                     "massrate_leak": 720,                       //泄漏质量速率(mg/s)，> 0   
                                     "timestart_leak": "2020-06-09 12:00:00",    //泄漏开始时间
