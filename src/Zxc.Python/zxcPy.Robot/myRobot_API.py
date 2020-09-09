@@ -29,7 +29,7 @@ if __name__ == '__main__':
     
 
     import myRobot_Updata   #更新说明
-    import myAPI_Robot, myWeb_Order, myWeb_Stock      #会重启导致多次输出信息，调整为不输出打印信息
+    import myAPI_Robot, myWeb_Order, myWeb_Stock, myWeb_Charging, myWeb_Test      #会重启导致多次输出信息，调整为不输出打印信息
     pWeb = myWeb.myWeb("0.0.0.0", 8668, webFolder = myRobot_Updata.myUpdata.Dir_Base + "/zxcPy.Webs/" )
     pWeb.add_API(myWeb.myAPI, '/test') 
 
@@ -37,6 +37,8 @@ if __name__ == '__main__':
     myAPI_Robot.add_APIs(pWeb)
     myWeb_Order.add_Webs(pWeb) 
     myWeb_Stock.add_Webs(pWeb) 
+    myWeb_Charging.add_Webs(pWeb)
+    myWeb_Test.add_Webs(pWeb) 
     pWeb.run()
 
 
