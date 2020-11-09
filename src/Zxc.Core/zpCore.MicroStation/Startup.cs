@@ -12,7 +12,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
+using zpCore.MicroStation.JobTrigger;
 using zpCore.MicroStation.Models;
+using zpCore.MicroStation.Common;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace zpCore.MicroStation
 {
@@ -44,16 +49,25 @@ namespace zpCore.MicroStation
             services.AddControllers();      //.AddNewtonsoftJson();
 
             // EF配置
+            common.coon = Configuration["ConnectionSetting:coon_MicroStation"];
             services.AddDbContext<db_MicroStationContext>(optionsBuilder =>
             {
-                string coon = Configuration["ConnectionSetting:coon_MicroStation"];
-                optionsBuilder.UseMySQL(coon);
+                optionsBuilder.UseMySQL(common.coon);
             });
             services.AddDbContext<dg_dbContext>(optionsBuilder =>
             {
                 string coon = Configuration["ConnectionSetting:coon_KPR"];
                 optionsBuilder.UseMySQL(coon);
             });
+
+            // 图片API
+            services.Configure<PictureOptions>(Configuration.GetSection("PictureOptions"));
+            common.ftpDir = Configuration["PictureOptions:ImageBaseUrl"];
+
+            // 添加定时任务
+            services.AddHostedService<FtpAlarmJobTrigger>();
+            services.AddHostedService<FtpTaskJobTrigger>();
+            services.AddHostedService<FtpUserJobTrigger>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,6 +77,7 @@ namespace zpCore.MicroStation
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseMiddleware<DeChunkerMiddleware>();
 
             app.UseRouting();
             app.UseAuthorization();
@@ -70,6 +85,13 @@ namespace zpCore.MicroStation
             app.UseErrorHandling();
 
             app.UseCors(MyAllowSpecificOrigins);
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                ServeUnknownFileTypes = true,
+                FileProvider = new PhysicalFileProvider(
+                Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),  //wwwroot相当于真实目录
+                RequestPath = new PathString("/src")                        //src相当于别名，为了安全
+            });
 
             app.UseEndpoints(endpoints =>
             {

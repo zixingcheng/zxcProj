@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using zpCore.MicroStation.Common;
 using zpCore.MicroStation.Models;
 /// <summary>告警接口集
 /// </summary>
@@ -37,7 +38,7 @@ namespace zpCore.MicroStation.Controllers
             DateTime dtTime = common.checkTime(jsonParams.Alarmtime);
 
             //if (!_context.Infoalarm.Any())
-            Infoalarm obj = new Infoalarm { InfoalarmOid = Guid.NewGuid().ToString("D"), DeployId = id, AlarmType = jsonParams.AlarmType, Warningindex = jsonParams.Warningindex, Alarmlevel = jsonParams.Alarmlevel, Alarmcontent = jsonParams.Alarmcontent, Alarmtime = dtTime, Cratetime = DateTime.Now };
+            Infoalarm obj = new Infoalarm { InfoalarmOid = Guid.NewGuid().ToString("D"), DeployId = id, AlarmType = jsonParams.AlarmType, Alarmindex = jsonParams.Alarmindex, Alarmlevel = jsonParams.Alarmlevel, Alarmcontent = jsonParams.Alarmcontent, Alarmtime = dtTime, Cratetime = DateTime.Now };
             _context.Add(obj);
             int result = _context.SaveChanges();
             var data = new { InfoalarmOid = obj.InfoalarmOid, result = result };
@@ -76,15 +77,21 @@ namespace zpCore.MicroStation.Controllers
             int id = Convert.ToInt32(jsonParams.DeployId);
             if (id > 0)
                 sql += " And DeployId = " + id;
-            //sql += " And DeployId.Contains(@4)";
-            //int[] ints = new int[] { 2618, 2619 };
-            //query.Where("DeployId.Contains(@0)", ints);
+            List<int> delopyss = common.checkCondition_ID(jsonParams, "DeployId", 6, ref sql);
+
+            #region 数据权限控制
+
+            //List<int> delopyIds = common.checkPermission_IDs(Convert.ToString(jsonParams.userName), _context);
+            // 合并前端查询ID进行查询
+
+            #endregion
 
             var query = _context.Infoalarm
                                 .AsQueryable()
-                                    .Where(sql, dtEnd, dtStart, type, lv, index, id)
-                                    .OrderBy("DeployId")
-                                    .Select("new (DeployId, AlarmType, Warningindex, Alarmlevel, Alarmcontent, Alarmtime)");
+                                    .Where(sql, dtEnd, dtStart, type, lv, index, id, delopyss)
+                                    .OrderBy("Alarmtime")
+                                    .ThenByDescending(e => e.DeployId)
+                                    .Select("new (DeployId, AlarmType, Alarmindex, Alarmlevel, Alarmcontent, Alarmtime)");
             var queryFen = query.Skip(size * (page - 1)).Take(size);
             JObject objRes = common.transResult_page(page, size, queryFen.Count());
             return common.transResult((JToken)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(queryFen)), objRes);

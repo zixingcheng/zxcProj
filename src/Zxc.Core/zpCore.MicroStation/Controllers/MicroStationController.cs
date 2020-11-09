@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using zpCore.MicroStation.Common;
 using zpCore.MicroStation.Models;
 /// <summary>微站接口集
 /// </summary>
@@ -42,6 +43,78 @@ namespace zpCore.MicroStation.Controllers
             //        c.deploy_id, c.site_name, c.latitude, c.longitude 
             //    });
             return common.transResult((JToken)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(query)));
+        }
+
+        public ActionResult<string> getInfo_StationPerm(dynamic param)
+        {
+            var jsonParams = JsonConvert.DeserializeObject<dynamic>(param.ToString());
+            string strSql = "DeployId > 0";
+
+            #region 数据权限控制
+
+            List<int> delopyIds = common.checkPermission_IDs(Convert.ToString(jsonParams.userName), _context);
+
+            #endregion
+
+            var query = _context.MicroStation
+                            .AsQueryable()
+                                .Where("@0.Contains(DeployId)", delopyIds)
+                                .OrderBy("DeployId")
+                                .Select("new (DeployId as deploy_id, SiteName as site_name, StreetName as stree_name,CommunityName as community_name, LatitudeBd as latitude, LongitudeBd as longitude)");
+            return common.transResult((JToken)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(query)));
+        }
+
+
+        /// <summary>提取站点信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<string>> getInfo_StationsAsync(dynamic param)
+        {
+            var query = _context.MicroStation
+                        .Where(s => s.DeployId > 0)
+                            .OrderBy(b => b.DeployId)
+                            .Select(s => new { s.DeployId, s.SiteName, s.StreetName, s.CommunityName });
+                            //.GroupBy(g => new { g.StreetName, g.CommunityName });
+                            //.Select("new (DeployId as deploy_id, SiteName as site_name)");
+            JObject objRes = new JObject();
+            foreach (var item in query)
+            {
+                // 镇街节点
+                if (!objRes.ContainsKey(item.StreetName))
+                    objRes.Add(item.StreetName, new JObject());
+                JObject objStreet = (JObject)objRes[item.StreetName];
+
+                // 村社区节点
+                if (!objStreet.ContainsKey(item.CommunityName))
+                    objStreet.Add(item.CommunityName, new JArray());
+                JArray objCommunity = (JArray)objStreet[item.CommunityName];
+
+                // 站点信息
+                JObject objDeploy = new JObject();
+                objDeploy["id"] = item.DeployId;
+                objDeploy["site_name"] = item.SiteName;
+                objCommunity.Add(objDeploy);
+            }
+            return common.transResult(objRes);
+
+            //foreach (var item in allStreets)
+            //{
+            //    var allCommunitys = 
+            //    item.StreetName 
+            //}
+
+
+
+            //var allCommunitys = query.GroupBy("CommunityName");
+
+
+            //var query = _context.MicroStation.Where(s => s.deploy_id > 0).OrderBy(b => b.deploy_id)
+            //    .Select(c => new { 
+            //        c.deploy_id, c.site_name, c.latitude, c.longitude 
+            //    });
+            //return common.transResult((JToken)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(allStreets)));
         }
 
         /// <summary>更新经纬度信息(DB09)

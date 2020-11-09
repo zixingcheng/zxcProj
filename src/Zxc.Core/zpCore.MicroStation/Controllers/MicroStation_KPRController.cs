@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using zpCore.MicroStation.Common;
 using zpCore.MicroStation.Models;
 namespace zpCore.MicroStation.Controllers
 {
@@ -40,12 +41,13 @@ namespace zpCore.MicroStation.Controllers
             int id = Convert.ToInt32(jsonParams.DeployId);
             string sql = id == 0 ? "" : " And DeployId = " + id.ToString();
             sql = "Pubtime >= @0 And Pubtime < @1" + sql;
+            List<int> delopyss = common.checkCondition_ID(jsonParams, "DeployId", 2, ref sql);
 
             var query = _context.KprMonitorDataDeviceHour
                             .AsQueryable()
-                                .Where(sql, dtStart, dtEnd)
+                                .Where(sql, dtStart, dtEnd, delopyss)
                                 .OrderBy("DeployId")
-                                .OrderByDescending(e => e.Pubtime)
+                                //.OrderByDescending(e => e.Pubtime)
                                 .Select("new (DeployId, AddressDetail, Aqi, Pm25, Pm10, So2, No2, Co, O3, O38h, Voc," +
                                     //"WindSpeed, WindDirection, Temperature, AirPressure, " +
                                     "Pubtime, CreateDt)");
@@ -82,12 +84,13 @@ namespace zpCore.MicroStation.Controllers
 
             string sql = id == 0 ? "" : " And DeployId = " + id.ToString();
             sql = "Pubtime >= @0 And Pubtime < @1" + sql;
+            List<int> delopyss = common.checkCondition_ID(jsonParams, "DeployId", 2, ref sql);
 
             var query = _context.KprMonitorDataDeviceHour
                             .AsQueryable()
-                                .Where(sql, dtStart, dtEnd)
-                                .OrderBy("DeployId")
-                                .OrderByDescending(e => e.Pubtime)
+                                .Where(sql, dtStart, dtEnd, delopyss)
+                                .OrderBy(e => e.DeployId)
+                                .ThenBy(e => e.Pubtime)
                                 .Select("new (DeployId, AddressDetail, Aqi, Pm25, Pm10, So2, No2, Co, O3, O38h, Voc," +
                                     //"WindSpeed, WindDirection, Temperature, AirPressure, " +
                                     "Pubtime, CreateDt)");
@@ -113,10 +116,11 @@ namespace zpCore.MicroStation.Controllers
             int id = Convert.ToInt32(jsonParams.DeployId);
             string sql = id == 0 ? "" : " And DeployId = " + id.ToString();
             sql = "Pubtime >= @0 And Pubtime < @1" + sql;
+            List<int> delopyss = common.checkCondition_ID(jsonParams, "DeployId", 2, ref sql);
 
             var query = _context.KprMonitorDataDeviceDay
                             .AsQueryable()
-                                .Where(sql, dtStart, dtEnd)
+                                .Where(sql, dtStart, dtEnd, delopyss)
                                 .OrderBy("DeployId")
                                 .Select("new (DeployId, AddressDetail, Aqi, Pm25, Pm10, So2, No2, Co, O3, O38h, Voc," +
                                     //"WindSpeed, WindDirection, Temperature, AirPressure, " +
@@ -142,12 +146,13 @@ namespace zpCore.MicroStation.Controllers
 
             string sql = id == 0 ? "" : " And DeployId = " + id.ToString();
             sql = "Pubtime >= @0 And Pubtime < @1" + sql;
+            List<int> delopyss = common.checkCondition_ID(jsonParams, "DeployId", 2, ref sql);
 
             var query = _context.KprMonitorDataDeviceDay
                             .AsQueryable()
-                                .Where(sql, dtStart, dtEnd)
-                                .OrderBy("DeployId")
-                                .OrderByDescending(e => e.Pubtime)
+                                .Where(sql, dtStart, dtEnd, delopyss)
+                                .OrderBy(e => e.DeployId)
+                                .ThenBy(e => e.Pubtime)
                                 .Select("new (DeployId, AddressDetail, Aqi, Pm25, Pm10, So2, No2, Co, O3, O38h, Voc," +
                                     //"WindSpeed, WindDirection, Temperature, AirPressure, " +
                                     "Pubtime, UpdateDt, CreateDt)");
