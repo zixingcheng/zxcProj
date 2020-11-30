@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
+<script src="/static/JS/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+    var imgFile = [];   //文件流
+    var imgSrc = [];    //图片路径
+    var imgName = [];   //图片名字
+
+    $(function () {
+
+        //图片上传
+        $('#upload').on('change', function () {
+            if (imgSrc.length >= 4) {
+                return alert("最多只能上传4张图片");
+            }
+            var imgSize = this.files[0].size;
+            if (imgSize > 1024 * 1024 * 1) {
+                return alert("上传图片不能超过1M");
+            }
+            console.log(this.files[0].type)
+            if (this.files[0].type != 'image/png' && this.files[0].type != 'image/jpeg' && this.files[0].type != 'image/gif') {
+                return alert("图片上传格式不正确");
+            }
+
+            // 检查是否支持FormData
+            if (window.FormData) {
+                alert("图片上传格式不正确哇哇哇哇哇");
+                var formData = new FormData();
+
+                // 建立一个upload表单项，值为上传的文件
+                formData.append('upload', document.getElementById('upload').files[0]);
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', "/img_upload");
+
+                // 定义上传完成后的回调函数
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        console.log('上传成功');
+                    } else {
+                        console.log('出错了');
+                    }
+                };
+                xhr.send(formData);
+            }
+
+            alert("图片上传格式不正确");
+
+            //upload_Img();
+        })
+
+        //提交请求
+        $('#btn-submit-upload').on('click', function () {
+            // FormData上传图片
+            var formFile = new FormData();
+            $.each(imgFile, function (i, file) {
+                formFile.append('myFile[]', file);
+            });
+            console.log(imgFile);
+        });
+
+    });
+
+    function htmlPost() {
+        var data = {};
+        myPost("url", data);
+    }
+    function myPost(url, params) {
+        var temp = document.createElement("form");
+        temp.action = url;
+        temp.method = "post";
+        temp.style.display = "none";
+        for (var x in params) {
+            var opt = document.createElement("textarea");
+            opt.test = x;
+            temp.appendChild(opt);
+        }
+        document.body.appendChild(temp);
+        temp.submit();
+        return temp;
+    }
+
+    function upload_Img() {
+        alert("ssddssdd");
+        $.post('/img_upload', {}, function (data) {
+            re = JSON.parse(data, null);
+            alert(rs);
+            alert(rs['success']);
+        });
+    }
+
+</script>
+
+<body>
+    <div>
+        <form method="post" action="/img_upload" enctype="multipart/form-data">
+            <div class="file">
+                <i class="ico-plus"> </i> 上传图片，支持jpg/png<input type="file" name="fileImg" accept="image/*" id="upload">
+            </div>
+
+            <br>
+            <input type="text" class="txt_input" name="name" style="margin-top:15px;" />
+            <input type="submit" value="提交信息" class="button-new" style="margin-top:15px;" />
+
+    </div>
+    </form>
+    </div>
+</body>
+</html>
+

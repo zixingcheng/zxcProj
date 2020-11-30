@@ -34,28 +34,20 @@ class myCompanyForm(FlaskForm):
     companyInVillage = StringField('所属村（社区）', [DataRequired(),Length(min=2, max=50)], render_kw={"placeholder": "请输入企业所属村（社区）", "style": txtStyle})
     companyAdrr = StringField('详细地址', [DataRequired(),Length(min=6, max=100)], render_kw={"placeholder": "请输入企业详细地址", "style": txtStyle})    
     companyScale = StringField('企业规模', [DataRequired()], render_kw={"placeholder": "请选择企业规模", "style": txtStyle})
-    companyContacts = StringField('企业联系人', [DataRequired(),Length(min=2, max=8)], render_kw={"placeholder": "请输入企业联系人", "style": txtStyle})
+    companySpecialcase = StringField('特殊情形', [DataRequired()], render_kw={"placeholder": "请选择企业特殊情形", "style": txtStyle})
+    companyManangeclass = StringField('管理类别', [DataRequired()], render_kw={"placeholder": "请选择企业管理类别", "style": txtStyle})
+    companyContacts = StringField('图片上传人', [DataRequired(),Length(min=2, max=8)], render_kw={"placeholder": "请输入图片上传人姓名", "style": txtStyle})
     companyPhone = StringField('电话号码', validators=[DataRequired(),Regexp("1[3578]\d{9}", message="手机格式不正确")], render_kw={"placeholder": "请输入联系电话", "style": txtStyle})
     
-    companyHasProcess  = StringField('是否采用活性炭吸附工艺', [DataRequired()], render_kw={"placeholder": "请选择是否采用活性炭吸附工艺", "style": txtStyle})
-    companyNumProcess = IntegerField('活性炭吸附工艺设施套数', [InputRequired(),NumberRange(min=-1, max=100)], render_kw={"placeholder": "请输入采用活性炭吸附工艺设施套数", "style": txtStyle})
-    companyRecycle = IntegerField('正常更换周期（日/次）', [InputRequired(),NumberRange(min=0, max=365)], render_kw={"placeholder": "请输入更换周期（日/次）", "style": txtStyle})
-    companyVolumeTotal = DecimalField('设计总填装量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入设计总填装量（千克）", "style": txtStyle})
-    
-    companyRedate = DateField('新活性炭更换日期', default='', format='%Y-%m-%d', render_kw={"placeholder": "请选择新活性炭更换日期", "style": txtStyle}) 
-    companyRevolume = DecimalField('新活性炭更换量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入新活性炭更换量（千克）", "style": txtStyle})
-    companyTransferredvolume = DecimalField('已转移废活性炭量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入已转移废活性炭量（千克）", "style": txtStyle})
-    companyNoTransferredvolume = DecimalField('暂未转移废活性炭量（千克）', [InputRequired(),NumberRange(min=0, max=99999)], render_kw={"placeholder": "请输入暂未转移废活性炭量（千克）", "style": txtStyle})
-    
     save = SubmitField('保存信息', render_kw={"class": "btn-submit-upload","style": "margin-left:10px"})                    # 保存按钮
-    
+
     # 图片信息 
-    imgName_1 = StringField('图片_1', [], render_kw={"style": "display:none;"}) 
-    imgName_2 = StringField('图片_2', [], render_kw={"style": "display:none;"}) 
-    imgName_3 = StringField('图片_3', [], render_kw={"style": "display:none;"}) 
-    imgName_4 = StringField('图片_4', [], render_kw={"style": "display:none;"}) 
-    imgName_5 = StringField('图片_5', [], render_kw={"style": "display:none;"}) 
-    imgName_6 = StringField('图片_6', [], render_kw={"style": "display:none;"}) 
+    imgName_1 = StringField('图片_相关部门证明', [], render_kw={"style": "display:none;"}) 
+    imgName_2 = StringField('图片_正门照片', [], render_kw={"style": "display:none;"}) 
+    imgName_3 = StringField('图片_生产车间照片', [], render_kw={"style": "display:none;"}) 
+    imgName_4 = StringField('图片_营业执照注销', [], render_kw={"style": "display:none;"}) 
+    imgName_5 = StringField('图片_断水断电证明', [], render_kw={"style": "display:none;"}) 
+    imgName_6 = StringField('图片_执法笔录', [], render_kw={"style": "display:none;"}) 
     
 #集中添加所有Web
 def add_Webs(appWeb, dirBase):
@@ -77,9 +69,6 @@ def add_Webs(appWeb, dirBase):
             pCompany = pCompany.copy()
 
         #修正部分信息
-        pCompany['companyHasProcess'] = myData.iif(pCompany['companyHasProcess'], "是", "否")
-        if(type(pCompany['companyRedate']) == datetime.datetime):
-            pCompany['companyRedate'] = myData_Trans.Tran_ToDatetime_str(pCompany['companyRedate'], "%Y-%m-%d")
         jsonCompany = myData_Json.Json_Object(pCompany)
         return jsonCompany.ToString() 
 
@@ -96,25 +85,20 @@ def add_Webs(appWeb, dirBase):
                 pValues = []
                 if(True):
                     pValues.append("-1")
-                    pValues.append(form.companyID.data)
+                    if(form.companyID.data == "000000000000000000"):
+                        companyID = "_" + myIO.create_UUID()
+                        pValues.append(companyID)
+                    else:
+                        pValues.append(form.companyID.data)
                     pValues.append(form.companyName.data)
                     pValues.append(form.companyInStreet.data)
                     pValues.append(form.companyInVillage.data)
                     pValues.append(form.companyAdrr.data)
                     pValues.append(form.companyScale.data)
+                    pValues.append(form.companySpecialcase.data)
+                    pValues.append(form.companyManangeclass.data)
                     pValues.append(form.companyContacts.data)
                     pValues.append(form.companyPhone.data)
-    
-                    companyHasProcess = myData.iif(form.companyHasProcess.data == "是", True, False)
-                    pValues.append(companyHasProcess)
-                    pValues.append(form.companyNumProcess.data)
-                    pValues.append(form.companyRecycle.data)
-                    pValues.append(form.companyVolumeTotal.data)
-                
-                    pValues.append(myData_Trans.Tran_ToDatetime_str(form.companyRedate.data))
-                    pValues.append(form.companyRevolume.data)
-                    pValues.append(form.companyTransferredvolume.data)
-                    pValues.append(form.companyNoTransferredvolume.data)
             
                     pValues.append(form.imgName_1.data)
                     pValues.append(form.imgName_2.data)
@@ -132,7 +116,7 @@ def add_Webs(appWeb, dirBase):
             # 保存时，验证失败，不需要刷新
             if form.save.data:
                 needRefresh = False
-        return render_template('company_active carbon.html', title = 'company upload', form = form, companyID = companyID, needRefresh = needRefresh, editSucess = editSucess)
+        return render_template('company.html', title = 'company upload', form = form, companyID = companyID, needRefresh = needRefresh, editSucess = editSucess)
     
     #添加接口--删除筛选公司
     @appWeb.app.route('/zxcAPI/companys/query/del')
@@ -170,18 +154,23 @@ def add_Webs(appWeb, dirBase):
         companyName = request.args.get('companyName', "") 
         companyInStreet = request.args.get('companyInStreet', "") 
         companyInVillage = request.args.get('companyInVillage', "") 
+        companyAdrr = request.args.get('companyAdrr', "") 
         companyScale = request.args.get('companyScale', "") 
-        companyHasProcess = request.args.get('companyHasProcess', "") 
+        companySpecialcase = request.args.get('companySpecialcase', "") 
+        companyManangeclass = request.args.get('companyManangeclass', "") 
+        companyContacts = request.args.get('companyContacts', "") 
         
         #组装筛选条件
         fliter = ""
         if(companyID != ""): fliter += " && companyID == " + companyID
-        if(companyName != ""): fliter += " && companyName == " + companyName
+        if(companyName != ""): fliter += " && companyName %like% " + companyName
         if(companyInStreet != ""): fliter += " && companyInStreet == " + companyInStreet
         if(companyInVillage != ""): fliter += " && companyInVillage == " + companyInVillage
+        if(companyAdrr != ""): fliter += " && companyAdrr == " + companyAdrr
         if(companyScale != ""): fliter += " && companyScale == " + companyScale
-        if(companyHasProcess != ""): 
-            fliter += " && companyHasProcess == " + str(myData.iif(companyHasProcess == "是", True, False))
+        if(companySpecialcase != ""): fliter += " && companySpecialcase == " + companySpecialcase
+        if(companyManangeclass != ""): fliter += " && companyManangeclass == " + companyManangeclass
+        if(companyContacts != ""): fliter += " && companyContacts == " + companyContacts
         if(fliter != ""): fliter = fliter[4:]
         
         #筛选
@@ -200,7 +189,7 @@ def add_Webs(appWeb, dirBase):
     @appWeb.app.route("/zxcWebs/companyinfos",methods=['GET','POST'])
     @appWeb.app.route("/zxcWebs/companyinfos/<int:page>",methods=['GET','POST'])
     def query_companys(page=1):
-        return render_template('company_active carbon_list.html')
+        return render_template('company_list.html')
     
     #添加接口--保存筛选公司列表
     @appWeb.app.route('/zxcAPI/companys/query/save')
@@ -210,8 +199,106 @@ def add_Webs(appWeb, dirBase):
         companyName = request.args.get('companyName', "") 
         companyInStreet = request.args.get('companyInStreet', "") 
         companyInVillage = request.args.get('companyInVillage', "") 
+        companyAdrr = request.args.get('companyAdrr', "") 
         companyScale = request.args.get('companyScale', "") 
-        companyHasProcess = request.args.get('companyHasProcess', "") 
+        companySpecialcase = request.args.get('companySpecialcase', "") 
+        companyManangeclass = request.args.get('companyManangeclass', "") 
+        companyContacts = request.args.get('companyContacts', "") 
+        companyContacts = request.args.get('companyContacts', "") 
+        
+        #组装筛选条件
+        fliter = ""
+        if(companyID != ""): fliter += " && companyID == " + companyID
+        if(companyName != ""): fliter += " && companyName %like% " + companyName
+        if(companyInStreet != ""): fliter += " && companyInStreet == " + companyInStreet
+        if(companyInVillage != ""): fliter += " && companyInVillage == " + companyInVillage
+        if(companyAdrr != ""): fliter += " && companyAdrr == " + companyAdrr
+        if(companyScale != ""): fliter += " && companyScale == " + companyScale
+        if(companySpecialcase != ""): fliter += " && companySpecialcase == " + companySpecialcase
+        if(companyManangeclass != ""): fliter += " && companyManangeclass == " + companyManangeclass
+        if(companyContacts != ""): fliter += " && companyContacts == " + companyContacts
+        if(fliter != ""): fliter = fliter[4:]
+        
+        #筛选
+        res = {"success": 1, "data": "", "msg": ""}
+        try:
+            dbCompany = gol._Get_Value('dbCompany')
+            totalCount, pCompanys = dbCompany.getCompanys(param = fliter, isDel = False, page = 1, per_page = 99999999)
+            if(totalCount == 0): 
+                res['success'] = 0
+                res['msg'] = str(err)
+                return myData_Json.Trans_ToJson_str(res)
+
+            #保存属性信息
+            nameUUID = myIO.create_UUID()
+            dirTemp =  myIO.checkPath(appWeb.baseDir + "static/data/temp/temp_" + nameUUID + "/")
+            myIO.mkdir(dirTemp, True, True)
+            nameFile = "企业信息数据表"
+            if(totalCount == 1): nameFile = pCompanys[0]['companyName']
+            nameFile = nameFile + "_" + nameUUID
+            dbCompany.Save_as_csv(dirTemp + nameFile + ".csv", pCompanys, True)
+
+            #保存相关图片
+            files = []; newfiles = [];
+            imgSrcdir =  appWeb.baseDir
+            dictImgs = { "imgName_1" : "图片_相关部门证明",
+                        "imgName_2" : "图片_正门照片",
+                        "imgName_3" : "图片_生产车间照片",
+                        "imgName_4" : "图片_营业执照注销",
+                        "imgName_5" : "图片_断水断电证明",
+                        "imgName_6" : "图片_执法笔录",
+                }
+            for x in pCompanys:
+                #文件夹保存图片
+                dirCompany = dirTemp + x['companyName'] + "/"
+                for name in dictImgs:
+                    nameImg = dictImgs[name].replace("图片_", "")
+                    filesImg = x[name].split(';')
+                    targetDir = dirCompany + nameImg
+
+                    # 拷贝文件到文件夹
+                    ind = 0
+                    for xx in filesImg:
+                        ind += 1
+                        if(xx == ''): continue;
+                        pathDest = myIO.copyFile(imgSrcdir + xx, targetDir, nameImg + "_" + str(ind))
+                        files.append(pathDest)
+                        newfiles.append(pathDest.replace(dirTemp, ""))
+            files.append(dirTemp + nameFile+ ".csv")
+            newfiles.append(nameFile + ".csv")
+            
+            #压缩文件
+            zip_name = nameFile 
+            zip_path = appWeb.baseDir + "static/data/Companys/"
+            
+            #if(myIO.Save_Files_zip(files, newfiles, zip_path, zip_name)):
+            if(myIO.Save_Floders_zip(dirTemp, zip_path, zip_name)):
+                res['filename'] = zip_name + '.zip'
+                res['filefloder'] = "Companys"
+                res['totalCount'] = totalCount
+            else:
+                res['success'] = 0
+                res['msg'] = str(err)
+            myIO.deldir(dirTemp)
+        except Exception as err:
+            res['success'] = 0
+            res['msg'] = str(err)
+        return myData_Json.Trans_ToJson_str(res)
+    
+
+    @appWeb.app.route('/zxcAPI/companys/query/save')
+    def companysQuery_save2(): 
+        #载入配置
+        companyID = request.args.get('companyID', "")
+        companyName = request.args.get('companyName', "") 
+        companyInStreet = request.args.get('companyInStreet', "") 
+        companyInVillage = request.args.get('companyInVillage', "") 
+        companyAdrr = request.args.get('companyAdrr', "") 
+        companyScale = request.args.get('companyScale', "") 
+        companySpecialcase = request.args.get('companySpecialcase', "") 
+        companyManangeclass = request.args.get('companyManangeclass', "") 
+        companyContacts = request.args.get('companyContacts', "") 
+        companyContacts = request.args.get('companyContacts', "") 
         
         #组装筛选条件
         fliter = ""
@@ -219,9 +306,11 @@ def add_Webs(appWeb, dirBase):
         if(companyName != ""): fliter += " && companyName == " + companyName
         if(companyInStreet != ""): fliter += " && companyInStreet == " + companyInStreet
         if(companyInVillage != ""): fliter += " && companyInVillage == " + companyInVillage
+        if(companyAdrr != ""): fliter += " && companyAdrr == " + companyAdrr
         if(companyScale != ""): fliter += " && companyScale == " + companyScale
-        if(companyHasProcess != ""): 
-            fliter += " && companyHasProcess == " + str(myData.iif(companyHasProcess == "是", True, False))
+        if(companySpecialcase != ""): fliter += " && companySpecialcase == " + companySpecialcase
+        if(companyManangeclass != ""): fliter += " && companyManangeclass == " + companyManangeclass
+        if(companyContacts != ""): fliter += " && companyContacts == " + companyContacts
         if(fliter != ""): fliter = fliter[4:]
         
         #筛选
@@ -237,11 +326,39 @@ def add_Webs(appWeb, dirBase):
             res['filename'] = "企业信息数据表.csv"
             res['filefloder'] = "Companys"
             res['totalCount'] = totalCount
+
+            
+            """
+            import requests
+            from openpyxl.drawing import image
+            from openpyxl import Workbook
+            image_bytes=requests.get('https://images2015.cnblogs.com/blog/1135581/201704/1135581-20170407154037347-2055197925.png').content
+            data_stream=image.BytesIO(image_bytes)
+            im=image.Image(data_stream)
+            wb=Workbook()
+            ws=wb.active
+
+            #设置单元格的行高列宽
+            c=ws.column_dimensions['A']
+            #设置行高列宽公式里面的96为图片的水平和垂直分辨率。即所谓的dpi。
+            c.width=im.width*12/96
+            r=ws.row_dimensions[1]
+            r.height=im.height*72/96
+            ws.add_image(im,'A1')
+            wb.save('demo.xlsx')
+            
+            """
+
+            path = appWeb.baseDir + "/static/data/Companys/企业信息数据表.csv"
+            dbCompany.Save_as_csv(path, pCompanys, True)
+
+            res['filename'] = "企业信息数据表.csv"
+            res['filefloder'] = "Companys"
+            res['totalCount'] = totalCount
         except Exception as err:
             res['success'] = 0
             res['msg'] = str(err)
         return myData_Json.Trans_ToJson_str(res)
-    
 
 
 

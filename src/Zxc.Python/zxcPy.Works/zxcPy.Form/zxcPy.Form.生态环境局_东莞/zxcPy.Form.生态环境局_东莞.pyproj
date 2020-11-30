@@ -28,8 +28,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="myDataDB_Company_active_carbon.py" />
+    <Compile Include="myData_DB.py" />
+    <Compile Include="myIO.py" />
+    <Compile Include="myWeb.py" />
     <Compile Include="runserver.py" />
     <Compile Include="myDataDB_Company.py" />
+    <Compile Include="zxcPy_Form\infoCompany_active_carbon.py" />
     <Compile Include="zxcPy_Form\infoCompany.py" />
     <Compile Include="zxcPy_Form\__init__.py" />
     <Compile Include="zxcPy_Form\views.py" />
@@ -73,8 +78,10 @@
     <Content Include="zxcPy_Form\static\scripts\paging.js" />
     <Content Include="zxcPy_Form\static\scripts\_references.js" />
     <Content Include="zxcPy_Form\templates\about.html" />
+    <Content Include="zxcPy_Form\templates\company.html" />
+    <Content Include="zxcPy_Form\templates\company_list.html" />
     <Content Include="zxcPy_Form\templates\_macros.html" />
-    <Content Include="zxcPy_Form\templates\company_active carbon_list.html" />
+    <Content Include="zxcPy_Form\templates\company_active_carbon_list.html" />
     <Content Include="zxcPy_Form\templates\company_base.html" />
     <Content Include="zxcPy_Form\templates\contact.html" />
     <Content Include="zxcPy_Form\templates\index.html" />
@@ -83,7 +90,7 @@
     <Content Include="zxcPy_Form\templates\upload - Copy %282%29.html" />
     <Content Include="zxcPy_Form\templates\upload - Copy %283%29.html" />
     <Content Include="zxcPy_Form\templates\upload - Copy - Copy.html" />
-    <Content Include="zxcPy_Form\templates\company_active carbon.html" />
+    <Content Include="zxcPy_Form\templates\company_active_carbon.html" />
     <Content Include="zxcPy_Form\templates\upload.html" />
     <Content Include="zxcPy_Form\static\content\upload_img.css" />
     <Content Include="zxcPy_Form\static\scripts\upload_img.js" />

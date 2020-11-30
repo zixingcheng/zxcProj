@@ -61,27 +61,33 @@
             text-align: center;
             color: #aaa;
         }
+
         .typecut {
             float: right;
             width: 100%;
         }
-        .typecut:hover
-        {
-            background-color:#ccc;
-            cursor:pointer;
-        }
+
+            .typecut:hover {
+                background-color: #ccc;
+                cursor: pointer;
+            }
     </style>
 
     <div class="data">
         <div class="params">
             <label left="100px" for="course_id">企业全称：</label><input type="text" id="companyName">
             <label style='padding-left: 35px;' for="course_id">统一社会信用代码：</label><input type="text" id="companyID">
-            <label style='padding-left: 35px;' for="course_id">所在镇街：&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companyInStreet">
+            <label style='padding-left: 35px;' for="course_id">图片上传人：&nbsp</label><input type="text" id="companyContacts">
+        </div>
+        <div class="params">
+            <label left="100px" for="course_id">企业地址：</label><input type="text" id="companyAdrr">
+            <label style='padding-left: 35px;' for="course_id">所在镇街：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companyInStreet">
+            <label style='padding-left: 35px;' for="course_id">所属村/社区：</label><input type="text" id="companyInVillage">
         </div>
         <div class="params">
             <label left="100px" for="course_id">企业规模：</label><input type="text" id="companyScale">
-            <label style='padding-left: 35px;' for="course_id">活性炭吸附工艺：&nbsp&nbsp&nbsp</label><input type="text" id="companyHasProcess">
-            <label style='padding-left: 35px;' for="course_id">所属村/社区：</label><input type="text" id="companyInVillage">
+            <label style='padding-left: 35px;' for="course_id">特殊情形：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companySpecialcase">
+            <label style='padding-left: 35px;' for="course_id">管理类别：&nbsp&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companyManangeclass">
             <input type="button" value="查询" class="search-btn" id="search_btn">
             <p style='height: 0px; font-size: 8px'>&nbsp</p>
         </div>
@@ -92,9 +98,10 @@
                     <th>统一社会信用代码</th>
                     <th>企业全称</th>
                     <th>企业规模</th>
+                    <th>特殊情形</th>
+                    <th>管理类别</th>
                     <th>所在镇街</th>
                     <th>所属村（社区）</th>
-                    <th>活性炭吸附工艺</th>
                 </tr>
             </thead>
             <tbody id="data_list"></tbody>
@@ -136,10 +143,20 @@
         <option value="小型">
         <option value="微型">
     </datalist>
-    <!--活性炭工艺列表-->
-    <datalist id="lstCompanyHasProcess">
-        <option value="是">
-        <option value="否">
+    <!--特殊情形列表-->
+    <datalist id="lstCompanySpecialcase">
+        <option value="无特殊情形类">
+        <option value="无实体企业类">
+        <option value="永久关闭类">
+        <option value="正在建设类">
+        <option value="禁止核发类">
+        <option value="长期停产类">
+    </datalist>
+    <!--管理类别列表-->
+    <datalist id="lstCompanyManangeclass">
+        <option value="重点管理">
+        <option value="简化管理">
+        <option value="登记管理">
     </datalist>
     <!--镇街、村社区列表-->
     <datalist id="lstTown"></datalist>
@@ -162,7 +179,8 @@
 
             //控件调整，绑定下拉辅助输入列表
             $("#companyScale").attr("list", 'lstCompanyScales');
-            $("#companyHasProcess").attr("list", 'lstCompanyHasProcess');
+            $("#companySpecialcase").attr("list", 'lstCompanySpecialcase');
+            $("#companyManangeclass").attr("list", 'lstCompanyManangeclass');
             $("#companyInStreet").attr("list", 'lstTown');
             $("#companyInVillage").attr("list", 'lstVillage');
         });
@@ -194,13 +212,16 @@
                         type: 'get',
                         data: {
                             pageIndex: pageIndex,
-                            pageSize: pageSize,
+                            pageSize: pageSize,                            
                             companyID: $('#companyID').val(),
                             companyName: $('#companyName').val(),
+                            companyAdrr: $('#companyAdrr').val(),
                             companyInStreet: $('#companyInStreet').val(),
                             companyInVillage: $('#companyInVillage').val(),
                             companyScale: $('#companyScale').val(),
-                            companyHasProcess: $('#companyHasProcess').val()
+                            companySpecialcase: $('#companySpecialcase').val(),
+                            companyManangeclass: $('#companyManangeclass').val(),
+                            companyContacts: $('#companyContacts').val()
                         },
                         success: function (res) {
                             jsonCompanys = JSON.parse(res, null);
@@ -209,18 +230,17 @@
                                     var dataCompans = jsonCompanys['data'];
                                     var html = '';
                                     dataCompans.forEach(function (item, i) {
-                                        hasProcess = "否";
-                                        if (item['companyHasProcess']) hasProcess = "是";
-                                        html += '<tr>' +                                            
+                                        html += '<tr>' +
                                             '<td style="width: 5%;">'
-                                            + '<div class="typecut"  onmouseover = "cutover(this)" onclick = "doCut(this)" onmouseout = "cutout(this)" >'+ ((pageIndex - 1) * pageSize + i + 1) +'</div >'
+                                            + '<div class="typecut"  onmouseover = "cutover(this)" onclick = "doCut(this)" onmouseout = "cutout(this)" >' + ((pageIndex - 1) * pageSize + i + 1) + '</div >'
                                             + '</td>' +
                                             '<td style="width: 10%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyID'] + '</a></td>' +
                                             '<td style="width: 15%;">' + '<a href = "/zxcWebs/companyinfo/' + item['companyID'] + '">' + item['companyName'] + '</a></td>' +
                                             '<td style="width: 6%;">' + item['companyScale'] + '</td>' +
+                                            '<td style="width: 6%;">' + item['companySpecialcase'] + '</td>' +
+                                            '<td style="width: 6%;">' + item['companyManangeclass'] + '</td>' +
                                             '<td style="width: 8%;">' + item['companyInStreet'] + '</td>' +
                                             '<td style="width: 8%;">' + item['companyInVillage'] + '</td>' +
-                                            '<td style="width: 8%;">' + hasProcess + '</td>' +
                                             '</tr>';
                                     });
                                     $('#data_list').html(html);
@@ -257,14 +277,14 @@
             $(div).html("删除 " + $(div).html());
         };
         function cutout(div) {
-            $(div).html($(div).html().replace("删除 ",''));
+            $(div).html($(div).html().replace("删除 ", ''));
         };
         function doCut(div) {
             var tr = $(div).parents("tr");                                 //获取当前行的Tr
             var ind = $(div).html().replace("删除 ", '');
             var company_id = tr.find("td").eq(1).children("a").html();
             var compan_name = tr.find("td").eq(2).children("a").html();
-            if (!confirm("是否删除序号(" + ind +")数据？企业信息如下：\r\n\r\n企业全称：" + compan_name + "\r\n统一社会信用代码：" + company_id)) {
+            if (!confirm("是否删除序号(" + ind + ")数据？企业信息如下：\r\n\r\n企业全称：" + compan_name + "\r\n统一社会信用代码：" + company_id)) {
                 return false;
             }
 
@@ -291,31 +311,31 @@
         //导出数据
         function exportData() {
             //列标题，逗号隔开，每一个逗号就是隔开一个单元格
-            let str = `统一社会信用代码,企业全称,企业规模,企业联系人,电话号码,所在镇街,所属村（社区）,详细地址,是否采用活性炭吸附工艺,采用活性炭吸附工艺设施套数,正常更换周期（日 / 次）,设计总填装量（千克）,新活性炭更换日期,新活性炭更换量（千克）,已转移废活性炭量（千克）,暂未转移废活性炭量（千克）\n`;
+            let str = `统一社会信用代码,企业全称,所在镇街,所属村（社区）,详细地址,企业规模,特殊情形,管理类别,图片上传人,电话号码,相关部门证明,正门照片,生产车间照片,营业执照注销,断水断电证明,执法笔录,isDel(bool)\n`;
 
             //增加\t为了不让表格显示科学计数法或者其他格式
             var dataCompans = jsonCompanys['data'];
             for (let i = 0; i < dataCompans.length; i++) {
+                str += `${dataCompans[i]["ID"] + '\t'},`;
                 str += `${dataCompans[i]["companyID"] + '\t'},`;
                 str += `${dataCompans[i]["companyName"] + '\t'},`;
-                str += `${dataCompans[i]["companyScale"] + '\t'},`;
-                str += `${dataCompans[i]["companyContacts"] + '\t'},`;
-                str += `${dataCompans[i]["companyPhone"] + '\t'},`;
                 str += `${dataCompans[i]["companyInStreet"] + '\t'},`;
                 str += `${dataCompans[i]["companyInVillage"] + '\t'},`;
                 str += `${dataCompans[i]["companyAdrr"] + '\t'},`;
-                
-                str += `${dataCompans[i]["companyHasProcess"] + '\t'},`;
-                str += `${dataCompans[i]["companyNumProcess"] + '\t'},`;
-                str += `${dataCompans[i]["companyRecycle"] + '\t'},`;
-                str += `${dataCompans[i]["companyVolumeTotal"] + '\t'},`;
-                str += `${dataCompans[i]["companyRedate"] + '\t'},`;
-                str += `${dataCompans[i]["companyRevolume"] + '\t'},`;
-                str += `${dataCompans[i]["companyTransferredvolume"] + '\t'},`;
-                str += `${dataCompans[i]["companyNoTransferredvolume"] + '\t'},`;
+                str += `${dataCompans[i]["companyScale"] + '\t'},`;
+                str += `${dataCompans[i]["companySpecialcase"] + '\t'},`;
+                str += `${dataCompans[i]["companyManangeclass"] + '\t'},`;
+                str += `${dataCompans[i]["companyContacts"] + '\t'},`;
+                str += `${dataCompans[i]["companyPhone"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_1"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_2"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_3"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_4"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_5"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_6"] + '\t'},`;
                 str += '\n';
             }
-            
+
             let uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(str);   //encodeURIComponent解决中文乱码
             var link = document.createElement("a");                                     //通过创建a标签实现
             link.href = uri;
@@ -333,16 +353,19 @@
                 data: {
                     companyID: $('#companyID').val(),
                     companyName: $('#companyName').val(),
+                    companyAdrr: $('#companyAdrr').val(),
                     companyInStreet: $('#companyInStreet').val(),
                     companyInVillage: $('#companyInVillage').val(),
                     companyScale: $('#companyScale').val(),
-                    companyHasProcess: $('#companyHasProcess').val()
+                    companySpecialcase: $('#companySpecialcase').val(),
+                    companyManangeclass: $('#companyManangeclass').val(),
+                    companyContacts: $('#companyContacts').val()
                 },
                 success: function (res) {
                     jsonCompanys = JSON.parse(res, null);
                     if (jsonCompanys['success'] == 1) {
                         var link = document.createElement("a");             //通过创建a标签实现
-                        link.href = "/download/" + jsonCompanys['filefloder'] + "/" + jsonCompanys['filename']; 
+                        link.href = "/download/" + jsonCompanys['filefloder'] + "/" + jsonCompanys['filename'];
 
                         document.body.appendChild(link);
                         link.click();

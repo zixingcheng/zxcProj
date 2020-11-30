@@ -1,0 +1,52 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>多图片上传</title>
+    <link rel="stylesheet" type="text/css" href="/static/content/upload_img.css">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/static/scripts/upload_img.js"></script>
+    <!--<script src="{{ url_for('.static',filename='scripts/upload_img.js?202005261506')}}"></script>-->
+</head>
+<body>
+    <form action="" enctype='multipart/form-data' method='POST'>
+	    <h1 style="margin-left:60px">股票监测设置 </h1>
+        {{ form.hidden_tag() }} 
+	
+	    <table>
+		    {{ render_field2(form.stockID, size=20) }} 
+		    {{ render_field2(form.stockName, size=20) }}  
+		
+		    {{ render_field2(form.monitorRise_Fall, size=20) }} 
+		    {{ render_field2(form.monitorHourly, size=20) }} 
+		
+		    {{ render_field2(form.monitorUsrID, size=20) }} 
+	    </table>  
+	    <p style="margin-left:110px">{{ form.remove|safe }} {{ form.save|safe }}</p>
+	
+	    <td>{{ form.exType|safe }}{{ form.code_id|safe }}{{ form.code_name|safe }}</td>	
+	    <datalist id="lstStockIDs"></datalist>
+	    <datalist id="lstStockNames"></datalist> 
+
+        <div class="upload-content">
+            <div class="content-img">
+                <ul class="content-img-list">
+                    <li class="content-img-list-item"><img src="/img/base/add_img.jpg" alt=""><a class="delete-btn"><i class="ico-delete"></i></a></li>
+                </ul>
+                <div class="file">
+                    <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload">
+                </div>
+            </div>
+            <div class="upload-tips">
+                最多上传4张图片，支持jpg/png，单张不超过2M
+            </div> 
+
+        </div>
+        <div class="upload-submit">
+            <input type="submit" value="上传" class="button-new" style="margin-top:15px;" />
+            <a href="javascript:;" id="btn-submit-upload" class="btn-submit-upload">提交</a>
+        </div>
+    </form>
+</body>
+</html>
