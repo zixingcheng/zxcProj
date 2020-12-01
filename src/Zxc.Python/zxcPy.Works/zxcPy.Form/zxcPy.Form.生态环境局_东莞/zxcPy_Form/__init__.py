@@ -9,8 +9,9 @@ Created on  张斌 2020-05-20 09:58:00
 import mySystem
 
 mySystem.Append_Us("", False)    
-import myWeb, myDataDB_Company, myDataDB_Company_active_carbon
+import myWeb, myDataDB_Company, myDataDB_Company_active_carbon, myDataDB_Company_feedback
 from myGlobal import gol 
+from zxcPy_Form import loginManager 
 gol._Init()             #先必须在主模块初始化（只在Main模块需要一次即可）
 
 
@@ -21,16 +22,20 @@ gol._Set_Setting("serverBaseDir", dirBase)
 
 #初始Web程序
 appWeb = myWeb.myWeb("0.0.0.0", PORT, webFolder = dirBase + "/" )
+appWeb.initLogin(userObj = loginManager.myWeb_LoginUser({}))
 appWeb.add_Web()
 appWeb.add_API(myWeb.myAPI, '/test') 
 
 #载入web页面类
 import zxcPy_Form.infoCompany
 import zxcPy_Form.infoCompany_active_carbon
-
+import zxcPy_Form.infoCompany_feedback
+ 
 
 #公司信息数据初始
 dbCompany = myDataDB_Company.myDataDB_Company("dbCompany", dirBase + "/Data/DB_Company/")
 dbCompany_ac = myDataDB_Company_active_carbon.myDataDB_Company_ac("dbCompany_ac", dirBase + "/Data/DB_Company/")
+dbCompany_fb = myDataDB_Company_feedback.myDataDB_Company("db_MicroStation", dirBase + "/Data/DB_Company/")
 gol._Set_Value("dbCompany", dbCompany)
 gol._Set_Value("dbCompany_ac", dbCompany_ac)
+gol._Set_Value("dbCompany_fb", dbCompany_fb)

@@ -243,7 +243,7 @@ class myData_Table():
     
 
     # 查询筛选--多参数（&&、||）
-    def Query(self, fliters, sortField="", reverse=False, tableName = ""): 
+    def Query(self, fliters, sortField="", reverse=False, tableName = "", pageInd = 1, perSize = 10): 
         # 解析参数
         nPos_And = myData.Find_Pos(u'&&', fliters)
         nPos_Or = myData.Find_Pos(u'||', fliters)
@@ -281,7 +281,7 @@ class myData_Table():
             datas = sorted(datas.items(), key = lambda d:d[1].get(sortField,0), reverse = reverse)
         return datas
     # 查询筛选
-    def _Query(self, fliter, tableName = ""): 
+    def _Query(self, fliter, tableName = "", pageInd = 1, perSize = 10): 
         lstSymbol = ['==', '!=', '>=', '>', '<=', '<', '%like%']
         for x in lstSymbol:
             ind = fliter.find(x)
@@ -294,7 +294,7 @@ class myData_Table():
             return data
         return {}
     # 提取与指定筛选条件相同项--继承需重写
-    def _Find_ByFliter(self, field, fliter, data = None, tableName = ""): 
+    def _Find_ByFliter(self, field, fliter, data = None, tableName = "", pageInd = 1, perSize = 10):  
         # 解析条件
         if(data == None): data = self.rows
         txts = fliter.strip().split(' ')
@@ -416,7 +416,7 @@ class myData_Table():
         elif(utype == "int"):
             if(type(value) == int): return value
             return myData_Trans.To_Int(value)
-        elif(utype == "bool"):
+        elif(utype == "bool" or utype == "bit"):
             if(type(value) == bool): return value
             return myData_Trans.To_Bool(value)
         elif(utype == "datetime"):

@@ -1,0 +1,228 @@
+﻿<!-- extend from base layout -->
+<!doctype html>
+{% extends "company_base.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
+
+{% block content %}
+  {% from "company_base.html" import render_field %}
+<form action="" method="post" name="stockQuery" style="margin-left:10px;margin-top:10px">
+    {{ form.hidden_tag() }}
+
+    <div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">企业基本信息</h1>
+        <table cellspacing="0" cellpadding="0">
+            {{ render_field(form.companyID, size=20, hasSearch=false) }}
+            {{ render_field(form.companyName, size=20, hasSearch=false) }}
+
+            {{ render_field(form.companyInStreet, size=20) }}
+            {{ render_field(form.companyInVillage, size=20) }}
+            {{ render_field(form.companyAdrr, size=20) }}
+
+            {{ render_field(form.companyScale, size=20) }}
+            {{ render_field(form.companySpecialcase, size=20) }}
+            {{ render_field(form.companyManangeclass, size=20) }}
+            {{ render_field(form.companyContacts, size=20) }}
+            {{ render_field(form.companyPhone, size=20) }}
+        </table>
+    </div>
+
+    <div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件1 -- 相关部门证明</h1>
+
+        <div class="content-img" maxImg="3" fileSize="8" img-list-ind="1">
+            <ul class="content-img-list" id="img-list_1">
+                <!--<li class="content-img-list-item"> <img src="/img/base/add_img.jpg" alt=""><a index='0' class="delete-btn"><i class="ico-delete"></i></a></li>-->
+            </ul>
+            <div class="file">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_1" onchange="event_uploadImg(this)">
+            </div>
+        </div>
+        <div class="upload-tips">
+            相关部门证明，上传3张图片，支持jpg/png，单张不超过4M。
+        </div>
+    </div>
+    <div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件2 -- 正门照片</h1>
+        <div class="content-img" maxImg="3" fileSize="8" img-list-ind="2">
+            <ul class="content-img-list" id="img-list_2">
+            </ul>
+            <div class="file">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_2" onchange="event_uploadImg(this)">
+            </div>
+        </div>
+        <div class="upload-tips">
+            企业正门清晰照片，上传3张图片，支持jpg/png，单张不超过4M。
+        </div>
+    </div>
+    <div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件3 -- 生产车间照片</h1>
+        <div class="content-img" maxImg="3" fileSize="8" img-list-ind="3">
+            <ul class="content-img-list" id="img-list_3">
+            </ul>
+            <div class="file">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_3" onchange="event_uploadImg(this)">
+            </div>
+        </div>
+        <div class="upload-tips">
+            生产车间全貌照片，上传3张图片，支持jpg/png，单张不超过4M。
+        </div>
+    </div>
+    <div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件4 -- 营业执照注销</h1>
+        <div class="content-img" maxImg="3" fileSize="8" img-list-ind="4">
+            <ul class="content-img-list" id="img-list_4">
+            </ul>
+            <div class="file">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_4" onchange="event_uploadImg(this)">
+            </div>
+        </div>
+        <div class="upload-tips">
+            营业执照注销证明图片，上传3张图片，支持jpg/png，单张不超过4M。
+        </div>
+    </div>
+    <div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件5 -- 断水断电证明</h1>
+        <div class="content-img" maxImg="3" fileSize="8" img-list-ind="5" img-preName="">
+            <ul class="content-img-list" id="img-list_5">
+            </ul>
+            <div class="file">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_5" onchange="event_uploadImg(this)">
+            </div>
+        </div>
+        <div class="upload-tips">
+            断水断电证明图片，上传3张图片，支持jpg/png，单张不超过4M。
+        </div>
+    </div>
+    <div class="upload-content">
+        <h1 style="margin-left:0px; height: 55px; vertical-align: middle;">附件6 -- 执法笔录</h1>
+        <div class="content-img" maxImg="3" fileSize="8" img-list-ind="6">
+            <ul class="content-img-list" id="img-list_6">
+            </ul>
+            <div class="file">
+                <i class="ico-plus"></i>上传图片<input type="file" name="file" accept="image/*" id="upload_6" onchange="event_uploadImg(this)">
+            </div>
+        </div>
+        <div class="upload-tips">
+            执法笔录图片，上传3张图片，支持jpg/png，单张不超过4M。
+        </div>
+    </div>
+
+    <div class="upload-submit">
+        {{ form.save|safe }}
+
+        <div style="padding-top: 10px; font-size:12px;">
+            <b>注：</b>附件图片信息，可以多次传入。
+        </div>
+
+        {{ render_field3(form.imgName_1, size=20) }}
+        {{ render_field3(form.imgName_2, size=20) }}
+        {{ render_field3(form.imgName_3, size=20) }}
+        {{ render_field3(form.imgName_4, size=20) }}
+        {{ render_field3(form.imgName_5, size=20) }}
+        {{ render_field3(form.imgName_6, size=20) }}
+    </div>
+    <br />
+
+
+    <!--企业规模列表-->
+    <datalist id="lstCompanyScales">
+        <option value="大型">
+        <option value="中型">
+        <option value="小型">
+        <option value="微型">
+    </datalist>
+    <!--特殊情形列表-->
+    <datalist id="lstCompanySpecialcase">
+        <option value="无特殊情形类">
+        <option value="无实体企业类">
+        <option value="永久关闭类">
+        <option value="正在建设类">
+        <option value="禁止核发类">
+        <option value="长期停产类">
+    </datalist>
+    <!--管理类别列表-->
+    <datalist id="lstCompanyManangeclass">
+        <option value="重点管理">
+        <option value="简化管理">
+        <option value="登记管理">
+    </datalist>
+    <!--镇街、村社区列表-->
+    <datalist id="lstTown"></datalist>
+    <datalist id="lstVillage"></datalist>
+
+
+    <link rel="stylesheet" type="text/css" href="/static/content/upload_img.css">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/static/scripts/division.js"></script>
+    <script src="/static/scripts/division_gds_dgs.js"></script>
+    <script src="/static/scripts/upload_img.js"></script>
+    <script type="text/javascript">
+        var jsonCompany = JSON.parse("{}", null);
+        $(document).ready(function () {
+            //调整镇街对应村社区列表
+            initTownList('lstTown');        //初始镇街下来列表
+            $("#companyInStreet").on('input propertychange change', function () {
+                if (this.value.length < 2) return;
+                changeVillageList(this.value, 'lstVillage');
+            });
+
+
+            //控件调整，绑定下拉辅助输入列表
+            $("#companyID").val('{{companyID}}');
+            $("#companyScale").attr("list", 'lstCompanyScales');
+            $("#companySpecialcase").attr("list", 'lstCompanySpecialcase');
+            $("#companyManangeclass").attr("list", 'lstCompanyManangeclass');
+            $("#companyInStreet").attr("list", 'lstTown');
+            $("#companyInVillage").attr("list", 'lstVillage');
+
+            //更新成功提示
+            if ('{{editSucess}}' == 'True') {
+                $("#companyID").val('{{companyID}}');
+                alert("信息更新成功！")
+            }
+            //公司信息动态查询与更新
+            if ('{{needRefresh}}' == 'True') {
+                updatInfo($("#companyID").val(), $("#companyName").val());
+            };
+        });
+
+        //公司信息动态查询
+        function iconSearch(event) {
+            updatInfo($("#companyID").val(), $("#companyName").val());
+        };
+        //公司信息动态查询与更新
+        function updatInfo(companyID, companyName) {
+            if (companyID != "" | companyName != "") {
+                $.get('/zxcAPI/company_fb/query', { company_id: companyID, company_name: companyName }, function (data) {
+                    jsonCompany = JSON.parse(data, null);
+
+                    if (jsonCompany != null & '{{needRefresh}}'=='True') {
+                        //更新匹配公司信息
+                        $("#companyID").val(jsonCompany['companyID']);
+                        $("#companyName").val(jsonCompany['companyName']);
+                        $("#companyInStreet").val(jsonCompany['companyInStreet']);
+                        $("#companyInVillage").val(jsonCompany['companyInVillage']);
+                        $("#companyAdrr").val(jsonCompany['companyAdrr']);
+                        $("#companyScale").val(jsonCompany['companyScale']);
+                        $("#companySpecialcase").val(jsonCompany['companySpecialcase']);
+                        $("#companyManangeclass").val(jsonCompany['companyManangeclass']);
+                        $("#companyContacts").val(jsonCompany['companyContacts']);
+                        $("#companyPhone").val(jsonCompany['companyPhone']);
+
+                        //更新匹配公司图片信息
+                        initImgList("img-list_1", jsonCompany['imgName_1'], true);
+                        initImgList("img-list_2", jsonCompany['imgName_2'], true);
+                        initImgList("img-list_3", jsonCompany['imgName_3'], true);
+                        initImgList("img-list_4", jsonCompany['imgName_4'], true);
+                        initImgList("img-list_5", jsonCompany['imgName_5'], true);
+                        initImgList("img-list_6", jsonCompany['imgName_6'], true);
+
+                        //调整镇街对应村社区列表
+                        changeVillageList($("#companyInStreet").val(), 'lstVillage');
+                    };
+                });
+            };
+        };
+    </script>
+</form>
+{% endblock %}
+

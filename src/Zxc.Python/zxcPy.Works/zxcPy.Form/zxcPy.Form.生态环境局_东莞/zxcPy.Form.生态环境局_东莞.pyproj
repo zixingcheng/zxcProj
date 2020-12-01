@@ -28,12 +28,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="myDataDB_Company_feedback.py" />
     <Compile Include="myDataDB_Company_active_carbon.py" />
     <Compile Include="myData_DB.py" />
+    <Compile Include="myData_DB_Mysql.py" />
     <Compile Include="myIO.py" />
+    <Compile Include="myPyMysql.py" />
     <Compile Include="myWeb.py" />
     <Compile Include="runserver.py" />
     <Compile Include="myDataDB_Company.py" />
+    <Compile Include="zxcPy_Form\infoCompany_feedback.py" />
+    <Compile Include="zxcPy_Form\loginManager.py" />
     <Compile Include="zxcPy_Form\infoCompany_active_carbon.py" />
     <Compile Include="zxcPy_Form\infoCompany.py" />
     <Compile Include="zxcPy_Form\__init__.py" />
@@ -78,8 +83,11 @@
     <Content Include="zxcPy_Form\static\scripts\paging.js" />
     <Content Include="zxcPy_Form\static\scripts\_references.js" />
     <Content Include="zxcPy_Form\templates\about.html" />
+    <Content Include="zxcPy_Form\templates\company_feedback.html" />
     <Content Include="zxcPy_Form\templates\company.html" />
+    <Content Include="zxcPy_Form\templates\company_feedback_list.html" />
     <Content Include="zxcPy_Form\templates\company_list.html" />
+    <Content Include="zxcPy_Form\templates\login.html" />
     <Content Include="zxcPy_Form\templates\_macros.html" />
     <Content Include="zxcPy_Form\templates\company_active_carbon_list.html" />
     <Content Include="zxcPy_Form\templates\company_base.html" />

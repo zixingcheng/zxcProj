@@ -1,0 +1,382 @@
+﻿<!-- extend from base layout -->
+<!doctype html>
+{% extends "company_base.html" %}      #这里extends意思是扩展自base.html，意思是调用login.html的时候，预先要读取base.html
+
+{% block content %}
+  {% from "company_base.html" import render_field %}
+<form action="" method="post" name="stockQuery" style="margin-left:10px;margin-top:10px">
+    <meta charset="UTF-8">
+    <style>
+        .data {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        .params {
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+            .params input {
+                width: 150px;
+                height: 26px;
+                box-sizing: border-box;
+            }
+
+            .params .search-btn {
+                float: right;
+                width: 100px;
+                height: 30px;
+                border: 0 none;
+                background-color: #666;
+                color: #fff;
+                font-size: 12px;
+                margin-left: 12px;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        th {
+            border: 1px solid #999;
+            height: 30px;
+            line-height: 30px;
+            font-size: 14px;
+        }
+
+        td {
+            border: 1px solid #999;
+            height: 26px;
+            line-height: 26px;
+            font-size: 13px;
+        }
+
+        .no-data {
+            display: none;
+            height: 80px;
+            line-height: 80px;
+            text-align: center;
+            color: #aaa;
+        }
+
+        .typecut {
+            float: right;
+            width: 100%;
+        }
+
+            .typecut:hover {
+                background-color: #ccc;
+                cursor: pointer;
+            }
+    </style>
+
+    <div class="data">
+        <div class="params">
+            <label left="100px" for="course_id">企业全称：</label><input type="text" id="companyName">
+            <label style='padding-left: 35px;' for="course_id">统一社会信用代码：</label><input type="text" id="companyID">
+            <label style='padding-left: 35px;' for="course_id">图片上传人：&nbsp</label><input type="text" id="companyContacts">
+        </div>
+        <div class="params">
+            <label left="100px" for="course_id">企业地址：</label><input type="text" id="companyAdrr">
+            <label style='padding-left: 35px;' for="course_id">所在镇街：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companyInStreet">
+            <label style='padding-left: 35px;' for="course_id">所属村/社区：</label><input type="text" id="companyInVillage">
+        </div>
+        <div class="params">
+            <label left="100px" for="course_id">企业规模：</label><input type="text" id="companyScale">
+            <label style='padding-left: 35px;' for="course_id">特殊情形：&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companySpecialcase">
+            <label style='padding-left: 35px;' for="course_id">管理类别：&nbsp&nbsp&nbsp&nbsp&nbsp</label><input type="text" id="companyManangeclass">
+            <input type="button" value="查询" class="search-btn" id="search_btn">
+            <p style='height: 0px; font-size: 8px'>&nbsp</p>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>统一社会信用代码</th>
+                    <th>企业全称</th>
+                    <th>企业规模</th>
+                    <th>特殊情形</th>
+                    <th>管理类别</th>
+                    <th>所在镇街</th>
+                    <th>所属村（社区）</th>
+                </tr>
+            </thead>
+            <tbody id="data_list"></tbody>
+        </table>
+        <div class="no-data">未查询到数据</div>
+
+        <!-- 分页结构 -->
+        <div class="page">
+            <div class="page-l" id="page_l" style="float: left;">
+                <span>总共 <span id="total_count"></span> 条</span>
+                <div class="page-size-box">
+                    <span>每页显示</span>
+                    <select id="page_size">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select> 条
+                </div>
+            </div>
+            <div class="page-r">
+                <ul id="page_ul" class="page-ul"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="data">
+        <div class="params">
+            <input type="button" value="导出全部数据" class="search-btn" id="export_all_btn" onclick='exportData_all()'>
+            <input type="button" value="导出当前页数据" class="search-btn" id="export_btn" onclick='exportData()'>
+        </div>
+    </div>
+
+
+    <!--企业规模列表-->
+    <datalist id="lstCompanyScales">
+        <option value="大型">
+        <option value="中型">
+        <option value="小型">
+        <option value="微型">
+    </datalist>
+    <!--特殊情形列表-->
+    <datalist id="lstCompanySpecialcase">
+        <option value="无特殊情形类">
+        <option value="无实体企业类">
+        <option value="永久关闭类">
+        <option value="正在建设类">
+        <option value="禁止核发类">
+        <option value="长期停产类">
+    </datalist>
+    <!--管理类别列表-->
+    <datalist id="lstCompanyManangeclass">
+        <option value="重点管理">
+        <option value="简化管理">
+        <option value="登记管理">
+    </datalist>
+    <!--镇街、村社区列表-->
+    <datalist id="lstTown"></datalist>
+    <datalist id="lstVillage"></datalist>
+
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/static/scripts/paging.js"></script>
+    <script src="/static/scripts/division.js"></script>
+    <script src="/static/scripts/division_gds_dgs.js"></script>
+    <script>
+        var jsonCompanys = JSON.parse("{}", null);
+        $(document).ready(function () {
+            //调整镇街对应村社区列表
+            initTownList('lstTown');        //初始镇街下来列表
+            $("#companyInStreet").on('input propertychange change', function () {
+                if (this.value.length < 2) return;
+                changeVillageList(this.value, 'lstVillage');
+            });
+
+            //控件调整，绑定下拉辅助输入列表
+            $("#companyScale").attr("list", 'lstCompanyScales');
+            $("#companySpecialcase").attr("list", 'lstCompanySpecialcase');
+            $("#companyManangeclass").attr("list", 'lstCompanyManangeclass');
+            $("#companyInStreet").attr("list", 'lstTown');
+            $("#companyInVillage").attr("list", 'lstVillage');
+        });
+
+        //公司信息筛选与列表更新
+        $(function () {
+            var pageConfig = {            //分页参数（参数名固定不可变）
+                pageSize: 10,             //每页条数（不设置时，默认为10）
+                prevPage: '上页',         //上一页（不设置时，默认为：<）
+                nextPage: '下页',         //下一页（不设置时，默认为：>）
+                firstPage: '首页',        //首页（不设置时，默认为：<<）
+                lastPage: '末页',         //末页（不设置时，默认为：>>）
+                degeCount: 4,             //当前页前后两边可显示的页码个数（不设置时，默认为3）
+                ellipsis: true            //是否显示省略号按钮(不可点击)（true:显示，false:不显示，不设置时，默认为显示）
+            }
+            getList();                    //初始加载就查询
+
+            //点击查询按钮
+            $('#search_btn').click(function () {
+                getList();
+            })
+
+            //公司信息筛选与列表更新
+            function getList() {
+                //初始化Paging实例(pageConfig参数也可以为空对象，此时就是默认设置)
+                var pageIng = new Paging(pageConfig, function (pageIndex, pageSize) {
+                    $.ajax({
+                        url: '/zxcAPI/companys_fb/query',                  //这里就不显示接口地址
+                        type: 'get',
+                        data: {
+                            pageIndex: pageIndex,
+                            pageSize: pageSize,                            
+                            companyID: $('#companyID').val(),
+                            companyName: $('#companyName').val(),
+                            companyAdrr: $('#companyAdrr').val(),
+                            companyInStreet: $('#companyInStreet').val(),
+                            companyInVillage: $('#companyInVillage').val(),
+                            companyScale: $('#companyScale').val(),
+                            companySpecialcase: $('#companySpecialcase').val(),
+                            companyManangeclass: $('#companyManangeclass').val(),
+                            companyContacts: $('#companyContacts').val()
+                        },
+                        success: function (res) {
+                            jsonCompanys = JSON.parse(res, null);
+                            if (jsonCompanys['success'] == 1) {
+                                if (jsonCompanys['data'].length > 0) {  //如果查询到了数据
+                                    var dataCompans = jsonCompanys['data'];
+                                    var html = '';
+                                    dataCompans.forEach(function (item, i) {
+                                        html += '<tr>' +
+                                            '<td style="width: 5%;">'
+                                            + '<div class="typecut"  onmouseover = "cutover(this)" onclick = "doCut(this)" onmouseout = "cutout(this)" >' + ((pageIndex - 1) * pageSize + i + 1) + '</div >'
+                                            + '</td>' +
+                                            '<td style="width: 10%;">' + '<a href = "/zxcWebs/companyinfo_fb/' + item['companyID'] + '">' + item['companyID'] + '</a></td>' +
+                                            '<td style="width: 15%;">' + '<a href = "/zxcWebs/companyinfo_fb/' + item['companyID'] + '">' + item['companyName'] + '</a></td>' +
+                                            '<td style="width: 6%;">' + item['companyScale'] + '</td>' +
+                                            '<td style="width: 6%;">' + item['companySpecialcase'] + '</td>' +
+                                            '<td style="width: 6%;">' + item['companyManangeclass'] + '</td>' +
+                                            '<td style="width: 8%;">' + item['companyInStreet'] + '</td>' +
+                                            '<td style="width: 8%;">' + item['companyInVillage'] + '</td>' +
+                                            '</tr>';
+                                    });
+                                    $('#data_list').html(html);
+                                    var totalCount = jsonCompanys['totalCount'];        //接口返回的总条数
+                                    var totalPage = Math.ceil(totalCount / pageSize);   //根据总条数和每页条数计算总页码数
+
+                                    pageIng.initPage(totalCount, totalPage, pageIndex); // 调用Paging实例的 initPage()方法生成分页DOM结构
+                                    $('.page').show();
+                                    $('.no-data').hide();
+                                    $('#export_btn').show();
+                                    $('#export_all_btn').show();
+                                } else {  //如果未查询到数据
+                                    $('#data_list').html('');
+                                    $('.page').hide();
+                                    $('.no-data').show();
+                                    $('#export_btn').hide();
+                                    $('#export_all_btn').hide();
+                                }
+                            } else {
+                                $('#data_list').html('');
+                                $('.page').hide();
+                                $('.no-data').show();
+                                $('#export_btn').hide();
+                                $('#export_all_btn').hide();
+                            }
+                        }
+                    })
+                });
+            }
+        })
+
+        //数据信息移除
+        function cutover(div) {
+            $(div).html("删除 " + $(div).html());
+        };
+        function cutout(div) {
+            $(div).html($(div).html().replace("删除 ", ''));
+        };
+        function doCut(div) {
+            var tr = $(div).parents("tr");                                 //获取当前行的Tr
+            var ind = $(div).html().replace("删除 ", '');
+            var company_id = tr.find("td").eq(1).children("a").html();
+            var compan_name = tr.find("td").eq(2).children("a").html();
+            if (!confirm("是否删除序号(" + ind + ")数据？企业信息如下：\r\n\r\n企业全称：" + compan_name + "\r\n统一社会信用代码：" + company_id)) {
+                return false;
+            }
+
+            //删除数据
+            $.ajax({
+                url: '/zxcAPI/companys_fb/query/del',                         //这里就不显示接口地址
+                type: 'get',
+                data: {
+                    companyID: company_id,
+                    companyName: compan_name
+                },
+                success: function (res) {
+                    jsonCompanys = JSON.parse(res, null);
+                    if (jsonCompanys['success'] == 1) {
+                        alert(jsonCompanys['data']);
+                        window.location.reload();
+                    } else {
+                        alert(jsonCompanys['data']);
+                    }
+                }
+            })
+        };
+
+        //导出数据
+        function exportData() {
+            //列标题，逗号隔开，每一个逗号就是隔开一个单元格
+            let str = `统一社会信用代码,企业全称,所在镇街,所属村（社区）,详细地址,企业规模,特殊情形,管理类别,图片上传人,电话号码,相关部门证明,正门照片,生产车间照片,营业执照注销,断水断电证明,执法笔录,isDel(bool)\n`;
+
+            //增加\t为了不让表格显示科学计数法或者其他格式
+            var dataCompans = jsonCompanys['data'];
+            for (let i = 0; i < dataCompans.length; i++) {
+                str += `${dataCompans[i]["ID"] + '\t'},`;
+                str += `${dataCompans[i]["companyID"] + '\t'},`;
+                str += `${dataCompans[i]["companyName"] + '\t'},`;
+                str += `${dataCompans[i]["companyInStreet"] + '\t'},`;
+                str += `${dataCompans[i]["companyInVillage"] + '\t'},`;
+                str += `${dataCompans[i]["companyAdrr"] + '\t'},`;
+                str += `${dataCompans[i]["companyScale"] + '\t'},`;
+                str += `${dataCompans[i]["companySpecialcase"] + '\t'},`;
+                str += `${dataCompans[i]["companyManangeclass"] + '\t'},`;
+                str += `${dataCompans[i]["companyContacts"] + '\t'},`;
+                str += `${dataCompans[i]["companyPhone"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_1"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_2"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_3"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_4"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_5"] + '\t'},`;
+                str += `${dataCompans[i]["imgName_6"] + '\t'},`;
+                str += '\n';
+            }
+
+            let uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(str);   //encodeURIComponent解决中文乱码
+            var link = document.createElement("a");                                     //通过创建a标签实现
+            link.href = uri;
+            link.download = "企业信息数据表.csv";                                       //对下载的文件命名
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        //导出全部数据
+        function exportData_all() {
+            $.ajax({
+                url: '/zxcAPI/companys_fb/query/save',                         //这里就不显示接口地址
+                type: 'get',
+                data: {
+                    companyID: $('#companyID').val(),
+                    companyName: $('#companyName').val(),
+                    companyAdrr: $('#companyAdrr').val(),
+                    companyInStreet: $('#companyInStreet').val(),
+                    companyInVillage: $('#companyInVillage').val(),
+                    companyScale: $('#companyScale').val(),
+                    companySpecialcase: $('#companySpecialcase').val(),
+                    companyManangeclass: $('#companyManangeclass').val(),
+                    companyContacts: $('#companyContacts').val()
+                },
+                success: function (res) {
+                    jsonCompanys = JSON.parse(res, null);
+                    if (jsonCompanys['success'] == 1) {
+                        var link = document.createElement("a");             //通过创建a标签实现
+                        link.href = "/download/" + jsonCompanys['filefloder'] + "/" + jsonCompanys['filename'];
+
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        alert("导出文件生成失败！");
+                    }
+                }
+            })
+        };
+    </script>
+</form>
+{% endblock %}
+

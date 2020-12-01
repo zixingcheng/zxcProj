@@ -12,7 +12,12 @@ from flask import Flask, Response, make_response, send_from_directory
 from flask import jsonify, request, render_template, redirect   #导入模块
 from flask_restful import reqparse, Api, Resource
 from flask_wtf import FlaskForm                                 #FlaskForm 为表单基类 
+from flask_login import UserMixin                               #引入用户基类
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired, EqualTo
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 import logging
 log = logging.getLogger('zxc')
@@ -44,6 +49,90 @@ def get_InfoServer(fileObj, evnSERVER_HOST = 'SERVER_HOST', evnSERVER_PORT = 'SE
     return HOST, PORT, dirBase
 
 
+# 登录表单类
+class myWeb_LoginForm(FlaskForm):
+    username = StringField('用户名', validators=[DataRequired()])
+    password = PasswordField('密码', validators=[DataRequired()])
+#User接口类 
+class myWeb_LoginUser(UserMixin):
+    USERS = []
+    # 用户类 
+    def __init__(self, user):
+        self.username = user.get("Username")
+        self.password_hash = user.get("Userpwd")
+        self.userid = user.get("Userid")
+    
+    # 密码验证
+    def verifyPWD(self, password):
+        if self.password_hash is None:
+            return False
+        return check_password_hash(self.password_hash, password)
+    def toDict(self):
+        return {
+                    "Userid": self.userid,
+                    "Username": self.username,
+                    "Userpwd": self.password_hash
+                }
+
+    @staticmethod
+    # 根据用户名D获取用户实体
+    def initUser_Info():
+        return {
+                    "Userid": "",
+                    "Username": "",
+                    "Userpwd": generate_password_hash('123456')
+                }
+    
+    @staticmethod
+    def setUser(user):
+        userid = user.get("Userid", "")
+        if user == None or userid == "":
+            return False
+        else:
+            if(myWeb_LoginUser.getUser(userid) != None):
+                return False
+            else:
+                myWeb_LoginUser.USERS.append(user)
+                return True
+
+    # 根据用户ID获取用户实体，为 login_user 方法提供支持
+    @staticmethod
+    def getUser(user_id):
+        if not user_id:
+            return None
+        for user in myWeb_LoginUser.USERS:
+            if user.get('Userid') == user_id:
+                return myWeb_LoginUser(user)
+        return None
+    
+    # 根据用户ID获取用户实体，为 login_user 方法提供支持
+    @staticmethod
+    def queryUser(user_name):
+        if not user_name:
+            return None
+
+        # 静态方式实现用户管理，可外部关联
+        user_info = None
+        # for user in USERS:
+        #     if user.get('Userid') == user_id or user.get('Username') == user_name:
+        #         user_info = user
+        if(user_info == None):
+            return {
+                    "Userid": "admin",
+                    "Username": "admin",
+                    "Userpwd": generate_password_hash('123456')
+                }
+        return None
+
+    def is_authenticated(self):
+        return True
+    def is_active(self):
+        return True
+    def is_anonymous(self):
+        return False
+    def get_id(self):
+        return self.userid
+
 #Web配置接口类
 class myWeb_Config(): 
     class Config(object):
@@ -71,6 +160,7 @@ class myWeb(myThread.myThread):
         self.processes = processes 
         self.baseDir = webFolder
         self.imgDir = self.baseDir + "/static/images/"
+        self.useSession = False
 
         #创建app，并使用RestApi方式
         #Flask初始化参数尽量使用你的包名，这个初始化方式是官方推荐的，官方解释：http://flask.pocoo.org/docs/0.12/api/#flask.Flask
@@ -93,6 +183,46 @@ class myWeb(myThread.myThread):
         @self.app.errorhandler(404)  
         def not_found(error):  
             return jsonify({'error':'Not found'}), 404  
+        
+    #初始登录操作
+    def initLogin(self, secret_key = "zxcWebSession", login_view="login", userObj = None): 
+        self.app.config["SECRET_KEY"] = secret_key  # 设置session的secret key
+        self.User = userObj
+
+        from flask_login import LoginManager, login_user, login_required 
+        self.login_manager = LoginManager()         # 实例化一个登录的管理实例
+        self.login_manager.init_app(self.app)
+        self.login_manager.login_view = login_view  # 设置用户登录视图函数 endpoint
+        self.useSession = True
+
+        #user_loader 回调函数
+        @self.login_manager.user_loader
+        def user_loader(user_id):
+            if(self.User != None):
+                return self.User.getUser(user_id)
+            else:
+                return None
+        
+        # 登录页面
+        @self.app.route('/login/', methods=('GET', 'POST'))  # 登录
+        def login():
+            form = myWeb_LoginForm()
+            emsg = None
+            if self.User != None and form.validate_on_submit():
+                user_name = form.username.data
+                password = form.password.data
+                user = self.User.queryUser(user_name)       # 从用户数据中查找用户记录
+
+                if user is None:
+                    emsg = "用户名或密码密码有误"
+                else:
+                    if user.verifyPWD(password):            # 校验密码
+                        login_user(user)                    # 创建用户 Session
+                        self.User.setUser(user.toDict())
+                        return redirect(request.args.get('next') or url_for('index'))
+                    else:
+                        emsg = "用户名或密码密码有误"
+            return render_template('login.html', form=form, emsg=emsg)
 
     #添加API类
     def add_API(self, pyApi, url): 
@@ -102,9 +232,16 @@ class myWeb(myThread.myThread):
     def add_Web(self): 
         # 指定主页 URL='/' 的路由规则
         # 当访问 HTTP://server_ip/ GET(Default) 时，call home()
-        @self.app.route('/')
-        def home():
-            return '<h1>Hello! There is zxcWeb...</h1>'  
+        if(self.useSession == False):
+            @self.app.route('/')
+            def home():
+                return '<h1>Hello! There is zxcWeb...</h1>'  
+        else:
+            from flask_login import login_required 
+            @self.app.route('/')
+            @login_required  # 需要登录才能访问
+            def home():
+                return '<h1>Hello! There is zxcWeb...</h1>'  
              
         # API-上传图片
         @self.app.route('/img_upload/<string:fileTag>', methods=['POST', 'GET'], strict_slashes=False)
@@ -199,8 +336,7 @@ class myWeb(myThread.myThread):
     def run(self, use_reloader=False): 
         #官方启动方式参见：http://flask.pocoo.org/docs/0.12/quickstart/#a-minimal-application
         self.app.run(host = self.host, port = self.port, debug = self.debug, threaded = self.threaded, processes = self.processes, use_reloader = use_reloader)  
-        
-         
+
 
 # RESTfulAPI的参数解析 -- put / post参数解析
 parser = reqparse.RequestParser()

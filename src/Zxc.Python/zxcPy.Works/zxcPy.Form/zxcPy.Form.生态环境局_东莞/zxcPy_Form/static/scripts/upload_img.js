@@ -2,6 +2,7 @@ var dicImg = new Array();				//图片字典
 var tag_img_list_txt = "imgName_"		//图片列表绑定文本标签
 var tag_img_list = "img-list_"			//图片列表标签
 var tag_img_list_ind = "img-list-ind"	//图片列表序号标签
+var tag_img_prefixName = "img-preName"	//图片名称前缀
 var tag_maxImg = "maxImg"				//图片列表数量标签
 var tag_fileSize = "fileSize"			//图片大小标签
 $(function(){
@@ -49,12 +50,13 @@ function event_uploadImg(objFile) {
 	var obj = "#" + objFile.id;
 	var numImg = $(obj).parent().parent().attr(tag_maxImg);
 	var indLst = $(obj).parent().parent().attr(tag_img_list_ind);
+	var prrfixName = $(obj).parent().parent().attr(tag_img_prefixName);
 	var tagImgLst = tag_img_list + indLst
 
 	checkImgDict(tagImgLst);
 	imgSrc = dicImg[tagImgLst];
 	if (imgSrc.length >= numImg) {
-		return alert("最多只能上传4张图片");
+		return alert("最多只能上传" + numImg + "张图片");
 	}
 
 	var fileList = objFile.files;
@@ -62,16 +64,16 @@ function event_uploadImg(objFile) {
 	var fileSize = $(obj).parent().parent().attr(tag_fileSize);
 	var fileSize_Max = 1024 * 1024 * fileSize;
 	if (fileSize_Max < imgSize) {				//content-img下fileSize设置
-		return alert("上传图片不能超过1M");
+		return alert("上传图片不能超过" + fileSize + "M");
 	}
 	console.log(fileList[0].type)
-	if (fileList[0].type != 'image/png' && fileList[0].type != 'image/jpeg' && fileList[0].type != 'image/gif') {
+	if (fileList[0].type != 'image/png' && fileList[0].type != 'image/jpeg' && fileList[0].type != 'image/gif' && fileList[0].type != 'application/pdf') {
 		return alert("图片上传格式不正确");
 	}
 
 	//图片上传，及信息记录
 	for (var i = 0; i < fileList.length; i++) {
-		var imgSrcI = getObjectURL(fileList[i]);
+		var imgSrcI = getObjectURL(fileList[i], prrfixName);
 		dicImg[tagImgLst].push(imgSrcI);
 	}
 
@@ -80,9 +82,10 @@ function event_uploadImg(objFile) {
 	$(obj).value = null;			//解决无法上传相同图片的问题
 };
 //图片上传
-function uploadImg(fileTag, file) {
+function uploadImg(fileTag, file, prefixName = "") {
 	var data = new FormData();
 	data.append(fileTag, file);
+	data.append("prefixName", prefixName);
 
 	urlImg = '';
 	$.ajax({
@@ -165,7 +168,8 @@ function initImgList(imgTag, imgUrl, resetImgs = true) {
 		imgUrls = imgUrl.split(';')
 		for (var item in imgUrls) {
 			if (imgUrls[item].length > 0)
-				dicImg[imgTag].push(imgUrls[item]);
+				imgUrls[item] = imgUrls[item].replace("/static/images/upload/", "")
+			dicImg[imgTag].push("/static/images/upload/" + imgUrls[item]);
 		};
 	};
 	refreshImgList(imgTag);
@@ -180,11 +184,11 @@ function checkImgDict(imgTag) {
 	}
 }
 //建立一個可存取到該file的url
-function getObjectURL(file) {
+function getObjectURL(file, prefixName = "") {
 	var url = null;
 
 	//图片上传-提取URL时
-	url = uploadImg('fileImg', file);
+	url = uploadImg('fileImg', file, prefixName);
 	if (url.length <= 1) {
 		alert("图片上传失败");
 	}
