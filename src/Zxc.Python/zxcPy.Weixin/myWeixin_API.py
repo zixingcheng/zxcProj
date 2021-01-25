@@ -15,7 +15,7 @@ mySystem.Append_Us("/zxcPy.Weixin", False, __file__)
 mySystem.Append_Us("/zxcPy.Weixin/Weixin_Reply", False, __file__)
 mySystem.Append_Us("/zxcPy.Weixin/Weixin_Reply/myWxDo", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myDebug, myMMap, myMQ_Rabbit, myWeixin_Cmd, myAPI_WeChat
+import myWeb, myDebug, myMMap, myMQ_Rabbit, myWeixin_Cmd, myAPI_WeChat, myWeixin_Updata
 from myGlobal import gol 
 
 

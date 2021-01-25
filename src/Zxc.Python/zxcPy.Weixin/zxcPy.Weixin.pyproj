@@ -24,6 +24,7 @@
     <Compile Include="zxcPy.APIs\myAPI_WeChat.py" />
     <Compile Include="zxcPy.APIs\myWeixin.py" />
     <Compile Include="zxcPy.DataSwap\myData_SwapWx.py" />
+    <Compile Include="myWeixin_Updata.py" />
     <Compile Include="zxcPy.Test\myTest_Chat.py" />
     <Compile Include="myWeixin_API.py" />
     <Compile Include="zxcPy.Test\myTest_Event.py" />
@@ -33,10 +34,12 @@
     <Compile Include="zxcPy.Weixin\myWeixin_ItChat.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Docs\Updata.md" />
     <Content Include="README.md" />
     <Content Include="Start.bat" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Docs\" />
     <Folder Include="zxcPy.DataSwap\" />
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Test\" />
