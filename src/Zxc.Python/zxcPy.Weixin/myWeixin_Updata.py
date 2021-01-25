@@ -28,7 +28,7 @@ class myWeixin_Updata():
     def _Init(self): 
         #初始根目录信息
         strDir, strName = myIO.getPath_ByFile(__file__)
-        self.Dir_Base = os.path.abspath(os.path.join(strDir, "../"))  
+        self.Dir_Base = os.path.abspath(os.path.join(strDir, ""))  
 
         self.mdUpdata = myIO_md.myMD(self.Dir_Base + "/Docs/Updata.md")
         pNode = self.mdUpdata[0]
@@ -76,7 +76,7 @@ myUpdata = myWeixin_Updata()     # 机器人功能--更新消息类
 #主启动程序
 if __name__ == "__main__": 
     #机器人功能--更新消息类 
-    myUpdata.Send_UpdataMsg()  
+    #myUpdata.Send_UpdataMsg()  
 
     print() 
     exit()
