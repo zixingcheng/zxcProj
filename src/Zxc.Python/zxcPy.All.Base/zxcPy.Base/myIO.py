@@ -6,7 +6,7 @@ Created on  张斌 2016-09-02 16:30:00
 
     IO操作 
 """
-import os, time, codecs, base64
+import os, time, codecs, base64, zipfile
 import shutil, random, datetime
  
 
@@ -205,13 +205,14 @@ def getPath_ByFile(file):
 
 
 #定义文件拷贝函数 2017-10-18
-def copyFile(scrPath,  targetDir, name = ""):
+def copyFile(scrPath, targetDir, name = "", recover = True):
     #组装目标文件路径
     scrPath = checkPath(scrPath)
     fileName = os.path.basename(scrPath)
     if(name != ""):
-        fileName = name
+        fileName = name.split('.')[0] + "." + fileName.split(".")[1]
     destPath = targetDir + os.path.sep + fileName  
+    destPath = checkPath(destPath)
 
     #目标文件夹检测
     if (os.path.exists(targetDir) == False):
@@ -219,8 +220,16 @@ def copyFile(scrPath,  targetDir, name = ""):
         
     #源文件存在则拷贝
     if (os.path.exists(scrPath)): 
-        shutil.copy(scrPath, destPath)
+        if(recover):
+            shutil.copy(scrPath, destPath)
+            return destPath
+        else:
+            if (os.path.exists(destPath) == False): 
+                shutil.copy(scrPath, destPath)
+                return destPath
         print("copy %s %s" % (scrPath, destPath))
+    return ""
+
 #定义文件加内拷贝函数 2017-10-18
 def copyFiles(scrDir, targetDir, wildcard = "", iswalk = False, bSameFloder = False):
     #目标文件夹检测
@@ -262,13 +271,44 @@ def Save_File(path, text, isUtf = True, isNoBoom = True):
         text = u'\ufeff' + text
     pFile.write(text)
     pFile.close()
-      
+
+#保存压缩文件
+def Save_Files_zip(files, newfiles, filedir, zip_name):
+    filepath = checkPath(filedir + "/" + zip_name + '.zip')
+    zp = zipfile.ZipFile(filepath,'w', zipfile.ZIP_DEFLATED)
+
+    for x in range(0, len(files)):
+        zp.write(files[x], newfiles[x])
+    zp.close()
+    time.sleep(3)
+    print(zip_name + '-压缩完成。') 
+    return True
+
+#保存压缩文件夹
+def Save_Floders_zip(floderdir, filedir, zip_name):
+    filepath = checkPath(filedir + "/" + zip_name + '.zip')
+    zp = zipfile.ZipFile(filepath,'w', zipfile.ZIP_DEFLATED)
+
+    # 压缩文件的名字 
+    for dirpath, dirmanes, filenames in os.walk(floderdir): 
+        fpath = dirpath.replace(floderdir,'')   # 这一句很重要，不replace的话，就从根目录开始复制
+        fpath = fpath and fpath + os.sep or ''
+
+        # 当前文件夹以及包含的所有文件的压缩
+        for filename in filenames: 
+            zp.write(os.path.join(dirpath, filename), fpath + filename)
+    zp.close()
+    time.sleep(3)
+    print(zip_name + '-压缩完成。') 
+    return True
+
     
 #生成唯一名称字符串
 def create_UUID(): 
-    nowTime = datetime.datetime.now().strftime("%Y%m%d%H%M%S")  # 生成当前时间
+    nowTime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # 生成当前时间
     randomNum = random.randint(0, 100)                          # 生成的随机整数n，其中0<=n<=100
     if randomNum <= 10:
         randomNum = str(0) + str(randomNum)
     uniqueNum = str(nowTime) + str(randomNum)
     return uniqueNum
+

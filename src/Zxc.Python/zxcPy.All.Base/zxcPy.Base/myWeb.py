@@ -24,7 +24,7 @@ import myIO, myData_Json, myThread
 
 
 #限制上传文件类型，设置允许的文件格式
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'JPG', 'PNG', 'gif', 'GIF'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'JPG', 'PNG', 'gif', 'GIF', 'pdf', 'PDF'])
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -111,21 +111,24 @@ class myWeb(myThread.myThread):
         def api_img_upload(fileTag):
             #提取图片路径
             f = request.files[fileTag]
+            fi = request.args.get('company_id', "")
+            prefixName = request.args.get('prefixName', "")
 
             #剔除非支持图片格式
             if not (f and allowed_file(f.filename)):
-                return jsonify({"status": 0, "error": 1001, "msg": "请检查上传的图片类型，仅限于png、PNG、jpg、JPG、bmp"})
+                return jsonify({"status": 0, "error": 1001, "msg": "请检查上传的图片类型，仅限于png、PNG、jpg、JPG、bmp、pdf"})
 
             #调整文件命名，避免重复
-            fname_new = save_img(f)
+            fname_new = save_img(f, prefixName)
             return jsonify({"status": 1, "msg": "上传成功", "fileName": fname_new, "filePath": "/static/images/upload"})
         # 图片保存，唯一名称
         def save_img(f, namePreffix = ""):
             #调整文件命名，避免重复
-            fname = secure_filename(f.filename)
+            #fname = secure_filename(f.filename)     #?
+            fname = f.filename
             suffix = fname.rsplit('.', 1)[1]
 
-            if(namePreffix != ""): namePreffix = namePreffix + "_"
+            if(namePreffix + "" != ""): namePreffix = namePreffix + "_"
             fname_new = namePreffix + myIO.create_UUID() + '.' + suffix
             f.save(os.path.join(self.imgDir + "upload", fname_new))
             return fname_new

@@ -28,11 +28,15 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
     def query(self, checkTime = True, nReturn = 0, parms = None):    
         #新浪Stock接口查询
         host="http://hq.sinajs.cn/list="
-        url = host + self.params
-        print("\n查询ID列表：", self.params)
+        strParams = ""
         if(parms != None):
-            if(parms.get('queryIDs', None) != None):
-                url = host + parms['queryIDs']
+            if(parms.get('queryIDs', None) != None): 
+                strParams = parms['queryIDs']
+
+        if(strParams == ""): strParams = self.params
+        print("\n查询ID列表：", strParams)
+        url = host + strParams
+
 
         req = urllib.request.Request(url)
         res_data = urllib.request.urlopen(req)
@@ -41,6 +45,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
         #返回组
         nNum = nReturn
         lstReturn = []
+        if(res == ""): return lstReturn
 
         #解析所有返回数据
         lines = res.split('\n')
@@ -120,7 +125,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
                 #                    买价位四,买数量五,买价位五,卖数量一,卖价位一,卖数量二,卖价位二,卖数量三,卖价位三,卖数量四,
                 #                    卖价位四,卖数量五,卖价位五,行情日期,行情时间,停牌状态
                 qd.id = stkid[2:] 
-                qd.idTag = "sh." + qd.id
+                qd.idTag = stkid[0:2] + "." +  qd.id
                 qd.rawline = info
                 qd.name = vargs[0]
                 qd.openPrice = vargs[1]

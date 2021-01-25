@@ -10,19 +10,21 @@ import sys, os, time, re, ast, threading, mySystem
 import itchat
 from itchat.content import *
 from atexit import register
+from collections import OrderedDict
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
-#mySystem.Append_Us("/Weixin_Reply", False, __file__)
+mySystem.Append_Us("../zxcPy.DataSwap", False, __file__)
 #mySystem.Append_Us("/Weixin_Reply/myWxDo", False, __file__)
-mySystem.Append_Us("", False) 
-import myError, myIO, myDebug, myMMap, myThread, myDebug, myData_Trans, myMQ_Rabbit
-import myReply_Factory    
+mySystem.Append_Us("", False)  
+import myError, myIO, myDebug, myMMap, myThread, myDebug, myData_Trans, myMQ_Rabbit, myData_Swap, myData_SwapWx
+import myReply_Factory   
 from myGlobal import gol 
+
 
 
 #webWeixin接口封装类
 class myWeixin_ItChat(myThread.myThread):
-    def __init__(self, Tag = "zxcWeixin", useCmdMMap = True):
+    def __init__(self, Tag = "zxcWeixin", useCmdMMap = True, useSwap = True):
         super().__init__("", 0) # 必须调用
         self.usrTag = Tag       # 类实例标识
         self.usrName = ""       # 类实例用户名
@@ -41,6 +43,8 @@ class myWeixin_ItChat(myThread.myThread):
         self.managerMMap = None         #接收共享内存
         self.mqRecv = None              #接收消息队列     
         self.mqTimeNow = 0              #接收时间--当前
+        self.useSwap = useSwap          #消息通询使用数据交换
+        self.swapRecv = None            #接收消息数据交换 
         self.Init_MsgCache(useCmdMMap)  #创建消息通讯缓存
     def Init(self, dir = "", pathPicDir = ""):
         if (dir == ""):
@@ -77,6 +81,10 @@ class myWeixin_ItChat(myThread.myThread):
             return False
     #创建消息队列 
     def Init_MQ(self, bStart = False):
+        if(gol._Get_Value("msgSet_usrMQ", False) == False):
+            self.Init_Swap(bStart)
+            return 
+
         #初始消息接收队列
         self.mqName = 'zxcMQ_wx'
         if(self.mqRecv == None):
@@ -96,6 +104,35 @@ class myWeixin_ItChat(myThread.myThread):
         #if(bStart): 
         #    self.thrd_MQ.start()
         #    self.mqTimeNow = myData_Trans.Tran_ToTime_int()   #接收开始时间
+        
+    #创建消息队列 
+    def Init_Swap(self, bStart = False):
+        #初始消息接收-Swap
+        self.swapName = 'zxcSwap_wx'
+        if(self.swapRecv == None):
+            self.swapRecv = gol._Get_Value('dataSwap_msgWx')
+            
+            @self.swapRecv.changeDataSwap()
+            def Reply(lstData): 
+                for x in lstData:
+                    if(self.Done_Swap(x)):
+                        self.swapRecv.ackDataSwap(x)
+                    pass
+            myDebug.Print("消息Swap(" + self.swapName + ")创建成功...")
+            
+        #接收消息 
+        if(bStart): 
+            self.swapRecv.startSwap()
+            self.mqTimeNow = myData_Trans.Tran_ToTime_int()   #接收开始时间
+    #处理交换消息集
+    def Done_Swap(self, msgSwaps):
+        lstData = msgSwaps['data']['fileInfo']
+        bRes = 0
+        for x in lstData:
+            if(self._Send_Msg(x)):
+                bRes += 1
+        if(bRes > 0): return True
+        return False
 
     #运行
     def run(self): 
@@ -207,6 +244,8 @@ class myWeixin_ItChat(myThread.myThread):
             msg = myData_Json.Trans_ToJson(msgInfo)
         elif(type(msgInfo)== dict):
             msg = msgInfo
+        elif(type(msgInfo)== OrderedDict):
+            msg = msgInfo
         elif(type(msgInfo)== myData_Json.Json_Object):
             msg = msgInfo
         else:
@@ -215,6 +254,8 @@ class myWeixin_ItChat(myThread.myThread):
         #增加记录日志--消息管理器实现 
 
         #调用 消息发送
+        msgR = msg
+        msgR['msg'] = msgR['msg'].replace("/r", "\r").replace("/n", "\n")
         if(msgR.get('groupID', '') != '' or msgR.get('groupName', '') != ''):       #区分群、个人
             return self.Send_Msg(msgR['groupID'], msgR['groupName'], msgR['msg'], msgR['msgType'], 1)
         else:
@@ -272,6 +313,8 @@ class myWeixin_ItChat(myThread.myThread):
             itchat.send_raw_msg(49, Content, userName, params)
         else:
             myDebug.Print("No this type.")
+            return False
+        return True
     #提取格式化返回信息 
     def Get_Msg_Back(self, msg, isGroup = False):
         #回复操作调用 
@@ -511,6 +554,7 @@ class myWeixin_CmdThread (threading.Thread):  #继承父类threading.Thread
         self.exitFlag = True     
    
 
+
 #主启动程序
 if __name__ == "__main__":
     #单例运行检测
@@ -518,7 +562,7 @@ if __name__ == "__main__":
        exit(0)
 
     #声明Weixin操作对象
-    pWeixin = myWeixin_ItChat('zxcWx', False)
+    pWeixin = myWeixin_ItChat('zxcWx', False, gol._Get_Value("msgSet_usrMQ", False))
     
     #登录微信网页版(二维码扫码)
     pWeixin.Logion();

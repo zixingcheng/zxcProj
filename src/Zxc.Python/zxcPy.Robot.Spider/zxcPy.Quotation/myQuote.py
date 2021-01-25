@@ -7,6 +7,7 @@ Created on  张斌 2019-03-30 19:58:00
     行情爬取--基类 
 """
 import sys, os, time, datetime, threading, mySystem 
+import pandas as pd
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.Append_Us("/Quote_Source", False, __file__)

@@ -21,7 +21,10 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="zxcPy.APIs\myAPI_WeChat.py" />
+    <Compile Include="myManager_Msg.py" />
     <Compile Include="zxcPy.APIs\myWeixin.py" />
+    <Compile Include="zxcPy.DataSwap\myData_SwapWx.py" />
     <Compile Include="zxcPy.Test\myTest_Chat.py" />
     <Compile Include="myWeixin_API.py" />
     <Compile Include="zxcPy.Test\myTest_Event.py" />
@@ -35,6 +38,7 @@
     <Content Include="Start.bat" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="zxcPy.DataSwap\" />
     <Folder Include="zxcPy.APIs\" />
     <Folder Include="zxcPy.Test\" />
     <Folder Include="zxcPy.Weixin\" />

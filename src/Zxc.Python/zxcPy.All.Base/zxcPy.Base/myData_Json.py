@@ -58,8 +58,8 @@ class Json_Object:
         return data
 
     #转换为字符串   
-    def ToString(self, decode = 'unicode_escape', ispretty = True):
-        if(type(self._dict_) == list):
+    def ToString(self, decode = 'unicode_escape', ispretty = True, useList = False):
+        if(type(self._dict_) == list and useList):
             strJson = str(self._dict_)
         else:
             strJson = json.dumps(self._dict_, cls=DateEncoder, default = __serialize_instance__, indent = 4)
@@ -177,7 +177,7 @@ def Trans_ToJson(objStr):
     return data
 #字典转Json字符串
 def Trans_ToJson_str(dic, utf = True):
-    data = json.dumps(dic,cls=DateEncoder,ensure_ascii=(not utf))
+    data = json.dumps(dic, cls=DateEncoder,ensure_ascii=(not utf))
     return data
 
     

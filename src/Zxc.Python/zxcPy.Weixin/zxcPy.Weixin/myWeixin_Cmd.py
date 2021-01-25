@@ -16,6 +16,7 @@ from myGlobal import gol
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
 
+
 #API-命令--共享内存
 class myAPI_Weixin_Cmd_ByMMP(myWeb.myAPI): 
     def get(self, user, text, type = "Text"):
@@ -53,6 +54,7 @@ class myAPI_Weixin_Cmd_ByMQ(myWeb.myAPI):
             return True
         except :
             return False
+
 
 
 #主程序启动 

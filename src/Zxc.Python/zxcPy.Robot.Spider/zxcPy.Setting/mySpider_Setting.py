@@ -19,8 +19,8 @@ spideTypes = {'webPage': "静态页面", 'quote': "股票行情"}
  
 #爬虫--设置对象
 class mySpider_Setting():
-    def __init__(self, spiderTitle, spiderTag, spiderUrl, spiderRule): 
-        self.spiderTitle = spiderTitle  #爬虫名称    
+    def __init__(self, spiderName, spiderTag, spiderUrl, spiderRule): 
+        self.spiderName = spiderName  #爬虫名称    
         self.spiderTag = spiderTag      #爬虫类型标识    
         self.spiderUrl = spiderUrl      #爬虫网址   
         self.spiderRule = spiderRule    #爬虫规则设置 
@@ -30,11 +30,11 @@ class mySpider_Setting():
         self.InitRule()
     #是否有效
     def IsValid(self):  
-        return self.isValid
+        return self.isValid and not self.isDeled
     #由字符串初始
     def InitBystr(self, strSets): 
-        if(len(strSets) > 6): 
-            self.spiderTitle = strSets[0]
+        if(len(strSets) > 4): 
+            self.spiderName = strSets[0]
             self.spiderTag = strSets[1]
             self.spiderUrl = strSets[2]
             self.spiderRule = strSets[3].replace('，', ',')
@@ -45,15 +45,25 @@ class mySpider_Setting():
     #初始规则信息
     def InitRule(self): 
         return True
-    #配置信息组
+    #转换信息组
     def ToList(self): 
         pValues = []
-        pValues.append(self.spiderTitle)
+        pValues.append(self.spiderName)
         pValues.append(self.spiderTag)
         pValues.append(self.spiderUrl)
         pValues.append(self.spiderRule)
         pValues.append(self.isValid)
         pValues.append(self.mark)
+        return pValues
+    #转换信息字典
+    def ToDict(self): 
+        pValues = {}
+        pValues['spiderName'] = self.spiderName
+        pValues['spiderTag'] = self.spiderTag
+        pValues['spiderUrl'] = self.spiderUrl
+        pValues['spiderRule'] = self.spiderRule
+        pValues['isValid'] = self.isValid
+        pValues['mark'] = self.mark
         return pValues
 
 #爬虫--设置对象集管理
@@ -97,7 +107,7 @@ class mySpider_Settings():
 
         #按类型初始
         if(pSet):
-            pSet.InitBystr(temps) 
+            pSet.InitBystr(strSets) 
             return True
         return False
     
@@ -122,12 +132,23 @@ class mySpider_Settings():
         if(setName != ""):
             return self.setList.get(setName.lower()) 
         return None  
+    #查找 
+    def _Find_ByTypes(self, type):
+        lstSet = []
+        for x in self.setList:
+            pSet = self.setList[x]
+            if(pSet.spiderTag == ""): pSet.spiderTag = "webPage"
+            if(type != ""):
+                if(type != pSet.spiderTag):
+                    continue
+            lstSet.append(pSet)
+        return lstSet  
     #设置索引
     def _Index(self, pSet): 
-        if(pSet.spiderTitle == ""): return
-        if(self._Find(pSet.spiderTitle) != None): return
+        if(pSet.spiderName == ""): return
+        if(self._Find(pSet.spiderName) != None): return
 
-        self.setList[pSet.spiderTitle.lower()] = pSet
+        self.setList[pSet.spiderName.lower()] = pSet
         return True
     
     # 设置移除
@@ -142,7 +163,7 @@ class mySpider_Settings():
     # 设置修改
     def _Edit(self, dictSet):
         bResult = False
-        name = dictSet.get("spiderTitle", "")
+        name = dictSet.get("spiderName", "")
         if(name == ""): return False
 
         #初始设置集
@@ -208,11 +229,11 @@ if __name__ == "__main__":
 
 
     #新增测试
-    editInfo = {'spiderTitle': "ceshi", 'spiderTag': 'webPage', 'spiderUrl': "", "spiderRule": "", 'isValid':'True', 'mark':'测试设置' }
+    editInfo = {'spiderName': "ceshi", 'spiderTag': 'webPage', 'spiderUrl': "", "spiderRule": "", 'isValid':'True', 'mark':'测试设置' }
     pSets._Edit(editInfo)
 
     #修改测试
-    editInfo = {'spiderTitle': "ceshi",  'isValid':'False', 'mark':'测试设置2' }
+    editInfo = {'spiderName': "ceshi",  'isValid':'False', 'mark':'测试设置2' }
     pSets._Edit(editInfo)
     
     #移除测试

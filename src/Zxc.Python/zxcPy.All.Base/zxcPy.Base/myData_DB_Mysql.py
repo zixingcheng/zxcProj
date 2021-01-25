@@ -33,11 +33,11 @@ class myData_Table(myData_DB.myData_Table):
         port = self.params.get('port', "3306")   
         charset = self.params.get('charset', "utf8")   
         usrName = self.params.get('usrName', "root")    
-        usrPw = self.params.get('usrPw', "root")   
+        usrPw = self.params.get('usrPw', "a123456")   
         
         # 测试mysql操作
-        #self.pySql = myPyMysql.myPyMysql(usrName='root', usrPw='Zxcvbnm123*', charset='utf8', host = '39.105.196.175')   #远程操作测试
-        self.pySql = myPyMysql.myPyMysql(usrName='root', usrPw='Zxcvbnm123*', charset='utf8', host = '127.0.0.1')         #本地操作测试
+        #self.pySql = myPyMysql.myPyMysql(usrName='root', usrPw='Zxcvbnm123*', charset='utf8', host = '127.0.0.1')            #本地操作测试
+        self.pySql = myPyMysql.myPyMysql(usrName='root', usrPw='Zxcvbnm!@#45678', charset='utf8', host = '106.13.206.223')   #远程操作测试
 
         #初始数据库-mysql
         #self.pySql = myPyMysql.myPyMysql(usrName=usrName, usrPw=usrPw, charset=charset, host=host, port=port, dbName=dbName)
@@ -222,7 +222,6 @@ class myData_Table(myData_DB.myData_Table):
             if(strFliter != ""):
                 strFliter = strFliter[3:]
                 rs = self._Query(strFliter, tableName = tableName)
-                
                 if(len(rs) > 0):
                     return True, rs[0]['id']
         return False,-1

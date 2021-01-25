@@ -7,12 +7,13 @@ Created on  张斌 2018-07-23 11:00:00
     消息处理器--通用消息处理器
 """
 import sys, os, copy, time, datetime, threading
-import myEnum, myData, myData_Trans, myDebug, myIO, myWeb_urlLib, myMQ_Rabbit #, myVoice 
-
+import myEnum, myData, myData_Trans, myDebug, myIO, myWeb_urlLib, myMQ_Rabbit, myData_Swap #, myVoice 
 
 #定义消息类型枚举
 myMsgType = myEnum.enum('TEXT', 'PICTURE', 'VOICE', 'VIDEO', 'NOTE')
 myMsgPlat = myEnum.enum('robot', 'wx', 'usrWin')
+
+
 
 #自定义消息对象
 class myMsg():
@@ -80,6 +81,7 @@ class myManager_Msg():
         self.msgInd_Nick = {}
         self.usrWebs = {}           #在线消息集    
         self.usrMQs = {}            #消息队列  
+        self.usrSwaps = {}          #消息交换集合  
         self.usrNameSelfs = {}      #各个平台标识的自己用户名（接收特殊消息）  
         self.usrMsgs_Buffer = []    #异步消息集    
         self.dirLog = dir
@@ -91,7 +93,7 @@ class myManager_Msg():
             self.thrd_Handle.setDaemon(False)
             self.thrd_Handle.start()
     #初始API、消息队列    
-    def _Init(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = None, usrHelper = '', isAuto_ack = False):
+    def _Init_MQ(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgMQ_Sender = None, usrHelper = 'filehelper', isAuto_ack = False):
         if(plat == None or plat == ""): return 
         self.usrNameSelfs[plat] = usrHelper      #自定义的特殊用户名(特殊发送目标)
 
@@ -99,6 +101,21 @@ class myManager_Msg():
         if(msgMQ_Sender != None): 
             msgMQ_Sender.Init_Queue(msgMQ_Sender.nameQueue, True, isAuto_ack)           #消息持久化设置
             self.usrMQs[plat] = msgMQ_Sender
+            
+        #消息回调API
+        if(msgUrl_API != ""):                 
+            pWeb = myWeb_urlLib.myWeb(msgUrl_API, "", False)                #按消息分类标识初始对应web对象并存入dict
+            self.usrWebs[plat] = pWeb
+    #初始API、消息交换   
+    def _Init_Swap(self, plat = myMsgPlat.wx, msgUrl_API = "http://127.0.0.1:8666/zxcAPI/weixin", msgSwap_Sender = None, usrHelper = 'filehelper', isAuto_ack = False):
+        if(plat == None or plat == ""): return 
+        self.usrNameSelfs[plat] = usrHelper      #自定义的特殊用户名(特殊发送目标)
+
+        #消息交换对象
+        if(msgSwap_Sender != None): 
+            msgSwap_Sender.Init_Swap(isAuto_ack = isAuto_ack)
+            msgSwap_Sender.startSwap()
+            self.usrSwaps[plat] = msgSwap_Sender
             
         #消息回调API
         if(msgUrl_API != ""):                 
@@ -207,6 +224,21 @@ class myManager_Msg():
                 usrMQ.Send_Msg(usrMQ.nameQueue, str(msg))
                 if(self.usePrint):
                     myDebug.Print("消息管理器转发::", usrMQ.nameQueue + ">> ",strMsg)
+
+            usrSwap = self.usrSwaps.get(typePlatform, None)
+            if(usrSwap != None):
+                #特殊消息处理
+                toUser = msg.get('to_usrName', "")
+                if(toUser != ""):
+                    toUser = myData.iif(toUser.lower() != "self", toUser, self.usrNameSelfs.get(typePlatform, toUser))
+                    msg['usrID'] = ""
+                    msg['usrName'] = toUser     #调整toUser
+                    msg['usrNameNick'] = ""
+                #转发消息-写入文件
+                usrSwap.SwapData_Out(msg)
+                if(self.usePrint):
+                    myDebug.Print("消息管理器转发::", usrSwap.nameSwap + ">> ",strMsg)
+
     #运行（线程检测, 异步延时发送）
     def OnHandleMsg_ByThread(self): 
         try:
@@ -288,16 +320,30 @@ class myManager_Msg():
 #初始全局消息管理器
 from myGlobal import gol 
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
-gol._Set_Setting('bufferMsgs', myMsgs("zxc", "zxc", "", ""))    #实例 消息缓存
-gol._Set_Setting('manageMsgs', myManager_Msg())                 #实例 消息管理器并初始消息api及消息队列 
-gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "")                        #不使用api回调
-gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "", usrHelper = 'filehelper')    #不使用api回调
-gol._Get_Setting('manageMsgs', None)._Init(plat = myMsgPlat.usrWin, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_usrWin'), msgUrl_API = "", isAuto_ack = True)   #不使用api回调
+useMQ = gol._Get_Value("msgSet_usrMQ", False)  
+def _initMsg_Swap(useMQ = False):
+    if(gol._Get_Setting('dirMsgsSwaps', None) == None):
+        gol._Set_Setting('dirMsgsSwaps', "D:/myCode/zxcProj/src/Zxc.Python/zxcPy.Weixin/Data/Swaps")    #实例 消息缓存 
+
+    gol._Set_Setting('bufferMsgs', myMsgs("zxc", "zxc", "", ""))    #实例 消息缓存    
+    gol._Set_Setting('manageMsgs', myManager_Msg())                 #实例 消息管理器并初始消息api及消息队列 
+    if(useMQ):
+        gol._Get_Setting('manageMsgs', None)._Init_MQ(plat = myMsgPlat.robot, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_robot'), msgUrl_API = "")                        #不使用api回调
+        gol._Get_Setting('manageMsgs', None)._Init_MQ(plat = myMsgPlat.wx, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_wx'), msgUrl_API = "", usrHelper = 'filehelper')    #不使用api回调
+        gol._Get_Setting('manageMsgs', None)._Init_MQ(plat = myMsgPlat.usrWin, msgMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True, 'zxcMQ_usrWin'), msgUrl_API = "", isAuto_ack = True)   #不使用api回调
+    else: 
+        dirMsgsSwaps = gol._Get_Setting('dirMsgsSwaps')
+        pDataSwap_In = myData_Swap.myData_Swap_FileIO("msgWx", dirMsgsSwaps + "/SwapMsg", stepSwaps = 1, delayedTime = 0, useAck = True, nameSwap = "zxcSwap_wx")
+        gol._Get_Setting('manageMsgs')._Init_Swap(plat = myMsgPlat.wx, msgSwap_Sender = pDataSwap_In, isAuto_ack = True, msgUrl_API = "")
+        pass        
+_initMsg_Swap();
+
 
 
 if __name__ == '__main__':
    pMMsg = gol._Get_Setting('manageMsgs')
-   pMMsg.Init_LogDir("D:/myGit/zxcProj/src/Zxc.Python/zxcPy.Robot/Log/Msgs/")
+   pMMsg.Init_LogDir("D:/myCode/zxcProj/src/Zxc.Python/zxcPy.Weixin/Data/Log/Msgs/")
+   
 
    #组装消息 
    msg = pMMsg.OnCreatMsg()

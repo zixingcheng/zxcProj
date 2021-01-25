@@ -587,8 +587,8 @@ class myPyMysql():
 #测试
 if __name__ ==  "__main__":
     # 测试mysql操作
-    #pMysql = myPyMysql(usrName='root', usrPw='Zxcvbnm123*', charset='utf8', host = '39.105.196.175')   #远程操作测试
-    pMysql = myPyMysql(usrName='root', usrPw='Zxcvbnm123*', charset='utf8', host = '127.0.0.1')         #本地操作测试
+    #pMysql = myPyMysql(usrName='root', usrPw='Zxcvbnm123*', charset='utf8', host = '127.0.0.1')             #本地操作测试
+    pMysql = myPyMysql(usrName='root', usrPw='Zxcvbnm!@#45678', charset='utf8', host = '106.13.206.223')    #远程操作测试
     
     # 文件型初始
     pMysql.createDB_ByFile("zxcDB")

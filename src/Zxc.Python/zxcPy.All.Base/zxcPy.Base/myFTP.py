@@ -29,6 +29,8 @@ class myFTP:
         self.log_file = open(self.logFile, "a")
         self.file_list = []
         self.delete_files()                     # 保留三天内的文件
+        self.funDownloaded_file = None          # 下载文件完成装饰函数
+        self.funUploaded_file = None            # 上传文件完成装饰函数
     # FTP 登录
     def login(self, username, password):
         try:
@@ -63,10 +65,13 @@ class myFTP:
         else:
             try:
                 self.debug_print('>>>>>>>>>>>>下载文件 %s ... ...' % local_file)
+                #myIO.mkdir(local_file)
                 buf_size = 1024
                 file_handler = open(local_file, 'wb')
                 self.ftp.retrbinary('RETR %s' % remote_file, file_handler.write, buf_size)
                 file_handler.close()
+                if(self.funDownloaded_file != None):
+                    self.funDownloaded_file(remote_file, local_file)
             except Exception as err:
                 self.debug_print('下载文件出错，出现异常：%s ' % err)
                 return
@@ -99,8 +104,8 @@ class myFTP:
             elif file_type == '-':
                 print("download_file()---> 下载文件： %s" % file_name)
                 self.download_file(local, file_name)
-            self.ftp.cwd("..")
-            self.debug_print('返回上层目录 %s' % self.ftp.pwd())
+        self.ftp.cwd("..")
+        self.debug_print('返回上层目录 %s' % self.ftp.pwd())
         return True
     # 从本地上传文件到
     def upload_file(self, local_file, remote_file):
@@ -116,6 +121,8 @@ class myFTP:
         try:
             with open(local_file,'rb')as f:
                 self.ftp.storbinary('STOR %s' % remote_file, f, buf_size)
+                if(self.funUploaded_file != None):
+                    self.funUploaded_file(remote_file, local_file)
         except Exception as err:
             self.deal_error("FTP 上传失败 ，错误描述为：%s" % err)
             pass
@@ -146,6 +153,19 @@ class myFTP:
                 self.upload_file(src, local_name)
         self.ftp.cwd("..")
     
+    # 下载文件完成装饰函数
+    def downloaded_file(self):
+        # 定义一个嵌套函数
+        def _downloaded_file(fn):
+            self.funDownloaded_file = fn
+        return _downloaded_file
+    # 上传文件完成装饰函数
+    def uploaded_file(self):
+        # 定义一个嵌套函数
+        def _uploaded_file(fn):
+            self.funUploaded_file = fn
+        return _uploaded_file
+
     # 获取文件列表
     def get_file_list(self, line):
         file_arr = self.get_file_name(line)
@@ -189,6 +209,7 @@ class myFTP:
     # 判断远程文件和本地文件大小是否一致
     def is_same_size(self, local_file, remote_file):
         try:
+            if(os.path.exists(local_file) == False): return 0
             local_file_size = os.path.getsize(local_file)
         except Exception as err:
             self.debug_print("is_same_size() 错误描述为：%s" % err)
@@ -305,6 +326,43 @@ class myFTP_Monitor:
             self.timesChange -= 1
         except Exception as err:
             self.my_ftp.deal_error("FTP 上传失败 ，错误描述为：%s" % err)
+            self.my_ftp.close()
+            pass
+        self.updatLog = False           #屏蔽日志文件，避免频繁上传
+    # 文件夹下载FTP
+    def downLoad_files(self):
+        try:
+            # FTP已登录时退出
+            if(not self.my_ftp.closed): 
+                return
+
+            # 删除历史时间数据
+            self.my_ftp.delete_files()
+
+            # FTP登录
+            self.my_ftp.login(self.username, self.password)
+
+            # 下载单个文件 --测试
+            # my_ftp.download_file("G:/ftp_test/XTCLauncher.apk", "/App/AutoUpload/ouyangpeng/I12/Release/XTCLauncher.apk")
+
+            # 下载目录 --测试
+            self.my_ftp.download_file_tree(self.localDir, self.dataFolder)
+
+            # 上传单个文件--测试
+            # my_ftp.upload_file(my_ftp.localFolder + "Test2.txt", "/Test/Test2.txt")
+
+            # 上传目录
+            # self.my_ftp.upload_file_tree(self.localDir, self.dataFolder, self.updatLog)
+            
+            # 上传日志目录
+            # if(self.updatLog):
+            #     self.my_ftp.upload_file_tree(self.logDir, "Logs", self.updatLog)
+
+            # 退出FTP
+            self.my_ftp.close()
+            self.timesChange -= 1
+        except Exception as err:
+            self.my_ftp.deal_error("FTP 下载失败 ，错误描述为：%s" % err)
             self.my_ftp.close()
             pass
         self.updatLog = False           #屏蔽日志文件，避免频繁上传

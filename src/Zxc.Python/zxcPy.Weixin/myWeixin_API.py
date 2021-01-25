@@ -15,7 +15,7 @@ mySystem.Append_Us("/zxcPy.Weixin", False, __file__)
 mySystem.Append_Us("/zxcPy.Weixin/Weixin_Reply", False, __file__)
 mySystem.Append_Us("/zxcPy.Weixin/Weixin_Reply/myWxDo", False, __file__)
 mySystem.Append_Us("", False)    
-import myWeb, myDebug, myMMap, myMQ_Rabbit, myWeixin_Cmd
+import myWeb, myDebug, myMMap, myMQ_Rabbit, myWeixin_Cmd, myAPI_WeChat
 from myGlobal import gol 
 
 
@@ -24,6 +24,7 @@ from myGlobal import gol
 if __name__ == '__main__': 
     gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
     useCmdMMap = False
+    useMQ = gol._Get_Value("msgSet_usrMQ", False)
 
     errStr = ""
     try:
@@ -33,12 +34,13 @@ if __name__ == '__main__':
             gol._Set_Value('manageMMap', pMMap_Manager, True)
             errStr = "创建内存映射失败."
         else:
-            # 创建消息队列
-            nameMQ = 'zxcMQ_wx'
-            pMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True)
-            pMQ_Sender.Init_Queue(nameMQ, True)
-            gol._Set_Value('zxcMQ_Wx_Sender', pMQ_Sender, True)
-            errStr = "创建消息队列失败."
+            if(useMQ):
+                # 创建消息队列
+                nameMQ = 'zxcMQ_wx'
+                pMQ_Sender = myMQ_Rabbit.myMQ_Rabbit(True)
+                pMQ_Sender.Init_Queue(nameMQ, True)
+                gol._Set_Value('zxcMQ_Wx_Sender', pMQ_Sender, True)
+                errStr = "创建消息队列失败."
 
         #测试
         #users = ['茶叶一主号', '老婆']
@@ -57,10 +59,13 @@ if __name__ == '__main__':
     pWeb = myWeb.myWeb("0.0.0.0", 8666)
     pWeb.add_API(myWeb.myAPI, '/test')
     pWeb.add_API(myWeb.myAPI_p, '/test1/<param>')
+    myAPI_WeChat.add_APIs(pWeb)
+
     if(useCmdMMap):
         pWeb.add_API(myWeixin_Cmd.myAPI_Weixin_Cmd_ByMMP, '/zxcAPI/weixin/<user>/<text>/<type>')
     else:
-        pWeb.add_API(myWeixin_Cmd.myAPI_Weixin_Cmd_ByMQ, '/zxcAPI/weixin/<user>/<text>/<type>')
+        if(useMQ):
+            pWeb.add_API(myWeixin_Cmd.myAPI_Weixin_Cmd_ByMQ, '/zxcAPI/weixin/<user>/<text>/<type>')
     
     #运行API
     pWeb.run()
