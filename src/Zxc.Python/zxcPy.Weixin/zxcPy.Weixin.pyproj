@@ -22,7 +22,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="zxcPy.APIs\myAPI_WeChat.py" />
-    <Compile Include="myManager_Msg.py" />
     <Compile Include="zxcPy.APIs\myWeixin.py" />
     <Compile Include="zxcPy.DataSwap\myData_SwapWx.py" />
     <Compile Include="zxcPy.Test\myTest_Chat.py" />

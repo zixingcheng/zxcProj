@@ -18,5 +18,5 @@ sleep 1s
 
 #重启
 sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh
-sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
+#sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh
 

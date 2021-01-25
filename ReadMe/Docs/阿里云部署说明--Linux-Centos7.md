@@ -170,7 +170,7 @@
 
 
 
-## 安装 Python-3.5
+## 安装 Python-3
 
 ### 准备工作
 	
@@ -385,20 +385,26 @@ Known problems with Fedora Linux and Python 3 version: Error message:
 		启动mysqld，启动之前先修改/etc/my.cnf配置文件，本文用默认的配置。
 		service mysqld start
 	
-	四、连接MySQL并修改密码
+	四、连接MySQL并修改密码(如报错可参见测试2设置)
 	
 		grep "password" /var/log/mysqld.log
 		mysql -uroot -p
 		
+		设置密码：可能报错一一试过
+		
+		alter user root@localhost identified by 'Zp.666888!@#';
+		
 		update user set authentication_string=password('a123456') where user='root';
 		update user set host = '%' where user = 'root' and host = 'localhost';
+		
+		update user set authentication_string=password('Zp.666888!@#') where user='root';
 		
 		mysql> set global validate_password_policy=0;
 		mysql> set global validate_password_length=1;
 		mysql> set password=password('a123456');
 	
 	五、使用Navicat远程连接MySQL报错1103
-		
+			   grant all privileges on *.* to root@'%' identified by 'zxcvbnm1238';
 		mysql> grant all privileges on *.* to 'root'@'%' identified by 'Zxcvbnm!@#45678' with grant option;
 			   grant all privileges on *.* to 'root'@'%' identified by 'Zxcvbnm!@#45678' with grant option;
 			   grant all privileges on *.* to 'root'@'%' identified by 'Zxcvbnm!@#45678';
@@ -461,6 +467,9 @@ Known problems with Fedora Linux and Python 3 version: Error message:
 	-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 	-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
 	-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+	
+	-A INPUT -p tcp -s 192.168.175.128 -j ACCEPT
+	
 	-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
 	-A FORWARD -p icmp -j ACCEPT
 	-A FORWARD -i lo -j ACCEPT
@@ -702,7 +711,7 @@ crontabs软件包是用来安装、卸装、或列举用来驱动 cron 守护进
 git 更新脚本：
 	
 	sh /root/Public/myPrjs/zxcProj/ReadMe/git_zxcPy.sh
-
+	
 启动脚本
 	sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Robot.sh	(Robot + Weixin)
 	sh /root/Public/myPrjs/zxcProj/ReadMe/run_zxcPy_Quote.sh		(Qoute)
@@ -713,6 +722,7 @@ git 更新脚本：
 	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Weixin/zxcPy.Weixin/myWeixin_ItChat.py
 
 	#启动微信API
+	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Weixin/myWeixin_API.py
 	python /root/Public/myPrjs/zxcProj/src/Zxc.Python/zxcPy.Robot/myRobot_API.py
 
 	#启动行情监测 
@@ -763,3 +773,29 @@ git 更新脚本：
 			 netsh wlan show profiles HUAWEI-NNRZ key=clear
 
 	
+## 反向代理
+编辑nginx设置：
+	vi /etc/nginx/nginx.conf
+	vi /etc/nginx/conf.d/ucml.conf
+
+常用命令nginx：
+	1:重启服务： 
+		service nginx restart
+	2:快速停止或关闭
+		nginx -s stop
+	3:正常停止或关闭
+		nginx -s quit
+	4:配置文件修改重装载命令
+		nginx -s reload
+
+	5:停止Nginx软件
+		service nginx stop
+	6:删除Nginx的自动启动
+		chkconfig nginx off
+	7:从源头删除Nginx
+		rm -rf /usr/sbin/nginx
+		rm -rf /etc/nginx
+		rm -rf /etc/init.d/nginx
+	8:再使用yum清理
+		yum remove nginx
+
