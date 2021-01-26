@@ -226,12 +226,14 @@ class myWeixin_ItChat(myThread.myThread):
         if(roupID[0:2] == "@@"):
             pUsers = itchat.search_chatrooms(userName = roupID)
             if(pUsers != None and len(pUsers) == 1): return pUsers[0]
-
+            
         #统配查询所有
         if(roupID != ""):
+            if(roupID[0:2] == "@*"): roupID = roupID[2:]
             pUsers = itchat.search_chatrooms(name = roupID)
             if(pUsers != None and len(pUsers) == 1): return pUsers[0]
         if(groupName != ""):
+            if(groupName[0:2] == "@*"): roupID = groupName[2:]
             pUsers = itchat.search_chatrooms(name = groupName)
             if(pUsers != None and len(pUsers) == 1): return pUsers[0]
 
