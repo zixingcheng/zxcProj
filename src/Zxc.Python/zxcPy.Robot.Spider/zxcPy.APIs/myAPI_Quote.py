@@ -60,11 +60,13 @@ class myAPI_Stock_Query(myWeb.myAPI):
 class myAPI_Quote_Set(myWeb.myAPI): 
     def get(self):
         #提取爬虫设置信息 
-        #?setInfo={'spiderName': "ceshi2", 'spiderTag': 'webPage', 'spiderUrl': "", "spiderRule": "", 'isValid':'False', 'isDel':'True', 'mark':'测试设置' }
+        #?setInfo={'spiderName': "ceshi2", 'spiderTag': 'webPage', 'spiderUrl': "", "spiderRule": "", 'isValid':'False', 'isDel':'True', "timeSet" = "* * * * *", 'mark':'测试设置' }
         #?setInfo={'spiderName': "sh000001", 'spiderTag': 'quote', 'spiderUrl': "", "spiderRule": "", 'isValid':'True', 'isDel':'False', 'mark':'测试设置' }
         params = request.args.get('setInfo', "{}")
         setInfo = myData_Trans.Tran_ToDict(params)
         bRemove = myData_Trans.To_Bool(setInfo.get('isDel', "False"))
+        if(setInfo.get("timeSet", None) == None):
+            setInfo['spiderName'] = "* 9-15 * * 1-5"
 
         if(bRemove):
             bRes = setsSpider._Remove(setInfo['spiderName'])

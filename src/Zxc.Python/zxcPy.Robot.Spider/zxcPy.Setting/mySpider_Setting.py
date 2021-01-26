@@ -16,34 +16,89 @@ import myIO, myIO_xlsx, myData, myData_Trans
 spideTypes = {'webPage': "静态页面", 'quote': "股票行情"}
 
 
- 
+# M H D m d command
+# M: 分（0-59） H：时（0-23） D：天（1-31） m: 月（1-12） d: 周（0-6） 0为星期日(或用Sun或Mon简写来表示) 
+# 每周一，三，五的下午3：00系统进入维护状态，重新启动系统。
+# 00 15 * * 1,3,5
+class myTimeSets():
+    class myTimeSet():
+        def __init__(self, strSet, typeTime): 
+            self.allVlid = False
+            self.InitBystr(strSet, typeTime)
+        def InitBystr(self, strSet, typeTime): 
+            self.values = []
+            self.typeTime = typeTime
+            if(strSet == "*"): 
+                self.allVlid = True
+                return 
+            if(strSet.count(",") > 0): 
+                values = strSet.split(',')
+                for x in values:
+                    self.values.append(myData_Trans.To_Int(x))
+                return
+            if(strSet.count("-") > 0): 
+                temps = strSet.split('-')
+                self.values = range(myData_Trans.To_Int(temps[0]), myData_Trans.To_Int(temps[1]))
+                return
+            self.values.append(myData_Trans.To_Int(strSet))
+        #是否有效
+        def IsValid(self, value):  
+            if(self.allVlid): return True
+            return value in self.values
+    def __init__(self, tagSet, timeSets): 
+        self.tagName = tagSet
+        self.InitBystr(timeSets)
+    def InitBystr(self, strSets): 
+        temps = strSets.split(' ')
+        if(len(temps) > 4): 
+            self.M = myTimeSets.myTimeSet(temps[0], "M")
+            self.H = myTimeSets.myTimeSet(temps[1], "H")
+            self.D = myTimeSets.myTimeSet(temps[2], "D")
+            self.m = myTimeSets.myTimeSet(temps[3], "m")
+            self.d = myTimeSets.myTimeSet(temps[4], "d")
+    #是否有效
+    def IsValid(self, dtTime = None):  
+        if(dtTime == None):
+            dtTime = datetime.datetime.now()
+        weekday = myData_Trans.To_Int(dtTime.strftime("%w"))
+        return self.M.IsValid(dtTime.minute) and self.H.IsValid(dtTime.hour) and self.D.IsValid(dtTime.day) and self.m.IsValid(dtTime.month) and self.d.IsValid(weekday)
+
 #爬虫--设置对象
 class mySpider_Setting():
-    def __init__(self, spiderName, spiderTag, spiderUrl, spiderRule): 
-        self.spiderName = spiderName  #爬虫名称    
+    def __init__(self, spiderName, spiderTag, spiderUrl, spiderRule, timeSet = "* * * * *"): 
+        self.spiderName = spiderName    #爬虫名称    
         self.spiderTag = spiderTag      #爬虫类型标识    
         self.spiderUrl = spiderUrl      #爬虫网址   
         self.spiderRule = spiderRule    #爬虫规则设置 
         self.isValid = False            #设置是否生效
         self.isDeled = False            #设置是否已删除
+        self.timeSet = timeSet          #时间规则
+        self.timeRule = None
         self.mark = ''                  #备注说明
+        self.dateEnd = 0                #结束日期
+        
+        self.validTime = False          #设置是否生效
         self.InitRule()
     #是否有效
     def IsValid(self):  
-        return self.isValid and not self.isDeled
+        return self.isValid and not self.isDeled and self.timeRule.IsValid()
     #由字符串初始
     def InitBystr(self, strSets): 
-        if(len(strSets) > 4): 
+        if(len(strSets) > 5): 
             self.spiderName = strSets[0]
             self.spiderTag = strSets[1]
             self.spiderUrl = strSets[2]
             self.spiderRule = strSets[3].replace('，', ',')
-            self.isValid = myData_Trans.To_Bool(strSets[4])      
+            self.isValid = myData_Trans.To_Bool(strSets[4]) 
+            self.timeSet = strSets[5]          #时间规则
             self.mark = strSets[5]
             self.InitRule()
         return True
     #初始规则信息
     def InitRule(self): 
+        if(self.timeSet == ""): 
+            self.timeSet = "* * * * *"
+        self.timeRule = myTimeSets(self.spiderName, self.timeSet)    
         return True
     #转换信息组
     def ToList(self): 
@@ -53,6 +108,7 @@ class mySpider_Setting():
         pValues.append(self.spiderUrl)
         pValues.append(self.spiderRule)
         pValues.append(self.isValid)
+        pValues.append(self.timeSet)
         pValues.append(self.mark)
         return pValues
     #转换信息字典
@@ -63,6 +119,7 @@ class mySpider_Setting():
         pValues['spiderUrl'] = self.spiderUrl
         pValues['spiderRule'] = self.spiderRule
         pValues['isValid'] = self.isValid
+        pValues['timeSet'] = self.timeSet
         pValues['mark'] = self.mark
         return pValues
 
@@ -77,13 +134,13 @@ class mySpider_Settings():
         self.Dir_Base = os.path.abspath(os.path.join(strDir, ".."))  
         self.Dir_Setting = self.Dir_Base + "/Data/Setting"
         self.Path_SetSpider = self.Dir_Setting + "/Setting_Spider.csv"
-        self.lstFields = ["名称","类型标识","网址","规则信息","是否生效","备注"]   
+        self.lstFields = ["名称","类型标识","网址","规则信息","是否生效","时间设置","备注"]   
         self._Init()
     #初始参数信息等   
     def _Init(self):            
         #提取字段信息  
         dtSetting = myIO_xlsx.DtTable() 
-        dtSetting.dataFieldType = ["","","","","","bool",""]
+        dtSetting.dataFieldType = ["","","","","bool","",""]
         dtSetting.Load_csv(self.Path_SetSpider, 1, 0, isUtf = True) 
         if(len(dtSetting.dataMat) < 1 or len(dtSetting.dataField) < 1): return
 
@@ -169,12 +226,13 @@ class mySpider_Settings():
         #初始设置集
         pSet = self._Find(name)
         if(pSet == None):
-            pSet = mySpider_Setting(name, dictSet.get("spiderTag", ""), dictSet.get("spiderUrl", ""), dictSet.get("spiderRule", ""))
+            pSet = mySpider_Setting(name, dictSet.get("spiderTag", ""), dictSet.get("spiderUrl", ""), dictSet.get("spiderRule", ""), dictSet.get("timeSet", ""))
             bResult = self._Index(pSet)
         else:
             pSet.spiderTag = dictSet.get("spiderTag", pSet.spiderTag)
             pSet.spiderUrl = dictSet.get("spiderUrl", pSet.spiderUrl)
             pSet.spiderRule = dictSet.get("spiderRule", pSet.spiderRule)
+            pSet.timeSet = dictSet.get("spiderRule", pSet.timeSet)
             bResult = pSet.InitRule();
         pSet.isValid = myData_Trans.To_Bool(dictSet.get("isValid", str(pSet.isValid)))      
         pSet.mark = dictSet.get("mark", pSet.mark)
@@ -217,6 +275,9 @@ def _Find(setName, bCreatAuto = False):
 
 #主启动程序
 if __name__ == "__main__":
+    timeRule =  myTimeSets("", "00 15 * * 1,3,5")
+    timeRule.IsValid();
+
     pSets = gol._Get_Value('setsSpider')
     
     # 装饰函数，处理监测到的上升、下降、拐点

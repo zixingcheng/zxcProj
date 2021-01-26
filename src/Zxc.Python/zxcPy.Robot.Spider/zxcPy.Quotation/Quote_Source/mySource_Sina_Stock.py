@@ -163,6 +163,7 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
             #时间检查(是否当天)
             if(checkTime):
                 if(qd.checkTime() == False): 
+                    print("\n\t" + qd.idTag + "：非实时数据，无效。")
                     return None 
 
             #设置数据

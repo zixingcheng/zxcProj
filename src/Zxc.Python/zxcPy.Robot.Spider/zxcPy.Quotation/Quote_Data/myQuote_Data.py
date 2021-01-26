@@ -54,7 +54,9 @@ class Quote_Data:
         if(self.datetime == None): self.getTime()
         return (self.datetime_queryed.year == self.datetime.year) \
                 and (self.datetime_queryed.month == self.datetime.month) \
-                 and (self.datetime_queryed.day == self.datetime.day)
+                 and (self.datetime_queryed.day == self.datetime.day) \
+                    and (self.datetime_queryed.hour * 3600 + self.datetime_queryed.minute * 60 + self.datetime_queryed.second \
+                        - self.datetime.hour * 3600 - self.datetime.minute * 60 - self.datetime.second < 60)
     #获取时间信息(完整时间还是分钟时间)
     def getTime(self, bMinute = False):
         if(not bMinute):

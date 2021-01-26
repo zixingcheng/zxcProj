@@ -30,6 +30,8 @@ class Source_Control(myQuote_Source.Quote_Source):
         self.srcQuotes = {}
         self.srcQuotes['SinaAPI'] = gol._Get_Value('quoteSource_Sina', None)          #新浪源
         self.srcQuotes['JqDataAPI'] = gol._Get_Value('quoteSource_JqData', None)      #聚宽源
+    def _Stoped(self):
+        return False 
         
     #添加监听
     def addListener(self, listener):
@@ -95,7 +97,7 @@ class Quote_Thread(threading.Thread):
                 #判断结束
                 if(self.source._Stoped()):
                     break
-            except :
+            except Exception as ex:
                 pass
         self.stop()
     def stop(self):
@@ -115,7 +117,7 @@ class Quote_Thread(threading.Thread):
             pMsg['result'] = True
 
             strJson = myData_Json.Trans_ToJson_str(pMsg);
-            path = self.Dir_Swaps + myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d") + "/Quote_" + myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d-%H-%M-%S") + ".json"
+            path = self.Dir_Swaps + "/Quote_" + myData_Trans.Tran_ToDatetime_str(None, "%Y-%m-%d-%H-%M-%S") + ".json"
             myIO.Save_File(path, strJson, isUtf = True, isNoBoom = True)
             return True
         return False

@@ -35,6 +35,7 @@ class myAPI_Robot_msgWx(myWeb.myAPI):
         
         #消息处理(应为异步处理)
         msg = ast.literal_eval(msgInfo) 
+        msg['msg'] = msg['msg'].replace("※r※", "\r").replace("※n※", "\n").replace("※t※", "\t")
         usrMMsg.OnHandleMsg(msg, 'wx', True)
         pMsg['result'] = True
         pMsg['text'] = "Swap Cached!"
