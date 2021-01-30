@@ -22,7 +22,6 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="myIO_xlsx.py" />
     <Compile Include="mySpider_API.py" />
     <Compile Include="zxcPy.APIs\myAPI_Quote.py" />
     <Compile Include="zxcPy.Quotation\myQuote.py" />

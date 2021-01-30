@@ -91,7 +91,7 @@ class mySpider_Setting():
             self.spiderRule = strSets[3].replace('，', ',')
             self.isValid = myData_Trans.To_Bool(strSets[4]) 
             self.timeSet = strSets[5]          #时间规则
-            self.mark = strSets[5]
+            self.mark = strSets[6]
             self.InitRule()
         return True
     #初始规则信息

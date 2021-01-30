@@ -75,14 +75,18 @@ class Quote_Thread(threading.Thread):
                 lstIDs.append(x.spiderName)
         if(len(lstIDs) < 1): return None
 
-        parms = {"queryIDs": myData_Trans.Tran_ToStr(lstIDs)}
+        stockIds = myData_Trans.Tran_ToStr(lstIDs).replace(".", "")
+        parms = {"queryIDs": stockIds}
         return parms
     def run(self):
         time.sleep(10)   
-        if(self.source.setTime() == False):
-            myDebug.Print('Spider Quote Stoped.\n         -- not quote time.')
-            self.stop()
-            return 
+        myDebug.Print("Spider Quote Thread Start...")
+        while(self.source.setTime() == False):
+            time.sleep(30)   
+            #myDebug.Print('Spider Quote Stoped.\n         -- not quote time.\n')
+            #myDebug.Print("nSpider Quote Thread ReStart...")
+            #self.stop()
+            #return 
 
         myDebug.Print('Spider Quote Run...')
         self.threadRunning = True;
@@ -122,12 +126,12 @@ class Quote_Thread(threading.Thread):
             return True
         return False
 
-
 #缓存全局对象
 from myGlobal import gol 
 gol._Init()                 #先必须在主模块初始化（只在Main模块需要一次即可）
 gol._Set_Value('quoteSource', Source_Control())   #实例 行情对象
 quoteSource = gol._Get_Value('quoteSource')
+
 
 
 #线程执行-行情监测
@@ -142,7 +146,6 @@ def quoteStart():
         thrdQuote.setDaemon(True)
         thrdQuote.start()
         gol._Set_Value('quoteSourceThread', thrdQuote)
-        myDebug.Print("Spider Quote Thread Start...")
 #初始行情数据源
 def initSource(addListener = True):
     #初始全局行情对象

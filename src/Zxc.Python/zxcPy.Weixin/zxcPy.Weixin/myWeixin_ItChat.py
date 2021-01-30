@@ -256,8 +256,8 @@ class myWeixin_ItChat(myThread.myThread):
         #增加记录日志--消息管理器实现 
 
         #调用 消息发送
-        msgR = msg
-        msgR['msg'] = msgR['msg'].replace("/r", "\r").replace("/n", "\n")
+        msgR = msg 
+        msgR['msg'] = msgR['msg'].replace("※r※", "\r").replace("※n※", "\n").replace("※t※", "\t")
         if(msgR.get('groupID', '') != '' or msgR.get('groupName', '') != ''):       #区分群、个人
             return self.Send_Msg(msgR['groupID'], msgR['groupName'], msgR['msg'], msgR['msgType'], 1)
         else:
@@ -280,6 +280,7 @@ class myWeixin_ItChat(myThread.myThread):
             itchat.send('%s' % (msgInfo), userName)
         elif(typeMsg == "IMAGE"):   #未实现
             itchat.send_image(msgInfo, userName)
+            print(userName, msgInfo)
         elif(typeMsg == "CARD1"): 
             Content = "<?xml version=\"1.0\"?>\n<msg bigheadimgurl=\"http://wx.qlogo.cn/mmhead/ver_1/UuYfjibTFM2RFQsy5hvdojN8qeSqghGeONUBib34ucEWpztQOM18xFicVYK02lfNYLFdiaYZww71H6oDgiaBPhVm9vCgXXB1bP9XoPgE8jOibJcko/0\" smallheadimgurl=\"http://wx.qlogo.cn/mmhead/ver_1/UuYfjibTFM2RFQsy5hvdojN8qeSqghGeONUBib34ucEWpztQOM18xFicVYK02lfNYLFdiaYZww71H6oDgiaBPhVm9vCgXXB1bP9XoPgE8jOibJcko/132\" username=\"v1_cd9b652b5b54d225963c03833cef2f27e2a1e7b9b55f5659ac9210eb315cca20@stranger\" nickname=\"MlNA\"  shortpy=\"MLNA\" alias=\"\" imagestatus=\"3\" scene=\"17\" province=\"广东\" city=\"广州\" sign=\"\" sex=\"2\" certflag=\"0\" certinfo=\"\" brandIconUrl=\"\" brandHomeUrl=\"\" brandSubscriptConfigUrl=\"\" brandFlags=\"0\" regionCode=\"CN_Guangdong_Guangzhou\" antispamticket=\"v2_2ced7b6604ee323f392d80574d0de3db9f4b52048d9bb0a3c231dc36f9285c02212ad1a52bcf0968b17bde1e4d8c167a153b52d5b9ff638a1cdf560d5f9d5e1a014792f12a7a6189768f049d47ca18ebb66e0bc34578bef58ce3602817a355f07c891384ee03a11f5639f39ba61ccac48bdaeaf0e3ebf06b707af8c6328d3de5834a7a89f03601ae0bc8fb5d0e8216acd0d50b8bd8e3fac6c9dad59253b829f74688d6fa701259f7ded3a108304cd7cd@stranger\" />\n"
             itchat.send_raw_msg(42, Content, userName)
