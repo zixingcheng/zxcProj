@@ -51,6 +51,7 @@
     <Folder Include="zxcPy.Quotation\Quote_Source\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\Setting\README.md" />
     <Content Include="Data\Setting\Setting_Spider.csv" />
     <Content Include="Data\Setting\StockInfos.csv" />
     <Content Include="README.md" />
