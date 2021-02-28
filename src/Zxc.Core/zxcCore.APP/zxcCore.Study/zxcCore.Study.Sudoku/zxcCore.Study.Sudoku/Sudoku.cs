@@ -37,6 +37,7 @@ namespace zxcCore.Sudoku
 
         public Sudoku(int level)
         {
+            //_debug = false;
             _Level = level;
             _valuesSpare = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         }
@@ -78,6 +79,7 @@ namespace zxcCore.Sudoku
             this.Print();
             Console.WriteLine("");
 
+            _debug = true;
             if (this.Solve())
             {
                 Console.WriteLine("Test Solved");
@@ -98,7 +100,7 @@ namespace zxcCore.Sudoku
             _Level = level;
             _Level = _Level > 20 ? 20 : _Level;
             _values = new int[9, 9];
-            _sudokuGrid = new SudokuGrid(this);
+            _sudokuGrid = null;
             if (autoData == false) return true;
 
             //求解
@@ -251,60 +253,76 @@ namespace zxcCore.Sudoku
         //求解
         protected bool Solve()
         {
-            _debug = false;
-            DateTime dtStart = DateTime.Now;
-            _numBacks = 0;
+            try
+            {
+                DateTime dtStart = DateTime.Now;
+                _numBacks = 0;
 
-            //统计获取第一个种子
-            this.Statics();
-            (int x, int y) = getSolve_Next();
+                //统计获取第一个种子
+                this.Statics();
+                (int x, int y) = getSolve_Next();
 
-            //返回计算结果
-            bool bResult = Solve(x, y);
-            if (bResult)
-                this.Print();
-            DateTime dtEnd = DateTime.Now;
-            Console.WriteLine(string.Format("**求解完成**，耗时 {0} s，回退 {1} 步。", (dtEnd - dtStart).TotalMilliseconds / 1000, _numBacks));
-            return bResult;
+                //返回计算结果
+                bool bResult = Solve(x, y);
+                if (bResult)
+                    this.Print();
+                DateTime dtEnd = DateTime.Now;
+                Console.WriteLine(string.Format("**求解完成**，耗时 {0} s，回退 {1} 步。", (dtEnd - dtStart).TotalMilliseconds / 1000, _numBacks));
+                return bResult;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
         //求解-递归
         protected bool Solve(int row, int col)
         {
-            //提取备用值,循环判断
-            if (_debug)
-                Console.WriteLine(string.Format("{0},{1}  --求解：", row, col));
-            List<int> valuesSpare = Solve_Values(row, col);
-            if (valuesSpare.Count == 0)
+            try
+            {
+                //提取备用值,循环判断
+                if (_debug)
+                    Console.WriteLine(string.Format("{0},{1}  --求解：", row, col));
+                List<int> valuesSpare = Solve_Values(row, col);
+                if (valuesSpare.Count == 0)
+                    return false;
+
+                //循环求解
+                for (int i = 0; i < valuesSpare.Count; i++)
+                {
+                    _values[row, col] = valuesSpare[i];
+                    this.Statics(row, col, 1);
+                    if (_debug)
+                        Console.WriteLine(string.Format("   {0},{1}  --求解值：{2} ", row, col, _values[row, col]));
+
+                    //下一个种子
+                    (int x, int y) = getSolve_Next();
+                    if (x == -1 && y == -1) return true;
+                    if (x > -1 && y > -1)
+                    {
+                        //递归求解
+                        if (this.Solve(x, y))
+                            return true;
+                    }
+
+                    //恢复-重新统计
+                    if (_debug)
+                        Console.WriteLine(string.Format("   {0},{1}  --无解： {2} ", x, y, _values[x, y]));
+                    _values[row, col] = 0;
+                    this.Statics();
+
+                    //this.Statics(row, col, -1);
+                    if (_debug)
+                        Console.WriteLine(string.Format("   {0},{1}  --已回退：{2}, 已重新统计", row, col, _values[row, col], _values[row, col]));
+                }
                 return false;
 
-            //循环求解
-            for (int i = 0; i < valuesSpare.Count; i++)
-            {
-                _values[row, col] = valuesSpare[i];
-                this.Statics(row, col, 1);
-                if (_debug)
-                    Console.WriteLine(string.Format("   {0},{1}  --求解值：{2} ", row, col, _values[row, col]));
-
-                //下一个种子
-                (int x, int y) = getSolve_Next();
-                if (x == -1 && y == -1) return true;
-                if (x > -1 && y > -1)
-                {
-                    //递归求解
-                    if (this.Solve(x, y))
-                        return true;
-                }
-
-                //恢复-重新统计
-                if (_debug)
-                    Console.WriteLine(string.Format("   {0},{1}  --无解： {2} ", x, y, _values[x, y]));
-                _values[row, col] = 0;
-                this.Statics();
-                //this.Statics(row, col, -1);
-                if (_debug)
-                    Console.WriteLine(string.Format("   {0},{1}  --已回退：{2}, 已重新统计", row, col, _values[row, col], _values[row, col]));
             }
-            return false;
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         //计算该位置的备用
         protected List<int> Solve_Values(int row, int col)
@@ -385,6 +403,7 @@ namespace zxcCore.Sudoku
                     Statics_Cell_Buffer(i, j, 2);
             }
             _numBacks++;
+            Console.WriteLine(string.Format("**求解数**，回退 {0} 步。", _numBacks));
             return true;
         }
         //修正统计各格子可用数据数
@@ -439,9 +458,10 @@ namespace zxcCore.Sudoku
             return true;
         }
         //转换未图片
-        public bool SaveImage(string path)
+        public bool SaveImage(string path, string name = "")
         {
-            return _sudokuGrid.InitValue() && _sudokuGrid.Save(path);
+            _sudokuGrid = new SudokuGrid(this);
+            return _sudokuGrid.InitValue() && _sudokuGrid.Save(path, name);
         }
 
         #region 属性及构造

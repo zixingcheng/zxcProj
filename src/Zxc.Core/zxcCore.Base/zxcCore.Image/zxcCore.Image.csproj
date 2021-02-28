@@ -6,8 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.2" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta11" />
+    <Compile Remove="Image\ImageColor-ImageSharp.cs" />
+    <Compile Remove="Image\ImageObj-ImageSharp.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ZKWeb.System.Drawing" Version="4.0.1" />
   </ItemGroup>
 
 </Project>
