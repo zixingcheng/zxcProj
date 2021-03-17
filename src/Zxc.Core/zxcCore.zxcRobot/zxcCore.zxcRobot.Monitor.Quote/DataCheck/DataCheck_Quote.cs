@@ -5,7 +5,7 @@ using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.zxcRobot.Msger;
 
-namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
+namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-行情基类
     /// </summary>

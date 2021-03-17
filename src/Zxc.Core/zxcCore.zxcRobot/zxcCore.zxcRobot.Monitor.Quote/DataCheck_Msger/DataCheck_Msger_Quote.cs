@@ -4,7 +4,7 @@ using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.zxcRobot.Msger;
 
-namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
+namespace zxcCore.zxcRobot.Monitor.Msger
 {
     /// <summary>数据检查-消息管理类-行情
     /// </summary>

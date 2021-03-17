@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.Common;
+using zxcCore.zxcRobot.Monitor.DataAnalysis;
 
-namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
+namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-打印行情信息
     /// </summary>

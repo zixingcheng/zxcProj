@@ -1,7 +1,7 @@
 ﻿using System;
 using zpCore.zpDataCache.Memory;
 
-namespace zxcCore.zxcRobot.Monitor.Quote
+namespace zxcCore.zxcRobot.Monitor
 {
     /// <summary>消息类型
     /// </summary>

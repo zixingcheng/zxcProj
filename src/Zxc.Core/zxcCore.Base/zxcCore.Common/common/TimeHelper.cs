@@ -35,6 +35,14 @@ namespace zxcCore.Common
             }
             return dtTime;
         }
+        public static DateTime checkTimeS(dynamic varTime, bool bzero = true)
+        {
+            DateTime dtTime = checkTime(varTime);
+
+            int offset = bzero ? 0 : -1;
+            dtTime = dtTime.AddMilliseconds(-dtTime.Millisecond + offset);
+            return dtTime;
+        }
 
         public static DateTime checkTimeH(dynamic varTime, bool bzero = true)
         {

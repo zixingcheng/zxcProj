@@ -4,7 +4,7 @@ using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.Common;
 
-namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
+namespace zxcCore.zxcRobot.Monitor.DataAnalysis
 {
     /// <summary>数据统计
     /// </summary>
@@ -22,18 +22,32 @@ namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
         /// <summary>最小值
         /// </summary>
         public double Min { get; set; }
-        /// <summary>当前值
+        /// <summary>当前值-修正值
         /// </summary>
         public double Value { get; set; }
+        /// <summary>前值-原始值
+        /// </summary>
+        public double Value_Original { get; set; }
         /// <summary>当前值时间
         /// </summary>
         public DateTime Time { get; set; }
-        /// <summary>前值
+
+        /// <summary>最大值-前值
+        /// </summary>
+        public double Max_last { get; set; }
+        /// <summary>最小值-前值
+        /// </summary>
+        public double Min_last { get; set; }
+        /// <summary>前值-修正值
         /// </summary>
         public double Value_last { get; set; }
+        /// <summary>前值-原始值
+        /// </summary>
+        public double Value_Original_last { get; set; }
         /// <summary>前值时间
         /// </summary>
         public DateTime Time_last { get; set; }
+
         /// <summary>数据生效与前值的数据差（间隔倍数）
         /// </summary>
         public double Value_delta { get; set; }
@@ -68,8 +82,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
         public virtual bool Init(double value, double max, double min, DateTime time, double interval = 0, string tag = "")
         {
             Tag = tag;
-            Max = max;
-            Min = min;
+            Max = max; Max_last = max;
+            Min = min; Min_last = min;
             Value_interval = Math.Round(interval, 4);
             double value0 = value;
             int times = 0;
@@ -82,6 +96,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
             }
             _IsInited = this.Statistics(value, time);
 
+            Value_Original_last = value0;
             Value_last = value; Time_last = time;
             ConsoleHelper.Debug("****** {7}: {0}，差值：{1}，前值：{2}，当前：{6}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, value0, 0, value, Value_interval, times, value, Tag);
             return _IsInited;
@@ -91,14 +106,19 @@ namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
         {
             //最小间隔
             double value0 = value;
-            if (_IsInited && Value_interval > 0)
+            int times = 0;
+            if (_IsInited && Value_interval >= 0)
             {
                 double delta = value - Value;
 
                 //值修正为区间大小倍数
-                value = Math.Round(value / Value_interval) * Value_interval;
-                int times = (int)Math.Round(delta / Value_interval);
-                Value_delta = times * Value_interval;
+                Value_delta = delta;
+                if (Value_interval > 0)
+                {
+                    value = Math.Round(value / Value_interval) * Value_interval;
+                    times = (int)Math.Round(delta / Value_interval);
+                    Value_delta = times * Value_interval;
+                }
 
                 //不到最小间隔，忽略
                 if (Math.Abs(delta) <= Value_interval)
@@ -117,6 +137,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
             //值更新 
             Value_last = Value; Time_last = Time;
             Value = value; Time = time;
+            Value_Original_last = Value_Original; Value_Original = value0;
 
             //计算
             if (Time_last != DateTime.MinValue)
@@ -128,10 +149,12 @@ namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
             //统计
             if (value > Max)
             {
+                Max_last = Max;
                 Max = value;
             }
             else if (value < Min)
             {
+                Min_last = Min;
                 Min = value;
             }
             return true;

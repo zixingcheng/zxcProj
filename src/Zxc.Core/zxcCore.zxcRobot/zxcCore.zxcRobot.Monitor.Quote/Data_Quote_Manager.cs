@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using zpCore.zpDataCache.Memory;
 using zxcCore.zxcDataCache.Swap;
 using zxcCore.Common;
-using zxcCore.zxcRobot.Monitor.Quote.DataCheck;
+using zxcCore.zxcRobot.Monitor.DataCheck;
 using System.Reflection;
+using zxcCore.zxcRobot.Monitor.Msger;
 
 namespace zxcCore.zxcRobot.Monitor.Quote
 {
@@ -27,8 +28,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             _managerCaches.Init(DateTime.Now);
 
             string dirSwap = _configDataCache.config["DataCache.Swap:Monitor_Quote"] + "";
-            //_swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 0, typeof(Data_Quote), "", false);
-            _swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 60 * 5, typeof(Data_Quote), "", true);      //忽略5分钟前数据
+            _swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 0, typeof(Data_Quote), "", false);
+            //_swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 60 * 5, typeof(Data_Quote), "", true);      //忽略5分钟前数据
             _swapIOFiles.SwapData_Change += new DataSwapChange_EventHandler(EventHandler_DataSwapChange);
         }
         ~Data_Quote_Manager()
@@ -40,7 +41,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
 
         //数据对象监测开始
-        public bool Start(int nSteps = -1, int nStepSwaps = 88, int nFrequency = 1000)
+        public bool Start(int nSteps = -1, int nStepSwaps = 88, int nFrequency = 200)
         {
             return _swapIOFiles.Start(nSteps, nStepSwaps, nFrequency);
         }
@@ -126,6 +127,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         public bool InitDataChecks_M(IDataChecks pDataChecks)
         {
             this.InitDataCheck(pDataChecks, typeof(DataCheck_Print<Data_Quote>));
+            this.InitDataCheck(pDataChecks, typeof(DataCheck_Hourly<Data_Quote>));
             this.InitDataCheck(pDataChecks, typeof(DataCheck_RiseFall_Fixed<Data_Quote>));
             return true;
         }
