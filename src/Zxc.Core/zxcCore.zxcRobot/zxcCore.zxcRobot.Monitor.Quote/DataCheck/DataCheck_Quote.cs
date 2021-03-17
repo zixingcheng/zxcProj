@@ -98,7 +98,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote.DataCheck
         protected internal virtual string getMsg_Perfix()
         {
             //组装消息
-            string tagRF = _data._valueRF > 0 ? "涨" : "跌";
+            string tagRF = _data._valueRF == 0 ? "平" : (_data._valueRF > 0 ? "涨" : "跌");
             string tagUnit = _data._isIndex ? "" : "元";
             int digits = _data._isIndex ? 3 : 2;
             float value = _data._typeStock == typeStock.Option ? _data.Value * 10000 : _data.Value;
