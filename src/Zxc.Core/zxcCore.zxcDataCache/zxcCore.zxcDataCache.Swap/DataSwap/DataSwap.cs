@@ -123,9 +123,9 @@ namespace zxcCore.zxcDataCache.Swap
             //泛型
             //Type constructedType = classType.MakeGenericType(typeof(T));
         }
-        protected internal DataSwap_EventArgs CreateDataSwap_EventArgs(List<dynamic> datas)
+        protected internal DataSwap_Event CreateDataSwap_EventArgs(List<dynamic> datas)
         {
-            DataSwap_EventArgs pArgs = new DataSwap_EventArgs();
+            DataSwap_Event pArgs = new DataSwap_Event();
             pArgs._Datas = datas;
             return pArgs;
         }

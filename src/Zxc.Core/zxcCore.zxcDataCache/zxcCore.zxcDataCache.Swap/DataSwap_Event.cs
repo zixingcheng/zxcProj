@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 namespace zxcCore.zxcDataCache.Swap
 {
-    public class DataSwap_EventArgs : EventArgs
+    public delegate void DataSwapChange_EventHandler(object sender, DataSwap_Event e);
+
+    public class DataSwap_Event : EventArgs
     {
         #region 属性及构造
 
@@ -13,14 +15,15 @@ namespace zxcCore.zxcDataCache.Swap
             get { return _Datas; }
         }
 
-        public DataSwap_EventArgs()
+        public DataSwap_Event()
         {
         }
-        ~DataSwap_EventArgs()
+        ~DataSwap_Event()
         {
             // 缓存数据？
         }
 
         #endregion
     }
+
 }
