@@ -140,32 +140,39 @@ class myWeixin_ItChat(myThread.myThread):
     def Done_Swap_MsgOut(self, msg, isGroup = False):
         if(msg or len(msg) > 1):
             myDebug.Debug("消息接收::", msg['Text'])
+            if(str(msg['Text']) == '[]'): return 
+            if(msg.get('Type', "") == 'System'): return
 
             #特殊消息处理
-            picPath = ""
-            dtTime = myData_Trans.Tran_ToTime_byInt(myData_Trans.To_Int(str(msg.get('CreateTime', 0))))
-            if(msg['MsgType'] == 3):    # or msg['MsgType'] == 49):
-                picPath = self.dirPic + "Temps/" + msg.fileName
-                msg.download(picPath); time.sleep(1);
+            try:
+                picPath = ""
+                dtTime = myData_Trans.Tran_ToTime_byInt(myData_Trans.To_Int(str(msg.get('CreateTime', 0))))
+                if(msg['MsgType'] == 3):    # or msg['MsgType'] == 49):
+                    picPath = self.dirPic + "Temps/" + msg.fileName
+                    msg.download(picPath); time.sleep(1);
 
-            #组装消息内容
-            wxMsg = self.pMMsg.OnCreatMsg();
-            wxMsg['usrID'] = msg['User']['UserName']
-            wxMsg['usrName'] = msg['User']['NickName']
-            wxMsg['usrNameNick'] = msg['User']['RemarkName']
-            wxMsg['groupID'] = myData.iif(isGroup, msg['User']['UserName'], "")
-            if(wxMsg['groupID'] != ""):
-                wxMsg['usrNameNick'] = msg['ActualNickName']
-            wxMsg['msgID'] = msg['MsgId']
-            wxMsg['msgType'] = msg['Type'].upper()
-            wxMsg['msg'] = msg['Text']
-            wxMsg['usrPlat'] = "wx"
-            wxMsg['time'] = myData_Trans.Tran_ToTime_str(dtTime)
-            if(picPath != ""):
-                wxMsg['msg'] = picPath
+                #组装消息内容
+                wxMsg = self.pMMsg.OnCreatMsg();
+                wxMsg['usrID'] = msg['User']['UserName']
+                wxMsg['usrName'] = msg['User']['NickName']
+                wxMsg['usrNameNick'] = msg['User']['RemarkName']
+                wxMsg['groupID'] = myData.iif(isGroup, msg['User']['UserName'], "")
+                if(wxMsg['groupID'] != ""):
+                    wxMsg['usrNameNick'] = msg['ActualNickName']
+                wxMsg['msgID'] = msg['MsgId']
+                wxMsg['msgType'] = msg['Type'].upper()
+                wxMsg['msg'] = msg['Text']
+                wxMsg['msgContent'] = msg.get('Content', '')
+                wxMsg['usrPlat'] = "wx"
+                wxMsg['time'] = myData_Trans.Tran_ToTime_str(dtTime)
+                if(picPath != ""):
+                    wxMsg['msg'] = picPath
 
-            #保存
-            self.swapOut.SwapData_Out(wxMsg)
+                #保存
+                if(wxMsg['msg'] != ""):  
+                    self.swapOut.SwapData_Out(wxMsg)
+            except Exception as ex:
+                myError.Error(ex)  
         return
 
     #运行
