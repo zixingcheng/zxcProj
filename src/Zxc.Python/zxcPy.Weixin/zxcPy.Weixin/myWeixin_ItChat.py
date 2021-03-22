@@ -16,7 +16,7 @@ from collections import OrderedDict
 mySystem.Append_Us("../zxcPy.DataSwap", False, __file__)
 #mySystem.Append_Us("/Weixin_Reply/myWxDo", False, __file__)
 mySystem.Append_Us("", False)  
-import myError, myIO, myDebug, myMMap, myThread, myDebug, myData_Trans, myMQ_Rabbit, myData_Swap, myData_SwapWx
+import myError, myIO, myDebug, myMMap, myThread, myDebug, myData, myData_Trans, myMQ_Rabbit, myData_Swap, myData_SwapWx, myManager_Msg
 import myReply_Factory   
 from myGlobal import gol 
 
@@ -28,7 +28,8 @@ class myWeixin_ItChat(myThread.myThread):
         super().__init__("", 0) # 必须调用
         self.usrTag = Tag       # 类实例标识
         self.usrName = ""       # 类实例用户名
-        self.wxReply = myReply_Factory.myWx_Reply(Tag)     #回复消息处理工厂对象类
+        self.wxReply = myReply_Factory.myWx_Reply(Tag)      #
+        self.pMMsg = gol._Get_Setting('manageMsgs')         #消息管理类
         self.usrDefault = {'UserName' : ""}
         self.Init()             # 文件初始
         self.ind = 0
@@ -111,6 +112,7 @@ class myWeixin_ItChat(myThread.myThread):
         self.swapName = 'zxcSwap_wx'
         if(self.swapRecv == None):
             self.swapRecv = gol._Get_Value('dataSwap_msgWx')
+            self.swapOut = gol._Get_Value('dataSwap_msgWx_out')
             
             @self.swapRecv.changeDataSwap()
             def Reply(lstData): 
@@ -122,6 +124,7 @@ class myWeixin_ItChat(myThread.myThread):
             
         #接收消息 
         if(bStart): 
+            self.swapOut.startSwap()
             self.swapRecv.startSwap()
             self.mqTimeNow = myData_Trans.Tran_ToTime_int()   #接收开始时间
     #处理交换消息集
@@ -133,6 +136,37 @@ class myWeixin_ItChat(myThread.myThread):
                 bRes += 1
         if(bRes > 0): return True
         return False
+    #处理交换消息集-缓存已收消息
+    def Done_Swap_MsgOut(self, msg, isGroup = False):
+        if(msg or len(msg) > 1):
+            myDebug.Debug("消息接收::", msg['Text'])
+
+            #特殊消息处理
+            picPath = ""
+            dtTime = myData_Trans.Tran_ToTime_byInt(myData_Trans.To_Int(str(msg.get('CreateTime', 0))))
+            if(msg['MsgType'] == 3):    # or msg['MsgType'] == 49):
+                picPath = self.dirPic + "Temps/" + msg.fileName
+                msg.download(picPath); time.sleep(1);
+
+            #组装消息内容
+            wxMsg = self.pMMsg.OnCreatMsg();
+            wxMsg['usrID'] = msg['User']['UserName']
+            wxMsg['usrName'] = msg['User']['NickName']
+            wxMsg['usrNameNick'] = msg['User']['RemarkName']
+            wxMsg['groupID'] = myData.iif(isGroup, msg['User']['UserName'], "")
+            if(wxMsg['groupID'] != ""):
+                wxMsg['usrNameNick'] = msg['ActualNickName']
+            wxMsg['msgID'] = msg['MsgId']
+            wxMsg['msgType'] = msg['Type'].upper()
+            wxMsg['msg'] = msg['Text']
+            wxMsg['usrPlat'] = "wx"
+            wxMsg['time'] = myData_Trans.Tran_ToTime_str(dtTime)
+            if(picPath != ""):
+                wxMsg['msg'] = picPath
+
+            #保存
+            self.swapOut.SwapData_Out(wxMsg)
+        return
 
     #运行
     def run(self): 
@@ -321,6 +355,8 @@ class myWeixin_ItChat(myThread.myThread):
         return True
     #提取格式化返回信息 
     def Get_Msg_Back(self, msg, isGroup = False):
+        return None         #强制关闭，调整为文件交换方式
+
         #回复操作调用 
         msgR = self.wxReply.Done_ByMsg(msg, isGroup)    #兼容API方式，消息队列无返回        
         if(msgR == None): return None
@@ -410,28 +446,20 @@ class myWeixin_ItChat(myThread.myThread):
             #@itchat.msg_register([TEXT, PICTURE, SYSTEM, CARD, NOTE, SHARING], isFriendChat=True) 
             @itchat.msg_register([TEXT, PICTURE, SYSTEM, NOTE], isFriendChat=True) 
             def Reply_Text(msg): 
-                #图片缓存
-                if(msg['MsgType'] == 3): 
-                    msg.download(self.dirPic + "Temps/" + msg.fileName)
-                    time.sleep(1)
+                self.Done_Swap_MsgOut(msg);     #缓存信息
 
                 if self.Auto_RreplyText:  
                     #提取回复消息内容
-                    myDebug.Debug("消息接收::", msg['Content'])
                     return self.Get_Msg_Back(msg)               #格式化提取(兼容API方式，消息队列无返回)
             self.funStatus_RText = self.Auto_RreplyText
             
             #注册普通文本消息回复                 
             @itchat.msg_register([TEXT, SYSTEM, SHARING], isMpChat=True) 
             def Reply_Text(msg): 
-                #图片缓存
-                if(msg['MsgType'] == 49): 
-                    msg.download(self.dirPic + "Temps/" + msg.fileName)
-                    time.sleep(1)
+                self.Done_Swap_MsgOut(msg);     #缓存信息 
 
                 if self.Auto_RreplyText:  
                     #提取回复消息内容
-                    myDebug.Debug("消息接收::", msg['Content'])
                     return self.Get_Msg_Back(msg)               #格式化提取(兼容API方式，消息队列无返回)
             self.funStatus_RText = self.Auto_RreplyText
 
@@ -442,11 +470,7 @@ class myWeixin_ItChat(myThread.myThread):
             #@itchat.msg_register([TEXT, PICTURE, FRIENDS, SYSTEM, CARD, NOTE, SHARING], isGroupChat=True)
             @itchat.msg_register([TEXT, PICTURE, SYSTEM, NOTE], isGroupChat=True)
             def Reply_Text_Group(msg): 
-                #图片缓存
-                if(msg['MsgType'] == 3): 
-                    msg.download(self.dirPic + "Temps/" + msg.fileName)
-                    time.sleep(1)
-                    #itchat.send_image(self.dirPic + "Temps/" + msg.fileName, "filehelper")
+                self.Done_Swap_MsgOut(msg, True);     #缓存信息
 
                 if self.Auto_RreplyText_G: 
                     #提取回复消息内容
