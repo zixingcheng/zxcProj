@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.Common;
-using zxcCore.zxcRobot.Monitor.DataAnalysis;
+using zxcCore.zxcRobot.DataAnalysis;
 
 namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
-    /// <summary>数据检查-打印行情信息
+    /// <summary>数据检查-涨跌幅度固定监测
     /// </summary>
     public class DataCheck_RiseFall_Fixed<T> : DataCheck_Quote<T>
     {
@@ -15,9 +15,9 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 
         protected internal DataStatistics _dataStics = null;        //实时数据统计对象
 
-        protected internal float _valueRF_last = 0;                 //涨跌幅-最后
-        protected internal float _valueRF_step = 0.005f;            //涨跌幅监测间隔
-        protected internal float _valueRF_step_last = 0;            //涨跌幅间隔-最后
+        protected internal double _valueRF_last = 0;                //涨跌幅-最后
+        protected internal double _valueRF_step = 0.005;            //涨跌幅监测间隔
+        protected internal double _valueRF_step_last = 0;           //涨跌幅间隔-最后
         protected internal DateTime _timeRF_last = DateTime.Now;    //涨跌幅时间-最后
         protected internal int _timeInterval_last = 0;              //涨跌幅时间间隔-最后
         protected internal int _nNums = 0;                          //监测次数
@@ -47,7 +47,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             if (!_dataStics.IsInited)
             {
                 //修正最小生效间隔
-                float dValue_interval = _data._isIndex ? _valueRF_step / 2.0f : _data._typeStock == typeStock.Option ? _valueRF_step * 4.0f : _valueRF_step;
+                double dValue_interval = _data._isIndex ? _valueRF_step * 0.4 : _data._typeStock == typeStock.Option ? _valueRF_step * 4.0 : _valueRF_step;
 
                 //初始统计信息
                 _dataStics.Init(_data._valueRF, _data.highPrice / _data.preClose - 1, _data.lowPrice / _data.preClose - 1, _data.Time, dValue_interval, _data.name);

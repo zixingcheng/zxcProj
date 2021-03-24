@@ -65,6 +65,7 @@ namespace zxcCore.zxcRobot.Msger
             get; set;
         }
 
+
         public Msg()
         {
             DestTypeMsger = new List<typeMsger>();

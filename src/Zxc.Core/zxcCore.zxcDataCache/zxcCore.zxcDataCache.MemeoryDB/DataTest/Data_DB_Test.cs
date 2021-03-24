@@ -10,7 +10,7 @@ namespace zxcCore.zxcDataCache.MemoryDB.Test
     {
         #region 属性及构造
 
-        /// <summary>数据库路径
+        /// <summary>库表
         /// </summary>
         public Data_Table<Data_TestObj> Data_Test { get; set; }
 
@@ -22,7 +22,12 @@ namespace zxcCore.zxcDataCache.MemoryDB.Test
 
         protected override void OnModelCreating()
         {
+            base.OnModelCreating();
+
+            Data_Test = new Data_Table<Data_TestObj>(); this.InitModel(Data_Test);
+
             Data_Test = this.OnModelCreating<Data_TestObj>();
+
         }
 
 

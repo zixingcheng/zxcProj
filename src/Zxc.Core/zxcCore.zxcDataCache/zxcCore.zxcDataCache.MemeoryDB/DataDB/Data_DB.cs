@@ -16,16 +16,34 @@ namespace zxcCore.zxcDataCache.MemoryDB
 
         public Data_DB(string dirBase)
         {
-            DirBase = dirBase;
-            this.OnModelCreating();
+            if (dirBase != "")
+            {
+                DirBase = dirBase;
+                this.OnModelCreating();
+            }
         }
 
         #endregion
 
-
         protected virtual void OnModelCreating()
         {
+            if (this.DirBase != "")
+            {
+                if (!System.IO.Directory.Exists(this.DirBase))
+                    System.IO.Directory.CreateDirectory(this.DirBase);
+            }
+        }
 
+
+        protected virtual bool InitModel<T>(Data_Table<T> objModel) where T : class, IData
+        {
+            Data_Table<T> dtTemp = this.OnModelCreating<T>();
+            foreach (var item in dtTemp)
+            {
+                objModel.Add(item);
+            }
+            objModel.SetDB(this);
+            return true;
         }
         protected virtual Data_Table<T> OnModelCreating<T>() where T : class, IData
         {

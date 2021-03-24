@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace zxcCore.zxcRobot.Monitor.DataAnalysis
+namespace zxcCore.zxcRobot.DataAnalysis
 {
     public interface IDataStatistics
     {

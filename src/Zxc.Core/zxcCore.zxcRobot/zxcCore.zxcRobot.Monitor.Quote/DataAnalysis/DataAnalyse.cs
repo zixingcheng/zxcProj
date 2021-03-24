@@ -4,14 +4,19 @@ using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.Common;
 
-namespace zxcCore.zxcRobot.Monitor.DataAnalysis
+namespace zxcCore.zxcRobot.DataAnalysis
 {
     /// <summary>数据统计
     /// </summary>
     /// 
-    public class DataAnalysis
+    public class DataAnalyse
     {
         #region 属性及构造
+
+        /// <summary数据交换事件
+        /// </summary>
+        public event DataAnalyse_EventHandler DataAnalyse_Trigger;
+
 
         /// <summary>标识
         /// </summary>
@@ -39,7 +44,7 @@ namespace zxcCore.zxcRobot.Monitor.DataAnalysis
 
         /// <summary>数据对象缓存
         /// </summary>
-        protected Datas Datas { get; set; }
+        protected internal Datas Datas { get; set; }
         /// <summary>数据统计对象
         /// </summary>
         protected DataStatistics DataStatistics { get; set; }
@@ -55,9 +60,11 @@ namespace zxcCore.zxcRobot.Monitor.DataAnalysis
             get { return _IsInited; }
         }
 
-        public DataAnalysis(string tag)
+
+        public DataAnalyse(string tag)
         {
             Tag = tag;
+            this.Datas = new Datas(Tag);
         }
 
         #endregion
@@ -95,7 +102,6 @@ namespace zxcCore.zxcRobot.Monitor.DataAnalysis
         {
             //缓存及统计数据
             this.Datas.AddData(value, time);
-            //this.DataStatistics.Statistics(value, time);
 
             //数据处理
             this.dataHandle(value, time);
@@ -126,7 +132,8 @@ namespace zxcCore.zxcRobot.Monitor.DataAnalysis
 
 
             //计算变化区间
-            string monitorType = "";
+            typeMonitor monitorType = typeMonitor.NONE;
+            typeMonitor2 monitorType2 = typeMonitor2.NONE;
             double dRatio = Math.Round(dDelta / this.Value_base, 6);
             ConsoleHelper.Debug("监测值：{0}-{1}，变动：{2}，时间：{3}", dValue0, value, dRatio, time.ToString("HH:mm:ss"));
             if (dRatio == 0) return true;
@@ -136,11 +143,11 @@ namespace zxcCore.zxcRobot.Monitor.DataAnalysis
             {
                 if (dRatio > 0)     //上升,新高       
                 {
-                    monitorType = "RAISE"; this.Value_last_direction = 1;
+                    monitorType = typeMonitor.RAISE; monitorType2 = typeMonitor2.RAISE; this.Value_last_direction = 1;
                 }
                 else               //下降，新低
                 {
-                    monitorType = "FALL"; this.Value_last_direction = -1;
+                    monitorType = typeMonitor.FALL; monitorType2 = typeMonitor2.FALL; this.Value_last_direction = -1;
                 }
 
                 //超限跨区间限制处理
@@ -148,7 +155,14 @@ namespace zxcCore.zxcRobot.Monitor.DataAnalysis
                 {
                     //前值记录
                     if (this.Value_last_direction * (dValue0 - this.Value) > 0)
+                    {
                         this.Value = dValue0;
+                    }
+                    else
+                    {
+                        //标识波动
+                        monitorType2 = this.Value_last_direction < 0 ? typeMonitor2.RAISE_WAVE : typeMonitor2.RAISE_WAVE;
+                    }
                 }
                 else
                 {
@@ -158,7 +172,7 @@ namespace zxcCore.zxcRobot.Monitor.DataAnalysis
                 //递归修正，不触发
                 if (recursion)
                 {
-                    monitorType = "";
+                    monitorType = typeMonitor.NONE;
                 }
 
                 //第一个数据直接退出
@@ -177,18 +191,26 @@ namespace zxcCore.zxcRobot.Monitor.DataAnalysis
                     this.InitDataStatistics(dValue0, time, dMax, dMin);     //初始新统计对象
                     this.Value = dValue0;
 
-                    monitorType = "BREAK"; bHitLimit = true; this.Value_last_direction *= -1;
+                    monitorType = typeMonitor.BREAK; bHitLimit = true; this.Value_last_direction *= -1;
+                    monitorType2 = this.Value_last_direction < 0 ? typeMonitor2.FALL_BREAK : typeMonitor2.RAISE_BREAK;
                 }
             }
 
             //组装消息
-            if (monitorType != "")
+            if (monitorType != typeMonitor.NONE)
             {
                 double profit = Math.Round(this.DataStatistics.Value / this.Value_base - 1, 6);
                 var msg = new { Type = monitorType, codeState = this.Value_last_direction, hitLimit = bHitLimit, Value = this.DataStatistics.Value, Ratio = dRatio, Profit = profit };
 
+                if (this.DataAnalyse_Trigger != null)
+                {
+                    DataAnalyse_EventArgs pArgs = new DataAnalyse_EventArgs();
+                    pArgs.MonitorType = monitorType;
+                    pArgs.MonitorType2 = monitorType2;
+                    pArgs.Value = dValue0;
+                    this.DataAnalyse_Trigger(this, pArgs);
+                }
                 ConsoleHelper.Debug("{0}", msg.ToString());
-
                 //self.datasMonitor.append([index, valueLast, monitorType, self.state, hitLimit])
             }
 

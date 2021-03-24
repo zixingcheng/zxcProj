@@ -4,7 +4,7 @@ using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.Common;
 
-namespace zxcCore.zxcRobot.Monitor.DataAnalysis
+namespace zxcCore.zxcRobot.DataAnalysis
 {
     /// <summary>数据对象
     /// </summary>

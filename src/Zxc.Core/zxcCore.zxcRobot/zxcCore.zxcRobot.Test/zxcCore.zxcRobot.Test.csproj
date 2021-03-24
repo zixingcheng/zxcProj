@@ -6,7 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\zxcCore.zxcDataCache\zxcCore.zxcDataCache.MemeoryDB\zxcCore.zxcDataCache.MemeoryDB.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Monitor.Quote\zxcCore.zxcRobot.Monitor.Quote.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.Robot\zxcCore.zxcRobot.Robot.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.User\zxcCore.zxcRobot.User.csproj" />
   </ItemGroup>
 
 </Project>
