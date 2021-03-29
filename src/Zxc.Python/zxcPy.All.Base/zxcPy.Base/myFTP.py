@@ -7,19 +7,19 @@ Created on  张斌 2020-05-21 16:30:00
     FTP操作 
        --参考 博客地址：http://blog.csdn.net/ouyang_peng/article/details/79271113 作者：欧阳鹏
 """
-import os, sys, time, datetime, socket, threading
+import os, sys, re, time, datetime, socket, threading
 from ftplib import FTP
-from myIO_monitor import myMonitor_File
-import myProcess_monitor
 
 
 # FTP自动下载、自动上传脚本，可以递归目录操作
 class myFTP:
-    def __init__(self, host, port, localFolder):
+    def __init__(self, host, port, localFolder, vaildDays = 30, lastDays_file = 15):
         # 初始化 FTP 客户端
         self.localFolder = localFolder
         self.host = host
         self.port = port
+        self.vaildDays = vaildDays
+        self.lastDays_file = -lastDays_file
         self.closed = True
         self.ftp = FTP()
         self.ftp.encoding = 'gbk'               # 重新设置下编码方式
@@ -28,9 +28,10 @@ class myFTP:
         self.logFile = self.logDir + '/Logs/log_{}.txt'.format(datetime.datetime.strftime(datetime.datetime.now(), "%Y_%m_%d"))
         self.log_file = open(self.logFile, "a")
         self.file_list = []
-        self.delete_files()                     # 保留三天内的文件
+        self.delete_files(self.lastDays_file)   # 保留三天内的文件
         self.funDownloaded_file = None          # 下载文件完成装饰函数
         self.funUploaded_file = None            # 上传文件完成装饰函数
+        self.noVaildwords = []                  # 包含文件名剔除
     # FTP 登录
     def login(self, username, password):
         try:
@@ -59,6 +60,10 @@ class myFTP:
     # 下载文件
     def download_file(self, local_file, remote_file):
         self.debug_print("download_file()---> local_path = %s ,remote_path = %s" % (local_file, remote_file))
+        if not self.check_file_vaild(local_file + "/", remote_file):
+            self.debug_print('%s 文件名排除，无需下载' % local_file)
+            return
+
         if self.is_same_size(local_file, remote_file):
             self.debug_print('%s 文件大小相同，无需下载' % local_file)
             return
@@ -79,6 +84,9 @@ class myFTP:
     def download_file_tree(self, local_path, remote_path):
         print("download_file_tree()--->  local_path = %s ,remote_path = %s" % (local_path, remote_path))
         try:
+            if not self.check_file_vaild(local_path + "/", remote_path):
+                self.debug_print('%s 文件夹排除，无需下载' % remote_path)
+                return
             self.ftp.cwd(remote_path)
         except Exception as err:
             self.debug_print('远程目录%s不存在，继续...' % remote_path + " ,具体错误描述为：%s" % err)
@@ -165,18 +173,33 @@ class myFTP:
         def _uploaded_file(fn):
             self.funUploaded_file = fn
         return _uploaded_file
+    
+    # 检查文件名
+    def check_file_vaild(self, dirName, fileName):
+        path = dirName + fileName
+        for x in self.noVaildwords:
+            if(x in path):
+                return False
+
+        # 判断文件时间是否有效
+        if(not self.isVaildTime(fileName, self.vaildDays)):
+           return False
+        return True
 
     # 获取文件列表
     def get_file_list(self, line):
         file_arr = self.get_file_name(line)
-        # 去除  . 和  ..
-        if file_arr[1] not in ['.', '..']:
-            self.file_list.append(file_arr)
+        if(file_arr != None):
+            # 去除  . 和  ..
+            if file_arr[1] not in ['.', '..']:
+                self.file_list.append(file_arr)
     # 获取文件名
     def get_file_name(self, line):
         pos = line.rfind(':')
         while (line[pos] != ' '):
             pos += 1
+            if(pos >= len(line)):
+                return None
         while (line[pos] == ' '):
             pos += 1
         file_arr = [line[0], line[pos:]]
@@ -226,6 +249,36 @@ class myFTP:
                 time.sleep(10)
         self.debug_print('local_file_size:%d  , remote_file_size:%d' % (local_file_size, remote_file_size))
         return remote_file_size == local_file_size
+    # 判断文件是否有效
+    def isVaildTime(self, fileName, days = -5):
+        if(fileName == ""): return True
+        dtFile = datetime.datetime.now() 
+        if(len(fileName) == 8):
+            if(self.isNumberic(fileName)):
+                dtFile = datetime.datetime.strptime(fileName, "%Y%m%d")
+        else:
+            name = fileName.split('.')[0]
+            temps = name.split('_')
+            if(len(temps) > 1):
+                timeStr = temps[len(temps) - 2]
+                dtFile = datetime.datetime.strptime(timeStr, "%Y%m%d")
+        
+        # 时间有效判断
+        dtNow = datetime.datetime.now()
+        deltaDay = dtNow.__sub__(dtFile).days
+        if(deltaDay >= days):
+            return False
+        return True
+    #是否为数字
+    def isNumberic(self, value):
+        #调用正则 
+        pRe = re.compile(r'[-+]?\d+(\.\d+)?$')
+        result = pRe.match(value)
+        if(result):
+            return True
+        else:
+            return False 
+
     # 删除文件
     def delete_files(self, days = -5):
         file_list = [self.localFolder, self.logDir]     # 文件夹列表
@@ -249,7 +302,7 @@ class myFTP:
                                 continue                   # 屏蔽readme文件
                             os.remove(pathFile)
                             self.debug_print('删除文件{}'.format(pathFile))
-                            time.sleep(2)
+                            time.sleep(0.02)
                     else:
                         if not os.listdir(pathFile):  # 判断目录是否为空
                             # 若目录为空，则删除，并递归到上一级目录，如若也为空，则删除，依此类推
@@ -261,13 +314,14 @@ class myFTP:
                             file_list.append(pathFile)
             return True
         except Exception as err:
-            self.deal_error("FTP 连接或登录失败 ，错误描述为：%s" % err)
+            self.deal_error("FTP 历史文件删除出错 ，错误描述为：%s" % err)
             return False
+
     
 # FTP自动下载、自动上传脚本，自动监测文件夹变动执行上传         
 class myFTP_Monitor:
-    def __init__(self, host, port, username, password, localDir, dataFolder, limitH = 12):
-        self.my_ftp = myFTP(host, port, localDir)
+    def __init__(self, host, port, username, password, localDir, dataFolder, limitH = 12, vaildDays = 30, lastDays_file = 15):
+        self.my_ftp = myFTP(host, port, localDir, vaildDays, lastDays_file)
         self.username = username
         self.password = password
         self.localDir = localDir
@@ -286,7 +340,7 @@ class myFTP_Monitor:
         # 装饰函数，文件变动触发
         @self.fileMonitor.changes_register()
         def Reply(params): 
-            pass
+             pass
         # 装饰函数，文件变动触发
         @self.fileMonitor.change()
         def Change(): 
@@ -300,7 +354,7 @@ class myFTP_Monitor:
                 return
 
             # 删除历史时间数据
-            self.my_ftp.delete_files()
+            self.my_ftp.delete_files(self.my_ftp.lastDays_file)
 
             # FTP登录
             self.my_ftp.login(self.username, self.password)
@@ -337,7 +391,7 @@ class myFTP_Monitor:
                 return
 
             # 删除历史时间数据
-            self.my_ftp.delete_files()
+            self.my_ftp.delete_files(-30)
 
             # FTP登录
             self.my_ftp.login(self.username, self.password)
