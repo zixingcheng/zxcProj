@@ -85,6 +85,7 @@
     <Content Include="zxcPy_Form\templates\about.html" />
     <Content Include="zxcPy_Form\templates\company_feedback.html" />
     <Content Include="zxcPy_Form\templates\company.html" />
+    <Content Include="zxcPy_Form\templates\company_feedback_lists.html" />
     <Content Include="zxcPy_Form\templates\company_feedback_list.html" />
     <Content Include="zxcPy_Form\templates\company_list.html" />
     <Content Include="zxcPy_Form\templates\login.html" />

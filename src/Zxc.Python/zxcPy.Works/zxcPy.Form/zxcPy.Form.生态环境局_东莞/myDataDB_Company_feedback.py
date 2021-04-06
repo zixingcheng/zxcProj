@@ -58,7 +58,7 @@ class myDataDB_Company(myData_DB_Mysql.myData_Table):
         # 查询数据
         if(dataDB == None):
             dataDB = gol._Get_Value('dbCompany_fb')
-        dictSet = dataDB.Query("isDel==False" , "", True, "companyInfo")
+        dictSet = dataDB.Query("isDel==False" , "", True, "Task_OrderCompany")
         return dictSet
     # 提取设置，指定公司名、公司代码
     def getCompany(self, idCompany, nameCompany, isDel = False, dataDB = None): 
@@ -70,8 +70,8 @@ class myDataDB_Company(myData_DB_Mysql.myData_Table):
         # 查询数据
         if(dataDB == None):
             dataDB = gol._Get_Value('dbCompany_fb')
-        lstData = dataDB.Query(strFilter, "", True, "companyInfo")
-        #dictData = dataDB.Query(strFilter, "", True, "companyInfo")
+        lstData = dataDB.Query(strFilter, "", True, "Task_OrderCompany")
+        #dictData = dataDB.Query(strFilter, "", True, "Task_OrderCompany")
 
         # 提取及返回
         #lstData = list(dictData.values())
@@ -89,10 +89,10 @@ class myDataDB_Company(myData_DB_Mysql.myData_Table):
         if(dataDB == None):
             dataDB = gol._Get_Value('dbCompany_fb')
         if(True):
-            values = dataDB.Query(strFilter, "", True, "companyInfo")
+            values = dataDB.Query(strFilter, "", True, "Task_OrderCompany")
             return len(values), values
         else:
-            dictData = dataDB.Query(strFilter, "", True, "companyInfo")
+            dictData = dataDB.Query(strFilter, "", True, "Task_OrderCompany")
             lstData = list(dictData.values())
 
             # 提取及返回

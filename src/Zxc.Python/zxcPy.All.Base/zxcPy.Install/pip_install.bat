@@ -39,7 +39,7 @@ pip install jqdatasdk
 
 :: 数学操作相关模块 （重装 pandas，跟jqdatasdk版本冲突)
 pip uninstall pandas
-pip install pandas
+pip install pandas==0.25.3
 pip install matplotlib
 
 

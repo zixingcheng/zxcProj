@@ -164,7 +164,7 @@ class myWeixin_ItChat(myThread.myThread):
                 wxMsg['msg'] = msg['Text']
                 wxMsg['msgContent'] = msg.get('Content', '')
                 wxMsg['usrPlat'] = "wx"
-                wxMsg['time'] = myData_Trans.Tran_ToTime_str(dtTime)
+                wxMsg['msgTime'] = myData_Trans.Tran_ToTime_str(dtTime)
                 if(picPath != ""):
                     wxMsg['msg'] = picPath
 
