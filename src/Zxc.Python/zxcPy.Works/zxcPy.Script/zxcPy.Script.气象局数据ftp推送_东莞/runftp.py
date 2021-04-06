@@ -4,7 +4,7 @@ Created on  张斌 2020-05-20 09:58:00
     @author: zhang bin
     @email:  zhangbin@qq.com
 
-    Ftp Server --脚本启动，单例
+    Ftp Server --脚本启动，单例（只可部署windows系统，已部署东莞市气象局）
 """ 
 import os, time, mySystem 
 
