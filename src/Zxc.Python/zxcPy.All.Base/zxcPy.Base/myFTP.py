@@ -149,7 +149,8 @@ class myFTP:
             src = os.path.join(local_path, local_name)
             if os.path.isdir(src):
                 try:
-                    self.ftp.mkd(local_name)
+                    if(self.check_fileFtp_exist(local_name) == False):
+                        self.ftp.mkd(local_name)
                 except Exception as err:
                     self.debug_print("目录已存在 %s ,具体错误描述为：%s" % (local_name, err))
                 self.debug_print("upload_file_tree()---> 上传目录： %s" % local_name)
@@ -185,6 +186,13 @@ class myFTP:
         if(not self.isVaildTime(fileName, self.vaildDays)):
            return False
         return True
+    # 检查远程ftp文件夹/名是否存在
+    def check_fileFtp_exist(self, fileName):
+        try:
+            files = self.ftp.nlst()
+            return fileName in files
+        except :
+            return False
 
     # 获取文件列表
     def get_file_list(self, line):
