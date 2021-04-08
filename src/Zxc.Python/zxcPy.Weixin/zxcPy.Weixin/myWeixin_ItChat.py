@@ -50,7 +50,7 @@ class myWeixin_ItChat(myThread.myThread):
     def Init(self, dir = "", pathPicDir = ""):
         if (dir == ""):
             strDir, strName = myIO.getPath_ByFile(__file__)
-            self.dirBase = os.path.abspath(os.path.join(strDir, ".."))  
+            self.dirBase = os.path.abspath(os.path.join(strDir, "..")).replace("\\", "/")  
         else:
             self.dirBase = dir
             
@@ -59,8 +59,11 @@ class myWeixin_ItChat(myThread.myThread):
         self.dirData = self.dirBase + "/Data/"
         if(pathPicDir == ""): pathPicDir = self.dirData
         self.dirPic = pathPicDir + "Pic/"
+        self.dirFile = pathPicDir + "File/"
         myIO.mkdir(self.dirPic, False)
         myIO.mkdir(self.dirPic + "Temps", False, True)
+        myIO.mkdir(self.dirFile, False)
+        myIO.mkdir(self.dirFile + "Temps", False, True)
 
     #初始消息通讯缓存    
     def Init_MsgCache(self, useCmdMMap = True):
@@ -145,11 +148,15 @@ class myWeixin_ItChat(myThread.myThread):
 
             #特殊消息处理
             try:
-                picPath = ""
+                destPath = ""
                 dtTime = myData_Trans.Tran_ToTime_byInt(myData_Trans.To_Int(str(msg.get('CreateTime', 0))))
-                if(msg['MsgType'] == 3):    # or msg['MsgType'] == 49):
-                    picPath = self.dirPic + "Temps/" + msg.fileName
-                    msg.download(picPath); time.sleep(1);
+                msgType = msg['MsgType']
+                if(msgType == 3):       # 图片 
+                    destPath = self.dirPic + "Temps/" + msg.fileName
+                    msg.download(destPath); time.sleep(1);
+                elif(msgType == 49):    # 文件
+                    destPath = self.dirFile + "Temps/" + msg.fileName
+                    msg.download(destPath); time.sleep(1);
 
                 #组装消息内容
                 wxMsg = self.pMMsg.OnCreatMsg();
@@ -165,8 +172,8 @@ class myWeixin_ItChat(myThread.myThread):
                 wxMsg['msgContent'] = msg.get('Content', '')
                 wxMsg['usrPlat'] = "wx"
                 wxMsg['msgTime'] = myData_Trans.Tran_ToTime_str(dtTime)
-                if(picPath != ""):
-                    wxMsg['msg'] = picPath
+                if(destPath != ""):
+                    wxMsg['msg'] = destPath
 
                 #保存
                 if(wxMsg['msg'] != ""):  
@@ -450,8 +457,8 @@ class myWeixin_ItChat(myThread.myThread):
         #注册普通文本消息回复(一对一)
         if self.Auto_RreplyText != self.funStatus_RText:
             #注册普通文本消息回复                 
-            #@itchat.msg_register([TEXT, PICTURE, SYSTEM, CARD, NOTE, SHARING], isFriendChat=True) 
-            @itchat.msg_register([TEXT, PICTURE, SYSTEM, NOTE], isFriendChat=True) 
+            #@itchat.msg_register([TEXT, PICTURE, RECORDING, ATTACHMENT, VIDEO, SYSTEM, CARD, NOTE, SHARING], isFriendChat=True) 
+            @itchat.msg_register([TEXT, PICTURE, RECORDING, ATTACHMENT, VIDEO, SYSTEM, NOTE], isFriendChat=True) 
             def Reply_Text(msg): 
                 self.Done_Swap_MsgOut(msg);     #缓存信息
 
@@ -475,7 +482,7 @@ class myWeixin_ItChat(myThread.myThread):
         if self.Auto_RreplyText_G != self.funStatus_RText_G:
             #注册普通文本消息回复                 
             #@itchat.msg_register([TEXT, PICTURE, FRIENDS, SYSTEM, CARD, NOTE, SHARING], isGroupChat=True)
-            @itchat.msg_register([TEXT, PICTURE, SYSTEM, NOTE], isGroupChat=True)
+            @itchat.msg_register([TEXT, PICTURE, RECORDING, ATTACHMENT, VIDEO, SYSTEM, NOTE], isGroupChat=True)
             def Reply_Text_Group(msg): 
                 self.Done_Swap_MsgOut(msg, True);     #缓存信息
 
