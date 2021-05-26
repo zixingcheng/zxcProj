@@ -17,11 +17,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcRobot.Msger", "z
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcDataCache.Swap", "..\zxcCore.zxcDataCache\zxcCore.zxcDataCache.Swap\zxcCore.zxcDataCache.Swap.csproj", "{1C4211BB-684D-4066-AC5D-0FFD9A19C9C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zxcCore.zxcDataCache.MemeoryDB", "..\zxcCore.zxcDataCache\zxcCore.zxcDataCache.MemeoryDB\zxcCore.zxcDataCache.MemeoryDB.csproj", "{EAEAFCF5-F35A-4D59-BFB3-7E01072A5BA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcDataCache.MemeoryDB", "..\zxcCore.zxcDataCache\zxcCore.zxcDataCache.MemeoryDB\zxcCore.zxcDataCache.MemeoryDB.csproj", "{EAEAFCF5-F35A-4D59-BFB3-7E01072A5BA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zxcCore.zxcRobot.Robot", "zxcCore.zxcRobot.Robot\zxcCore.zxcRobot.Robot.csproj", "{1507B90A-125A-4E2A-AFDF-94C66CA3F552}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcRobot.Robot", "zxcCore.zxcRobot.Robot\zxcCore.zxcRobot.Robot.csproj", "{1507B90A-125A-4E2A-AFDF-94C66CA3F552}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zxcCore.zxcRobot.User", "zxcCore.zxcRobot.User\zxcCore.zxcRobot.User.csproj", "{0F262094-5365-4805-BF8B-DAF5E176B359}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcRobot.User", "zxcCore.zxcRobot.User\zxcCore.zxcRobot.User.csproj", "{0F262094-5365-4805-BF8B-DAF5E176B359}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zxcCore.zxcRobot.Monitor.Msg", "zxcCore.zxcRobot.Monitor.Msg\zxcCore.zxcRobot.Monitor.Msg.csproj", "{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataCache", "DataCache", "{219C788A-DCCD-4233-9285-D30A46A1779C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataBase", "DataBase", "{9869A7F9-A6A7-4990-918C-C7FAA2F5BFD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataMonitor", "DataMonitor", "{480A8248-4D17-4919-A2E0-9D6A64469CB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,9 +119,27 @@ Global
 		{0F262094-5365-4805-BF8B-DAF5E176B359}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F262094-5365-4805-BF8B-DAF5E176B359}.Release|x64.ActiveCfg = Release|Any CPU
 		{0F262094-5365-4805-BF8B-DAF5E176B359}.Release|x64.Build.0 = Release|Any CPU
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}.Debug|x64.Build.0 = Debug|Any CPU
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}.Release|x64.ActiveCfg = Release|Any CPU
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C07B3D1A-F048-4400-9984-D9A488CF9B1B} = {219C788A-DCCD-4233-9285-D30A46A1779C}
+		{EF2F99D4-AA4F-4D3A-80EC-A38B55AA42A8} = {9869A7F9-A6A7-4990-918C-C7FAA2F5BFD2}
+		{D4BB9EB3-FF28-49AB-86C2-C11B0ECD8701} = {480A8248-4D17-4919-A2E0-9D6A64469CB7}
+		{147A332C-4399-415C-9435-0848FCE23A77} = {9869A7F9-A6A7-4990-918C-C7FAA2F5BFD2}
+		{AAF9C4BF-52D4-45C3-A51B-ABCC239E71BA} = {9869A7F9-A6A7-4990-918C-C7FAA2F5BFD2}
+		{1C4211BB-684D-4066-AC5D-0FFD9A19C9C0} = {219C788A-DCCD-4233-9285-D30A46A1779C}
+		{EAEAFCF5-F35A-4D59-BFB3-7E01072A5BA5} = {219C788A-DCCD-4233-9285-D30A46A1779C}
+		{895E0B18-65DB-41FE-9B2D-95FBA9D448D2} = {480A8248-4D17-4919-A2E0-9D6A64469CB7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6AF3A8F3-C496-48E8-ACA3-963F42506F2A}

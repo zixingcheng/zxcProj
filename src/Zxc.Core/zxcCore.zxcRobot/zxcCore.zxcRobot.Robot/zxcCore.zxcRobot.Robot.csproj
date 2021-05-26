@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\zxcCore.Base\zxcCore.Base\zxcCore.Base.csproj" />
+    <ProjectReference Include="..\..\zxcCore.Base\zxcCore.Common\zxcCore.Common.csproj" />
+    <ProjectReference Include="..\..\zxcCore.zxcDataCache\zxcCore.zxcDataCache.Swap\zxcCore.zxcDataCache.Swap.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.Monitor.Msg\zxcCore.zxcRobot.Monitor.Msg.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.Msger\zxcCore.zxcRobot.Msger.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.User\zxcCore.zxcRobot.User.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MsgSwap\" />
+  </ItemGroup>
+
+</Project>

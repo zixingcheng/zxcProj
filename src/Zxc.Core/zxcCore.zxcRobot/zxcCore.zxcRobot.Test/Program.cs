@@ -11,6 +11,7 @@ using zxcCore.zxcRobot.Monitor.Quote;
 using zxcCore.zxcRobot.User;
 using zxcCore.zxcDataCache.MemoryDB;
 using zxcCore.zxcDataCache.MemoryDB.Test;
+using zxcCore.zxcRobot.Robot;
 
 namespace zxcCore.zxcRobot.Test
 {
@@ -18,6 +19,15 @@ namespace zxcCore.zxcRobot.Test
     {
         static void Main(string[] args)
         {
+            Robot_Manager._Manager.Start();
+
+            while (true)
+            {
+                Thread.Sleep(2000);         //模拟长时间运算
+            }
+            return;
+
+
             //UserManager _Users = new UserManager("");
 
 

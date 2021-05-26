@@ -34,10 +34,10 @@ namespace zxcCore.zxcDataCache.Swap
 
         /// <summary>提取及转换数据
         /// </summary>
-        /// <param name="delayedTime">有效延迟时间，超过无效</param>
         /// <param name="nStepSwaps">单次处理交换数据条数</param>
+        /// <param name="ackInfo">确认信息</param>
         /// <returns></returns>
-        List<dynamic> SwapData_In(int nStepSwaps = 1);
+        List<dynamic> SwapData_In(int nStepSwaps, out AckInfo ackInfo);
         /// <summary>转换及输出数据
         /// </summary>
         /// <returns></returns>

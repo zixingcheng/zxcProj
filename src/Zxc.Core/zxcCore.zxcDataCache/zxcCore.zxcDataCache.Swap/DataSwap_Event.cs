@@ -15,6 +15,14 @@ namespace zxcCore.zxcDataCache.Swap
             get { return _Datas; }
         }
 
+        /// <summary>确认信息
+        /// </summary>
+        protected internal AckInfo _AckInfo = null;
+        public AckInfo AckInfo
+        {
+            get { return _AckInfo; }
+        }
+
         public DataSwap_Event()
         {
         }

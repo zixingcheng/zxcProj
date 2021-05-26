@@ -10,7 +10,8 @@ namespace zxcCore.zxcRobot.Msger
         None = -1,
         Sys = 0,
         EMail = 1,
-        Wx = 10
+        wx = 10,
+        wxmp = 11
     }
 
     /// <summary>消息接口

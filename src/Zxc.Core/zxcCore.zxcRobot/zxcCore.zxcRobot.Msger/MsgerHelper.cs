@@ -18,6 +18,10 @@ namespace zxcCore.zxcRobot.Msger
     {
         #region 属性及构造
 
+        /// <summary>全局消息缓存对象
+        /// </summary>
+        public static readonly MsgerHelper Msger = new MsgerHelper(true, -1);
+
         protected internal Dictionary<string, IMsger> _MsgsHandle = null;
         public Dictionary<string, IMsger> MsgsHandle
         {

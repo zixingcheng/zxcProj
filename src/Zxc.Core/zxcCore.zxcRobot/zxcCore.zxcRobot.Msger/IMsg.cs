@@ -12,15 +12,20 @@ namespace zxcCore.zxcRobot.Msger
     }
     public interface IMsg
     {
-        List<typeMsger> DestTypeMsger { get; set; }
-        string MsgID { get; set; }
-        string MsgInfo { get; set; }
-        string MsgLink { get; set; }
-        DateTime MsgTime { get; set; }
-        typeMsg MsgType { get; set; }
-        string UserID_Src { get; set; }
+        string groupID { get; set; }
+        bool IsSend { get; set; }
         bool IsUserGroup { get; set; }
-        string UserID_To { get; set; }
+        string msg { get; set; }
+        string msgContent { get; set; }
+        string msgID { get; set; }
+        string msgLink { get; set; }
+        DateTime msgTime { get; set; }
+        typeMsg msgType { get; set; }
+        string UserName_src { get; set; }
+        string usrID { get; set; }
+        string usrName { get; set; }
+        string usrNameNick { get; set; }
+        typeMsger usrPlat { get; set; }
 
         dynamic ToDict();
     }

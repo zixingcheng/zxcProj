@@ -82,15 +82,15 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             //组装消息
             Msg pMsg = new Msg()
             {
-                MsgID = "",
-                MsgInfo = msg + "",
-                MsgType = typeMsg.TEXT,
-                MsgLink = "",
-                UserID_To = userID_To,
-                IsUserGroup = userID_To.Substring(0, 2) == "@*" ? true : false,
-                DestTypeMsger = new List<typeMsger>() { typeMsger.Wx },
-                UserID_Src = "System",
-                MsgTime = DateTime.Now
+                msgID = "",
+                msg = msg + "",
+                msgType = typeMsg.TEXT,
+                msgLink = "",
+                usrNameNick = userID_To,
+                usrPlat = typeMsger.wx,
+                UserName_src = "System",
+                msgTime = DateTime.Now,
+                IsSend = true
             };
             return pMsg;
         }
