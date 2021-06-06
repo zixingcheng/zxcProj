@@ -105,7 +105,7 @@ class myData_Swap_FileIO():
         if(tagName == "" and dirOut == ""): return False
 
         fileName = tagName + myData_Trans.Tran_ToDatetime_str(None, "_%Y_%m_%d_%H_%M_%S") + ".json"
-        content = jsonData.ToString().replace("\\", "/")
+        content = jsonData.ToString(autoFormat = False).replace("\\", "/")
         myIO.Save_File(dirOut + fileName, content, True, False);
         myDebug.Print("DataSwap Out IOFiles::" + dirOut + fileName)
         return True

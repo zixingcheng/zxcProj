@@ -57,8 +57,10 @@ class myMsgs():
 
         #文件追加数据内容
         if(self.pathLog != ""):
-            with open(self.pathLog, 'a+') as f:
-                f.write(msg.toCSVString())   
+            msgInfo = msg.toCSVString()
+            if(msgInfo != ""):
+                with open(self.pathLog, 'a+') as f:
+                    f.write(msgInfo)   
         return True
     
     #查找消息

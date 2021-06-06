@@ -176,8 +176,9 @@ class myWeixin_ItChat(myThread.myThread):
                     wxMsg['msg'] = destPath
 
                 #保存
-                if(wxMsg['msg'] != ""):  
-                    self.swapOut.SwapData_Out(wxMsg)
+                if(msgType == 1): 
+                    if(wxMsg['msg'] != ""):  
+                        self.swapOut.SwapData_Out(wxMsg)
             except Exception as ex:
                 myError.Error(ex)  
         return

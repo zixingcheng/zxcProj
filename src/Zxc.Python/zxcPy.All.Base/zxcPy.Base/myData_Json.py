@@ -58,15 +58,15 @@ class Json_Object:
         return data
 
     #转换为字符串   
-    def ToString(self, decode = 'unicode_escape', ispretty = True, useList = False):
-        if(type(self._dict_) == list and useList):
+    def ToString(self, decode = 'unicode_escape', ispretty = True, useList = False, autoFormat = True):
+        if(autoFormat and (type(self._dict_) == list or useList)):
             strJson = str(self._dict_)
         else:
             strJson = json.dumps(self._dict_, cls=DateEncoder, default = __serialize_instance__, indent = 4)
 
-        #中文编码解码
-        if(decode != ""):
-            strJson =  strJson.encode('utf-8').decode(decode)
+            #中文编码解码
+            if(decode != ""):
+                strJson =  strJson.encode('utf-8').decode(decode)
 
         #漂亮输出
         if(ispretty):
@@ -276,6 +276,10 @@ if __name__ == "__main__":
     lista = []
     lista = pJson3;
     print(pJson3)
+
+    pJson4 = Trans_ToJson('[{"usrID": "llll"}]')
+    print(pJson4)
+    #[{'usrID': '@10f96e6966fb39f74e0653ec3474b88a2efbea7916ee564b1e6ff0e1f6c2b96e', 'usrName': '简易生活号', 'usrNameNick': '茶叶一主号', 'msg': '户籍科', 'msgID': '7189805021541666125', 'msgType': 'TEXT', 'groupID': '', 'usrPlat': 'wx', 'time': 1622990812, 'msgContent': '户籍科', 'msgTime': '2021-06-06 22:46:52'}]
 
 
     s1 = u'话大地方法'
