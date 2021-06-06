@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Temp\DataCheck\**" />
+    <Compile Remove="Temp\DataSet\**" />
+    <Compile Remove="Temp\IDataCheck\**" />
+    <Compile Remove="Temp\IDataSet_Rule\**" />
+    <EmbeddedResource Remove="Temp\DataCheck\**" />
+    <EmbeddedResource Remove="Temp\DataSet\**" />
+    <EmbeddedResource Remove="Temp\IDataCheck\**" />
+    <EmbeddedResource Remove="Temp\IDataSet_Rule\**" />
+    <None Remove="Temp\DataCheck\**" />
+    <None Remove="Temp\DataSet\**" />
+    <None Remove="Temp\IDataCheck\**" />
+    <None Remove="Temp\IDataSet_Rule\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\zpCore.zpDataCache.Memory\zpCore.zpDataCache.Memory.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Temp\" />
+  </ItemGroup>
+
+</Project>
