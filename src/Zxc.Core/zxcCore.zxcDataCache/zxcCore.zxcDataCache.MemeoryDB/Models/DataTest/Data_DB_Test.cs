@@ -12,7 +12,7 @@ namespace zxcCore.zxcDataCache.MemoryDB.Test
 
         /// <summary>库表
         /// </summary>
-        public Data_Table<Data_TestObj> Data_Test { get; set; }
+        public DataTable_TestObj<DataModels_Test> Data_Test { get; set; }
 
         public Data_DB_Test(string dirBase) : base(dirBase)
         {
@@ -20,14 +20,11 @@ namespace zxcCore.zxcDataCache.MemoryDB.Test
 
         #endregion
 
-        protected override void OnModelCreating()
+        protected override void OnDBModelCreating()
         {
-            base.OnModelCreating();
+            base.OnDBModelCreating();
 
-            Data_Test = new Data_Table<Data_TestObj>(); this.InitModel(Data_Test);
-
-            Data_Test = this.OnModelCreating<Data_TestObj>();
-
+            Data_Test = new DataTable_TestObj<DataModels_Test>(); this.InitDBModel(Data_Test);
         }
 
 

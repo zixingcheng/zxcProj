@@ -25,7 +25,6 @@ namespace zxcCore.zxcRobot.Msger
         ~Msger_Wx()
         {
             // 缓存数据？
-            _MsgsBuffer.Clear();
         }
 
         #endregion
@@ -48,7 +47,7 @@ namespace zxcCore.zxcRobot.Msger
         {
             if (_useApi)
                 return SendMsg(msg, _url);
-            return true;
+            return this.CacheMsg(msg);
         }
         public override bool SendMsg(dynamic msg, string url)
         {
@@ -65,6 +64,7 @@ namespace zxcCore.zxcRobot.Msger
                 if (statusCode != "OK")
                     return false;
             }
+            this.CacheMsg(msg);     //缓存消息
             return true;
         }
 
@@ -90,5 +90,6 @@ namespace zxcCore.zxcRobot.Msger
             };
             return JsonConvert.SerializeObject(msgWx);
         }
+
     }
 }

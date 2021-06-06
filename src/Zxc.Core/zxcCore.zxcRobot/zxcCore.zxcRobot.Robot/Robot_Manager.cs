@@ -21,7 +21,7 @@ namespace zxcCore.zxcRobot.Robot
 
         #region 属性及构造
 
-        /// <summary>消息交换对象
+        /// <summary>消息监测交换对象
         /// </summary>
         protected internal DataMonitor_Msg _MsgSwap = new DataMonitor_Msg();
         /// <summary>是否初始

@@ -32,7 +32,7 @@ namespace zxcCore.zxcRobot.Msger
         int NumsBuffer { get; }
         /// <summary>数据缓存集管理类
         /// </summary>
-        List<dynamic> MsgsBuffer { get; }
+        List<IMsg> MsgsBuffer { get; }
 
 
         /// <summary>消息发送(但一发送，单条单目标)

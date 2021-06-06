@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using zxcCore.Common;
 
 namespace zxcCore.zxcRobot.Msger
@@ -21,6 +22,7 @@ namespace zxcCore.zxcRobot.Msger
             get { return _Tag; }
         }
 
+        protected internal string _pathCacheFile = "";
         protected internal bool _IsBuffer = false;
         public bool IsBuffer
         {
@@ -31,8 +33,8 @@ namespace zxcCore.zxcRobot.Msger
         {
             get { return _NumsBuffer; }
         }
-        protected internal List<dynamic> _MsgsBuffer = null;
-        public List<dynamic> MsgsBuffer
+        protected internal List<IMsg> _MsgsBuffer = new List<IMsg>();
+        public List<IMsg> MsgsBuffer
         {
             get { return _MsgsBuffer; }
         }
@@ -40,8 +42,11 @@ namespace zxcCore.zxcRobot.Msger
         //静态Msg配置信息
         protected internal static ConfigurationHelper _configMsgSet = new ConfigurationHelper("appsettings.json");
 
-        public Msger(bool isBuffer = false, int numsBuffer = 100)
+        public Msger(bool isBuffer = false, int numsBuffer = 100, string pathCacheFile = "")
         {
+            _IsBuffer = isBuffer;
+            _NumsBuffer = numsBuffer;
+            _pathCacheFile = pathCacheFile;
         }
         ~Msger()
         {
@@ -51,18 +56,66 @@ namespace zxcCore.zxcRobot.Msger
 
         #endregion
 
-
+        /// <summary>发送消息（需重写）
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public virtual bool SendMsg(dynamic msg)
         {
-            return true;
+            //return this.CacheMsg(msg);
+            return false;
         }
+        /// <summary>发送消息（需重写）
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public virtual bool SendMsg(dynamic msg, string url)
         {
+            //return this.CacheMsg(msg);
+            return false;
+        }
+
+
+        /// <summary>查找消息
+        /// </summary>
+        /// <param name="match"></param>
+        /// <returns></returns>
+        public virtual List<IMsg> FindMsg(Predicate<IMsg> match)
+        {
+            return _MsgsBuffer.FindAll(match);
+        }
+        /// <summary>缓存消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+        public virtual bool CacheMsg(dynamic msg, bool isFromRobot = false)
+        {
+            if (_IsBuffer == false) return false;
+
+            //组装消息
+            IMsg pMsg = (IMsg)msg;
+            if (pMsg == null) return false;
+
+            //缓存消息
+            if (isFromRobot)
+                pMsg.IsFromRobot = true;
+            _MsgsBuffer.Add(pMsg);
+
+            //保持缓存数量
+            if (_NumsBuffer > 0 && _MsgsBuffer.Count > _NumsBuffer)
+            {
+                _MsgsBuffer.RemoveRange(_MsgsBuffer.Count, _MsgsBuffer.Count - _NumsBuffer);
+            }
             return true;
         }
+        /// <summary>记录消息日志
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public virtual bool LogMsg(dynamic msg)
         {
             return true;
         }
+
     }
 }

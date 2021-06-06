@@ -15,6 +15,8 @@ namespace zxcCore.zxcRobot.Msger
         string groupID { get; set; }
         bool IsSend { get; set; }
         bool IsUserGroup { get; set; }
+        bool IsFromRobot { get; set; }
+        bool IsSaved { get; set; }
         string msg { get; set; }
         string msgContent { get; set; }
         string msgID { get; set; }

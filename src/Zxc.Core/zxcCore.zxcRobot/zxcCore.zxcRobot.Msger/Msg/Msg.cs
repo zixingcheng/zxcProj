@@ -116,13 +116,32 @@ namespace zxcCore.zxcRobot.Msger
                 _IsUserGroup = value;
             }
         }
+        bool _IsFromRobot = false;
+        /// <summary>是否来源于robot的自动消息
+        /// </summary>
+        public bool IsFromRobot
+        {
+            get
+            {
+                return _IsFromRobot;
+            }
+            set
+            {
+                _IsFromRobot = value;
+            }
+        }
         /// <summary>是否为发送消息（false为接收消息）
         /// </summary>
         public bool IsSend
         {
             get; set;
         }
-
+        /// <summary>是否已经保存，记录日志
+        /// </summary>
+        public bool IsSaved
+        {
+            get; set;
+        }
 
         public Msg()
         {

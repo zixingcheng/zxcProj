@@ -52,11 +52,11 @@ namespace zxcCore.zxcRobot.Monitor.Msg
             ConsoleHelper.Debug(DateTime.Now + "::");
             foreach (IMsg item in e.Datas)
             {
-                //MsgerHelper.Msger.MsgsBuffer();
-                //调试筛选
-                //if (pData.name != "50ETF")   //50ETF购3月3500
-                //    continue;
+                //加入全局消息
+                MsgerHelper.Msger.CacheMsg(item);
+                //List<IMsg> aa = MsgerHelper.Msger.Find(e => e.msgID == "2269170550839591705");
 
+                    //'msgTime': '2021-05-27 22:33:15'
                 ConsoleHelper.Debug("\t**********" + item.msgTime);
             }
         }
