@@ -10,6 +10,7 @@
 //===============================================================================
 using System;
 using System.Collections.Generic;
+using zxcCore.Common;
 
 namespace zxcCore.zxcRobot.Msger
 {
@@ -19,14 +20,23 @@ namespace zxcCore.zxcRobot.Msger
     {
         #region 属性及构造
 
+        /// <summary>消息已缓存事件
+        /// </summary>
+        public event MsgCached_EventHandler MsgCached;
+
+        //静态Msg配置信息
+        protected internal static ConfigurationHelper _configMsgSet = new ConfigurationHelper("appsettings.json");
+        //消息库
+        protected internal static DataDB_Msg _dbMsg = null;
         /// <summary>全局消息缓存对象
         /// </summary>
         public static readonly MsgerHelper Msger = new MsgerHelper(true, -1);
 
-        protected internal Dictionary<string, IMsger> _MsgsHandle = null;
-        public Dictionary<string, IMsger> MsgsHandle
+
+        protected internal Dictionary<string, IMsger> _MsgersObj = null;
+        public Dictionary<string, IMsger> MsgersObj
         {
-            get { return _MsgsHandle; }
+            get { return _MsgersObj; }
         }
 
         protected internal bool _IsBuffer = false;
@@ -39,24 +49,82 @@ namespace zxcCore.zxcRobot.Msger
         {
             get { return _NumsBuffer; }
         }
-        protected internal List<IMsg> _MsgsBuffer = new List<IMsg>();
-        public List<IMsg> MsgsBuffer
+
+        protected internal string _dirMsgDB = null;
+        protected internal bool _cacheDebug = true;
+        public DataTable_Msg<Msg> MsgsCaches
         {
-            get { return _MsgsBuffer; }
+            get { return _dbMsg.Data_Msg; }
         }
+
 
         public MsgerHelper(bool isBuffer = true, int numsBuffer = -1)
         {
             _IsBuffer = isBuffer;
             _NumsBuffer = numsBuffer;
+            _MsgersObj = new Dictionary<string, IMsger>();
+            this.InitMsger("Wx", new Msger_Wx());
+
+            _dirMsgDB = MsgerHelper._configMsgSet.config["Msgerset:MsgDB_Path"] + "";
+            _cacheDebug = Convert.ToBoolean(MsgerHelper._configMsgSet.config["Msgerset:MsgCache_Debug"]);
+            if (MsgerHelper._dbMsg == null)
+                MsgerHelper._dbMsg = new DataDB_Msg(_dirMsgDB);
+
+            if (_cacheDebug)
+                ConsoleHelper.Debug("已启动.全局消息管理器。{0}", DateTime.Now.ToString());
         }
         ~MsgerHelper()
         {
             // 缓存数据？
-            _MsgsBuffer.Clear();
+            //_MsgsBuffer.Clear();
         }
 
         #endregion
+
+
+        /// <summary>初始消息接口
+        /// </summary>
+        /// <param name="tagName">标识名称</param>
+        /// <param name="msgHandle">消息处理对象</param>
+        /// <param name="isCanCover">是否直接覆盖</param>
+        /// <returns></returns>
+        public virtual bool InitMsger(string tagName, IMsger msgHandle, bool isCanCover = false)
+        {
+            bool bResult = false;
+            tagName = tagName.ToLower();
+            if (isCanCover)
+            {
+                _MsgersObj[tagName] = msgHandle; bResult = true;
+            }
+            else
+            {
+                //不存在时添加
+                if (!_MsgersObj.ContainsKey(tagName))
+                {
+                    _MsgersObj.Add(tagName, msgHandle); bResult = true;
+                }
+            }
+            return bResult;
+        }
+        //初始数据检查对象
+        public bool InitMsger(Type dest_ClassType)
+        {
+            var instance = this.CreateMsger(dest_ClassType);
+            Msger pMsger = (Msger)instance;
+            if (pMsger != null)
+            {
+                this.InitMsger(pMsger.Tag, pMsger);
+            }
+            return true;
+        }
+        //创建对象-泛型实现
+        protected internal dynamic CreateMsger(Type dest_ClassType, bool useApi = true, bool useGet = true, bool isBuffer = false, int numsBuffer = 100)
+        {
+            if (dest_ClassType == null) return null;
+            var instance = Activator.CreateInstance(dest_ClassType, new object[] { dest_ClassType.Name, useApi, useGet, isBuffer, numsBuffer });
+            return instance;
+        }
+
 
         /// <summary>查找消息对象（按类型）
         /// </summary>
@@ -73,9 +141,10 @@ namespace zxcCore.zxcRobot.Msger
         public virtual IMsger Find(string typeMsg)
         {
             IMsger msger = null;
-            _MsgsHandle.TryGetValue(typeMsg.ToLower(), out msger);
+            _MsgersObj.TryGetValue(typeMsg.ToLower(), out msger);
             return msger;
         }
+
 
         /// <summary>发送消息（多个消息类型）
         /// </summary>
@@ -100,7 +169,7 @@ namespace zxcCore.zxcRobot.Msger
         public virtual bool SendMsg(dynamic msg, typeMsger typeMsg)
         {
             IMsger msger = null;
-            _MsgsHandle.TryGetValue(typeMsg.ToString().ToLower(), out msger);
+            _MsgersObj.TryGetValue(typeMsg.ToString().ToLower(), out msger);
 
             if (msger != null)
             {
@@ -114,6 +183,7 @@ namespace zxcCore.zxcRobot.Msger
             return false;
         }
 
+
         /// <summary>缓存消息
         /// </summary>
         /// <param name="msg"></param>
@@ -123,28 +193,37 @@ namespace zxcCore.zxcRobot.Msger
             if (_IsBuffer == false) return false;
 
             //组装消息
-            IMsg pMsg = (IMsg)msg;
+            Msg pMsg = (Msg)msg;
             if (pMsg == null) return false;
 
             //缓存消息
             if (isFromRobot)
                 pMsg.IsFromRobot = true;
-            _MsgsBuffer.Add(pMsg);
+            MsgsCaches.Add(pMsg);
+            if (_cacheDebug)
+                ConsoleHelper.Debug("CacheMsg:: {0}({1}):: {2}", pMsg.msgTime, pMsg.msgID, pMsg.msgContent);
+
+            //触发消息已缓存事件
+            if (this.MsgCached != null)
+            {
+                MsgCached_Event pArgs = new MsgCached_Event(pMsg);
+                this.MsgCached(this, pArgs);
+            }
 
             //保持缓存数量
-            if (_NumsBuffer > 0 && _MsgsBuffer.Count > _NumsBuffer)
-            {
-                _MsgsBuffer.RemoveRange(_MsgsBuffer.Count, _MsgsBuffer.Count - _NumsBuffer);
-            }
+            //if (_NumsBuffer > 0 && MsgsCaches.Count > _NumsBuffer)
+            //{
+            //    _MsgsBuffer.RemoveRange(_MsgsBuffer.Count, _MsgsBuffer.Count - _NumsBuffer);
+            //}
             return true;
         }
         /// <summary>查找消息
         /// </summary>
         /// <param name="match"></param>
         /// <returns></returns>
-        public virtual List<IMsg> FindMsg(Predicate<IMsg> match)
+        public virtual List<Msg> FindMsg(Predicate<IMsg> match)
         {
-            return _MsgsBuffer.FindAll(match);
+            return MsgsCaches.FindAll(match);
         }
 
     }

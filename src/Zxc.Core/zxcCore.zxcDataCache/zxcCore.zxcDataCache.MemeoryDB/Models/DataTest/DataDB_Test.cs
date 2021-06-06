@@ -6,7 +6,7 @@ namespace zxcCore.zxcDataCache.MemoryDB.Test
 {
     /// <summary>数据对象集类-数据库-测试
     /// </summary>
-    public class Data_DB_Test : Data_DB
+    public class DataDB_Test : Data_DB
     {
         #region 属性及构造
 
@@ -14,7 +14,7 @@ namespace zxcCore.zxcDataCache.MemoryDB.Test
         /// </summary>
         public DataTable_TestObj<DataModels_Test> Data_Test { get; set; }
 
-        public Data_DB_Test(string dirBase) : base(dirBase)
+        public DataDB_Test(string dirBase) : base(dirBase)
         {
         }
 

@@ -23,7 +23,10 @@ namespace zxcCore.zxcRobot.Robot
 
         /// <summary>消息监测交换对象
         /// </summary>
-        protected internal DataMonitor_Msg _MsgSwap = new DataMonitor_Msg();
+        protected internal DataMonitor_Msg _MsgSwaper = new DataMonitor_Msg();
+        /// <summary>消息处理对象
+        /// </summary>
+        protected internal MsgsHandler _MsgsHandler = new MsgsHandler("zxcRobot");
         /// <summary>是否初始
         /// </summary>
         protected internal bool _isInited = false;
@@ -47,18 +50,26 @@ namespace zxcCore.zxcRobot.Robot
         public bool Init()
         {
             _isInited = true;
-            return _isInited;
+            return _isInited && this.InitMsgHandles();
+        }
+        /// <summary>初始消息处理对象集
+        /// </summary>
+        /// <returns></returns>
+        public bool InitMsgHandles()
+        {
+            _MsgsHandler.InitMsgHandle(typeof(MsgHandle_Print));
+            return true;
         }
 
         //消息交换对象监测开始
         public bool Start()
         {
-            return _MsgSwap.Start();
+            return _MsgSwaper.Start();
         }
         //消息交换对象监测结束
         public bool Stop()
         {
-            return _MsgSwap.Stop();
+            return _MsgSwaper.Stop();
         }
 
     }

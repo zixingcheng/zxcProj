@@ -252,7 +252,7 @@ namespace zxcCore.zxcDataCache.Swap
             {
                 string fileName = Path.GetFileName(path);
                 int ind = fileName.IndexOf("_");
-                string destDir = dir + "/" + fileName.Substring(ind + 1);
+                string destDir = dir + "/" + fileName.Substring(ind + 1, 10);
 
                 if (Directory.Exists(destDir) == false)
                     Directory.CreateDirectory(destDir);

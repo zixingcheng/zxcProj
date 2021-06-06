@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using zxcCore.zxcRobot.Monitor.Msg;
 using zxcCore.zxcRobot.User;
 
 namespace zpCore.zpDataCache.Memory
 {
     /// <summary>机器人-基类
     /// </summary>
-    public abstract class RobotBase
+    public abstract class RobotBase //: MsgHandle
     {
         #region 属性及构造
 

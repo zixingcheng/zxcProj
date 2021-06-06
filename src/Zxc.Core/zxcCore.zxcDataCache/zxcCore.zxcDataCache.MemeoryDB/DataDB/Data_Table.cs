@@ -135,7 +135,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="isUnique">唯一性检查</param>
-        public virtual void AddRange(IEnumerable<T> collection, bool isUnique)
+        public virtual void AddRange(IEnumerable<T> collection, bool isUnique = true)
         {
             if (!this.CheckPermission(typePermission_DB.Writable))
                 throw (new Exception("没有写入权限"));
@@ -253,6 +253,15 @@ namespace zxcCore.zxcDataCache.MemoryDB
 
             //写入库表
             this._dbContext.OnOperationLog(pLog, item.Operator);
+            return true;
+        }
+        /// <summary>开启日志记录功能
+        /// </summary>
+        /// <param name="bRecord"></param>
+        /// <returns></returns>
+        public virtual bool OpenLogRecord(bool bRecord = true)
+        {
+            _isNoLog = !bRecord;
             return true;
         }
 

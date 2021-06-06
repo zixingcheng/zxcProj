@@ -10,16 +10,11 @@ namespace zxcCore.zxcRobot.Msger
     {
         #region 属性及构造
 
-        protected internal string _url = "";
-        protected internal bool _useApi;
-        protected internal bool _useGet;
-        public Msger_Wx(bool useApi = true, bool useGet = true, bool isBuffer = false, int numsBuffer = 100) : base(isBuffer, numsBuffer)
+        public Msger_Wx(bool useApi = true, bool useGet = true, bool isBuffer = false, int numsBuffer = 100) : base(useApi, useGet, isBuffer, numsBuffer)
         {
             _Tag = "Wx";
             _TypeMsg = typeMsger.wx;
-            _useApi = useApi;
-            _useGet = useGet;
-            if (_url == "")
+            if (_useApi && _url == "")
                 _url = _configMsgSet.config["Msgerset:Msger_Wx:url_API"] + "";
         }
         ~Msger_Wx()
@@ -74,7 +69,7 @@ namespace zxcCore.zxcRobot.Msger
             IMsg pMsg = (IMsg)msg;
             if (pMsg == null) return null;
 
-            string userName = pMsg.usrName == "" ? pMsg.usrNameNick : pMsg.usrName;
+            string userName = pMsg.usrName + "" == "" ? pMsg.usrNameNick : pMsg.usrName;
             var msgWx = new
             {
                 usrID = pMsg.IsUserGroup ? "" : pMsg.usrID,

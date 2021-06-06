@@ -12,6 +12,7 @@ using zxcCore.zxcRobot.User;
 using zxcCore.zxcDataCache.MemoryDB;
 using zxcCore.zxcDataCache.MemoryDB.Test;
 using zxcCore.zxcRobot.Robot;
+using zxcCore.zxcRobot.Msger;
 
 namespace zxcCore.zxcRobot.Test
 {
@@ -20,9 +21,10 @@ namespace zxcCore.zxcRobot.Test
         static void Main(string[] args)
         {
             //数据库测试
-            TestDB();
+            //TestDB();
 
             //机器人测试
+            MsgerHelper.Msger.MsgCached += new MsgCached_EventHandler(Program.MsgCached_EventHandler);
             Robot_Manager._Manager.Start();
             while (true)
             {
@@ -31,13 +33,11 @@ namespace zxcCore.zxcRobot.Test
         }
 
         //消息交换测试
-        static void Main2(string[] args)
+        private static void TestSwapMsg()
         {
-
             Console.WriteLine("Hello World!");
             Data_Quote_Manager pManager = new Data_Quote_Manager();
             pManager.Start(-1, 1);
-
 
             //string dirSwap = @"D:\myCode\zxcProj\src\Zxc.Python\zxcPy.Robot.Spider\Data\Swaps";
             //DataSwap_IOFiles pSwap = new DataSwap_IOFiles("Quote", dirSwap, 0, typeof(Data_Quote));
@@ -84,7 +84,7 @@ namespace zxcCore.zxcRobot.Test
 
 
             //初始数据库
-            Data_DB_Test _dbTest = new Data_DB_Test("D:/ftpData/DB_Test");
+            DataDB_Test _dbTest = new DataDB_Test("D:/ftpData/DB_Test");
 
             //测试添加数据
             watch.Restart();
@@ -93,9 +93,11 @@ namespace zxcCore.zxcRobot.Test
             _dbTest.Data_Test.SaveChanges(true);
 
             watch.Stop();
-            Console.WriteLine("单一添加耗时：" + watch.Elapsed.TotalMilliseconds);
+            Console.WriteLine("单一添加耗时0：" + watch.Elapsed.TotalMilliseconds);
 
             //单一添加测试
+            _dbTest.Data_Test.OpenLogRecord(false);
+            watch.Restart();
             for (int i = 0; i < 1000; i++)
             {
                 DataModels_Test obj = new DataModels_Test();
@@ -105,11 +107,12 @@ namespace zxcCore.zxcRobot.Test
                 _dbTest.Data_Test.Add(obj, false);
             }
             watch.Stop();
-            Console.WriteLine("单一添加耗时：" + watch.Elapsed.TotalMilliseconds);
+            Console.WriteLine("单一添加耗时1：" + watch.Elapsed.TotalMilliseconds);
 
             //多个添加测试
+            watch.Restart();
             List<DataModels_Test> lstTemp = new List<DataModels_Test>();
-            for (int i = 0; i < 1000; i++)
+            for (int i = 1000; i < 11000; i++)
             {
                 DataModels_Test obj = new DataModels_Test();
                 obj.Id = i;
@@ -119,15 +122,16 @@ namespace zxcCore.zxcRobot.Test
             }
             _dbTest.Data_Test.AddRange(lstTemp);
             watch.Stop();
-            Console.WriteLine("单一添加耗时：" + watch.Elapsed.TotalMilliseconds);
+            Console.WriteLine("单一添加耗时2：" + watch.Elapsed.TotalMilliseconds);
 
 
             //Name是传入的参数值
             watch.Restart();
-            var query = dbTest2.Where(e => e.Id < 33 && e.Id > 15).ToList();
+            var query = dbTest2.Where(e => e.Id < 11000 && e.Id > 10090).ToList();
             watch.Stop();
             Console.WriteLine("查询耗时：" + watch.Elapsed.TotalMilliseconds);
         }
+
         private static void DataAnalyse()
         {
             //UserManager _Users = new UserManager("");
@@ -178,6 +182,12 @@ namespace zxcCore.zxcRobot.Test
                 if (pData == null) continue;
                 Console.WriteLine("**********" + pData.Time);
             }
+        }
+        //消息缓存事件
+        private static void MsgCached_EventHandler(object sender, MsgCached_Event e)
+        {
+            Console.WriteLine(DateTime.Now + "::");
+            Console.WriteLine("**********{0}:: {1}", e.MsgInfo.msgID, e.MsgInfo.msgContent);
         }
 
     }

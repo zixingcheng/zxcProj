@@ -13,12 +13,9 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         #region 属性及构造
 
         protected internal DataSwap_IOFiles _swapIOFiles = null;
-        protected internal MsgerManager _msgManager = null;
         protected internal ConfigurationHelper _configDataCache = new ConfigurationHelper("appsettings.json");
         public DataMonitor_Msg()
         {
-            _msgManager = new MsgerManager(true, -1);
-
             string dirSwap = _configDataCache.config["DataCache.Swap:Monitor_Msg"] + "";
             _swapIOFiles = new DataSwap_IOFiles("msgWx", dirSwap, 0, typeof(Msger.Msg), "", true);
             //_swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 60 * 5, typeof(Data_Quote), "", true);      //忽略5分钟前数据
@@ -54,10 +51,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
             {
                 //加入全局消息
                 MsgerHelper.Msger.CacheMsg(item);
-                //List<IMsg> aa = MsgerHelper.Msger.Find(e => e.msgID == "2269170550839591705");
-
-                    //'msgTime': '2021-05-27 22:33:15'
-                ConsoleHelper.Debug("\t**********" + item.msgTime);
+                //List<Msger.Msg> aa = MsgerHelper.Msger.FindMsg(e => e.IsSend == false);
             }
         }
 

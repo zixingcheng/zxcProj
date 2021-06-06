@@ -11,10 +11,6 @@ namespace zxcCore.zxcRobot.Monitor.Msg
     {
         #region 属性及构造
 
-        /// <summary>消息管理类-微信
-        /// </summary>
-        protected internal static Msger_Wx _msger = new Msger_Wx();
-
         public MsgerManager(bool isBuffer, int numsBuffer) : base(isBuffer, numsBuffer)
         {
         }

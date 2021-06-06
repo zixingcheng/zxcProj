@@ -22,7 +22,9 @@ namespace zxcCore.zxcRobot.Msger
             get { return _Tag; }
         }
 
-        protected internal string _pathCacheFile = "";
+        protected internal string _url = "";
+        protected internal bool _useApi;
+        protected internal bool _useGet;
         protected internal bool _IsBuffer = false;
         public bool IsBuffer
         {
@@ -42,11 +44,15 @@ namespace zxcCore.zxcRobot.Msger
         //静态Msg配置信息
         protected internal static ConfigurationHelper _configMsgSet = new ConfigurationHelper("appsettings.json");
 
-        public Msger(bool isBuffer = false, int numsBuffer = 100, string pathCacheFile = "")
+        public Msger(bool useApi = true, bool useGet = true, bool isBuffer = false, int numsBuffer = 100)
         {
             _IsBuffer = isBuffer;
             _NumsBuffer = numsBuffer;
-            _pathCacheFile = pathCacheFile;
+
+            _Tag = "None";
+            _TypeMsg = typeMsger.None;
+            _useApi = useApi;
+            _useGet = useGet;
         }
         ~Msger()
         {

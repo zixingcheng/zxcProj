@@ -3,12 +3,13 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using zxcCore.Common;
+using zxcCore.zxcDataCache.MemoryDB;
 
 namespace zxcCore.zxcRobot.Msger
 {
     /// <summary>消息类
     /// </summary>
-    public class Msg : IMsg
+    public class Msg : Data_Models, IMsg
     {
         #region 属性及构造
 
