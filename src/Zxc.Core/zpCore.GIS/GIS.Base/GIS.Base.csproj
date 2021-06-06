@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>zpCore.GIS</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="WebTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings_gisBase.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings_gisBase.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Zxc.C++\src.Open\gdal\gdal\swig\csharp\gdal\gdal_csharp.csproj" />
+    <ProjectReference Include="..\..\..\Zxc.C++\src.Open\gdal\gdal\swig\csharp\ogr\ogr_csharp.csproj" />
+    <ProjectReference Include="..\..\..\Zxc.C++\src.Open\gdal\gdal\swig\csharp\osr\osr_csharp.csproj" />
+    <ProjectReference Include="..\Base.Common\Base.Common.csproj" />
+    <ProjectReference Include="..\Base.Image\Base.Image.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\OutputGis\" />
+    <Folder Include="Data\Temp\Algorithm\IWD\" />
+  </ItemGroup>
+
+</Project>

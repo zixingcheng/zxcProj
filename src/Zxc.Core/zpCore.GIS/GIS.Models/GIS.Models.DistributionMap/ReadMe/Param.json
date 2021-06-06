@@ -1,0 +1,25 @@
+{
+  "srcData": { "srcVectorFilename": "D:\\\\myCode\\\\zxcProj\\\\src\\\\Zxc.Core\\\\zpCore.zpGis\\\\zpCore.zpGis_Base\\\\Data\\\\Data_Temp\\\\test.json" },
+  "algType": "IDW",
+  "algParms": {
+    "algAtrrName": "Aqi",
+    "algCellSize": 0.0005,
+    "algEnvelope_offsetX": 0,
+    "algEnvelope_offsetY": 0,
+    "Power": 2,
+    "Smoothing": 0,
+    "Radius1": 0,
+    "Radius2": 0,
+    "NoDataValue": -9999
+  },
+  "clipData": {
+    "infoDivision": "",
+    "clipWhere": "O_Name='ÄÏ³ÇÇø'"
+  },
+  "dstContour": {
+    "LevelIntervals": [ 30, 40, 50, 60 ],
+    "LevelBase": 10,
+    "IsPolygon": true,
+    "dstFileName": ""
+  }
+}

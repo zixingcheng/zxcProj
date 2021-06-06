@@ -1,0 +1,2228 @@
+{"type":"FeatureCollection","name":"MicroStation_DataInfo_Day","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{
+  "Id": "00a4a563-6839-4c57-ae7d-84e54ee100b8",
+  "DeployId": 2663,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 59.0,
+  "PM10": 105.0,
+  "SO2": 7.2897,
+  "NO2": 43.1442,
+  "O3": 38.0932,
+  "O3_8H": 56.5229,
+  "CO": 0.7306,
+  "AQI": 80,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.71145,
+  22.9095
+]}},{"type":"Feature","properties":{
+  "Id": "01a2da6f-9c33-4f47-84ea-4b2b458a6f6b",
+  "DeployId": 2781,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 48.0,
+  "PM10": 97.0,
+  "SO2": 3.197,
+  "NO2": 36.396,
+  "O3": 47.9858,
+  "O3_8H": 78.6173,
+  "CO": 0.7657,
+  "AQI": 74,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.803,
+  22.9199
+]}},{"type":"Feature","properties":{
+  "Id": "08f88c66-61e8-4048-9e81-d70b42924799",
+  "DeployId": 2680,
+  "RegionCode": "441900129000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 66.0,
+  "PM10": 104.0,
+  "SO2": 10.3542,
+  "NO2": 42.3965,
+  "O3": 43.6343,
+  "O3_8H": 85.6239,
+  "CO": 0.8792,
+  "AQI": 89,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7242,
+  23.097
+]}},{"type":"Feature","properties":{
+  "Id": "0f2d4068-3e5e-40de-a721-35ed98530036",
+  "DeployId": 2726,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 63.0,
+  "PM10": 111.0,
+  "SO2": 7.7905,
+  "NO2": 46.904,
+  "O3": 35.3461,
+  "O3_8H": 60.2303,
+  "CO": 0.7296,
+  "AQI": 85,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.705,
+  22.9332
+]}},{"type":"Feature","properties":{
+  "Id": "11944db4-0351-425e-b1d4-3fea522adc47",
+  "DeployId": 2661,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 49.0,
+  "PM10": 77.0,
+  "SO2": 13.0428,
+  "NO2": 31.1116,
+  "O3": 45.0597,
+  "O3_8H": 64.7506,
+  "CO": 0.95,
+  "AQI": 68,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6959,
+  23.0666
+]}},{"type":"Feature","properties":{
+  "Id": "1217516b-dc37-46d0-9ef4-5b1f9b99c381",
+  "DeployId": 2658,
+  "RegionCode": "441900101000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 60.0,
+  "PM10": 109.0,
+  "SO2": 7.7148,
+  "NO2": 39.7827,
+  "O3": 47.0818,
+  "O3_8H": 83.9832,
+  "CO": 0.8039,
+  "AQI": 81,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7801,
+  23.0992
+]}},{"type":"Feature","properties":{
+  "Id": "14a4f537-f2ec-4c2c-b007-a4936ac1d814",
+  "DeployId": 2758,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 56.0,
+  "PM10": 91.0,
+  "SO2": 9.5204,
+  "NO2": 31.5263,
+  "O3": 50.3219,
+  "O3_8H": 93.9759,
+  "CO": 0.7988,
+  "AQI": 76,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8177,
+  23.0233
+]}},{"type":"Feature","properties":{
+  "Id": "1562d2c9-2580-4cc1-b853-84772cedf182",
+  "DeployId": 2725,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 50.0,
+  "PM10": 98.0,
+  "SO2": 7.6539,
+  "NO2": 33.8209,
+  "O3": 46.636,
+  "O3_8H": 69.7407,
+  "CO": 0.7371,
+  "AQI": 74,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.8096,
+  22.88355
+]}},{"type":"Feature","properties":{
+  "Id": "15835f0f-b944-431a-8059-d44222825dea",
+  "DeployId": 2648,
+  "RegionCode": "441900101000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 68.0,
+  "PM10": 109.0,
+  "SO2": 9.9543,
+  "NO2": 33.2326,
+  "O3": 56.3927,
+  "O3_8H": 97.5136,
+  "CO": 0.8283,
+  "AQI": 91,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8034,
+  23.1017
+]}},{"type":"Feature","properties":{
+  "Id": "164b51db-80e2-4fe7-a166-e20a3cab7372",
+  "DeployId": 2693,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 74.0,
+  "PM10": 134.0,
+  "SO2": 8.8116,
+  "NO2": 43.0155,
+  "O3": 44.6858,
+  "O3_8H": 81.3008,
+  "CO": 0.7742,
+  "AQI": 99,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7208,
+  22.9892
+]}},{"type":"Feature","properties":{
+  "Id": "19901f87-e018-4df1-aadf-25c784f26011",
+  "DeployId": 2795,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 61.0,
+  "PM10": 100.0,
+  "SO2": 7.9138,
+  "NO2": 40.046,
+  "O3": 59.6876,
+  "O3_8H": 109.0892,
+  "CO": 0.9068,
+  "AQI": 83,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7583,
+  23.0103
+]}},{"type":"Feature","properties":{
+  "Id": "1a6382c4-9f6d-4f7a-a28c-0a09daaa4517",
+  "DeployId": 2761,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 62.0,
+  "PM10": 115.0,
+  "SO2": 6.3344,
+  "NO2": 46.8639,
+  "O3": 41.3515,
+  "O3_8H": 71.2663,
+  "CO": 0.7415,
+  "AQI": 83,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8019,
+  22.9369
+]}},{"type":"Feature","properties":{
+  "Id": "1bc2ed98-f079-49cd-8052-a0c7528070ca",
+  "DeployId": 2678,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 52.0,
+  "PM10": 114.0,
+  "SO2": 9.2158,
+  "NO2": 38.7268,
+  "O3": 50.038,
+  "O3_8H": 84.8832,
+  "CO": 0.7637,
+  "AQI": 82,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7033,
+  23.020433
+]}},{"type":"Feature","properties":{
+  "Id": "1bf9e6af-7ad3-48df-9b12-223d56ff8311",
+  "DeployId": 2772,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 71.0,
+  "PM10": 121.0,
+  "SO2": 5.1131,
+  "NO2": 28.0663,
+  "O3": 63.351,
+  "O3_8H": 118.3715,
+  "CO": 0.946,
+  "AQI": 95,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7649,
+  23.0618
+]}},{"type":"Feature","properties":{
+  "Id": "1cbce7a7-29a2-467a-aa17-2fa174944409",
+  "DeployId": 2742,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 69.0,
+  "PM10": 116.0,
+  "SO2": 7.2355,
+  "NO2": 30.3128,
+  "O3": 51.8635,
+  "O3_8H": 104.3958,
+  "CO": 0.7333,
+  "AQI": 93,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8752,
+  23.0275
+]}},{"type":"Feature","properties":{
+  "Id": "1ee91fdb-3c6b-40eb-98be-ff5438516fdc",
+  "DeployId": 2640,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 61.0,
+  "PM10": 108.0,
+  "SO2": 7.1579,
+  "NO2": 37.9956,
+  "O3": 44.3367,
+  "O3_8H": 77.9509,
+  "CO": 0.7862,
+  "AQI": 82,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8205,
+  23.0069
+]}},{"type":"Feature","properties":{
+  "Id": "1efaba9a-e814-41dc-98f6-0cb79927d2da",
+  "DeployId": 2776,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 60.0,
+  "PM10": 107.0,
+  "SO2": 5.4364,
+  "NO2": 35.5122,
+  "O3": 43.9149,
+  "O3_8H": 80.2275,
+  "CO": 0.77,
+  "AQI": 81,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8364,
+  22.9909
+]}},{"type":"Feature","properties":{
+  "Id": "1f9399e8-19ba-4ff5-88a2-fe34eb4def77",
+  "DeployId": 2619,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 45.0,
+  "PM10": 94.0,
+  "SO2": 10.6572,
+  "NO2": 35.3283,
+  "O3": 39.6005,
+  "O3_8H": 50.8671,
+  "CO": 0.8476,
+  "AQI": 72,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7106,
+  23.0706
+]}},{"type":"Feature","properties":{
+  "Id": "20115068-7b66-4b45-9cc3-ea5f07547e87",
+  "DeployId": 2638,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 75.0,
+  "PM10": 107.0,
+  "SO2": 7.999,
+  "NO2": 32.7302,
+  "O3": 70.308,
+  "O3_8H": 122.0708,
+  "CO": 0.7061,
+  "AQI": 100,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8151,
+  23.0456
+]}},{"type":"Feature","properties":{
+  "Id": "20c071f8-7382-43ac-a2a6-6a99e6a9c717",
+  "DeployId": 2624,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 102.0,
+  "SO2": 10.4259,
+  "NO2": 30.3812,
+  "O3": 56.3792,
+  "O3_8H": 98.5496,
+  "CO": 0.8565,
+  "AQI": 78,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8178,
+  23.0892
+]}},{"type":"Feature","properties":{
+  "Id": "22309dc0-223c-43a1-bb1d-a199f17c0958",
+  "DeployId": 2650,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 70.0,
+  "PM10": 126.0,
+  "SO2": 8.6915,
+  "NO2": 64.2481,
+  "O3": 40.9662,
+  "O3_8H": 81.1914,
+  "CO": 0.8466,
+  "AQI": 94,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7557,
+  22.9455
+]}},{"type":"Feature","properties":{
+  "Id": "22b41d1f-34cf-4dd1-97cf-141448663983",
+  "DeployId": 2744,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 59.0,
+  "PM10": 112.0,
+  "SO2": 13.5619,
+  "NO2": 36.2318,
+  "O3": 56.8733,
+  "O3_8H": 102.6189,
+  "CO": 0.7843,
+  "AQI": 81,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7167,
+  23.0243
+]}},{"type":"Feature","properties":{
+  "Id": "241530e9-2dd8-4c11-9ddc-8f00a33ebd07",
+  "DeployId": 2709,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 98.0,
+  "SO2": 10.4062,
+  "NO2": 38.713,
+  "O3": 56.2995,
+  "O3_8H": 90.1477,
+  "CO": 0.8869,
+  "AQI": 79,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.759,
+  23.061
+]}},{"type":"Feature","properties":{
+  "Id": "2528d74d-d3fd-4523-ae00-00f9fd38db40",
+  "DeployId": 2785,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 96.0,
+  "SO2": 8.4801,
+  "NO2": 52.9465,
+  "O3": 43.826,
+  "O3_8H": 92.0241,
+  "CO": 0.8643,
+  "AQI": 79,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7561,
+  23.01685
+]}},{"type":"Feature","properties":{
+  "Id": "28e7c974-a731-418b-b232-b67a5494f714",
+  "DeployId": 2720,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 57.0,
+  "PM10": 102.0,
+  "SO2": 8.79,
+  "NO2": 38.8582,
+  "O3": 50.3994,
+  "O3_8H": 95.2801,
+  "CO": 0.8001,
+  "AQI": 78,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8308,
+  23.0221
+]}},{"type":"Feature","properties":{
+  "Id": "2b64b584-7be8-45d4-9cc3-5ebd8b0962af",
+  "DeployId": 2642,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 48.0,
+  "PM10": 88.0,
+  "SO2": 6.8198,
+  "NO2": 34.1743,
+  "O3": 52.4237,
+  "O3_8H": 74.1438,
+  "CO": 0.7456,
+  "AQI": 69,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.8344,
+  22.9304
+]}},{"type":"Feature","properties":{
+  "Id": "2bcfd3a2-b8ab-4d34-8cb1-a96395f59706",
+  "DeployId": 2789,
+  "RegionCode": "441900101000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 55.0,
+  "PM10": 99.0,
+  "SO2": 11.478,
+  "NO2": 39.4865,
+  "O3": 56.03,
+  "O3_8H": 108.0467,
+  "CO": 0.7498,
+  "AQI": 75,
+  "PrimaryPollutant": "PM2.5,PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7816,
+  23.0898
+]}},{"type":"Feature","properties":{
+  "Id": "2e5db35f-8518-4e7a-b084-dee7bc51f8dc",
+  "DeployId": 2639,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 54.0,
+  "PM10": 70.0,
+  "SO2": 8.4685,
+  "NO2": 34.1859,
+  "O3": 57.2419,
+  "O3_8H": 111.2317,
+  "CO": 0.7547,
+  "AQI": 74,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7223,
+  23.0424
+]}},{"type":"Feature","properties":{
+  "Id": "34724717-08ef-42f6-b07d-6d05c9f8bc2b",
+  "DeployId": 2783,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 44.0,
+  "PM10": 80.0,
+  "SO2": 6.1963,
+  "NO2": 43.485,
+  "O3": 54.0024,
+  "O3_8H": 85.8712,
+  "CO": 0.7567,
+  "AQI": 65,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7976,
+  22.9136
+]}},{"type":"Feature","properties":{
+  "Id": "3480f462-29e6-4d0b-895d-16c2248f688d",
+  "DeployId": 2674,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 68.0,
+  "PM10": 129.0,
+  "SO2": 7.2913,
+  "NO2": 42.0132,
+  "O3": 52.3335,
+  "O3_8H": 95.1683,
+  "CO": 0.7758,
+  "AQI": 92,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6945,
+  22.9828
+]}},{"type":"Feature","properties":{
+  "Id": "374f1654-41a7-46b7-af0c-9d91f8597b22",
+  "DeployId": 2779,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 61.0,
+  "PM10": 108.0,
+  "SO2": 4.0334,
+  "NO2": 33.8115,
+  "O3": 47.8633,
+  "O3_8H": 71.9855,
+  "CO": 0.7423,
+  "AQI": 82,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6766,
+  22.9088
+]}},{"type":"Feature","properties":{
+  "Id": "3851f510-8bc3-45a7-b37b-e6f14ff66dc9",
+  "DeployId": 2722,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 69.0,
+  "PM10": 103.0,
+  "SO2": 7.9453,
+  "NO2": 43.9957,
+  "O3": 49.7003,
+  "O3_8H": 94.7349,
+  "CO": 0.841,
+  "AQI": 93,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7447,
+  23.0061
+]}},{"type":"Feature","properties":{
+  "Id": "3a615320-497f-427f-b672-ecbb4b37a513",
+  "DeployId": 2732,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 63.0,
+  "PM10": 105.0,
+  "SO2": 10.4417,
+  "NO2": 44.3532,
+  "O3": 59.4709,
+  "O3_8H": 103.6593,
+  "CO": 0.881,
+  "AQI": 85,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6867,
+  22.9648
+]}},{"type":"Feature","properties":{
+  "Id": "3ae47e9e-0ff0-44ed-81a0-7a3a31c37ddf",
+  "DeployId": 2653,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 57.0,
+  "PM10": 88.0,
+  "SO2": 10.8272,
+  "NO2": 49.0355,
+  "O3": 58.0343,
+  "O3_8H": 114.2457,
+  "CO": 0.874,
+  "AQI": 78,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7675,
+  23.0405
+]}},{"type":"Feature","properties":{
+  "Id": "4fbc35b8-929c-400c-b3e3-c95e5e7f0bd5",
+  "DeployId": 2724,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 49.0,
+  "PM10": 97.0,
+  "SO2": 6.921,
+  "NO2": 37.8909,
+  "O3": 46.6857,
+  "O3_8H": 76.1003,
+  "CO": 0.7504,
+  "AQI": 73,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.8072,
+  22.948
+]}},{"type":"Feature","properties":{
+  "Id": "547430b3-8df2-434c-9cb0-8f0f794d524b",
+  "DeployId": 2769,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 55.0,
+  "PM10": 118.0,
+  "SO2": 7.3529,
+  "NO2": 38.6439,
+  "O3": 48.6702,
+  "O3_8H": 96.7973,
+  "CO": 0.7976,
+  "AQI": 84,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7352,
+  23.0143
+]}},{"type":"Feature","properties":{
+  "Id": "59a1e34e-2271-452c-b494-eb2a0ddc396a",
+  "DeployId": 2691,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 60.0,
+  "PM10": 111.0,
+  "SO2": 9.7832,
+  "NO2": 42.7266,
+  "O3": 47.6119,
+  "O3_8H": 76.5069,
+  "CO": 0.7358,
+  "AQI": 81,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7133,
+  22.9468
+]}},{"type":"Feature","properties":{
+  "Id": "601df5ee-bfe0-4097-91c9-0d9d9a3a5315",
+  "DeployId": 2682,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 52.0,
+  "PM10": 96.0,
+  "SO2": 8.1757,
+  "NO2": 40.441,
+  "O3": 47.7028,
+  "O3_8H": 75.866,
+  "CO": 0.801,
+  "AQI": 73,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.6739,
+  22.9432
+]}},{"type":"Feature","properties":{
+  "Id": "63ffdb1c-25c0-4f00-8efc-1ab6e2aebc3f",
+  "DeployId": 2786,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 54.0,
+  "PM10": 92.0,
+  "SO2": 8.3336,
+  "NO2": 42.6881,
+  "O3": 56.2511,
+  "O3_8H": 117.068,
+  "CO": 0.8954,
+  "AQI": 74,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7345,
+  23.0374
+]}},{"type":"Feature","properties":{
+  "Id": "65fc13d7-7993-4c80-9cdf-1f063f485638",
+  "DeployId": 2766,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 49.0,
+  "PM10": 82.0,
+  "SO2": 9.4183,
+  "NO2": 44.7398,
+  "O3": 54.5953,
+  "O3_8H": 98.8379,
+  "CO": 0.8667,
+  "AQI": 67,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8289,
+  23.0943
+]}},{"type":"Feature","properties":{
+  "Id": "66325fc1-af83-4981-83fa-fee261e14a1d",
+  "DeployId": 2637,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 59.0,
+  "PM10": 100.0,
+  "SO2": 6.4464,
+  "NO2": 36.1376,
+  "O3": 47.414,
+  "O3_8H": 81.7802,
+  "CO": 0.7398,
+  "AQI": 79,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8458,
+  22.977
+]}},{"type":"Feature","properties":{
+  "Id": "67d1e1e8-04e7-4ad2-9e77-93cf39a7ee75",
+  "DeployId": 2685,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 65.0,
+  "PM10": 119.0,
+  "SO2": 8.5479,
+  "NO2": 62.6023,
+  "O3": 46.1477,
+  "O3_8H": 90.2334,
+  "CO": 0.8422,
+  "AQI": 87,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7252,
+  22.9709
+]}},{"type":"Feature","properties":{
+  "Id": "6af28a43-5903-4ce6-a9fa-ba86b77faaa6",
+  "DeployId": 2731,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 57.0,
+  "PM10": 100.0,
+  "SO2": 10.2192,
+  "NO2": 41.3141,
+  "O3": 40.7206,
+  "O3_8H": 78.5313,
+  "CO": 0.7812,
+  "AQI": 78,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7299,
+  23.0319
+]}},{"type":"Feature","properties":{
+  "Id": "6b98e341-c04c-4b44-9fe5-47f2ce69965a",
+  "DeployId": 2771,
+  "RegionCode": "441900101000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 55.0,
+  "PM10": 90.0,
+  "SO2": 7.1074,
+  "NO2": 37.9228,
+  "O3": 49.8315,
+  "O3_8H": 96.9608,
+  "CO": 0.8102,
+  "AQI": 75,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.795267,
+  23.094967
+]}},{"type":"Feature","properties":{
+  "Id": "6c6512c6-a587-43a2-939e-c289aed2f938",
+  "DeployId": 2671,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 49.0,
+  "PM10": 79.0,
+  "SO2": 8.0711,
+  "NO2": 25.5272,
+  "O3": 74.3004,
+  "O3_8H": 121.4204,
+  "CO": 0.7152,
+  "AQI": 68,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.819,
+  23.067
+]}},{"type":"Feature","properties":{
+  "Id": "6d1e75d5-125a-426c-bf94-d5fa0cbeebe6",
+  "DeployId": 2684,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 77.0,
+  "PM10": 122.0,
+  "SO2": 8.8005,
+  "NO2": 65.0752,
+  "O3": 48.6528,
+  "O3_8H": 146.0362,
+  "CO": 0.7773,
+  "AQI": 102,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7056,
+  23.0649
+]}},{"type":"Feature","properties":{
+  "Id": "6d70b5b9-5c4e-40bb-989f-58b5048f6f36",
+  "DeployId": 2793,
+  "RegionCode": "441900101000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 73.0,
+  "PM10": 119.0,
+  "SO2": 9.7857,
+  "NO2": 29.1184,
+  "O3": 61.6611,
+  "O3_8H": 112.5673,
+  "CO": 0.8991,
+  "AQI": 98,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7768,
+  23.1202
+]}},{"type":"Feature","properties":{
+  "Id": "6ebdfbc9-0f0d-4be0-b16f-e8e6f6da49a7",
+  "DeployId": 2764,
+  "RegionCode": "441900129000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 88.0,
+  "SO2": 8.3515,
+  "NO2": 31.433,
+  "O3": 50.7913,
+  "O3_8H": 98.4393,
+  "CO": 0.8903,
+  "AQI": 79,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7464,
+  23.1032
+]}},{"type":"Feature","properties":{
+  "Id": "710cb753-a476-4073-a83a-6a5e29bc6408",
+  "DeployId": 2797,
+  "RegionCode": "441900129000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 49.0,
+  "PM10": 73.0,
+  "SO2": 9.5517,
+  "NO2": 42.4395,
+  "O3": 63.2832,
+  "O3_8H": 110.5914,
+  "CO": 0.8311,
+  "AQI": 68,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7374,
+  23.0694
+]}},{"type":"Feature","properties":{
+  "Id": "7318633b-4217-4d56-8da5-6014db3243bc",
+  "DeployId": 2641,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 49.0,
+  "PM10": 71.0,
+  "SO2": 8.2521,
+  "NO2": 29.1297,
+  "O3": 61.7401,
+  "O3_8H": 118.6841,
+  "CO": 0.8089,
+  "AQI": 67,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7613,
+  23.0549
+]}},{"type":"Feature","properties":{
+  "Id": "738e46d6-d703-477f-8ef9-d2c05346b59a",
+  "DeployId": 2677,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 60.0,
+  "PM10": 108.0,
+  "SO2": 10.5399,
+  "NO2": 41.0167,
+  "O3": 46.9386,
+  "O3_8H": 80.61,
+  "CO": 0.8941,
+  "AQI": 81,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.739,
+  23.0464
+]}},{"type":"Feature","properties":{
+  "Id": "746be293-15ab-4877-9781-460e300f13a3",
+  "DeployId": 2697,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 59.0,
+  "PM10": 91.0,
+  "SO2": 8.4143,
+  "NO2": 32.9037,
+  "O3": 42.2666,
+  "O3_8H": 78.6298,
+  "CO": 0.7914,
+  "AQI": 80,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8242,
+  23.0336
+]}},{"type":"Feature","properties":{
+  "Id": "74e5d417-1e2b-4ad4-a8b5-10c1f113459f",
+  "DeployId": 2652,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 63.0,
+  "PM10": 109.0,
+  "SO2": 9.5578,
+  "NO2": 29.3624,
+  "O3": 64.1625,
+  "O3_8H": 112.6315,
+  "CO": 0.8171,
+  "AQI": 85,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8006,
+  23.0632
+]}},{"type":"Feature","properties":{
+  "Id": "7ba0f1d9-8ab4-4c3e-a2b9-1331cf66a13b",
+  "DeployId": 2729,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 65.0,
+  "PM10": 107.0,
+  "SO2": 9.5783,
+  "NO2": 55.2671,
+  "O3": 45.1428,
+  "O3_8H": 94.0387,
+  "CO": 0.8835,
+  "AQI": 88,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7238,
+  23.0162
+]}},{"type":"Feature","properties":{
+  "Id": "7ba7ad69-71a1-4fe1-893b-d83b3766367c",
+  "DeployId": 2635,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 62.0,
+  "PM10": 118.0,
+  "SO2": 8.6637,
+  "NO2": 31.0114,
+  "O3": 59.6262,
+  "O3_8H": 94.7712,
+  "CO": 0.8085,
+  "AQI": 84,
+  "PrimaryPollutant": "PM10,PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7681,
+  23.0506
+]}},{"type":"Feature","properties":{
+  "Id": "80129d9b-03c6-41e9-8db3-976cb7b2f6be",
+  "DeployId": 2687,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 69.0,
+  "PM10": 108.0,
+  "SO2": 9.9133,
+  "NO2": 34.7611,
+  "O3": 48.6896,
+  "O3_8H": 96.0731,
+  "CO": 0.8321,
+  "AQI": 92,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.708067,
+  23.0777
+]}},{"type":"Feature","properties":{
+  "Id": "826d6bc6-425c-4ea9-9fc1-e0c6652410b7",
+  "DeployId": 2694,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 47.0,
+  "PM10": 85.0,
+  "SO2": 10.0051,
+  "NO2": 30.8552,
+  "O3": 33.7851,
+  "O3_8H": 50.2104,
+  "CO": 0.8463,
+  "AQI": 67,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7177,
+  23.0615
+]}},{"type":"Feature","properties":{
+  "Id": "82a3c3ad-d166-42bb-8682-ceecb88a9d9a",
+  "DeployId": 2765,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 46.0,
+  "PM10": 78.0,
+  "SO2": 9.4243,
+  "NO2": 35.8055,
+  "O3": 46.4821,
+  "O3_8H": 88.005,
+  "CO": 0.6764,
+  "AQI": 64,
+  "PrimaryPollutant": "PM10,PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7126,
+  23.0032
+]}},{"type":"Feature","properties":{
+  "Id": "869516a6-bd28-4da8-bd1e-01d710406663",
+  "DeployId": 2617,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 65.0,
+  "PM10": 108.0,
+  "SO2": 9.4467,
+  "NO2": 70.5194,
+  "O3": 43.2125,
+  "O3_8H": 74.6825,
+  "CO": 0.8136,
+  "AQI": 88,
+  "PrimaryPollutant": "NO2"
+},"geometry":{"type":"Point","coordinates":[
+  113.736842,
+  22.936399
+]}},{"type":"Feature","properties":{
+  "Id": "87842859-31d6-44e3-9c1b-8a8db214ca1f",
+  "DeployId": 2626,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 66.0,
+  "PM10": 109.0,
+  "SO2": 8.2306,
+  "NO2": 61.145,
+  "O3": 39.6949,
+  "O3_8H": 94.6817,
+  "CO": 0.8724,
+  "AQI": 89,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.76695,
+  23.0323
+]}},{"type":"Feature","properties":{
+  "Id": "89ff0f15-91f0-44ca-874c-ecad7bb506f0",
+  "DeployId": 2676,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 55.0,
+  "PM10": 89.0,
+  "SO2": 8.6293,
+  "NO2": 58.9394,
+  "O3": 34.9161,
+  "O3_8H": 85.9492,
+  "CO": 0.9659,
+  "AQI": 75,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6925,
+  23.0351
+]}},{"type":"Feature","properties":{
+  "Id": "8a2bc302-f301-4115-888e-5835efe15061",
+  "DeployId": 2762,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 50.0,
+  "PM10": 87.0,
+  "SO2": 12.9423,
+  "NO2": 31.4917,
+  "O3": 53.8772,
+  "O3_8H": 98.4698,
+  "CO": 0.8095,
+  "AQI": 69,
+  "PrimaryPollutant": "PM2.5,PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7252,
+  23.039367
+]}},{"type":"Feature","properties":{
+  "Id": "8a7d4fdc-13a4-465a-bc95-4f576481e99e",
+  "DeployId": 2760,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 51.0,
+  "PM10": 84.0,
+  "SO2": 9.5339,
+  "NO2": 52.9069,
+  "O3": 57.1059,
+  "O3_8H": 120.0692,
+  "CO": 0.9467,
+  "AQI": 71,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7478,
+  23.0535
+]}},{"type":"Feature","properties":{
+  "Id": "8abe003e-06c4-4282-98db-7a1c8ed2f2bd",
+  "DeployId": 2618,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 53.0,
+  "PM10": 81.0,
+  "SO2": 8.3095,
+  "NO2": 29.7265,
+  "O3": 61.4304,
+  "O3_8H": 114.5984,
+  "CO": 0.7269,
+  "AQI": 73,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7197,
+  23.0448
+]}},{"type":"Feature","properties":{
+  "Id": "8c64849f-2873-42a7-9bfe-02790a913686",
+  "DeployId": 2616,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 62.0,
+  "PM10": 116.0,
+  "SO2": 10.0253,
+  "NO2": 36.9334,
+  "O3": 48.3743,
+  "O3_8H": 84.1897,
+  "CO": 0.8039,
+  "AQI": 83,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.755,
+  23.0325
+]}},{"type":"Feature","properties":{
+  "Id": "8cd81611-ba7a-4828-9cff-3c11c99f20a9",
+  "DeployId": 2669,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 36.0,
+  "PM10": 56.0,
+  "SO2": 10.6953,
+  "NO2": 32.3814,
+  "O3": 24.9486,
+  "O3_8H": 42.2389,
+  "CO": 0.826,
+  "AQI": 53,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7178,
+  23.0615
+]}},{"type":"Feature","properties":{
+  "Id": "8d74cc19-0919-471a-a8f1-0116a7d406f8",
+  "DeployId": 2629,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 62.0,
+  "PM10": 92.0,
+  "SO2": 8.1338,
+  "NO2": 35.7526,
+  "O3": 53.2669,
+  "O3_8H": 93.608,
+  "CO": 0.8234,
+  "AQI": 84,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8493,
+  23.019
+]}},{"type":"Feature","properties":{
+  "Id": "8e777ae3-3348-435c-919e-828ae921ebd5",
+  "DeployId": 2752,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 72.0,
+  "PM10": 119.0,
+  "SO2": 8.349,
+  "NO2": 46.6117,
+  "O3": 67.8698,
+  "O3_8H": 131.4995,
+  "CO": 0.8873,
+  "AQI": 96,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.785389,
+  23.059329
+]}},{"type":"Feature","properties":{
+  "Id": "8e8c5382-ebd5-44d4-ac05-f4447543c95e",
+  "DeployId": 2654,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 64.0,
+  "PM10": 107.0,
+  "SO2": 8.2835,
+  "NO2": 56.5038,
+  "O3": 57.703,
+  "O3_8H": 106.5747,
+  "CO": 0.812,
+  "AQI": 86,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7534,
+  22.9611
+]}},{"type":"Feature","properties":{
+  "Id": "900af32e-a106-42ce-941a-5c1951e9396c",
+  "DeployId": 2770,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 106.0,
+  "SO2": 12.4291,
+  "NO2": 32.4648,
+  "O3": 50.5434,
+  "O3_8H": 100.4877,
+  "CO": 0.8199,
+  "AQI": 78,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8373,
+  23.0272
+]}},{"type":"Feature","properties":{
+  "Id": "90ecd23e-d649-4dd2-b881-208b8af2f252",
+  "DeployId": 2672,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 32.0,
+  "PM10": 53.0,
+  "SO2": 9.4276,
+  "NO2": 48.4166,
+  "O3": 41.9303,
+  "O3_8H": 62.4093,
+  "CO": 0.7691,
+  "AQI": 61,
+  "PrimaryPollutant": "NO2"
+},"geometry":{"type":"Point","coordinates":[
+  113.83,
+  22.915
+]}},{"type":"Feature","properties":{
+  "Id": "9340c9f5-3d61-494e-a457-c1b5e087b0b5",
+  "DeployId": 2666,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 60.0,
+  "PM10": 102.0,
+  "SO2": 8.2671,
+  "NO2": 30.4208,
+  "O3": 53.1378,
+  "O3_8H": 102.0764,
+  "CO": 0.88,
+  "AQI": 82,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7541,
+  23.0469
+]}},{"type":"Feature","properties":{
+  "Id": "93b3de84-61f3-477c-8625-7ae81e933397",
+  "DeployId": 2701,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 54.0,
+  "PM10": 87.0,
+  "SO2": 8.5094,
+  "NO2": 48.3303,
+  "O3": 46.3846,
+  "O3_8H": 107.7144,
+  "CO": 0.8612,
+  "AQI": 74,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7856,
+  23.0455
+]}},{"type":"Feature","properties":{
+  "Id": "97e01b20-1d65-41ac-828b-463ab6f53f92",
+  "DeployId": 2756,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 65.0,
+  "PM10": 115.0,
+  "SO2": 9.1065,
+  "NO2": 50.5081,
+  "O3": 62.6988,
+  "O3_8H": 121.2123,
+  "CO": 0.9339,
+  "AQI": 88,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7313,
+  23.0124
+]}},{"type":"Feature","properties":{
+  "Id": "9d2d5cd7-0c31-4012-b9fa-711d622817e2",
+  "DeployId": 2660,
+  "RegionCode": "441900129000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 65.0,
+  "PM10": 107.0,
+  "SO2": 11.0639,
+  "NO2": 29.9011,
+  "O3": 52.7643,
+  "O3_8H": 104.5054,
+  "CO": 0.8669,
+  "AQI": 88,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7371,
+  23.0821
+]}},{"type":"Feature","properties":{
+  "Id": "9ee7ae05-7265-441c-80dd-159f1d7a60ca",
+  "DeployId": 2662,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 52.0,
+  "PM10": 119.0,
+  "SO2": 11.1482,
+  "NO2": 38.0286,
+  "O3": 50.0984,
+  "O3_8H": 84.5022,
+  "CO": 0.8491,
+  "AQI": 84,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.6873,
+  23.0386
+]}},{"type":"Feature","properties":{
+  "Id": "a0791831-57d9-4dc5-96e0-d02bae6ee4a9",
+  "DeployId": 2681,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 65.0,
+  "PM10": 110.0,
+  "SO2": 9.1174,
+  "NO2": 42.9093,
+  "O3": 41.025,
+  "O3_8H": 75.9244,
+  "CO": 0.7549,
+  "AQI": 87,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7728,
+  23.0021
+]}},{"type":"Feature","properties":{
+  "Id": "a2286314-0f03-4c22-8674-27673ec2f330",
+  "DeployId": 2733,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 62.0,
+  "PM10": 93.0,
+  "SO2": 13.9723,
+  "NO2": 39.9428,
+  "O3": 47.4187,
+  "O3_8H": 82.8574,
+  "CO": 0.7518,
+  "AQI": 84,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.741067,
+  23.031933
+]}},{"type":"Feature","properties":{
+  "Id": "a3ca9780-b2a1-41a8-893b-c2f8bdeac062",
+  "DeployId": 2717,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 72.0,
+  "PM10": 120.0,
+  "SO2": 8.2756,
+  "NO2": 52.4938,
+  "O3": 44.4914,
+  "O3_8H": 96.3228,
+  "CO": 0.9001,
+  "AQI": 96,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7574,
+  23.0459
+]}},{"type":"Feature","properties":{
+  "Id": "a3f1d372-015b-4cca-ac87-828698bbe2f9",
+  "DeployId": 2736,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 59.0,
+  "PM10": 112.0,
+  "SO2": 8.8051,
+  "NO2": 35.8821,
+  "O3": 48.078,
+  "O3_8H": 85.6061,
+  "CO": 0.8111,
+  "AQI": 81,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7228,
+  23.0047
+]}},{"type":"Feature","properties":{
+  "Id": "a5bb9e7f-cf4f-4fe8-b969-bd2748fc6e2a",
+  "DeployId": 2716,
+  "RegionCode": "441900129000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 72.0,
+  "PM10": 131.0,
+  "SO2": 9.0769,
+  "NO2": 61.5522,
+  "O3": 46.0116,
+  "O3_8H": 105.0714,
+  "CO": 0.8932,
+  "AQI": 97,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7287,
+  23.0679
+]}},{"type":"Feature","properties":{
+  "Id": "a61e3041-fe3d-4851-8b55-88629f563338",
+  "DeployId": 2708,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 49.0,
+  "PM10": 77.0,
+  "SO2": 11.7448,
+  "NO2": 38.6473,
+  "O3": 47.9281,
+  "O3_8H": 90.849,
+  "CO": 0.8947,
+  "AQI": 67,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6896,
+  23.0506
+]}},{"type":"Feature","properties":{
+  "Id": "a7da86e9-a51e-4f73-af03-3b691178053a",
+  "DeployId": 2754,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 62.0,
+  "PM10": 107.0,
+  "SO2": 13.9159,
+  "NO2": 33.8712,
+  "O3": 51.3577,
+  "O3_8H": 90.6529,
+  "CO": 0.937,
+  "AQI": 84,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7483,
+  23.0469
+]}},{"type":"Feature","properties":{
+  "Id": "a802f0de-5ca8-4e04-90a7-12afa505c1cf",
+  "DeployId": 2647,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 66.0,
+  "PM10": 109.0,
+  "SO2": 7.9465,
+  "NO2": 55.664,
+  "O3": 62.1237,
+  "O3_8H": 124.5104,
+  "CO": 0.8956,
+  "AQI": 89,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.787,
+  23.068
+]}},{"type":"Feature","properties":{
+  "Id": "a9417877-5902-499f-81a4-dbc5a998bf54",
+  "DeployId": 2655,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 64.0,
+  "PM10": 112.0,
+  "SO2": 13.22,
+  "NO2": 37.8842,
+  "O3": 56.5412,
+  "O3_8H": 94.4883,
+  "CO": 0.8549,
+  "AQI": 86,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6887,
+  22.9979
+]}},{"type":"Feature","properties":{
+  "Id": "ab60d4a0-d47c-4019-8dbd-1f1a40557d16",
+  "DeployId": 2784,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 56.0,
+  "PM10": 91.0,
+  "SO2": 7.5917,
+  "NO2": 34.2108,
+  "O3": 54.1579,
+  "O3_8H": 103.2964,
+  "CO": 0.7831,
+  "AQI": 76,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7903,
+  23.0165
+]}},{"type":"Feature","properties":{
+  "Id": "ac0ac7da-e5e2-4a13-84e8-9d5e5fd294d5",
+  "DeployId": 2651,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 49.0,
+  "PM10": 89.0,
+  "SO2": 8.7368,
+  "NO2": 37.1439,
+  "O3": 51.4539,
+  "O3_8H": 94.1063,
+  "CO": 0.7336,
+  "AQI": 70,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7127,
+  23.0449
+]}},{"type":"Feature","properties":{
+  "Id": "ad8f1c18-b33b-4a58-8bd4-e43c84f1d9ae",
+  "DeployId": 2684,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 46.0,
+  "PM10": 70.0,
+  "SO2": 11.3449,
+  "NO2": 30.2663,
+  "O3": 38.0672,
+  "O3_8H": 47.3884,
+  "CO": 0.8827,
+  "AQI": 63,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7056,
+  23.0649
+]}},{"type":"Feature","properties":{
+  "Id": "af25eae8-dc8c-4a89-86fb-e5b5c336dc8d",
+  "DeployId": 2740,
+  "RegionCode": "441900124000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 42.0,
+  "PM10": 81.0,
+  "SO2": 10.9833,
+  "NO2": 39.5904,
+  "O3": 39.8043,
+  "O3_8H": 68.901,
+  "CO": 0.8031,
+  "AQI": 66,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.6776,
+  23.0046
+]}},{"type":"Feature","properties":{
+  "Id": "b0b29e9f-c0b4-4de8-8af1-bdb990d3b972",
+  "DeployId": 2695,
+  "RegionCode": "441900101000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 57.0,
+  "PM10": 102.0,
+  "SO2": 10.0589,
+  "NO2": 41.0995,
+  "O3": 41.4533,
+  "O3_8H": 83.446,
+  "CO": 0.8603,
+  "AQI": 78,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7669,
+  23.0858
+]}},{"type":"Feature","properties":{
+  "Id": "b231d543-1fac-4134-8648-83b4bb03d05c",
+  "DeployId": 2712,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 77.0,
+  "PM10": 135.0,
+  "SO2": 8.9186,
+  "NO2": 54.6265,
+  "O3": 54.9978,
+  "O3_8H": 108.6192,
+  "CO": 0.856,
+  "AQI": 103,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7589,
+  22.9842
+]}},{"type":"Feature","properties":{
+  "Id": "b43282f7-74ea-4b45-b595-1c992d9855c2",
+  "DeployId": 2669,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 82.0,
+  "PM10": 131.0,
+  "SO2": 8.879,
+  "NO2": 60.2939,
+  "O3": 56.5036,
+  "O3_8H": 169.9248,
+  "CO": 0.8275,
+  "AQI": 109,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7178,
+  23.0615
+]}},{"type":"Feature","properties":{
+  "Id": "b68621cb-27ab-4432-89ca-26b7d1238dfb",
+  "DeployId": 2689,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 64.0,
+  "PM10": 105.0,
+  "SO2": 10.8312,
+  "NO2": 46.5964,
+  "O3": 37.8138,
+  "O3_8H": 80.3016,
+  "CO": 0.8481,
+  "AQI": 86,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7052,
+  22.99
+]}},{"type":"Feature","properties":{
+  "Id": "be830de4-836f-46d1-aa6f-c0f601f7be35",
+  "DeployId": 2738,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 94.0,
+  "SO2": 8.898,
+  "NO2": 39.845,
+  "O3": 46.9947,
+  "O3_8H": 87.3839,
+  "CO": 0.8859,
+  "AQI": 79,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7834,
+  22.9929
+]}},{"type":"Feature","properties":{
+  "Id": "c0bc94a4-a66d-4652-971e-f74d2c30bc9f",
+  "DeployId": 2759,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 16.0,
+  "PM10": 42.0,
+  "SO2": 10.4161,
+  "NO2": 57.0273,
+  "O3": 53.7446,
+  "O3_8H": 70.4242,
+  "CO": 0.7801,
+  "AQI": 71,
+  "PrimaryPollutant": "NO2"
+},"geometry":{"type":"Point","coordinates":[
+  113.7392,
+  22.9092
+]}},{"type":"Feature","properties":{
+  "Id": "c0ef316c-db90-4237-9b96-7ed4ea64129e",
+  "DeployId": 2696,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 67.0,
+  "PM10": 124.0,
+  "SO2": 7.3259,
+  "NO2": 39.4251,
+  "O3": 47.3835,
+  "O3_8H": 70.1356,
+  "CO": 0.7302,
+  "AQI": 89,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6875,
+  22.9367
+]}},{"type":"Feature","properties":{
+  "Id": "c110f83f-4eda-4b88-9517-7bd5a6680637",
+  "DeployId": 2628,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 63.0,
+  "PM10": 105.0,
+  "SO2": 10.1929,
+  "NO2": 35.7902,
+  "O3": 51.9021,
+  "O3_8H": 87.1895,
+  "CO": 0.7448,
+  "AQI": 85,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7325,
+  23.0305
+]}},{"type":"Feature","properties":{
+  "Id": "c216f5a9-60dd-4399-a584-b63849e96495",
+  "DeployId": 2673,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 48.0,
+  "PM10": 83.0,
+  "SO2": 8.8861,
+  "NO2": 37.1719,
+  "O3": 53.0906,
+  "O3_8H": 86.7695,
+  "CO": 0.748,
+  "AQI": 67,
+  "PrimaryPollutant": "PM10,PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7041,
+  23.0111
+]}},{"type":"Feature","properties":{
+  "Id": "c5b7442c-787c-462f-b303-afcb75f39d88",
+  "DeployId": 2755,
+  "RegionCode": "441900124000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 56.0,
+  "PM10": 96.0,
+  "SO2": 9.4687,
+  "NO2": 43.7263,
+  "O3": 50.1396,
+  "O3_8H": 79.2115,
+  "CO": 0.8354,
+  "AQI": 76,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.671,
+  22.9898
+]}},{"type":"Feature","properties":{
+  "Id": "c6165b5e-66e9-4e58-b5a6-22f3f0a60cf2",
+  "DeployId": 2734,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 54.0,
+  "PM10": 86.0,
+  "SO2": 8.7983,
+  "NO2": 55.2585,
+  "O3": 46.8765,
+  "O3_8H": 101.0427,
+  "CO": 0.8841,
+  "AQI": 74,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7435,
+  23.0487
+]}},{"type":"Feature","properties":{
+  "Id": "c70c3c7e-79a6-4f2c-8fd1-23e505ed847a",
+  "DeployId": 2749,
+  "RegionCode": "441900124000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 45.0,
+  "PM10": 85.0,
+  "SO2": 7.7983,
+  "NO2": 36.4076,
+  "O3": 39.9192,
+  "O3_8H": 69.0979,
+  "CO": 0.747,
+  "AQI": 68,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.6758,
+  23.0185
+]}},{"type":"Feature","properties":{
+  "Id": "c8a86ff5-2edc-499f-971b-d83465c98dbb",
+  "DeployId": 2690,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 86.0,
+  "SO2": 8.0326,
+  "NO2": 30.7955,
+  "O3": 59.7494,
+  "O3_8H": 120.0311,
+  "CO": 0.7176,
+  "AQI": 79,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7499,
+  23.0591
+]}},{"type":"Feature","properties":{
+  "Id": "c8e670c3-2615-4091-8c7d-b91ea2da2719",
+  "DeployId": 2702,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 70.0,
+  "PM10": 127.0,
+  "SO2": 10.4111,
+  "NO2": 46.4026,
+  "O3": 46.278,
+  "O3_8H": 78.8817,
+  "CO": 0.7607,
+  "AQI": 93,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7465,
+  22.9879
+]}},{"type":"Feature","properties":{
+  "Id": "c8edbe3f-3239-4149-aa64-5b4735f0f37f",
+  "DeployId": 2763,
+  "RegionCode": "441900129000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 52.0,
+  "PM10": 86.0,
+  "SO2": 12.4161,
+  "NO2": 35.4102,
+  "O3": 42.2648,
+  "O3_8H": 85.9778,
+  "CO": 0.8913,
+  "AQI": 72,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7145,
+  23.0861
+]}},{"type":"Feature","properties":{
+  "Id": "cd16496c-bf1d-4c16-819f-c6711828c1d5",
+  "DeployId": 2679,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 60.0,
+  "PM10": 92.0,
+  "SO2": 8.486,
+  "NO2": 27.7618,
+  "O3": 69.9814,
+  "O3_8H": 130.7491,
+  "CO": 0.7324,
+  "AQI": 81,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.819,
+  23.0812
+]}},{"type":"Feature","properties":{
+  "Id": "cefe3ffc-5fca-47aa-99e7-d1b1c3b686ab",
+  "DeployId": 2657,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 52.0,
+  "PM10": 92.0,
+  "SO2": 9.6171,
+  "NO2": 37.2212,
+  "O3": 46.909,
+  "O3_8H": 84.4412,
+  "CO": 0.7338,
+  "AQI": 71,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7409,
+  23.0334
+]}},{"type":"Feature","properties":{
+  "Id": "d04210f6-f8c6-4861-8938-42fed51c1b10",
+  "DeployId": 2704,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 45.0,
+  "PM10": 79.0,
+  "SO2": 5.5811,
+  "NO2": 35.0789,
+  "O3": 45.7086,
+  "O3_8H": 60.2372,
+  "CO": 0.7642,
+  "AQI": 65,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.8084,
+  22.9057
+]}},{"type":"Feature","properties":{
+  "Id": "d0e49dac-77df-4815-b4bd-b561b48da89e",
+  "DeployId": 2707,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 83.0,
+  "PM10": 139.0,
+  "SO2": 9.9231,
+  "NO2": 54.9154,
+  "O3": 59.4304,
+  "O3_8H": 126.7443,
+  "CO": 0.8703,
+  "AQI": 110,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7875,
+  23.075
+]}},{"type":"Feature","properties":{
+  "Id": "d299464b-0ced-4e0d-a4ad-ddd8637cf5bd",
+  "DeployId": 2713,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 53.0,
+  "PM10": 91.0,
+  "SO2": 6.9767,
+  "NO2": 35.7125,
+  "O3": 40.0473,
+  "O3_8H": 65.0478,
+  "CO": 0.7312,
+  "AQI": 73,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7217,
+  22.9357
+]}},{"type":"Feature","properties":{
+  "Id": "d35f2f35-eacc-49df-9fe8-843fce62ab48",
+  "DeployId": 2705,
+  "RegionCode": "441900111000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 71.0,
+  "PM10": 125.0,
+  "SO2": 8.7571,
+  "NO2": 38.4186,
+  "O3": 42.9998,
+  "O3_8H": 78.641,
+  "CO": 0.7171,
+  "AQI": 95,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8369,
+  23.0126
+]}},{"type":"Feature","properties":{
+  "Id": "d480cf58-b042-49a1-88b6-4555ffcc65d2",
+  "DeployId": 2646,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 63.0,
+  "PM10": 111.0,
+  "SO2": 9.446,
+  "NO2": 65.9905,
+  "O3": 36.0348,
+  "O3_8H": 60.5282,
+  "CO": 0.8721,
+  "AQI": 85,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7119,
+  22.9699
+]}},{"type":"Feature","properties":{
+  "Id": "d4b25f03-1746-462a-8a49-a4bfe618972b",
+  "DeployId": 2768,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 61.0,
+  "PM10": 105.0,
+  "SO2": 5.9115,
+  "NO2": 45.5474,
+  "O3": 46.3593,
+  "O3_8H": 89.7274,
+  "CO": 0.7745,
+  "AQI": 82,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7014,
+  22.9658
+]}},{"type":"Feature","properties":{
+  "Id": "d70e43c2-28e1-42b1-9a78-56825a37a069",
+  "DeployId": 2631,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 54.0,
+  "PM10": 93.0,
+  "SO2": 11.3949,
+  "NO2": 36.4344,
+  "O3": 58.396,
+  "O3_8H": 94.771,
+  "CO": 0.8197,
+  "AQI": 74,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.716,
+  23.0335
+]}},{"type":"Feature","properties":{
+  "Id": "d8bec492-31ba-4ae9-8a92-9586c78b97d2",
+  "DeployId": 2625,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 63.0,
+  "PM10": 102.0,
+  "SO2": 9.0727,
+  "NO2": 36.4801,
+  "O3": 57.089,
+  "O3_8H": 112.3056,
+  "CO": 0.8732,
+  "AQI": 85,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7455,
+  23.0405
+]}},{"type":"Feature","properties":{
+  "Id": "dce5b332-deff-41df-81a4-5dbc8a86d842",
+  "DeployId": 2664,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 41.0,
+  "PM10": 88.0,
+  "SO2": 13.1557,
+  "NO2": 27.012,
+  "O3": 61.8533,
+  "O3_8H": 94.2959,
+  "CO": 0.817,
+  "AQI": 69,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7032,
+  23.0379
+]}},{"type":"Feature","properties":{
+  "Id": "deecb84e-85a6-48b1-9873-1bc178eb53b5",
+  "DeployId": 2743,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 114.0,
+  "SO2": 9.2644,
+  "NO2": 33.7818,
+  "O3": 54.6875,
+  "O3_8H": 96.5142,
+  "CO": 0.7709,
+  "AQI": 82,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.746,
+  22.9636
+]}},{"type":"Feature","properties":{
+  "Id": "e0d62b2a-ffc0-4a76-9933-a9b73df16e1d",
+  "DeployId": 2753,
+  "RegionCode": "441900101000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 57.0,
+  "PM10": 83.0,
+  "SO2": 8.8511,
+  "NO2": 28.9448,
+  "O3": 55.1953,
+  "O3_8H": 87.4505,
+  "CO": 0.8022,
+  "AQI": 77,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.79975,
+  23.1081
+]}},{"type":"Feature","properties":{
+  "Id": "e1aab076-90a8-4de8-8772-0c45d1c044de",
+  "DeployId": 2619,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 82.0,
+  "PM10": 131.0,
+  "SO2": 8.2864,
+  "NO2": 38.1784,
+  "O3": 66.1018,
+  "O3_8H": 154.1184,
+  "CO": 0.7657,
+  "AQI": 108,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7106,
+  23.0706
+]}},{"type":"Feature","properties":{
+  "Id": "e330875e-4292-4d6f-b47e-0ae0d2ebb130",
+  "DeployId": 2645,
+  "RegionCode": "441900118000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 44.0,
+  "PM10": 92.0,
+  "SO2": 7.3268,
+  "NO2": 38.6308,
+  "O3": 48.3643,
+  "O3_8H": 75.8412,
+  "CO": 0.7416,
+  "AQI": 71,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.8123,
+  22.9203
+]}},{"type":"Feature","properties":{
+  "Id": "e43e1d09-4861-4d93-b0a3-0af5bc639592",
+  "DeployId": 2675,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 51.0,
+  "PM10": 81.0,
+  "SO2": 8.8115,
+  "NO2": 39.8879,
+  "O3": 48.2172,
+  "O3_8H": 92.5445,
+  "CO": 0.7447,
+  "AQI": 70,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.712,
+  23.0215
+]}},{"type":"Feature","properties":{
+  "Id": "e6bb4414-b1b1-4602-986b-308d34fa2716",
+  "DeployId": 2737,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 100.0,
+  "SO2": 9.3248,
+  "NO2": 58.4185,
+  "O3": 39.483,
+  "O3_8H": 64.4507,
+  "CO": 0.8796,
+  "AQI": 79,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7019,
+  22.9756
+]}},{"type":"Feature","properties":{
+  "Id": "e88d1046-3715-4057-bb3c-d9663ebd0b61",
+  "DeployId": 2656,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 90.0,
+  "SO2": 8.5594,
+  "NO2": 67.2519,
+  "O3": 39.711,
+  "O3_8H": 85.1493,
+  "CO": 0.8562,
+  "AQI": 84,
+  "PrimaryPollutant": "NO2"
+},"geometry":{"type":"Point","coordinates":[
+  113.8138,
+  22.9994
+]}},{"type":"Feature","properties":{
+  "Id": "e910e35c-116f-40cc-9628-b30166380b52",
+  "DeployId": 2643,
+  "RegionCode": "441900003000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 61.0,
+  "PM10": 91.0,
+  "SO2": 7.6148,
+  "NO2": 26.3605,
+  "O3": 70.3122,
+  "O3_8H": 124.53,
+  "CO": 0.6633,
+  "AQI": 82,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.8022,
+  23.0806
+]}},{"type":"Feature","properties":{
+  "Id": "e950ca0b-8d3d-4e77-a23d-25ebc17e0ee5",
+  "DeployId": 2767,
+  "RegionCode": "441900101000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 52.0,
+  "PM10": 121.0,
+  "SO2": 9.0119,
+  "NO2": 33.1618,
+  "O3": 48.6937,
+  "O3_8H": 96.5252,
+  "CO": 0.9158,
+  "AQI": 86,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.756,
+  23.0752
+]}},{"type":"Feature","properties":{
+  "Id": "f18a5068-3773-4102-b7b3-09a1e393fdf8",
+  "DeployId": 2746,
+  "RegionCode": "441900124000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 47.0,
+  "PM10": 83.0,
+  "SO2": 13.3063,
+  "NO2": 33.1063,
+  "O3": 56.0146,
+  "O3_8H": 110.2464,
+  "CO": 0.8107,
+  "AQI": 66,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.6952,
+  23.0208
+]}},{"type":"Feature","properties":{
+  "Id": "f424dd12-981b-4e9c-9c9a-62f67058b70d",
+  "DeployId": 2694,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 80.0,
+  "PM10": 119.0,
+  "SO2": 8.4349,
+  "NO2": 53.0124,
+  "O3": 53.3925,
+  "O3_8H": 153.803,
+  "CO": 0.7849,
+  "AQI": 106,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7177,
+  23.0615
+]}},{"type":"Feature","properties":{
+  "Id": "f87bc0bb-44f6-4027-844a-fa1621d6f723",
+  "DeployId": 2721,
+  "RegionCode": "441900006000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 44.0,
+  "PM10": 60.0,
+  "SO2": 8.8458,
+  "NO2": 52.4455,
+  "O3": 63.1777,
+  "O3_8H": 115.8377,
+  "CO": 0.8579,
+  "AQI": 66,
+  "PrimaryPollutant": "NO2"
+},"geometry":{"type":"Point","coordinates":[
+  113.7362,
+  23.0467
+]}},{"type":"Feature","properties":{
+  "Id": "f8e823db-a1e1-4bd6-8fc1-174b7998f78e",
+  "DeployId": 2634,
+  "RegionCode": "441900005000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 59.0,
+  "PM10": 93.0,
+  "SO2": 11.1423,
+  "NO2": 41.8305,
+  "O3": 46.2117,
+  "O3_8H": 83.5096,
+  "CO": 0.8479,
+  "AQI": 81,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7278,
+  23.0547
+]}},{"type":"Feature","properties":{
+  "Id": "f9cb477b-7d3c-4733-90bc-6db825e52520",
+  "DeployId": 2801,
+  "RegionCode": "441900004000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 52.0,
+  "PM10": 107.0,
+  "SO2": 7.4842,
+  "NO2": 28.4162,
+  "O3": 60.0538,
+  "O3_8H": 98.9714,
+  "CO": 0.8068,
+  "AQI": 78,
+  "PrimaryPollutant": "PM10"
+},"geometry":{"type":"Point","coordinates":[
+  113.7307,
+  22.9884
+]}},{"type":"Feature","properties":{
+  "Id": "fe35e87e-0fcb-42cc-9513-ddd2f64a276d",
+  "DeployId": 2622,
+  "RegionCode": "441900122000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 61.0,
+  "PM10": 87.0,
+  "SO2": 7.6435,
+  "NO2": 33.234,
+  "O3": 51.7995,
+  "O3_8H": 81.2418,
+  "CO": 0.7723,
+  "AQI": 82,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.6697,
+  22.9319
+]}},{"type":"Feature","properties":{
+  "Id": "ff6b7d98-8ed1-4acf-bd5a-702384b2ba17",
+  "DeployId": 2714,
+  "RegionCode": "441900129000",
+  "Pubtime": "2021-03-03T00:00:00",
+  "PM2_5": 58.0,
+  "PM10": 90.0,
+  "SO2": 7.823,
+  "NO2": 58.4635,
+  "O3": 42.0069,
+  "O3_8H": 93.1658,
+  "CO": 0.8816,
+  "AQI": 79,
+  "PrimaryPollutant": "PM2.5"
+},"geometry":{"type":"Point","coordinates":[
+  113.7213,
+  23.0786
+]}}]}

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>zpCore.Image</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Drawing\**" />
+    <EmbeddedResource Remove="Drawing\**" />
+    <None Remove="Drawing\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Image\ImageObj-ImageSharp.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ZKWeb.System.Drawing" Version="4.0.1" />
+  </ItemGroup>
+
+</Project>

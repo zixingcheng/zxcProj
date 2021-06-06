@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+    <RootNamespace>zpCore.GIS.API</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\zpCore.zpDataCache\zpCore.zpDataCache.Swap\zpCore.zpDataCache.Swap.csproj" />
+    <ProjectReference Include="..\Base.Common\Base.Common.csproj" />
+    <ProjectReference Include="..\GIS.Models\GIS.Models.DistributionMap\GIS.Models.DistributionMap.csproj" />
+  </ItemGroup>
+
+
+</Project>
