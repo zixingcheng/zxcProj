@@ -180,14 +180,14 @@ namespace zxcCore.zxcRobot.Test
             {
                 Data_Quote pData = (Data_Quote)item;
                 if (pData == null) continue;
-                Console.WriteLine("**********" + pData.Time);
+                //Console.WriteLine("**********" + pData.Time);
             }
         }
         //消息缓存事件
         private static void MsgCached_EventHandler(object sender, MsgCached_Event e)
         {
-            Console.WriteLine(DateTime.Now + "::");
-            Console.WriteLine("**********{0}:: {1}", e.MsgInfo.msgID, e.MsgInfo.msgContent);
+            //Console.WriteLine(DateTime.Now + "::");
+            //Console.WriteLine("**********{0}:: {1}", e.MsgInfo.msgID, e.MsgInfo.msgContent);
         }
 
     }

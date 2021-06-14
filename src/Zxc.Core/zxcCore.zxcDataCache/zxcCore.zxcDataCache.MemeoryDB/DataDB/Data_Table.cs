@@ -78,6 +78,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
             return this._permissionDB.CheckPermission(permission);
         }
 
+
         /// <summary>是否临时表
         /// </summary>
         /// <returns></returns>

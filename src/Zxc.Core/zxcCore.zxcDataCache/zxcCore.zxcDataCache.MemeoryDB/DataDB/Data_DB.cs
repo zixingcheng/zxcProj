@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using zxcCore.Common;
 
 namespace zxcCore.zxcDataCache.MemoryDB
 {
@@ -16,6 +17,9 @@ namespace zxcCore.zxcDataCache.MemoryDB
         /// <summary>数据库路径-系统表
         /// </summary>
         public string DirBase_Sys { get; set; }
+        /// <summary>数据库路径-设置的根目录
+        /// </summary>
+        public string DirRoot { get; set; }
 
         protected internal bool _useCache_Realtime = true;
         /// <summary>是否使用实时缓存
@@ -39,14 +43,35 @@ namespace zxcCore.zxcDataCache.MemoryDB
         /// </summary>
         protected readonly DataTable_Log<DataModels_Log> _dtLog = null;
 
-        public Data_DB(string dirBase, typePermission_DB permission = typePermission_DB.Normal, bool useCache = true)
+        /// <summary>配置文件信息
+        /// </summary>
+        protected internal ConfigurationHelper _configDataCache = new ConfigurationHelper("appsettings.json");
+        public Data_DB(string dirBase, typePermission_DB permission = typePermission_DB.Normal, bool useCache = true, string dbName = "")
         {
             _useCache_Realtime = useCache;
             _permissionDB = new Data_Permission(permission);
 
+            //初始根目录
+            DirRoot = _configDataCache.config["DataCache.MemoryDB:Base_Dir"] + "";
+            if (DirRoot == "")
+                DirRoot = System.IO.Directory.GetCurrentDirectory();
+
+            //默认路径数据库
             if (dirBase != "")
             {
                 DirBase = dirBase;
+                DirRoot = Directory.GetDirectoryRoot(DirBase);
+                
+            }
+            else
+            {
+                if (dbName == "") return;
+                DirBase = DirRoot + dbName;
+            }
+
+            //创建数据库
+            if (DirBase != "")
+            {
                 this.OnDBModelCreating();
 
                 //初始日志库表

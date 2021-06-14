@@ -32,7 +32,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             bool bResult = base.CheckData(dtTime, data, dataCache);
 
             //打印信息
-            ConsoleHelper.Debug("DataCheck_Print: {0}   ---{1}.", this.getMsg_Perfix(), _data.Time);
+            ConsoleHelper.Debug(false, "DataCheck_Print: {0}   ---{1}.", this.getMsg_Perfix(), _data.Time);
             return bResult;
         }
     }

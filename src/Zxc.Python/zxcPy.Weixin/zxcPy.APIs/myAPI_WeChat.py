@@ -17,7 +17,7 @@ mySystem.Append_Us("../zxcPy.DataSwap", False, __file__)
 mySystem.Append_Us("../zxcPy.Setting", False, __file__)
 mySystem.Append_Us("../zxcPy.Quotation", False, __file__) 
 mySystem.Append_Us("", False)    
-import myIO, myWeb, myData_SwapWx, myDebug, myManager_Msg
+import myIO, myWeb, myData_Json, myData_SwapWx, myDebug, myManager_Msg
 from myGlobal import gol   
 gol._Init()     #先必须在主模块初始化（只在Main模块需要一次即可）
 
@@ -34,8 +34,11 @@ class myAPI_Robot_msgWx(myWeb.myAPI):
         if(usrMMsg == None): return pMsg
         
         #消息处理(应为异步处理)
-        msg = ast.literal_eval(msgInfo) 
-        msg['msg'] = msg['msg'].replace("※r※", "\r").replace("※n※", "\n").replace("※t※", "\t")
+        #msg = ast.literal_eval(msgInfo) 
+        pJson = myData_Json.Json_Object()
+        pJson.Trans_FromStr(msgInfo)
+        msg = pJson._dict_
+        msg['msg'] = msg['msg'].replace("※r※", "\r").replace("※n※", "\n").replace("※i※", '"').replace("※t※", "\t")
         usrMMsg.OnHandleMsg(msg, 'wx', True)
         pMsg['result'] = True
         pMsg['text'] = "Swap Cached!"

@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using zxcCore.Common;
 using zxcCore.zxcDataCache.MemoryDB;
 
@@ -109,6 +110,8 @@ namespace zxcCore.zxcRobot.Msger
         {
             get
             {
+                if (string.IsNullOrEmpty(usrName)) return false;
+                if (string.IsNullOrEmpty(usrNameNick)) return false;
                 _IsUserGroup = usrName.Substring(0, 2) == "@*" ? true : usrNameNick.Substring(0, 2) == "@*" ? true : (groupID != "" ? true : false);
                 return _IsUserGroup;
             }
@@ -147,12 +150,59 @@ namespace zxcCore.zxcRobot.Msger
         public Msg()
         {
         }
+        public Msg(string msg)
+        {
+            this.msg = msg;
+        }
         ~Msg()
         {
             // 缓存数据？
         }
 
         #endregion
+
+
+        /// <summary>提取群名称（没有返回""）
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetNameGroup()
+        {
+            string nameGroup = this.IsUserGroup ? this.usrName : "";
+            return nameGroup;
+        }
+        /// <summary>提取用户名称（没有返回""）
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetNameUser()
+        {
+            string nameUser = "";
+            if (this.IsUserGroup)
+            {
+                nameUser = this.usrNameNick;
+            }
+            else
+            {
+                nameUser = this.usrName;
+                if (string.IsNullOrEmpty(nameUser))
+                    nameUser = this.usrNameNick;
+            }
+            return nameUser;
+        }
+
+        /// <summary>提取XML内容
+        /// </summary>
+        /// <returns></returns>
+        public virtual XElement GetMsg_ForXml()
+        {
+            if (this.msgContent.Contains("></"))
+            {
+                this.msgContent = this.msgContent.Replace("※i※", "\"");
+                XElement pElemment = XElement.Parse(this.msgContent);
+                return pElemment;
+            }
+            return null;
+        }
+
 
         public virtual dynamic ToDict()
         {
@@ -173,12 +223,12 @@ namespace zxcCore.zxcRobot.Msger
             return msgWx;
         }
 
-        public virtual dynamic ToJson()
+        public override dynamic ToJson()
         {
             var result = JsonConvert.SerializeObject(this.ToDict());
             return result;
         }
-        public virtual bool FromJson(dynamic jsonData)
+        public override bool FromJson(dynamic jsonData)
         {
             if (jsonData == null) return false;
             JObject jMsg = null;
@@ -205,5 +255,6 @@ namespace zxcCore.zxcRobot.Msger
             msgTime = Convert.ToDateTime(jMsg["msgTime"]);
             return true;
         }
+
     }
 }

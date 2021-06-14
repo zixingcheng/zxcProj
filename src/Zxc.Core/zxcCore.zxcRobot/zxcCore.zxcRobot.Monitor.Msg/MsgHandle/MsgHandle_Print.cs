@@ -12,7 +12,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
     {
         #region 属性及构造
 
-        public MsgHandle_Print(string tagName, string setting) : base(tagName, setting)
+        public MsgHandle_Print(string tagName, string setting) : base("", setting)
         {
             _tag = "MsgPrint";
             _tagAlias = "实时打印";
@@ -39,8 +39,8 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         public override bool HandleMsg_Do(Msger.Msg msg)
         {
             //打印信息
-            ConsoleHelper.Debug("MsgHandle_Print: {0}   ---{1}.", this.getMsg_Perfix(msg), msg.msgTime);
-            this.NotifyMsg(msg.msgContent, "@*测试群");
+            ConsoleHelper.Debug(true, "MsgHandle_Print:: {0}   ---{1}.", this.getMsg_Perfix(msg), msg.msgTime);
+            //this.NotifyMsg(msg.msgContent, "@*测试群");
             return true;
         }
 

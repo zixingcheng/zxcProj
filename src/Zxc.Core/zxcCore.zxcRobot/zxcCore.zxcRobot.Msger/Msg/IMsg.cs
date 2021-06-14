@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 
 namespace zxcCore.zxcRobot.Msger
-{    
+{
     /// <summary>消息类型
-     /// </summary>
+    /// </summary>
     public enum typeMsg
     {
+        NOTE = -1,
         TEXT = 0,
         IMAGE = 1
     }
@@ -28,6 +29,9 @@ namespace zxcCore.zxcRobot.Msger
         string usrName { get; set; }
         string usrNameNick { get; set; }
         typeMsger usrPlat { get; set; }
+
+        string GetNameGroup();
+        string GetNameUser();
 
         dynamic ToDict();
     }

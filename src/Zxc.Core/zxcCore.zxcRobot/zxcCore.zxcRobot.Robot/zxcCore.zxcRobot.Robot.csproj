@@ -13,8 +13,4 @@
     <ProjectReference Include="..\zxcCore.zxcRobot.User\zxcCore.zxcRobot.User.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="MsgSwap\" />
-  </ItemGroup>
-
 </Project>

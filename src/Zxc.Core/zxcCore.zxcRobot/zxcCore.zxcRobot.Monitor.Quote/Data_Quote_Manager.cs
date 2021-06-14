@@ -158,7 +158,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         //交换文件监测变化事件
         private void EventHandler_DataSwapChange(object sender, DataSwap_Event e)
         {
-            ConsoleHelper.Debug(DateTime.Now + "::");
+            //ConsoleHelper.Debug(false, DateTime.Now + "::");
             foreach (var item in e.Datas)
             {
                 Data_Quote pData = (Data_Quote)item;

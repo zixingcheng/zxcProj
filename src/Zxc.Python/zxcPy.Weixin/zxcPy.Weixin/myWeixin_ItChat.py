@@ -176,7 +176,7 @@ class myWeixin_ItChat(myThread.myThread):
                     wxMsg['msg'] = destPath
 
                 #保存
-                if(msgType == 1): 
+                if(msgType == 1 or msgType == 10002): 
                     if(wxMsg['msg'] != ""):  
                         self.swapOut.SwapData_Out(wxMsg)
             except Exception as ex:
@@ -282,7 +282,7 @@ class myWeixin_ItChat(myThread.myThread):
             pUsers = itchat.search_chatrooms(name = roupID)
             if(pUsers != None and len(pUsers) == 1): return pUsers[0]
         if(groupName != ""):
-            if(groupName[0:2] == "@*"): roupID = groupName[2:]
+            if(groupName[0:2] == "@*"): groupName = groupName[2:]
             pUsers = itchat.search_chatrooms(name = groupName)
             if(pUsers != None and len(pUsers) == 1): return pUsers[0]
 
@@ -306,7 +306,7 @@ class myWeixin_ItChat(myThread.myThread):
 
         #调用 消息发送
         msgR = msg 
-        msgR['msg'] = msgR['msg'].replace("※r※", "\r").replace("※n※", "\n").replace("※t※", "\t")
+        msgR['msg'] = msgR['msg'].replace("※r※", "\r").replace("※n※", "\n").replace("※i※", '"').replace("※t※", "\t")
         if(msgR.get('groupID', '') != '' or msgR.get('groupName', '') != ''):       #区分群、个人
             return self.Send_Msg(msgR['groupID'], msgR['groupName'], msgR['msg'], msgR['msgType'], 1)
         else:
@@ -315,6 +315,7 @@ class myWeixin_ItChat(myThread.myThread):
     def Send_Msg(self, usrID, usrName = "", msgInfo = "" , typeMsg = "TEXT", typeUser = 0):
         #用户检测(@开头为用户名，filehelper，其他需要检索实际用户名)
         userName = usrName
+        if(usrID == None): usrID = ""
         if(userName != "filehelper"):
             if(typeUser == 0):
                 pUser = self.Get_User(usrID, usrName)

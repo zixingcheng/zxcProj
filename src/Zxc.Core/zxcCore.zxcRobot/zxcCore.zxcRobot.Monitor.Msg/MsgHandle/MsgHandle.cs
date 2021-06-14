@@ -23,9 +23,9 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         /// </summary>
         protected internal List<typeMsger> _typeMsgs = new List<typeMsger>();
 
-        public MsgHandle(string tagName, string setting)
+        public MsgHandle(string tag, string setting)
         {
-            _tag = "MsgHandle";
+            _tag = tag == "" ? "MsgHandle" : tag;
             _tagAlias = "消息处理";
 
             //后期优化为外部配置信息
@@ -84,7 +84,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         {
             if (msg + "" != null)
             {
-                var pMsg = this.getMsg(msg, userID_To, typeMsg, typeMsger);
+                var pMsg = this.getMsg(msg, userID_To, false, typeMsg, typeMsger);
                 if (pMsg != null)
                     MsgerHelper.Msger.SendMsg(pMsg, typeMsger);
             }
@@ -93,23 +93,27 @@ namespace zxcCore.zxcRobot.Monitor.Msg
 
 
         //提取返回消息
-        protected internal virtual Msger.Msg getMsg(string msg, string userID_To = "@*测试群", typeMsg typeMsg = typeMsg.TEXT, typeMsger typeMsger = typeMsger.wx)
+        protected internal virtual Msger.Msg getMsg(string msg, string userID_To = "@*测试群", bool isUsrGroup = false, typeMsg typeMsg = typeMsg.TEXT, typeMsger typeMsger = typeMsger.wx)
         {
             if (msg + "" == "") return null;
             if (userID_To + "" == "") return null;
 
             //组装消息
+            isUsrGroup = userID_To.Length > 2 && userID_To.Substring(0, 2) == "@*" ? true : isUsrGroup;
             Msger.Msg pMsg = new Msger.Msg()
             {
                 msgID = "",
                 msg = msg + "",
-                msgType = typeMsg,
+                msgType = typeMsg == typeMsg.NOTE ? typeMsg.TEXT : typeMsg,
                 msgLink = "",
+                groupID = isUsrGroup ? userID_To : "",
                 usrName = userID_To,
                 usrNameNick = userID_To,
                 usrPlat = typeMsger,
                 UserName_src = _tag,
                 msgTime = DateTime.Now,
+                IsUserGroup = isUsrGroup,
+                IsFromRobot = true,
                 IsSend = true
             };
             return pMsg;

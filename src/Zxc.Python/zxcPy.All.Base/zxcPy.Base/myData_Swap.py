@@ -91,7 +91,8 @@ class myData_Swap_FileIO():
     # 文件交换-out
     def SwapData_Out(self, dictData): 
         msg = copy.copy(dictData)
-        msg['msg'] = msg['msg'].replace("\r", "※r※").replace("\n", "※n※")   #.replace("\t", "※t※")
+        msg['msg'] = msg['msg'].replace("\r", "※r※").replace("\n", "※n※").replace('"', "※i※").replace("\t", "※t※")
+        msg['msgContent'] = msg.get('msgContent',"").replace("\r", "※r※").replace("\n", "※n※").replace('"', "※i※").replace("\t", "※t※")
         self.dataOut.append(msg)
     # 文件交换输出-out
     def SwapData_OutFile(self, tagName = "", dirDest = ""): 

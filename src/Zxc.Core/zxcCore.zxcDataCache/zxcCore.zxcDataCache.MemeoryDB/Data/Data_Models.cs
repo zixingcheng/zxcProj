@@ -36,7 +36,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
             set { _perator = value; }
         }
 
-        protected internal DateTime _opTime;
+        protected internal DateTime _opTime = DateTime.Now;
         /// <summary>操作时间
         /// </summary>
         public DateTime OpTime

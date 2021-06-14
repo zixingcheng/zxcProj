@@ -4,12 +4,14 @@
 //===============================================================================
 // 文件名称： 
 // 功能描述：Robot_Manager --机器人管理类
-// 创建标识：zxc   2021-03-24
+// 创建标识：zxc   2021-06-14
 // 修改标识： 
 // 修改描述：
 //===============================================================================
 using System.Collections.Generic;
+using zxcCore.zxcDataCache.MemoryDB;
 using zxcCore.zxcRobot.Monitor.Msg;
+using zxcCore.zxcRobot.Robot.Power;
 
 namespace zxcCore.zxcRobot.Robot
 {
@@ -17,19 +19,21 @@ namespace zxcCore.zxcRobot.Robot
     /// </summary>
     public class Robot_Manager
     {
+        public static readonly DataDB_Robot _dbRobot = new DataDB_Robot();
         public static readonly Robot_Manager _Manager = new Robot_Manager();
 
         #region 属性及构造
 
         /// <summary>消息监测交换对象
         /// </summary>
-        protected internal DataMonitor_Msg _MsgSwaper = new DataMonitor_Msg();
+        protected internal DataMonitor_Msg _msgSwaper = new DataMonitor_Msg();
         /// <summary>消息处理对象
         /// </summary>
-        protected internal MsgsHandler _MsgsHandler = new MsgsHandler("zxcRobot");
+        protected internal MsgsHandler _msgsHandler = new MsgsHandler("zxcRobot");
         /// <summary>是否初始
         /// </summary>
         protected internal bool _isInited = false;
+
         protected internal Robot_Manager()
         {
             this.Init();
@@ -57,19 +61,24 @@ namespace zxcCore.zxcRobot.Robot
         /// <returns></returns>
         public bool InitMsgHandles()
         {
-            _MsgsHandler.InitMsgHandle(typeof(MsgHandle_Print));
+            _msgsHandler.InitMsgHandle(typeof(MsgHandle_Print));
+            //_MsgsHandler.InitMsgHandle(typeof(zxcRobot_Note_wx));
+
+            zxcRobot_Note_wx pRobot = new zxcRobot_Note_wx(null, "");
+            _msgsHandler.InitMsgHandle(pRobot.Tag, pRobot);
             return true;
         }
+
 
         //消息交换对象监测开始
         public bool Start()
         {
-            return _MsgSwaper.Start();
+            return _msgSwaper.Start();
         }
         //消息交换对象监测结束
         public bool Stop()
         {
-            return _MsgSwaper.Stop();
+            return _msgSwaper.Stop();
         }
 
     }

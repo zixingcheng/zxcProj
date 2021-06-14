@@ -46,7 +46,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         //交换文件监测变化事件
         private void EventHandler_DataSwapChange(object sender, DataSwap_Event e)
         {
-            ConsoleHelper.Debug(DateTime.Now + "::");
+            //ConsoleHelper.Debug(false, DateTime.Now + "::");
             foreach (IMsg item in e.Datas)
             {
                 //加入全局消息

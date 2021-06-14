@@ -72,7 +72,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         protected void EventHandler_DataAnalyse_Trigger(object sender, DataAnalyse_EventArgs e)
         {
             _eventArgs = e;
-            ConsoleHelper.Debug("{0}:: {1}", DateTime.Now, e.MonitorType.ToString());
+            ConsoleHelper.Debug(true, "{0}:: {1}", DateTime.Now, e.MonitorType.ToString());
 
             //组装消息
             string msg = this.getMsg_Infix();
@@ -84,7 +84,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 //输出、打印信息
                 string usrTo = _data._typeStock == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
                 this.NotifyMsg(msg, "@*股票监测--" + usrTo);
-                ConsoleHelper.Debug("DataCheck_Hourly: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.Time, msg);
+                ConsoleHelper.Debug(true, "DataCheck_Hourly:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.Time, msg);
             }
         }
     }
