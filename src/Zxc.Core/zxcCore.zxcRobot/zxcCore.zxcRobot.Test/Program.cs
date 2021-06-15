@@ -64,7 +64,7 @@ namespace zxcCore.zxcRobot.Test
 
             //转化成Json
             watch.Start();
-            Data_Table<DataModels_Test> dbTest = new Data_Table<DataModels_Test>();
+            Data_Table<DataModels_Test> dbTest = new Data_Table<DataModels_Test>("");
             for (int i = 0; i < 100000; i++)
             {
                 DataModels_Test obj = new DataModels_Test();

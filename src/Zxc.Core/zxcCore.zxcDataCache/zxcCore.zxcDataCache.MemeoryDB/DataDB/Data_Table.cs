@@ -47,6 +47,11 @@ namespace zxcCore.zxcDataCache.MemoryDB
             _permissionDB = new Data_Permission();
             _dtName = this.GetType().Name;
         }
+        public Data_Table(string dtName)
+        {
+            _permissionDB = new Data_Permission();
+            _dtName = dtName == null ? this.GetType().Name : dtName;
+        }
         public Data_Table(typePermission_DB permission)
         {
             _permissionDB = new Data_Permission(permission);
@@ -336,7 +341,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
             foreach (var file in files)
             {
                 //读取文件信息生成表对象
-                Data_Table<T> Data_Table = new Data_Table<T>();
+                Data_Table<T> Data_Table = new Data_Table<T>("");
                 string strJson = File.ReadAllText(file);
                 Data_Table = Newtonsoft.Json.JsonConvert.DeserializeObject<Data_Table<T>>(strJson);
 

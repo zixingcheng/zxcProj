@@ -24,6 +24,9 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>库表--机器人功能授权信息表
         /// </summary>
         protected internal DataPower_Robot<Power_Robot> _powerRobot { get; set; }
+        /// <summary>库表--成长积分表
+        /// </summary>
+        protected internal DataTable_Points_Growth<Data_Points> _growthPoints { get; set; }
 
         protected internal DataDB_Robot() : base("", typePermission_DB.Normal, true, "/Datas/DB_Robot")
         {
@@ -45,6 +48,7 @@ namespace zxcCore.zxcRobot.Robot
 
             //初始库表信息
             _powerRobot = new DataPower_Robot<Power_Robot>(); this.InitDBModel(_powerRobot);
+            _growthPoints = new DataTable_Points_Growth<Data_Points>(); this.InitDBModel(_growthPoints); _growthPoints.Init_PointsLog();
         }
 
     }

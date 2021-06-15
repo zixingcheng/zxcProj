@@ -12,10 +12,10 @@ namespace zxcCore.zxcRobot.Msger
     {
         #region 属性及构造
 
-        public DataTable_Msg()
+        public DataTable_Msg() : base("dataMsg")
         {
             //Data_Test = new Data_Table<Data_TestObj>(); this.InitModel(Data_Test);
-            this._dtName = "dataMsg";
+            //this._dtName = "dataMsg";
         }
 
         #endregion

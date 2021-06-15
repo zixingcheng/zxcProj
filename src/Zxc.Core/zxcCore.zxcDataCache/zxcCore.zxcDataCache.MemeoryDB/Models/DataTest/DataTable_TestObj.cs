@@ -19,10 +19,10 @@ namespace zxcCore.zxcDataCache.MemoryDB.Test
     {
         #region 属性及构造
 
-        public DataTable_TestObj()
+        public DataTable_TestObj() : base("dataTest")
         {
             //Data_Test = new Data_Table<Data_TestObj>(); this.InitModel(Data_Test);
-            this._dtName = "dataTest";
+            //this._dtName = "dataTest";
         }
 
         #endregion

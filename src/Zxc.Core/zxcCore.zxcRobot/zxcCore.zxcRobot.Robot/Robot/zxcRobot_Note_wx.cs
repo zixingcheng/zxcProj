@@ -1,4 +1,14 @@
-﻿using System;
+﻿//===============================================================================
+// Copyright @ 2021 Guangzhou Yijian Life Technology Co.,Ltd. All rights reserved.
+// Copyright @ 2021 广州易简生活科技有限公司.  版权所有.
+//===============================================================================
+// 文件名称： 
+// 功能描述：zxcRobot_Note_wx --机器人-消息回撤(wx)
+// 创建标识：zxc   2021-06-14
+// 修改标识： 
+// 修改描述：
+//===============================================================================
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -61,7 +71,6 @@ namespace zxcCore.zxcRobot.Robot
         /// <returns></returns>
         public override bool HandleMsg_Do(Msg msg)
         {
-            string strReturn = "";
             if (msg.msgType.ToString().ToUpper() != "NOTE") return false;
 
             //解析通知

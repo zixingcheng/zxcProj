@@ -7,15 +7,15 @@ using zxcCore.zxcRobot.User;
 
 namespace zxcCore.zxcRobot.Robot.Power
 {
-    /// <summary>数据对象集类-机器人功能权限表
+    /// <summary>数据对象集类-积分变动记录表
     /// </summary>
-    public class DataPower_Robot<T> : Data_Table<T> where T : Power_Robot, IData
+    public class DataTable_PointsLog<T> : Data_Table<T> where T : Data_PointsLog
     {
         #region 属性及构造
 
-        public DataPower_Robot() : base("dataPower_Robot")
+        public DataTable_PointsLog(string dtName = "dataTable_PointsLog") : base(dtName)
         {
-            //this._dtName = "dataPower_Robot";
+            //this._dtName = string.IsNullOrEmpty(_dtName) ? "dataTable_PointsLog" : _dtName;
         }
 
         #endregion
@@ -35,8 +35,9 @@ namespace zxcCore.zxcRobot.Robot.Power
         /// <returns></returns>
         public override List<T> Query_Sames(T item)
         {
-            return this.FindAll(e => e.NameGroup == item.NameGroup && e.NameUser == item.NameUser && e.UsrPlat == item.UsrPlat && e.NameRobot == item.NameRobot && e.IsDel == false);
+            return this.FindAll(e => (e.UID == item.UID && e.IsDel == false) || (e.PointsType == item.PointsType && e.PointsUser == item.PointsUser && e.PointsNote == item.PointsNote && e.PointExChange == item.PointExChange && e.Operator == item.Operator && (e.OpTime - item.OpTime).TotalHours < 1 && e.IsDel == false));
         }
 
     }
+
 }

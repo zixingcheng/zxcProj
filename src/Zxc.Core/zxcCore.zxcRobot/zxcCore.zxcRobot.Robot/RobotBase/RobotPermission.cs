@@ -102,6 +102,7 @@ namespace zxcCore.zxcRobot.Robot
         protected internal ConfigurationHelper _configDataCache = null;
         protected internal string _configPerFix = "";   //设置前缀
         protected internal string _configMidFix = "";   //设置中缀
+        protected internal string _bindTag = "";        //绑定标签
         public RobotPermission(string configPerFix, string configMidFix, dynamic setting = null)
         {
             _configMidFix = configMidFix;
@@ -147,6 +148,7 @@ namespace zxcCore.zxcRobot.Robot
 
             this.IsValid_Personal = Convert.ToBoolean(_configDataCache.config[path + ":IsValid_Personal"] + "");
             this.IsValid_PersonalAll = Convert.ToBoolean(_configDataCache.config[path + ":IsValid_PersonalAll"] + "");
+            this._bindTag = _configDataCache.config[path + ":BindTag"] + "";
 
             //同步用户信息-群组
             string name = _configPerFix;
@@ -159,6 +161,7 @@ namespace zxcCore.zxcRobot.Robot
                 string strValid = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":isValid"] + "";
                 string bindTag = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindTag"] + "";
                 bool isValid = strValid == "" ? false : Convert.ToBoolean(strValid);
+                bindTag = bindTag == "" ? this._bindTag : bindTag;
                 this.Add_Permission(name, IsValid_GroupName, nameUser, usrPlat, isValid, bindTag);
 
                 ind++;
@@ -174,6 +177,7 @@ namespace zxcCore.zxcRobot.Robot
                 string strValid = _configDataCache.config[path + ":IsValid_PersonalNames:" + ind.ToString() + ":isValid"] + "";
                 string bindTag = _configDataCache.config[path + ":IsValid_PersonalNames:" + ind.ToString() + ":bindTag"] + "";
                 bool isValid = strValid == "" ? false : Convert.ToBoolean(strValid);
+                bindTag = bindTag == "" ? this._bindTag : bindTag;
                 this.Add_Permission(name, "", IsValid_PersonalName, usrPlat, isValid, bindTag);
 
                 ind++;
@@ -340,9 +344,9 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>权限查询
         /// </summary>
         /// <returns></returns>
-        public virtual bool Get_Permission()
+        public virtual Power_Robot Get_Permission(string nameRobot, string nameGroup, string usrID, string usrPlat)
         {
-            return true;
+            return Robot_Manager._dbRobot._powerRobot.Where(e => e.NameRobot == nameRobot && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false).FirstOrDefault();
         }
 
     }

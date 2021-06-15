@@ -1,0 +1,68 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using zxcCore.zxcDataCache.MemoryDB;
+using zxcCore.zxcRobot.User;
+
+namespace zxcCore.zxcRobot.Robot.Power
+{
+    /// <summary>数据对象集类-积分表
+    /// </summary>
+    public class DataTable_Points<T> : Data_Table<T> where T : Data_Points
+    {
+        #region 属性及构造
+
+        /// <summary>库表--积分记录表
+        /// </summary>
+        protected internal DataTable_PointsLog<Data_PointsLog> _logPoints { get; set; }
+        protected internal bool _bInited = false;
+
+
+        public DataTable_Points(string dtName = "dataTable_Points") : base(dtName)
+        {
+            //this._dtName = string.IsNullOrEmpty(_dtName) ? "dataTable_Points" : _dtName;
+            this.Init_PointsLog();
+        }
+
+        #endregion
+
+
+        /// <summary>对象是否存在
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool IsExist(T item)
+        {
+            return this.Contains(item) || this.IsSame(item);
+        }
+        /// <summary>查询相同对象-重写
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override List<T> Query_Sames(T item)
+        {
+            return this.FindAll(e => (e.UID == item.UID && e.IsDel == false) || (e.PointsType == item.PointsType && e.PointsUser == item.PointsUser && e.IsDel == false));
+        }
+
+
+        /// <summary>初始相关表--积分记录表
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool Init_PointsLog(string dtLogName = "dataTable_PointsLog")
+        {
+            //初始积分记录表
+            if (_bInited) return true;
+            if (_logPoints == null)
+                _logPoints = new DataTable_PointsLog<Data_PointsLog>(dtLogName);
+            if (this._dbContext != null)
+            {
+                this._dbContext.InitDBModel(_logPoints);
+                _bInited = true;
+            }
+            return true;
+        }
+
+    }
+
+}

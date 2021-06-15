@@ -12,9 +12,9 @@ namespace zxcCore.zxcDataCache.MemoryDB
     {
         #region 属性及构造
 
-        public DataUser_wx()
+        public DataUser_wx() : base("dataUser_wx")
         {
-            this._dtName = "dataUser_wx";
+            //this._dtName = "dataUser_wx";
         }
 
         #endregion

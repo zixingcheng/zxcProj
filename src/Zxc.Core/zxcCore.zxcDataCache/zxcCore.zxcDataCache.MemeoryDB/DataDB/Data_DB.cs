@@ -61,7 +61,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
             {
                 DirBase = dirBase;
                 DirRoot = Directory.GetDirectoryRoot(DirBase);
-                
+
             }
             else
             {
@@ -105,7 +105,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
             path = Path.GetFullPath(path);
 
             //反序列化
-            Data_Table<T> Data_Table = new Data_Table<T>();
+            Data_Table<T> Data_Table = new Data_Table<T>("");
             string strJson = "";
             if (File.Exists(path))
             {
@@ -132,7 +132,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
         /// <typeparam name="T"></typeparam>
         /// <param name="objDataModel"></param>
         /// <returns></returns>
-        protected virtual bool InitDBModel<T>(Data_Table<T> objDataModel) where T : Data_Models, IData
+        public virtual bool InitDBModel<T>(Data_Table<T> objDataModel) where T : Data_Models, IData
         {
             objDataModel.SetDB(this);
 

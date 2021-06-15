@@ -11,9 +11,8 @@ namespace zxcCore.zxcDataCache.MemoryDB
     {
         #region 属性及构造
 
-        public DataTable_Log()
+        public DataTable_Log() : base("sysLog")
         {
-            this._dtName = "sysLog";
             this._isSysTable = true;
             this._isNoLog = true;
         }

@@ -64,8 +64,11 @@ namespace zxcCore.zxcRobot.Robot
             _msgsHandler.InitMsgHandle(typeof(MsgHandle_Print));
             //_MsgsHandler.InitMsgHandle(typeof(zxcRobot_Note_wx));
 
-            zxcRobot_Note_wx pRobot = new zxcRobot_Note_wx(null, "");
-            _msgsHandler.InitMsgHandle(pRobot.Tag, pRobot);
+            zxcRobot_Note_wx pRobot_Note_wx = new zxcRobot_Note_wx(null, "");
+            _msgsHandler.InitMsgHandle(pRobot_Note_wx.Tag, pRobot_Note_wx);
+
+            zxcRobot_Point_growth pRobot_Point_growth = new zxcRobot_Point_growth(null, "");
+            _msgsHandler.InitMsgHandle(pRobot_Point_growth.Tag, pRobot_Point_growth);
             return true;
         }
 
