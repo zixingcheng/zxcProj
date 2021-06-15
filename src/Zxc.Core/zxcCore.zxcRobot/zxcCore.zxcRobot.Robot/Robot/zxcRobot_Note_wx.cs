@@ -94,10 +94,10 @@ namespace zxcCore.zxcRobot.Robot
 
             //返回消息通知
             int ind = _random.Next(0, _perfixRevoke.Count - 1);
-            string strMsg = string.Format("{0}【{1}】撤回了条消息。\n消息内容：\"{2}\"", _perfixRevoke[ind], msg.usrNameNick, msgs[0].msg);
+            string strMsg = string.Format("{0}「{1}」撤回了条消息。\n消息内容：\"{2}\"", _perfixRevoke[ind], msg.usrNameNick, msgs[0].msg);
 
-            ConsoleHelper.Debug(true, "消息回撤：【{0}】撤回消息：\"{1}\"", msg.usrNameNick, msgs[0].msg);
-            this.NotifyMsg(strMsg, msg);
+            ConsoleHelper.Debug(true, "消息回撤：「{1}」撤回消息：\"{1}\"", msg.usrNameNick, msgs[0].msg);
+            this.NotifyMsg(strMsg, msg, "消息回撤");
             return true;
         }
         //消息转账通知

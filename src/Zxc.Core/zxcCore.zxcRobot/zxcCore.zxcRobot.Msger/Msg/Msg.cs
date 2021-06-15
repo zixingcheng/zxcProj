@@ -76,6 +76,12 @@ namespace zxcCore.zxcRobot.Msger
         {
             get; set;
         }
+        /// <summary>消息标签
+        /// </summary>
+        public string msgTag
+        {
+            get; set;
+        }
 
         /// <summary>消息时间
         /// </summary>
@@ -150,9 +156,10 @@ namespace zxcCore.zxcRobot.Msger
         public Msg()
         {
         }
-        public Msg(string msg)
+        public Msg(string msg, string msgTag = "")
         {
             this.msg = msg;
+            this.msgTag = msgTag;
         }
         ~Msg()
         {
@@ -182,9 +189,9 @@ namespace zxcCore.zxcRobot.Msger
             }
             else
             {
-                nameUser = this.usrName;
+                nameUser = this.usrNameNick;            //优先自定义别名
                 if (string.IsNullOrEmpty(nameUser))
-                    nameUser = this.usrNameNick;
+                    nameUser = this.usrName;
             }
             return nameUser;
         }

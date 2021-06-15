@@ -7,9 +7,8 @@ namespace zxcCore.zxcRobot.Msger
     /// </summary>
     public enum typeMsger
     {
-        None = -1,
-        Sys = 0,
-        EMail = 1,
+        None = 0,
+        Sys = 1,
         wx = 10,
         wxmp = 11
     }

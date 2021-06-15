@@ -48,6 +48,7 @@ namespace zxcCore.zxcRobot.User
 
             //初始zxc用户信息
             _userZxc = new DataUser_zxc<User_zxc>(); this.InitDBModel(_userZxc);
+            _userWx = new DataUser_wx<User_wx>(); this.InitDBModel(_userWx);
         }
 
         /// <summary>初始系统用户
@@ -72,12 +73,11 @@ namespace zxcCore.zxcRobot.User
             //消息平台信息初始
             ConfigurationHelper configDataCache = new ConfigurationHelper("appsettings.json");
             string usrMsger_wx = _configDataCache.config["Msgerset:Msger_Wx:UsrName_Root"] + "";
-            User_Base userWx = new User_Base()
+            User_wx userWx = new User_wx()
             {
                 usrID = Guid.NewGuid().ToString(),
                 usrName = usrMsger_wx,
-                usrNameNick = "admin",
-                usrPlat = typeUserPlat.wx.ToString()
+                usrNameNick = "admin"
             };
             this.InitUser_system(userWx);
             _userZxc.SaveChanges();
@@ -134,8 +134,9 @@ namespace zxcCore.zxcRobot.User
         /// <returns></returns>
         public User_zxc GetUser(string usrName, string usrNameNick, string usrPlat)
         {
-            //查询用户信息--特定
-            Func<IEnumerable<User_Base>, IEnumerable<User_Base>> predicate = p => p.Where(e => e.usrName == usrName || e.usrNameNick == usrNameNick);
+            //提取对应平台用户信息
+            if (usrPlat == "None") return null;
+            Func<IEnumerable<User_Base>, IEnumerable<User_Base>> predicate = p => p.Where(e => (e.usrName == usrName || e.usrNameNick == usrNameNick) && e.IsDel == false);
             User_Base usr = UserManager._Users.GetUser(predicate, usrPlat);
             if (usr == null) return null;
 
@@ -144,10 +145,12 @@ namespace zxcCore.zxcRobot.User
             {
                 case "wx":
                     return _userZxc.Find(e => e.usrName == usr.usrName || e.usrName == usr.usrNameNick || e.usrNameNick == usr.usrNameNick || e.usrName_wx == usr.usrName);
+                case "Sys":
+                    return _userZxc.Find(e => e.usrName == usr.usrName || e.usrName == usr.usrNameNick || e.usrNameNick == usr.usrNameNick);
                 default:
                     break;
             }
-            return _userZxc.Find(e => e.usrName == usr.usrName || e.usrName == usr.usrNameNick || e.usrNameNick == usr.usrNameNick);
+            return null;
         }
 
         public User_Base GetUser(Func<IEnumerable<User_Base>, IEnumerable<User_Base>> predicate, typeUserPlat userPlat = typeUserPlat.zxc)
@@ -159,11 +162,13 @@ namespace zxcCore.zxcRobot.User
             switch (userPlat)
             {
                 case "wx":
-                    return (Lambda.LambdaDo<User_Base>(_userWx, predicate)).Where(e => e.IsDel == false).First();
+                    return Lambda.LambdaDo<User_Base>(_userWx, predicate).FirstOrDefault();
+                case "Sys":
+                    return Lambda.LambdaDo<User_Base>(_userWx, predicate).FirstOrDefault();
                 default:
                     break;
             }
-            return (Lambda.LambdaDo<User_Base>(_userZxc, predicate)).Where(e => e.IsDel == false).First();
+            return null;
         }
 
 

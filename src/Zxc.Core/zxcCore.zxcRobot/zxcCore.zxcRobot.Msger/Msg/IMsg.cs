@@ -24,6 +24,8 @@ namespace zxcCore.zxcRobot.Msger
         string msgLink { get; set; }
         DateTime msgTime { get; set; }
         typeMsg msgType { get; set; }
+        string msgTag { get; set; }
+        
         string UserName_src { get; set; }
         string usrID { get; set; }
         string usrName { get; set; }

@@ -67,7 +67,7 @@ class myData_Swap_FileIO():
                     continue;
 
             #读取文件内容
-            myDebug.Print("\tnew file swap:: " + file);
+            myDebug.Print("\tnew file swap:: " + myIO.getFileName(file, False));
             strJson = myIO.getContent(file, noBOM = True)
             pJson = myData_Json.Json_Object()
             pJson.Trans_FromStr(strJson)
@@ -108,7 +108,8 @@ class myData_Swap_FileIO():
         fileName = tagName + myData_Trans.Tran_ToDatetime_str(None, "_%Y_%m_%d_%H_%M_%S") + ".json"
         content = jsonData.ToString(autoFormat = False).replace("\\", "/")
         myIO.Save_File(dirOut + fileName, content, True, False);
-        myDebug.Print("DataSwap Out IOFiles::" + dirOut + fileName)
+        #myDebug.Print("DataSwap Out IOFiles::" + dirOut + fileName)
+        myDebug.Print("DataSwap Out IOFiles::" + fileName)
         return True
 
     # 交换文件备份

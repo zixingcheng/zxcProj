@@ -197,11 +197,11 @@ namespace zxcCore.zxcRobot.Robot
         /// <param name="msg"></param>
         /// <param name="userID_To"></param>
         /// <returns></returns>
-        public virtual bool NotifyMsg(dynamic msg, Msg msgSrc)
+        public virtual bool NotifyMsg(dynamic msg, Msg msgSrc, string msgTag = "")
         {
             if (msg + "" != null)
             {
-                Msg pMsg = _ReturnMsg(msg, msgSrc);
+                Msg pMsg = _ReturnMsg(msg, msgSrc, msgTag);
                 if (pMsg != null)
                     return MsgerHelper.Msger.SendMsg(pMsg, pMsg.usrPlat);
                 //else
@@ -214,9 +214,9 @@ namespace zxcCore.zxcRobot.Robot
         /// <param name="text"></param>
         /// <param name="msgSrc"></param>
         /// <returns></returns>
-        public virtual Msg _ReturnMsg(string text, Msg msgSrc)
+        public virtual Msg _ReturnMsg(string text, Msg msgSrc, string msgTag = "")
         {
-            return _ReturnMsg(text, msgSrc, msgSrc.msgType);
+            return _ReturnMsg(text, msgSrc, msgSrc.msgType, msgTag);
         }
         /// <summary>返回消息
         /// </summary>
@@ -224,12 +224,38 @@ namespace zxcCore.zxcRobot.Robot
         /// <param name="msgSrc"></param>
         /// <param name="typeMsg"></param>
         /// <returns></returns>
-        public virtual Msg _ReturnMsg(string text, Msg msgSrc, typeMsg typeMsg)
+        public virtual Msg _ReturnMsg(string text, Msg msgSrc, typeMsg typeMsg, string msgTag = "")
         {
             string userID_To = msgSrc.UserName_src;
             typeMsger typeMsger = msgSrc.usrPlat;
 
-            Msg pMsgR = this.getMsg(text, userID_To, msgSrc.IsUserGroup, typeMsg, typeMsger);
+            //修正消息
+            bool isGroup = msgSrc.IsUserGroup;
+            string usrGroup = msgSrc.GetNameGroup();
+            string usrName = msgSrc.GetNameUser();
+            if (_Permission.Check_Permission_SysUsr(usrName, msgSrc.usrPlat.ToString()) ||
+                !this._Permission.Check_Permission_SingleSet(usrGroup, usrName, msgSrc.usrPlat.ToString()))
+            {
+                //查询用户信息--系统管理员屏蔽
+                userID_To = "filehelper";       //非独立设置调整为发送Helper
+                isGroup = false;
+
+                //修正消息内容，现实群组信息
+                string strTag = string.IsNullOrEmpty(msgTag) ? _Title : msgTag;
+                if (msgSrc.IsUserGroup)
+                {
+                    string strMsg_Group = string.Format("{0}：〖{1}〗\n", strTag, msgSrc.GetNameGroup());
+                    text = strMsg_Group + text;
+                }
+                else
+                {
+                    string strMsg_Group = string.Format("{0}：『{1}』\n", strTag, msgSrc.GetNameUser());
+                    text = strMsg_Group + text;
+                }
+            }
+
+            //生成消息
+            Msg pMsgR = this.getMsg(text, userID_To, isGroup, typeMsg, typeMsger, msgTag);
             return pMsgR;
         }
 

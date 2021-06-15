@@ -193,7 +193,6 @@ namespace zxcCore.zxcRobot.Robot
             if (this.IsRunning && this.IsValid)
             {
                 //超时检查
-                isValid = true;
                 if (this.ValidMaxTime > 0)
                 {
                     var deltaT = (DateTime.Now - TimeStartRun).TotalSeconds;
@@ -239,7 +238,7 @@ namespace zxcCore.zxcRobot.Robot
                     if (this.IsValid_PersonalAll) return true;          //全部人有权限
 
                     //查询个人信息--通用(指定群、指定人员)
-                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configPerFix && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
+                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configPerFix && (e.NameGroup == "" || e.NameGroup == null) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
                     if (pPower != null && pPower.IsValid)
                     {
                         return true;                                    //指指定人员有效
@@ -247,16 +246,64 @@ namespace zxcCore.zxcRobot.Robot
                 }
 
                 //查询用户信息--特定
-                isValid = Check_Permission_sysUsr(usrID, usrPlat);
+                isValid = Check_Permission_SysUsr(usrID, usrPlat);
+            }
+            return isValid;
+        }
+        /// <summary>权限检查-单一设置
+        /// </summary> 
+        /// <returns></returns>
+        public virtual bool Check_Permission_SingleSet(string nameGroup, string usrID, string usrPlat)
+        {
+            bool isValid = false;
+            if (this.IsRunning && this.IsValid)
+            {
+                //超时检查
+                if (this.ValidMaxTime > 0)
+                {
+                    var deltaT = (DateTime.Now - TimeStartRun).TotalSeconds;
+                    if (deltaT > _ValidMaxTime)
+                    {
+                        isValid = false; return isValid;
+                    }
+                }
+
+                //群权限检查
+                if (this.IsValid_Group && !string.IsNullOrEmpty(nameGroup))
+                {
+                    //查询群组信息--通用(指定群、指定人员)
+                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configPerFix && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
+                    if (pPower != null && pPower.IsValid)
+                    {
+                        return true;                                    //指定群、指定人员有效
+                    }
+                }
+
+                //个人权限检查
+                if (this.IsValid_Personal && string.IsNullOrEmpty(nameGroup))
+                {
+                    //查询个人信息--通用(指定群、指定人员)
+                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configPerFix && (e.NameGroup == "" || e.NameGroup == null) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
+                    if (pPower != null && pPower.IsValid)
+                    {
+                        return true;                                    //指指定人员有效
+                    }
+                }
+
+                //查询用户信息--特定
+                isValid = Check_Permission_SysUsr(usrID, usrPlat);
             }
             return isValid;
         }
         /// <summary>权限检查--系统管理员（特例）
         /// </summary>
         /// <returns></returns>
-        public virtual bool Check_Permission_sysUsr(string usrID, string usrPlat)
+        public virtual bool Check_Permission_SysUsr(string usrID, string usrPlat)
         {
             //查询用户信息--特定
+            if (string.IsNullOrEmpty(usrID) || usrPlat == "None")
+                return false;
+
             User_zxc usr = UserManager._Users.GetUser(usrID, usrID, usrPlat);
             if (usr != null)
             {
@@ -265,6 +312,7 @@ namespace zxcCore.zxcRobot.Robot
             }
             return false;
         }
+
         /// <summary>权限新增
         /// </summary>
         /// <returns></returns>

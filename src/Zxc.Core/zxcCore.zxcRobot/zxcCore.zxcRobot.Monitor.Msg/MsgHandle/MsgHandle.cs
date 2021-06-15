@@ -93,13 +93,15 @@ namespace zxcCore.zxcRobot.Monitor.Msg
 
 
         //提取返回消息
-        protected internal virtual Msger.Msg getMsg(string msg, string userID_To = "@*测试群", bool isUsrGroup = false, typeMsg typeMsg = typeMsg.TEXT, typeMsger typeMsger = typeMsger.wx)
+        protected internal virtual Msger.Msg getMsg(string msg, string userID_To = "@*测试群", bool isUsrGroup = false, typeMsg typeMsg = typeMsg.TEXT, typeMsger typeMsger = typeMsger.wx, string msgTag = "")
         {
             if (msg + "" == "") return null;
             if (userID_To + "" == "") return null;
+            if (typeMsger == typeMsger.None) return null;
 
             //组装消息
-            isUsrGroup = userID_To.Length > 2 && userID_To.Substring(0, 2) == "@*" ? true : isUsrGroup;
+            if (!isUsrGroup)
+                isUsrGroup = userID_To.Length > 2 && userID_To.Substring(0, 2) == "@*" ? true : isUsrGroup;
             Msger.Msg pMsg = new Msger.Msg()
             {
                 msgID = "",
@@ -112,6 +114,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
                 usrPlat = typeMsger,
                 UserName_src = _tag,
                 msgTime = DateTime.Now,
+                msgTag = msgTag,
                 IsUserGroup = isUsrGroup,
                 IsFromRobot = true,
                 IsSend = true
