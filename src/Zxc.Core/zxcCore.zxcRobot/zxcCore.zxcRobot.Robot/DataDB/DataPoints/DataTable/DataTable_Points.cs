@@ -16,6 +16,7 @@ namespace zxcCore.zxcRobot.Robot.Power
         /// <summary>库表--积分记录表
         /// </summary>
         protected internal DataTable_PointsLog<Data_PointsLog> _logPoints { get; set; }
+        protected internal string _pointsType = "base";
         protected internal bool _bInited = false;
 
 
@@ -63,6 +64,51 @@ namespace zxcCore.zxcRobot.Robot.Power
             return true;
         }
 
+        /// <summary>添加成长宝贝点
+        /// </summary>
+        /// <param name="pGrowthPoints"></param>
+        /// <returns></returns>
+        public virtual Data_PointsLog Add_Points(RobotCmd_Infos pGrowthPoints)
+        {
+            //查找用户信息
+            Data_Points pDataPoints = this.Find(e => e.PointsType == _pointsType && e.PointsUser == pGrowthPoints.NoteUserTag && e.IsDel == false);
+            if (pDataPoints == null)
+            {
+                //初始
+                pDataPoints = new Data_Points()
+                {
+                    PointsNum = 0,
+                    PointExChange = 0,
+                    PointsUser = pGrowthPoints.NoteUserTag,
+                    PointsType = _pointsType,
+                    IsValid = true,
+                    RelID = "",
+                    Remark = ""
+                };
+            };
+
+            //添加积分记录
+            Data_PointsLog pDataPointsLog = new Data_PointsLog()
+            {
+                PointExChange = pGrowthPoints.PointsNum,
+                PointsLast = pDataPoints.PointsNum,
+                PointsNow = pDataPoints.PointsNum + pGrowthPoints.PointsNum,
+                PointsUser = pGrowthPoints.NoteUserTag,
+                PointsType = _pointsType,
+                PointsNote = pGrowthPoints.NoteInfo,
+                RelID = pDataPoints.RelID,
+                IsValid = true,
+                Remark = ""
+            };
+            this._logPoints.Add(pDataPointsLog, true, true);
+
+            //更新记录积分信息 
+            pDataPoints.RelID = pDataPointsLog.UID;
+            pDataPoints.PointsNum = pDataPointsLog.PointsNow;
+            pDataPoints.PointExChange = pDataPointsLog.PointExChange;
+            this.Add((T)pDataPoints, true, true);
+            return pDataPointsLog;
+        }
     }
 
 }

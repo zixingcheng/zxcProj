@@ -121,14 +121,15 @@ namespace zxcCore.zxcDataCache.MemoryDB
         /// </summary>
         /// <param name="item"></param>
         /// <param name="isUnique">唯一性检查</param>
-        public virtual void Add(T item, bool isUnique = true, bool bMultiple = false)
+        public virtual void Add(T item, bool isUnique = true, bool bUpdata = false, bool bMultiple = false)
         {
             if (!this.CheckPermission(typePermission_DB.Writable))
                 throw (new Exception("没有写入权限"));
 
             if (isUnique)
-                if (this.IsExist(item)) return;
-            bool _isUnique = !isUnique;
+                if (this.IsExist(item) && !bUpdata)
+                    return;
+            bool _isUnique = bUpdata ? isUnique : !isUnique;
             if (this.IsTempTable())
                 _isUnique = isUnique;
             this.SetValue(item, typePermission_DB.Writable, _isUnique);
@@ -141,13 +142,13 @@ namespace zxcCore.zxcDataCache.MemoryDB
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="isUnique">唯一性检查</param>
-        public virtual void AddRange(IEnumerable<T> collection, bool isUnique = true)
+        public virtual void AddRange(IEnumerable<T> collection, bool isUnique = true, bool bUpdata = false)
         {
             if (!this.CheckPermission(typePermission_DB.Writable))
                 throw (new Exception("没有写入权限"));
             foreach (var item in collection)
             {
-                this.Add(item, isUnique, true);
+                this.Add(item, isUnique, bUpdata, true);
             }
             this.SaveChanges_ToCache(collection);
         }

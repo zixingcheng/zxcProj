@@ -4,41 +4,11 @@ using System.Linq;
 using zxcCore.Common;
 using zxcCore.zxcRobot.Monitor.Msg;
 using zxcCore.zxcRobot.Msger;
+using zxcCore.zxcRobot.Robot.Power;
 using zxcCore.zxcRobot.User;
 
 namespace zxcCore.zxcRobot.Robot
 {
-    /// <summary>命令信息
-    /// </summary>
-    public class RobotCmd
-    {
-        /// <summary>命令字符串
-        /// </summary>
-        public string Cmdstr
-        {
-            get; set;
-        }
-
-        protected internal DateTime _CmdTime = DateTime.Now;
-        /// <summary>命令时间
-        /// </summary>
-        public DateTime CmdTime
-        {
-            set { _CmdTime = value; }
-            get { return _CmdTime; }
-        }
-
-        protected internal Msg _MsgInfo = null;
-        /// <summary>原始消息内容
-        /// </summary>
-        public Msg MsgInfo
-        {
-            set { _MsgInfo = value; }
-            get { return _MsgInfo; }
-        }
-    }
-
-
     /// <summary>机器人-基类
     /// </summary>
     public abstract class RobotBase : MsgHandle
@@ -95,6 +65,8 @@ namespace zxcCore.zxcRobot.Robot
 
         //参数配置节点-中间缀
         protected internal string _configMidFix = "";
+        protected internal bool _checkAllMsg = false;
+        protected internal bool _hasTitle = false;
         public RobotBase(IUser User, string tag, string configMidFix, string setting) : base(tag, setting)
         {
             _Title = "机器人基类";
@@ -108,7 +80,7 @@ namespace zxcCore.zxcRobot.Robot
             //this._Permission.ValidMaxTime = -1;
             //this._Permission.IsSingleUse = true;
             //this._Permission.IsBackProc = true;
-            this.InitPermissions();
+            this.Init_Permissions();
         }
         ~RobotBase()
         {
@@ -122,16 +94,72 @@ namespace zxcCore.zxcRobot.Robot
         /// </summary>
         /// <param name="setting"></param>
         /// <returns></returns>
-        public override bool InitSetting(dynamic setting)
+        public override bool Init_Setting(dynamic setting)
         {
             return true;
         }
-        protected internal virtual bool InitPermissions()
+        //初始用户功能权限
+        protected internal virtual bool Init_Permissions()
         {
             string configMidFix = _configMidFix;
             if (_Permission == null)
                 _Permission = new RobotPermission(_tag, configMidFix);
             return true;
+        }
+        //用户功能权限判断
+        protected internal bool _Check_Permission_usr(typePermission_PowerRobot usrPermission, Msg msg, Power_Robot pPower = null)
+        {
+            //提取权限设置
+            if (pPower == null)
+                pPower = _Permission.Get_Permission(_tag, msg.GetNameGroup(), msg.GetNameUser(), msg.usrPlat.ToString());
+            if (pPower == null) return false;
+
+            //权限判断
+            if ((usrPermission & pPower.UsrPermission) == usrPermission)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        //初始机器人功能命令信息
+        protected internal virtual RobotCmd Init_CmdInfo(Msg msg)
+        {
+            if (msg == null) return null;
+
+            //解析命令
+            string strCmd = msg.msg.Trim();
+            if (strCmd.Length < 2) return null;
+            if (!_checkAllMsg && strCmd.Substring(0, 1) != "@") return null;
+
+            //提取命令头
+            bool bStartCmd = strCmd == _CmdStr;
+            string perfixCmd = bStartCmd ? "@@" : "@";
+            string[] strCmds = strCmd.Split(perfixCmd);
+            string strCmdtemp = strCmds.Length <= 1 ? strCmds[0] : strCmds[1];
+            strCmds = strCmdtemp.Split(" ");
+            strCmd = strCmds[0];
+
+            //启动命令检测
+            if (bStartCmd)
+            {
+                strCmd = "@@" + strCmd;
+                if (strCmds.Length - 1 != 1) return null;
+                if (strCmd != _CmdStr) return null;
+            }
+
+            //解析命令
+            Power_Robot pPower = _Permission.Get_Permission(_tag, msg.GetNameGroup(), msg.GetNameUser(), msg.usrPlat.ToString());
+            RobotCmd_Infos cmdInfos = this._Init_CmdInfo(strCmds, pPower);
+
+            //初始命令信息
+            RobotCmd pRobotCmd = new RobotCmd(strCmd, msg, cmdInfos);
+            //_Cmds.Add(pRobotCmd);                    //记录命令信息
+            return pRobotCmd;
+        }
+        protected internal virtual RobotCmd_Infos _Init_CmdInfo(string[] strCmds, Power_Robot powerRobot)
+        {
+            return new RobotCmd_Infos(strCmds, powerRobot);
         }
 
 
@@ -139,12 +167,35 @@ namespace zxcCore.zxcRobot.Robot
         /// </summary>
         /// <param name="msg"></param>
         /// <returns></returns>
-        public virtual bool HandleMsg(Msg msg)
+        public override bool HandleMsg(Msg msg)
         {
+            //解析命令
+            RobotCmd pRobotCmd = this.Init_CmdInfo(msg);
+            if (pRobotCmd == null) return false;
+
+            //剔除非命令触发（全命令触发类型）
+            if (!_checkAllMsg && pRobotCmd.CmdInfos.Cmdstrs.Length <= 1)
+                return false;
+
+            //权限检查
             if (!this.HandleMsg_Check(msg))
                 return false;
 
-            return this.HandleMsg_Do(msg);
+            //启动命令-注册/反注册
+            if (pRobotCmd.Cmdstr == _CmdStr)
+            {
+                this.Done_Regist(null, pRobotCmd.MsgInfo, !this._Permission.IsRunning);
+                _Cmds.Add(pRobotCmd);                    //记录命令信息
+                return true;
+            }
+
+            //消息处理
+            if (this.HandleMsg_Do(pRobotCmd))
+            {
+                _Cmds.Add(pRobotCmd);                    //记录命令信息
+                return true;
+            }
+            return false;
         }
         /// <summary>消息检查
         /// </summary>
@@ -158,7 +209,7 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>消息处理实现
         /// </summary>
         /// <returns></returns>
-        public override bool HandleMsg_Do(Msg msg)
+        public virtual bool HandleMsg_Do(RobotCmd pRobotCmd)
         {
             return true;
         }
@@ -169,18 +220,17 @@ namespace zxcCore.zxcRobot.Robot
         /// <param name="usr">用户对象</param>
         /// <param name="bRegistOut">是否反注册</param>
         /// <returns></returns>
-        public virtual string Done_Regist(IUser usr, Msg msg, bool bRegistOut = false)
+        public virtual string Done_Regist(IUser usr, Msg msg, bool bRegistOut = false, bool bSysTrigger = true)
         {
             if (msg == null) return "";
             if (msg.msg != _CmdStr) return "";
 
             //实例命令信息
-            RobotCmd pCmd = new RobotCmd()
+            if (bSysTrigger)
             {
-                MsgInfo = msg,
-                Cmdstr = this._CmdStr
-            };
-            _Cmds.Add(pCmd);
+                RobotCmd pCmd = new RobotCmd(_CmdStr, msg);
+                _Cmds.Add(pCmd);
+            }
 
             //创建返回消息
             string strReturn = this._Title_User_Regist(usr, bRegistOut);
@@ -253,6 +303,15 @@ namespace zxcCore.zxcRobot.Robot
                     text = strMsg_Group + text;
                 }
             }
+            else
+            {
+                //添加文件头
+                if (_hasTitle)
+                {
+                    string strTag = string.IsNullOrEmpty(msgTag) ? _Title : msgTag;
+                    text = strTag + "：\n" + text;
+                }
+            }
 
             //生成消息
             Msg pMsgR = this.getMsg(text, userID_To, isGroup, typeMsg, typeMsger, msgTag);
@@ -290,8 +349,8 @@ namespace zxcCore.zxcRobot.Robot
             }
             else
             {
-                this.InitSetting("");                       //初始基础信息
-                this._Permission.IsRunning = true;          //标识运行
+                this.Init_Setting("");                       //初始基础信息
+                this._Permission.IsRunning = true;           //标识运行
                 this._Permission.TimeStartRun = DateTime.Now;
                 strReturn += "已注册" + this._Title_User_Opened() + "  -- " + _Cmds[_Cmds.Count - 1].CmdTime.ToString() + ".";
             }

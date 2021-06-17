@@ -28,7 +28,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         /// </summary>
         /// <param name="setting"></param>
         /// <returns></returns>
-        public override bool InitSetting(dynamic setting)
+        public override bool Init_Setting(dynamic setting)
         {
             return true;
         }

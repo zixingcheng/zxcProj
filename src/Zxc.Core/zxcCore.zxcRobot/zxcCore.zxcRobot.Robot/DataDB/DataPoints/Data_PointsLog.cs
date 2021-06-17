@@ -54,6 +54,12 @@ namespace zxcCore.zxcRobot.Robot.Power
         {
             get; set;
         }
+        /// <summary>积分缘由用户
+        /// </summary>
+        public string PointsNoteUser
+        {
+            get; set;
+        }
         /// <summary>备注
         /// </summary>
         public string Remark

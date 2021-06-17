@@ -139,7 +139,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
             Data_Table<T> dtTemp = this.OnDBModelCreating<T>(objDataModel);
             foreach (var item in dtTemp)
             {
-                objDataModel.Add(item, false, true);
+                objDataModel.Add(item, false, false, true);
             }
             objDataModel._dbPath = dtTemp._dbPath;
             objDataModel._dbPathCache = dtTemp._dbPathCache;

@@ -166,6 +166,9 @@ class myWeixin_ItChat(myThread.myThread):
                 wxMsg['groupID'] = myData.iif(isGroup, msg['User']['UserName'], "")
                 if(wxMsg['groupID'] != ""):
                     wxMsg['usrNameNick'] = msg['ActualNickName']
+                    if(wxMsg['usrNameNick'] == ""):
+                        if(msg['FromUserName'] == self.usrName):
+                            wxMsg['usrNameNick'] = self.usrName_Alias
                 wxMsg['msgID'] = msg['MsgId']
                 wxMsg['msgType'] = msg['Type'].upper()
                 wxMsg['msg'] = msg['Text']

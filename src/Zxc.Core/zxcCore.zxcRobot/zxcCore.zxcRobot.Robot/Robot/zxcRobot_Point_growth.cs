@@ -9,29 +9,54 @@
 // 修改描述：
 //===============================================================================
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Xml.Linq;
 using zxcCore.Common;
-using zxcCore.zxcRobot.Monitor.Msg;
 using zxcCore.zxcRobot.Msger;
 using zxcCore.zxcRobot.Robot.Power;
 using zxcCore.zxcRobot.User;
 
 namespace zxcCore.zxcRobot.Robot
 {
+    /// <summary>命令信息集合-成长宝贝点
+    /// </summary>
+    public class CmdInfos_PointsGrowth : RobotCmd_Infos
+    {
+        #region 属性及构造
+
+        public CmdInfos_PointsGrowth(string[] strCmds, Power_Robot powerRobot) : base(strCmds, powerRobot)
+        {
+        }
+
+        #endregion
+
+        public override bool Init(string[] strCmds)
+        {
+            //"@新增 5分 放学自觉读书"
+            if (strCmds.Length < 3) return false;
+            PointsNum = Convert.ToInt32(strCmds[1].Replace("分", ""));
+            NoteInfo = strCmds[2];
+            if (strCmds.Length > 3) Remark = strCmds[3];
+            return base.Init(strCmds);
+        }
+    }
+
+
     /// <summary>机器人-消息回撤(成长)
     /// </summary>
     public class zxcRobot_Point_growth : RobotBase
     {
         #region 属性及构造
 
+        //成长宝贝点表
+        protected internal DataTable_Points_Growth<Data_Points> _growthPoints = null;
+        protected internal string _pointsType = "growth";
+
         public zxcRobot_Point_growth(IUser User, string setting) : base(User, "zxcRobot_Point", "growth", setting)
         {
-            _Title = "成长积分";
-            _tagAlias = "成长积分";
+            _Title = "宝贝积分";
+            _tagAlias = "宝贝积分";
             _CmdStr = "@@PointGrowth";  //启动命令
+            _hasTitle = true;
+            _growthPoints = Robot_Manager._dbRobot._growthPoints;
 
             //权限信息初始
             this._Permission.ValidMaxTime = -1;
@@ -55,30 +80,32 @@ namespace zxcCore.zxcRobot.Robot
         /// </summary>
         /// <param name="setting"></param>
         /// <returns></returns>
-        public override bool InitSetting(dynamic setting)
+        public override bool Init_Setting(dynamic setting)
         {
             return true;
+        }
+
+        //初始机器人功能命令信息
+        protected internal override RobotCmd_Infos _Init_CmdInfo(string[] strCmds, Power_Robot powerRobot)
+        {
+            return new CmdInfos_PointsGrowth(strCmds, powerRobot);
         }
 
 
         /// <summary>消息处理实现
         /// </summary>
         /// <returns></returns>
-        public override bool HandleMsg_Do(Msg msg)
+        public override bool HandleMsg_Do(RobotCmd pRobotCmd)
         {
+            Msg msg = pRobotCmd.MsgInfo;
             if (msg.msgType.ToString().ToUpper() != "TEXT") return false;
 
             //解析命令
-            string strCmd = msg.msg;
-            string[] strCmds = strCmd.Split("@");
-            if (strCmds.Length - 1 != 1) return false;
-
-            strCmds = strCmds[1].Split(" ");
-            strCmd = strCmds[0];
+            string strCmd = pRobotCmd.CmdInfos.Cmdstr;
             switch (strCmd)
             {
                 case "新增":
-                    return _Done_Points_add(msg, strCmds);
+                    return _Done_Points_add(msg, pRobotCmd);
                 default:
                     break;
             }
@@ -86,11 +113,24 @@ namespace zxcCore.zxcRobot.Robot
         }
 
         //积分添加
-        public bool _Done_Points_add(Msg msg, string[] strCmds)
+        protected internal bool _Done_Points_add(Msg msg, RobotCmd pRobotCmd)
         {
-            //提取权限设置
-            Power_Robot pPower = _Permission.Get_Permission(_tag, msg.GetNameGroup(), msg.GetNameUser(), msg.usrPlat.ToString());
-            return true;
+            //用户权限判断
+            if (!this._Check_Permission_usr(typePermission_PowerRobot.Writable, msg, pRobotCmd.CmdInfos.PowerRobot)) return false;
+
+            //添加积分
+            Data_PointsLog pDataLog = _growthPoints.Add_Points(pRobotCmd.CmdInfos);
+            if (pDataLog != null)
+            {
+                string strPerfix = pDataLog.PointExChange > 0 ? "恭喜！" : "很遗憾！";
+                string strExchange = pDataLog.PointExChange > 0 ? "新增" : "被扣除";
+                string strMsg = string.Format("{0}「{1}」{2} {3} 个宝贝分.", strPerfix, pDataLog.PointsUser, strExchange, pDataLog.PointExChange);
+                strMsg = string.Format("{0}\n{1}原由：{2}\n审核人：{3}\n当前分：{4} 宝贝分.", strMsg, strExchange.Replace("被", ""), pDataLog.PointsNote, pRobotCmd.CmdInfos.PowerRobot.NameUserAlias, pDataLog.PointsNow);
+
+                ConsoleHelper.Debug(true, "宝贝积分：\n{0}", strMsg);
+                this.NotifyMsg(strMsg, msg, "宝贝积分");
+            }
+            return pDataLog == null;
         }
 
     }

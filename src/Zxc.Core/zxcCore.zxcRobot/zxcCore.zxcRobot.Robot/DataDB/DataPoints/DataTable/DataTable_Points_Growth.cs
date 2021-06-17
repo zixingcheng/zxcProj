@@ -16,6 +16,7 @@ namespace zxcCore.zxcRobot.Robot.Power
         public DataTable_Points_Growth(string dtName = "dataTable_Points_growth") : base(dtName)
         {
             //this._dtName = string.IsNullOrEmpty(_dtName) ? "dataTable_Points_Growth" : _dtName;
+            _pointsType = "growth";
         }
 
         #endregion

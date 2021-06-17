@@ -37,6 +37,7 @@ namespace zxcCore.zxcRobot.Robot
             _Title = "通知消息";
             _tagAlias = "通知消息";
             _CmdStr = "@@zxcRobot_Note";
+            _checkAllMsg = true;
 
             //权限信息初始
             this._Permission.ValidMaxTime = -1;
@@ -60,7 +61,7 @@ namespace zxcCore.zxcRobot.Robot
         /// </summary>
         /// <param name="setting"></param>
         /// <returns></returns>
-        public override bool InitSetting(dynamic setting)
+        public override bool Init_Setting(dynamic setting)
         {
             return true;
         }
@@ -69,8 +70,9 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>消息处理实现
         /// </summary>
         /// <returns></returns>
-        public override bool HandleMsg_Do(Msg msg)
+        public override bool HandleMsg_Do(RobotCmd pRobotCmd)
         {
+            Msg msg = pRobotCmd.MsgInfo;
             if (msg.msgType.ToString().ToUpper() != "NOTE") return false;
 
             //解析通知
@@ -89,7 +91,7 @@ namespace zxcCore.zxcRobot.Robot
         }
 
         //消息撤回通知
-        public bool _Done_Revoke(Msg msg)
+        protected internal bool _Done_Revoke(Msg msg)
         {
             //提取xml结果
             //"<sysmsg type="revokemsg"><revokemsg><session>wxid_xf3qaf1sj26622</session><oldmsgid>1137787376</oldmsgid><msgid>3098631128678888933</msgid><replacemsg><![CDATA["茶叶一主号" 撤回了一条消息]]></replacemsg></revokemsg></sysmsg>",
@@ -110,7 +112,7 @@ namespace zxcCore.zxcRobot.Robot
             return true;
         }
         //消息转账通知
-        public bool _Done_Pay(Msg msg)
+        protected internal bool _Done_Pay(Msg msg)
         {
             return true;
         }

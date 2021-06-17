@@ -35,7 +35,8 @@ namespace zxcCore.zxcRobot.Robot.Power
         /// <returns></returns>
         public override List<T> Query_Sames(T item)
         {
-            return this.FindAll(e => (e.UID == item.UID && e.IsDel == false) || (e.PointsType == item.PointsType && e.PointsUser == item.PointsUser && e.PointsNote == item.PointsNote && e.PointExChange == item.PointExChange && e.Operator == item.Operator && (e.OpTime - item.OpTime).TotalHours < 1 && e.IsDel == false));
+            return this.FindAll(e => e.UID == item.UID && e.PointsType == item.PointsType && e.PointsUser == item.PointsUser && e.PointsNote == item.PointsNote && e.PointExChange == item.PointExChange && e.Operator == item.Operator && (e.OpTime - item.OpTime).TotalHours < 1 && e.IsDel == false);
+            //return this.FindAll(e => (e.UID == item.UID && e.IsDel == false) || (e.PointsType == item.PointsType && e.PointsUser == item.PointsUser && e.PointsNote == item.PointsNote && e.PointExChange == item.PointExChange && e.Operator == item.Operator && (e.OpTime - item.OpTime).TotalHours < 1 && e.IsDel == false));
         }
 
     }

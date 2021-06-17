@@ -67,7 +67,7 @@ namespace zxcCore.zxcRobot.User
                     usrNameNick = "系统管理员",
                     usrType = typeUser.sysadmin
                 };
-                _userZxc.Add(sysAdmin, true);
+                _userZxc.Add(sysAdmin, true, true, false);
             }
 
             //消息平台信息初始
@@ -108,12 +108,12 @@ namespace zxcCore.zxcRobot.User
             {
                 case "wx":
                     usrZxc.usrName_wx = user.usrName;
-                    _userWx.Add((User_wx)user, true);
+                    _userWx.Add((User_wx)user, true, true, false);
                     break;
                 default:
                     break;
             }
-            _userZxc.Add(usrZxc, true);
+            _userZxc.Add(usrZxc, true, true, false);
         }
 
 

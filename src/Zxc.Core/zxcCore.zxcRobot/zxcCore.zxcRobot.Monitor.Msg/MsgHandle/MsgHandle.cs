@@ -31,7 +31,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
             //后期优化为外部配置信息
             _typeMsgs.Add(typeMsger.wx);
 
-            this.InitSetting(setting);
+            this.Init_Setting(setting);
         }
         ~MsgHandle()
         {
@@ -45,7 +45,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         /// </summary>
         /// <param name="setting"></param>
         /// <returns></returns>
-        public virtual bool InitSetting(dynamic setting)
+        public virtual bool Init_Setting(dynamic setting)
         {
             return true;
         }

@@ -6,13 +6,14 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace zxcCore.zxcDataCache.Swap
 {
     public class DataSwap_IOFiles : DataSwap
     {
         #region 属性及构造
-        
+
         protected internal string _dirSwap = "";           //文件交换目录
         protected internal string _dirSwap_back = "";      //文件交换目录-备份   
 
@@ -61,6 +62,11 @@ namespace zxcCore.zxcDataCache.Swap
                             this.SwapData_BackUp(item.PhysicalPath, _dirSwap_back);
                             continue;
                         }
+                    }
+                    if (item.Length == 0)
+                    {
+                        File.Delete(item.PhysicalPath);
+                        continue;
                     }
 
                     string strExtension = System.IO.Path.GetExtension(item.Name);

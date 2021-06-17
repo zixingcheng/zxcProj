@@ -63,6 +63,12 @@ namespace zxcCore.zxcRobot.Robot
         {
             get; set;
         }
+        /// <summary>是否屏蔽直接返回信息
+        /// </summary>
+        public bool IsShieldSys
+        {
+            get; set;
+        }
 
         /// <summary>是否有效-群组
         /// </summary>
@@ -137,6 +143,7 @@ namespace zxcCore.zxcRobot.Robot
             if (title == "") return false;
 
             this.IsValid = Convert.ToBoolean(_configDataCache.config[path + ":IsValid"] + "");
+            this.IsShieldSys = Convert.ToBoolean(_configDataCache.config[path + ":IsShieldSys"] + "");
             ValidMaxTime = Convert.ToInt32(_configDataCache.config[path + ":ValidMaxTime"] + "");
 
             this.IsSingleUse = Convert.ToBoolean(_configDataCache.config[path + ":IsSingleUse"] + "");
@@ -157,12 +164,14 @@ namespace zxcCore.zxcRobot.Robot
             while (IsValid_GroupName != "")
             {
                 string nameUser = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameUser"] + "";
+                string nameUserAlias = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameUserAlias"] + "";
                 string usrPlat = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrPlat"] + "";
+                string usrPermission = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrPermission"] + "";
                 string strValid = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":isValid"] + "";
                 string bindTag = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindTag"] + "";
                 bool isValid = strValid == "" ? false : Convert.ToBoolean(strValid);
                 bindTag = bindTag == "" ? this._bindTag : bindTag;
-                this.Add_Permission(name, IsValid_GroupName, nameUser, usrPlat, isValid, bindTag);
+                this.Add_Permission(name, IsValid_GroupName, nameUser, nameUserAlias, usrPlat, isValid, bindTag, usrPermission);
 
                 ind++;
                 IsValid_GroupName = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameGroup"] + "";
@@ -173,12 +182,14 @@ namespace zxcCore.zxcRobot.Robot
             string IsValid_PersonalName = _configDataCache.config[path + ":IsValid_PersonalNames:" + ind.ToString() + ":nameUser"] + "";
             while (IsValid_PersonalName != "")
             {
+                string nameUserAlias = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameUserAlias"] + "";
                 string usrPlat = _configDataCache.config[path + ":IsValid_PersonalNames:" + ind.ToString() + ":usrPlat"] + "";
+                string usrPermission = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrPermission"] + "";
                 string strValid = _configDataCache.config[path + ":IsValid_PersonalNames:" + ind.ToString() + ":isValid"] + "";
                 string bindTag = _configDataCache.config[path + ":IsValid_PersonalNames:" + ind.ToString() + ":bindTag"] + "";
                 bool isValid = strValid == "" ? false : Convert.ToBoolean(strValid);
                 bindTag = bindTag == "" ? this._bindTag : bindTag;
-                this.Add_Permission(name, "", IsValid_PersonalName, usrPlat, isValid, bindTag);
+                this.Add_Permission(name, "", IsValid_PersonalName, nameUserAlias, usrPlat, isValid, bindTag, usrPermission);
 
                 ind++;
                 IsValid_PersonalName = _configDataCache.config[path + ":IsValid_PersonalNames:" + ind.ToString() + ":nameUser"] + "";
@@ -311,7 +322,7 @@ namespace zxcCore.zxcRobot.Robot
             User_zxc usr = UserManager._Users.GetUser(usrID, usrID, usrPlat);
             if (usr != null)
             {
-                if (usr.usrType == typeUser.sysadmin)
+                if (IsShieldSys && usr.usrType == typeUser.sysadmin)
                     return true;                                //系统管理员有效
             }
             return false;
@@ -320,18 +331,22 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>权限新增
         /// </summary>
         /// <returns></returns>
-        public virtual bool Add_Permission(string nameRobot, string nameGroup, string usrID, string usrPlat, bool isValid, string bindTag)
+        public virtual bool Add_Permission(string nameRobot, string nameGroup, string usrID, string usrNameAlias, string usrPlat, bool isValid, string bindTag, string usrPermission = "0")
         {
+            usrPermission = usrPermission == "" ? "0" : usrPermission;
+            typePermission_PowerRobot pPermission = (typePermission_PowerRobot)Enum.Parse(typeof(typePermission_PowerRobot), Convert.ToString(usrPermission));
             Power_Robot pPowerInfo = new Power_Robot()
             {
                 NameRobot = nameRobot,
                 NameUser = usrID,
+                NameUserAlias = usrNameAlias,
                 NameGroup = nameGroup,
                 UsrPlat = usrPlat,
+                UsrPermission = pPermission,
                 IsValid = isValid,
                 BindTag = bindTag
             };
-            Robot_Manager._dbRobot._powerRobot.Add(pPowerInfo);
+            Robot_Manager._dbRobot._powerRobot.Add(pPowerInfo, true, true, false);
             return true;
         }
         /// <summary>权限删除
@@ -344,9 +359,15 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>权限查询
         /// </summary>
         /// <returns></returns>
-        public virtual Power_Robot Get_Permission(string nameRobot, string nameGroup, string usrID, string usrPlat)
+        public virtual Power_Robot Get_Permission(string nameRobot, string nameGroup, string usrID, string usrPlat, bool bOnlyUser = false)
         {
-            return Robot_Manager._dbRobot._powerRobot.Where(e => e.NameRobot == nameRobot && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false).FirstOrDefault();
+            Power_Robot pPower_Robot = Robot_Manager._dbRobot._powerRobot.Where(e => e.NameRobot == nameRobot && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && e.NameUser == usrID && e.UsrPlat == usrPlat && e.IsDel == false).FirstOrDefault();
+
+            if (pPower_Robot == null && !bOnlyUser)
+            {
+                pPower_Robot = Robot_Manager._dbRobot._powerRobot.Where(e => e.NameRobot == nameRobot && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && e.NameUser == "" && e.UsrPlat == usrPlat && e.IsDel == false).FirstOrDefault();
+            }
+            return pPower_Robot;
         }
 
     }
