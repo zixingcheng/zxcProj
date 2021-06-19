@@ -47,6 +47,7 @@ namespace zxcCore.zxcRobot.Robot
             get { return _CmdInfos; }
         }
 
+
         public RobotCmd(string cmdstr, Msg msgInfo, RobotCmd_Infos cmdInfos = null)
         {
             Cmdstr = cmdstr;
@@ -89,6 +90,15 @@ namespace zxcCore.zxcRobot.Robot
             get; set;
         }
 
+        protected internal typePermission_PowerRobot _CmdPermission = typePermission_PowerRobot.Writable;
+        /// <summary>解析后消息内容
+        /// </summary>
+        public typePermission_PowerRobot CmdPermission
+        {
+            get { return _CmdPermission; }
+            set { _CmdPermission = value; }
+        }
+
         /// <summary>点数
         /// </summary>
         public int PointsNum
@@ -105,6 +115,12 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>标记信息
         /// </summary>
         public string NoteInfo
+        {
+            get; set;
+        }
+        /// <summary>标记信息-标签
+        /// </summary>
+        public string NoteLabel
         {
             get; set;
         }

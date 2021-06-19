@@ -163,15 +163,55 @@ namespace zxcCore.zxcRobot.Robot
             string IsValid_GroupName = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameGroup"] + "";
             while (IsValid_GroupName != "")
             {
-                string nameUser = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameUser"] + "";
-                string nameUserAlias = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameUserAlias"] + "";
                 string usrPlat = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrPlat"] + "";
-                string usrPermission = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrPermission"] + "";
-                string strValid = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":isValid"] + "";
                 string bindTag = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindTag"] + "";
-                bool isValid = strValid == "" ? false : Convert.ToBoolean(strValid);
                 bindTag = bindTag == "" ? this._bindTag : bindTag;
-                this.Add_Permission(name, IsValid_GroupName, nameUser, nameUserAlias, usrPlat, isValid, bindTag, usrPermission);
+
+                //同步用户自定义设置信息
+                List<Power_Robot_UserSet> userSets = new List<Power_Robot_UserSet>();
+                int indusrSet = 0;
+                string usrSetTag = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindSetInfos:" + indusrSet.ToString() + ":setTag"];
+                while (usrSetTag != null)
+                {
+                    string usrSetValue = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindSetInfos:" + indusrSet.ToString() + ":setValue"] + "";
+                    string strValid = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindSetInfos:" + indusrSet.ToString() + ":isValid"] + "";
+                    string setLabel = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindSetInfos:" + indusrSet.ToString() + ":setLabel"] + "";
+                    string strRemark = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindSetInfos:" + indusrSet.ToString() + ":remark"] + "";
+                    bool isValid = strValid == "" ? false : Convert.ToBoolean(strValid);
+                    string strPermission = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindSetInfos:" + indusrSet.ToString() + ":setPermission"] + "";
+                    typePermission_PowerRobot setPermission = (typePermission_PowerRobot)Enum.Parse(typeof(typePermission_PowerRobot), Convert.ToString(strPermission));
+
+                    Power_Robot_UserSet pUserSet = new Power_Robot_UserSet()
+                    {
+                        SetTag = usrSetTag,
+                        SetValue = usrSetValue,
+                        IsValid = isValid,
+                        SetLabel = setLabel,
+                        Remark = strRemark,
+                        SetPermission = setPermission
+                    };
+
+                    userSets.Add(pUserSet);
+                    indusrSet++;
+                    usrSetTag = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":bindSetInfos:" + indusrSet.ToString() + ":setTag"];
+                }
+
+                //同步用户信息
+                int indusr = 0;
+                string nameUser = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrsSet:" + indusr.ToString() + ":nameUser"];
+                while (nameUser != null)
+                {
+                    string nameUserAlias = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrsSet:" + indusr.ToString() + ":nameUserAlias"] + "";
+                    string usrPermission = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrsSet:" + indusr.ToString() + ":usrPermission"] + "";
+                    string strValid = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrsSet:" + indusr.ToString() + ":isValid"] + "";
+                    string strBindTag = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrsSet:" + indusr.ToString() + ":bindTag"] + "";
+                    strBindTag = strBindTag == "" ? bindTag : strBindTag;
+                    bool isValid = strValid == "" ? false : Convert.ToBoolean(strValid);
+                    this.Add_Permission(name, IsValid_GroupName, nameUser, nameUserAlias, usrPlat, isValid, strBindTag, usrPermission, userSets);
+
+                    indusr++;
+                    nameUser = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrsSet:" + indusr.ToString() + ":nameUser"];
+                }
 
                 ind++;
                 IsValid_GroupName = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameGroup"] + "";
@@ -331,7 +371,7 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>权限新增
         /// </summary>
         /// <returns></returns>
-        public virtual bool Add_Permission(string nameRobot, string nameGroup, string usrID, string usrNameAlias, string usrPlat, bool isValid, string bindTag, string usrPermission = "0")
+        public virtual bool Add_Permission(string nameRobot, string nameGroup, string usrID, string usrNameAlias, string usrPlat, bool isValid, string bindTag, string usrPermission = "0", List<Power_Robot_UserSet> userSets = null)
         {
             usrPermission = usrPermission == "" ? "0" : usrPermission;
             typePermission_PowerRobot pPermission = (typePermission_PowerRobot)Enum.Parse(typeof(typePermission_PowerRobot), Convert.ToString(usrPermission));
@@ -346,6 +386,24 @@ namespace zxcCore.zxcRobot.Robot
                 IsValid = isValid,
                 BindTag = bindTag
             };
+            if (userSets != null)
+            {
+                foreach (var item in userSets)
+                {
+                    Power_Robot_UserSet pUserSet = pPowerInfo.UserSets.Find(e => e.SetTag == item.SetTag);
+                    if (pUserSet != null)
+                    {
+                        //pPowerInfo.UserSets.Remove(pUserSet);
+                        pUserSet.SetValue = item.SetValue;
+                        pUserSet.SetPermission = item.SetPermission;
+                        pUserSet.IsValid = item.IsValid;
+                        pUserSet.SetLabel = item.SetLabel;
+                        pUserSet.Remark = item.Remark;
+                    }
+                    else
+                        pPowerInfo.UserSets.Add((Power_Robot_UserSet)item.Clone());
+                }
+            }
             Robot_Manager._dbRobot._powerRobot.Add(pPowerInfo, true, true, false);
             return true;
         }

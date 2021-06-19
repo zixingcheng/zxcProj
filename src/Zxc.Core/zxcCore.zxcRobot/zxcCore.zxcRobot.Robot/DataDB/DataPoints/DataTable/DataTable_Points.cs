@@ -68,7 +68,7 @@ namespace zxcCore.zxcRobot.Robot.Power
         /// </summary>
         /// <param name="pGrowthPoints"></param>
         /// <returns></returns>
-        public virtual Data_PointsLog Add_Points(RobotCmd_Infos pGrowthPoints)
+        public virtual Data_PointsLog Add_Points(RobotCmd_Infos pGrowthPoints, string opUser = "")
         {
             //查找用户信息
             Data_Points pDataPoints = this.Find(e => e.PointsType == _pointsType && e.PointsUser == pGrowthPoints.NoteUserTag && e.IsDel == false);
@@ -96,9 +96,11 @@ namespace zxcCore.zxcRobot.Robot.Power
                 PointsUser = pGrowthPoints.NoteUserTag,
                 PointsType = _pointsType,
                 PointsNote = pGrowthPoints.NoteInfo,
+                PointsNote_Label = pGrowthPoints.NoteLabel,
+                PointsUser_OP = opUser,
                 RelID = pDataPoints.RelID,
                 IsValid = true,
-                Remark = ""
+                Remark = pGrowthPoints.Remark
             };
             this._logPoints.Add(pDataPointsLog, true, true);
 

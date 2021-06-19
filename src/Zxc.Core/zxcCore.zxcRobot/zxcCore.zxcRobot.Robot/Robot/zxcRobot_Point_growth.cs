@@ -31,10 +31,30 @@ namespace zxcCore.zxcRobot.Robot
         public override bool Init(string[] strCmds)
         {
             //"@新增 5分 放学自觉读书"
-            if (strCmds.Length < 3) return false;
-            PointsNum = Convert.ToInt32(strCmds[1].Replace("分", ""));
-            NoteInfo = strCmds[2];
-            if (strCmds.Length > 3) Remark = strCmds[3];
+            if (strCmds.Length < 3)
+            {
+                Power_Robot_UserSet pUserSet = this.PowerRobot.UserSets.Find(e => e.SetTag == strCmds[0]);
+                if (pUserSet == null) return false;
+
+                CmdPermission = pUserSet.SetPermission;
+                PointsNum = Convert.ToInt32(pUserSet.SetValue);
+                NoteInfo = pUserSet.SetTag;
+                NoteLabel = pUserSet.SetLabel;
+                Remark = pUserSet.Remark;
+                if (Remark == "" && strCmds.Length > 1)
+                    Remark = strCmds[1];
+                strCmds = new[] { strCmds[0], PointsNum.ToString(), NoteInfo, Remark };
+            }
+            else
+            {
+                PointsNum = Convert.ToInt32(strCmds[1].Replace("分", ""));
+                NoteInfo = strCmds[2];
+                if (strCmds.Length > 3)
+                    NoteLabel = strCmds[3];
+                else
+                    if (NoteInfo.Contains("赠送"))
+                    NoteLabel = "赠送";
+            }
             return base.Init(strCmds);
         }
     }
@@ -105,33 +125,48 @@ namespace zxcCore.zxcRobot.Robot
             switch (strCmd)
             {
                 case "新增":
-                    return _Done_Points_add(msg, pRobotCmd);
+                    return _Done_Points_operation(msg, pRobotCmd);
                 default:
-                    break;
+                    return _Done_Points_operation(msg, pRobotCmd, pRobotCmd.CmdInfos.CmdPermission);
             }
             return false;
         }
 
         //积分添加
-        protected internal bool _Done_Points_add(Msg msg, RobotCmd pRobotCmd)
+        protected internal bool _Done_Points_operation(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.Writable)
         {
             //用户权限判断
-            if (!this._Check_Permission_usr(typePermission_PowerRobot.Writable, msg, pRobotCmd.CmdInfos.PowerRobot)) return false;
+            Power_Robot pPowerRobot = pRobotCmd.CmdInfos.PowerRobot;
+            if (!this._Check_Permission_usr(pPermission, msg, pPowerRobot))
+                return false;
 
-            //添加积分
-            Data_PointsLog pDataLog = _growthPoints.Add_Points(pRobotCmd.CmdInfos);
+            //积分操作
+            Data_PointsLog pDataLog = _growthPoints.Add_Points(pRobotCmd.CmdInfos, pPowerRobot.NameUserAlias);
             if (pDataLog != null)
             {
-                string strPerfix = pDataLog.PointExChange > 0 ? "恭喜！" : "很遗憾！";
-                string strExchange = pDataLog.PointExChange > 0 ? "新增" : "被扣除";
-                string strMsg = string.Format("{0}「{1}」{2} {3} 个宝贝分.", strPerfix, pDataLog.PointsUser, strExchange, pDataLog.PointExChange);
-                strMsg = string.Format("{0}\n{1}原由：{2}\n审核人：{3}\n当前分：{4} 宝贝分.", strMsg, strExchange.Replace("被", ""), pDataLog.PointsNote, pRobotCmd.CmdInfos.PowerRobot.NameUserAlias, pDataLog.PointsNow);
+                string strPerfix = pDataLog.PointExChange > 0 ? "恭喜！" : pDataLog.PointsNote_Label != "" ? "" : "很遗憾！";
+                string strMidfix = pDataLog.PointExChange > 0 ? "获得" + pDataLog.PointsNote_Label + "！" : pDataLog.PointsNote_Label == "兑换" ? "兑换成功！" : "被" + pDataLog.PointsNote_Label + "！";
 
-                ConsoleHelper.Debug(true, "宝贝积分：\n{0}", strMsg);
-                this.NotifyMsg(strMsg, msg, "宝贝积分");
+                string strNumExChange = pDataLog.PointExChange > 0 ? "+" + pDataLog.PointExChange.ToString() : pDataLog.PointExChange.ToString();
+                string strExchange = pDataLog.PointExChange > 0 ? "新增" : "被扣除";
+                string strReason = strExchange.Replace("被", "") + "原由";
+                string strRemark = string.IsNullOrEmpty(pDataLog.Remark) ? "" : string.Format("({0}).", pDataLog.Remark);
+                if (pDataLog.PointsNote_Label == "兑换")
+                {
+                    strReason = "兑换内容";
+                }
+                else if (pDataLog.PointsNote_Label == "奖励")
+                    strReason = "奖励原由";
+
+                string strMsg = string.Format("{0}{1}「{2}」{3} 个宝贝分.", strMidfix, strPerfix, pDataLog.PointsUser, strNumExChange);
+                strMsg = string.Format("{0}\n{1}：{2}{3}\n审核人：{4}\n当前分：{5} 宝贝分.", strMsg, strReason, pDataLog.PointsNote, strRemark, pDataLog.PointsUser_OP, pDataLog.PointsNow);
+
+                ConsoleHelper.Debug(true, "宝贝分变动：\n{0}", strMsg);
+                this.NotifyMsg(strMsg, msg, "宝贝分变动");
             }
             return pDataLog == null;
         }
 
     }
+
 }
