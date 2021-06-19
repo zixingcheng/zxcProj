@@ -91,7 +91,7 @@ namespace zxcCore.zxcRobot.Robot
         }
 
         protected internal typePermission_PowerRobot _CmdPermission = typePermission_PowerRobot.Writable;
-        /// <summary>解析后消息内容
+        /// <summary>命令操作权限
         /// </summary>
         public typePermission_PowerRobot CmdPermission
         {

@@ -106,6 +106,7 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>配置文件信息
         /// </summary>
         protected internal ConfigurationHelper _configDataCache = null;
+        protected internal string _configTag = "";      //设置标签
         protected internal string _configPerFix = "";   //设置前缀
         protected internal string _configMidFix = "";   //设置中缀
         protected internal string _bindTag = "";        //绑定标签
@@ -113,6 +114,7 @@ namespace zxcCore.zxcRobot.Robot
         {
             _configMidFix = configMidFix;
             _configPerFix = configPerFix;
+            _configTag = _configPerFix + "_" + _configMidFix;
             _configDataCache = new ConfigurationHelper("appsettings_" + configPerFix + ".json");
             this.InitSetting(setting);
             this.Init();
@@ -158,7 +160,7 @@ namespace zxcCore.zxcRobot.Robot
             this._bindTag = _configDataCache.config[path + ":BindTag"] + "";
 
             //同步用户信息-群组
-            string name = _configPerFix;
+            string name = _configTag;
             int ind = 0;
             string IsValid_GroupName = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameGroup"] + "";
             while (IsValid_GroupName != "")
@@ -265,7 +267,7 @@ namespace zxcCore.zxcRobot.Robot
                         if (this.IsValid_GroupAll_UserALL) return true;     //全部群、全部人员有效
 
                         //查询群组信息--通用(指定群、指定人员)
-                        Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configPerFix && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
+                        Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configTag && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
                         if (pPower != null && pPower.IsValid)
                         {
                             return true;                                    //指定群、指定人员有效
@@ -274,7 +276,7 @@ namespace zxcCore.zxcRobot.Robot
                     else
                     {
                         //查询群组信息--通用(指定群)
-                        List<Power_Robot> lstPower = Robot_Manager._dbRobot._powerRobot.FindAll(e => e.NameRobot == _configPerFix && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && e.UsrPlat == usrPlat && e.IsDel == false);
+                        List<Power_Robot> lstPower = Robot_Manager._dbRobot._powerRobot.FindAll(e => e.NameRobot == _configTag && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && e.UsrPlat == usrPlat && e.IsDel == false);
                         if (lstPower.Count > 0)
                         {
                             if (this.IsValid_GroupAll_UserALL) return true;     //全部群、全部人员有效
@@ -293,7 +295,7 @@ namespace zxcCore.zxcRobot.Robot
                     if (this.IsValid_PersonalAll) return true;          //全部人有权限
 
                     //查询个人信息--通用(指定群、指定人员)
-                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configPerFix && (e.NameGroup == "" || e.NameGroup == null) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
+                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configTag && (e.NameGroup == "" || e.NameGroup == null) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
                     if (pPower != null && pPower.IsValid)
                     {
                         return true;                                    //指指定人员有效
@@ -327,7 +329,7 @@ namespace zxcCore.zxcRobot.Robot
                 if (this.IsValid_Group && !string.IsNullOrEmpty(nameGroup))
                 {
                     //查询群组信息--通用(指定群、指定人员)
-                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configPerFix && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
+                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configTag && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
                     if (pPower != null && pPower.IsValid)
                     {
                         return true;                                    //指定群、指定人员有效
@@ -338,7 +340,7 @@ namespace zxcCore.zxcRobot.Robot
                 if (this.IsValid_Personal && string.IsNullOrEmpty(nameGroup))
                 {
                     //查询个人信息--通用(指定群、指定人员)
-                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configPerFix && (e.NameGroup == "" || e.NameGroup == null) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
+                    Power_Robot pPower = Robot_Manager._dbRobot._powerRobot.Find(e => e.NameRobot == _configTag && (e.NameGroup == "" || e.NameGroup == null) && (e.NameUser == usrID || e.NameUser == "") && e.UsrPlat == usrPlat && e.IsDel == false);
                     if (pPower != null && pPower.IsValid)
                     {
                         return true;                                    //指指定人员有效

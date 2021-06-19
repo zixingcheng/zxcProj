@@ -110,16 +110,24 @@ namespace zxcCore.zxcRobot.Robot
         protected internal bool _Check_Permission_usr(typePermission_PowerRobot usrPermission, Msg msg, Power_Robot pPower = null)
         {
             //提取权限设置
+            bool bPermission = false;
             if (pPower == null)
-                pPower = _Permission.Get_Permission(_tag, msg.GetNameGroup(), msg.GetNameUser(), msg.usrPlat.ToString());
-            if (pPower == null) return false;
-
-            //权限判断
-            if ((usrPermission & pPower.UsrPermission) == usrPermission)
+                pPower = _Permission.Get_Permission(_Permission._configTag, msg.GetNameGroup(), msg.GetNameUser(), msg.usrPlat.ToString());
+            if (pPower != null)
             {
-                return true;
+                //权限判断
+                if ((usrPermission & pPower.UsrPermission) == usrPermission)
+                {
+                    bPermission = true;
+                }
             }
-            return false;
+
+            //无操作权限提示
+            if (bPermission == false)
+            {
+                this.NotifyMsg("权限不足，请联系管理员！", msg, "权限检测");
+            }
+            return bPermission;
         }
 
         //初始机器人功能命令信息
@@ -149,7 +157,7 @@ namespace zxcCore.zxcRobot.Robot
             }
 
             //解析命令
-            Power_Robot pPower = _Permission.Get_Permission(_tag, msg.GetNameGroup(), msg.GetNameUser(), msg.usrPlat.ToString());
+            Power_Robot pPower = _Permission.Get_Permission(_Permission._configTag, msg.GetNameGroup(), msg.GetNameUser(), msg.usrPlat.ToString());
             RobotCmd_Infos cmdInfos = this._Init_CmdInfo(strCmds, pPower);
 
             //初始命令信息

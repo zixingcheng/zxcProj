@@ -68,7 +68,7 @@ namespace zxcCore.zxcRobot.Robot.Power
         /// </summary>
         /// <param name="pGrowthPoints"></param>
         /// <returns></returns>
-        public virtual Data_PointsLog Add_Points(RobotCmd_Infos pGrowthPoints, string opUser = "")
+        public virtual Data_PointsLog Add_Points(RobotCmd_Infos pGrowthPoints, string opUser = "", bool checkPoints = true)
         {
             //查找用户信息
             Data_Points pDataPoints = this.Find(e => e.PointsType == _pointsType && e.PointsUser == pGrowthPoints.NoteUserTag && e.IsDel == false);
@@ -85,7 +85,7 @@ namespace zxcCore.zxcRobot.Robot.Power
                     RelID = "",
                     Remark = ""
                 };
-            };
+            }
 
             //添加积分记录
             Data_PointsLog pDataPointsLog = new Data_PointsLog()
@@ -102,6 +102,14 @@ namespace zxcCore.zxcRobot.Robot.Power
                 IsValid = true,
                 Remark = pGrowthPoints.Remark
             };
+
+            //数据校正
+            if (checkPoints && pDataPointsLog.PointsNow < 0)
+            {
+                pDataPointsLog.PointsNow = pDataPoints.PointsNum;
+                pDataPointsLog.IsValid = false;
+                return pDataPointsLog;
+            }
             this._logPoints.Add(pDataPointsLog, true, true);
 
             //更新记录积分信息 

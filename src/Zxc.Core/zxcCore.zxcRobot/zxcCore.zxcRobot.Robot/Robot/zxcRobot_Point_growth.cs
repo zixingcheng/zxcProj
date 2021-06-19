@@ -141,7 +141,8 @@ namespace zxcCore.zxcRobot.Robot
                 return false;
 
             //积分操作
-            Data_PointsLog pDataLog = _growthPoints.Add_Points(pRobotCmd.CmdInfos, pPowerRobot.NameUserAlias);
+            bool checkPoints = pRobotCmd.CmdInfos.NoteLabel == "兑换" ? true : false;
+            Data_PointsLog pDataLog = _growthPoints.Add_Points(pRobotCmd.CmdInfos, pPowerRobot.NameUserAlias, checkPoints);
             if (pDataLog != null)
             {
                 string strPerfix = pDataLog.PointExChange > 0 ? "恭喜！" : pDataLog.PointsNote_Label != "" ? "" : "很遗憾！";
@@ -158,13 +159,24 @@ namespace zxcCore.zxcRobot.Robot
                 else if (pDataLog.PointsNote_Label == "奖励")
                     strReason = "奖励原由";
 
-                string strMsg = string.Format("{0}{1}「{2}」{3} 个宝贝分.", strMidfix, strPerfix, pDataLog.PointsUser, strNumExChange);
-                strMsg = string.Format("{0}\n{1}：{2}{3}\n审核人：{4}\n当前分：{5} 宝贝分.", strMsg, strReason, pDataLog.PointsNote, strRemark, pDataLog.PointsUser_OP, pDataLog.PointsNow);
+                if (pDataLog.IsValid)
+                {
+                    string strMsg = string.Format("{0}{1}「{2}」{3} 个宝贝分.", strMidfix, strPerfix, pDataLog.PointsUser, strNumExChange);
+                    strMsg = string.Format("{0}\n{1}：{2}{3}\n审核人：{4}\n当前分：{5} 宝贝分.", strMsg, strReason, pDataLog.PointsNote, strRemark, pDataLog.PointsUser_OP, pDataLog.PointsNow);
 
-                ConsoleHelper.Debug(true, "宝贝分变动：\n{0}", strMsg);
-                this.NotifyMsg(strMsg, msg, "宝贝分变动");
+                    ConsoleHelper.Debug(true, "宝贝分变动：\n{0}", strMsg);
+                    this.NotifyMsg(strMsg, msg, "宝贝分变动");
+                    return true;
+                }
+                else
+                {
+                    string strMsg = string.Format("兑换失败！{0}：{1}{2} 需要 {3} 宝贝分，当前 {4} 个宝贝分，不足以兑换.", strReason, pDataLog.PointsNote, strRemark, strNumExChange, pDataLog.PointsNow);
+                    ConsoleHelper.Debug(true, "宝贝分提示：\n{0}", strMsg);
+                    this.NotifyMsg(strMsg, msg, "宝贝分提示");
+                }
+
             }
-            return pDataLog == null;
+            return false;
         }
 
     }
