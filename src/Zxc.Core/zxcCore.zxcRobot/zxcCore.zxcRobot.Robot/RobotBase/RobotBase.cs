@@ -363,8 +363,8 @@ namespace zxcCore.zxcRobot.Robot
                 strReturn += "已注册" + this._Title_User_Opened() + "  -- " + _Cmds[_Cmds.Count - 1].CmdTime.ToString() + ".";
             }
 
-            ConsoleHelper.Print(false, strTitle);
-            ConsoleHelper.Debug(false, strReturn);
+            zxcConsoleHelper.Print(false, strTitle);
+            zxcConsoleHelper.Debug(false, strReturn);
             return strTitle + "\n\t" + strReturn;
         }
         /// <summary>用户注册时消息

@@ -25,7 +25,7 @@ namespace zxcCore.zxcRobot.Msger
         public event MsgCached_EventHandler MsgCached;
 
         //静态Msg配置信息
-        protected internal static ConfigurationHelper _configMsgSet = new ConfigurationHelper("appsettings.json");
+        protected internal static zxcConfigurationHelper _configMsgSet = new zxcConfigurationHelper("appsettings.json");
         //消息库
         protected internal static DataDB_Msg _dbMsg = null;
         /// <summary>全局消息缓存对象
@@ -71,7 +71,7 @@ namespace zxcCore.zxcRobot.Msger
                 MsgerHelper._dbMsg = new DataDB_Msg(_dirMsgDB);
 
             if (_cacheDebug)
-                ConsoleHelper.Print(false, "消息管理器::全局 \n   >> 已启动.  -- {0}.", DateTime.Now.ToString());
+                zxcConsoleHelper.Print(false, "消息管理器::全局 \n   >> 已启动.  -- {0}.", DateTime.Now.ToString());
         }
         ~MsgerHelper()
         {
@@ -201,7 +201,7 @@ namespace zxcCore.zxcRobot.Msger
                 pMsg.IsFromRobot = true;
             MsgsCaches.Add(pMsg);
             if (_cacheDebug)
-                ConsoleHelper.Debug(true, "CacheMsg:: {0}({1}):: {2}", pMsg.msgTime, pMsg.msgID, pMsg.msgContent);
+                zxcConsoleHelper.Debug(true, "CacheMsg:: {0}({1}):: {2}", pMsg.msgTime, pMsg.msgID, pMsg.msgContent);
 
             //触发消息已缓存事件
             if (this.MsgCached != null)

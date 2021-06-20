@@ -2,7 +2,7 @@
 
 namespace zxcCore.Common
 {
-    public static class TimeHelper
+    public static class zxcTimeHelper
     {
         public static DateTime checkTime(dynamic varTime)
         {

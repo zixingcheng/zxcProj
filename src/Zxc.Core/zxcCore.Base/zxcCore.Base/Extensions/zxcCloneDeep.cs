@@ -8,7 +8,7 @@ using System.Text;
 
 namespace zxcCore.Extensions
 {
-    public class CloneDeep
+    public class zxcCloneDeep
     {
         /// <summary>Clones the specified list.
         /// </summary>

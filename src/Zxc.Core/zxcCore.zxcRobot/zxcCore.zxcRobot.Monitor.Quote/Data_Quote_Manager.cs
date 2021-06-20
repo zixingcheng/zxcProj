@@ -19,7 +19,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         protected internal DataCheck_Msger_Quote _msger = null;
         protected internal DataCaches_Manager _managerCaches = null;
         protected internal Dictionary<string, bool> _dictQuotes = null;
-        protected internal ConfigurationHelper _configDataCache = new ConfigurationHelper("appsettings.json");
+        protected internal zxcConfigurationHelper _configDataCache = new zxcConfigurationHelper("appsettings.json");
         public Data_Quote_Manager()
         {
             _dictQuotes = new Dictionary<string, bool>();

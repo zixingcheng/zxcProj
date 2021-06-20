@@ -53,9 +53,9 @@ namespace zxcCore.zxcRobot.Msger
 
                 string statusCode;
                 if (_useGet)
-                    NetHelper.Get_ByHttpClient(url, jsonMsg, out statusCode);
+                    zxcNetHelper.Get_ByHttpClient(url, jsonMsg, out statusCode);
                 else
-                    NetHelper.Post_ByHttpClient(url, jsonMsg, out statusCode);
+                    zxcNetHelper.Post_ByHttpClient(url, jsonMsg, out statusCode);
                 if (statusCode != "OK")
                     return false;
             }

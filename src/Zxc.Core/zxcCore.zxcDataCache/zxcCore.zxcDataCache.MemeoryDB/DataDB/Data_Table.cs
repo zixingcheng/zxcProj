@@ -121,7 +121,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
         /// </summary>
         /// <param name="item"></param>
         /// <param name="isUnique">唯一性检查</param>
-        public virtual void Add(T item, bool isUnique = true, bool bUpdata = false, bool bMultiple = false)
+        public virtual void Add(T item, bool isUnique = true, bool bUpdata = false, bool bMultiple = false, bool bCacheData = true)
         {
             if (!this.CheckPermission(typePermission_DB.Writable))
                 throw (new Exception("没有写入权限"));
@@ -132,25 +132,28 @@ namespace zxcCore.zxcDataCache.MemoryDB
             bool _isUnique = bUpdata ? isUnique : !isUnique;
             if (this.IsTempTable())
                 _isUnique = isUnique;
+
+            if (isUnique == false) _isUnique = false;
             this.SetValue(item, typePermission_DB.Writable, _isUnique);
 
             if (!bMultiple)
-                if (!this.IsTempTable())
+                if (bCacheData && !this.IsTempTable())
                     this.SaveChanges_ToCache(item);
         }
         /// <summary>添加对象集-剔除存在
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="isUnique">唯一性检查</param>
-        public virtual void AddRange(IEnumerable<T> collection, bool isUnique = true, bool bUpdata = false)
+        public virtual void AddRange(IEnumerable<T> collection, bool isUnique = true, bool bUpdata = false, bool bCacheData = true)
         {
             if (!this.CheckPermission(typePermission_DB.Writable))
                 throw (new Exception("没有写入权限"));
             foreach (var item in collection)
             {
-                this.Add(item, isUnique, bUpdata, true);
+                this.Add(item, isUnique, bUpdata, true, false);
             }
-            this.SaveChanges_ToCache(collection);
+            if (bCacheData && !this.IsTempTable())
+                this.SaveChanges_ToCache(collection);
         }
 
         /// <summary>删除对象集

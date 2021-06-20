@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
@@ -13,6 +14,9 @@ using zxcCore.zxcDataCache.MemoryDB;
 using zxcCore.zxcDataCache.MemoryDB.Test;
 using zxcCore.zxcRobot.Robot;
 using zxcCore.zxcRobot.Msger;
+using zxcCore.zxcRobot.Quote;
+using zxcCore.Common;
+using System.ComponentModel;
 
 namespace zxcCore.zxcRobot.Test
 {
@@ -22,6 +26,19 @@ namespace zxcCore.zxcRobot.Test
         {
             //数据库测试
             //TestDB();
+
+            //行情库测试
+            //typeStockExchange aaa = typeStockExchange.sh;
+            //Console.WriteLine( aaa.Get_AttrName());
+            //Console.WriteLine(aaa.Get_AttrValue());
+            //Console.WriteLine(aaa.Get_Description());
+            //Console.WriteLine(aaa.Get_Remark());
+            //Console.WriteLine(typeStockExchange.none.Get_AttrName());
+            //var aa = zxcEnumHelper.GetAttr<EnumAttr>(aaa).AttrName;
+
+            //typeStockExchange.sh.GetEnumDescription()
+
+            StockInfo pStockInfo = QuoteManager._Quotes._stocksZxc.Find(e => e.StockName == "同花顺");
 
             //机器人测试
             MsgerHelper.Msger.MsgCached += new MsgCached_EventHandler(Program.MsgCached_EventHandler);
@@ -178,7 +195,7 @@ namespace zxcCore.zxcRobot.Test
             Console.WriteLine(DateTime.Now + "::");
             foreach (var item in e.Datas)
             {
-                Data_Quote pData = (Data_Quote)item;
+                Monitor.Data_Quote pData = (Monitor.Data_Quote)item;
                 if (pData == null) continue;
                 //Console.WriteLine("**********" + pData.Time);
             }

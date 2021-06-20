@@ -45,7 +45,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
 
         /// <summary>配置文件信息
         /// </summary>
-        protected internal ConfigurationHelper _configDataCache = new ConfigurationHelper("appsettings.json");
+        protected internal zxcConfigurationHelper _configDataCache = new zxcConfigurationHelper("appsettings.json");
         public Data_DB(string dirBase, typePermission_DB permission = typePermission_DB.Normal, bool useCache = true, string dbName = "")
         {
             _useCache_Realtime = useCache;

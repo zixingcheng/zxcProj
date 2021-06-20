@@ -98,7 +98,7 @@ namespace zxcCore.zxcRobot.DataAnalysis
 
             Value_Original_last = value0;
             Value_last = value; Time_last = time;
-            ConsoleHelper.Debug(false, "****** {7}: {0}，差值：{1}，前值：{2}，当前：{6}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, value0, 0, value, Value_interval, times, value, Tag);
+            zxcConsoleHelper.Debug(false, "****** {7}: {0}，差值：{1}，前值：{2}，当前：{6}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, value0, 0, value, Value_interval, times, value, Tag);
             return _IsInited;
         }
         //数据统计实现
@@ -131,7 +131,7 @@ namespace zxcCore.zxcRobot.DataAnalysis
                 //{
                 //    int a = 0;
                 //}
-                ConsoleHelper.Debug(false, "******{7}: {0}，差值：{2}，前值：{1}，当前：{6}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, Value_delta, Value_interval, times, value, Tag);
+                zxcConsoleHelper.Debug(false, "******{7}: {0}，差值：{2}，前值：{1}，当前：{6}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, Value_delta, Value_interval, times, value, Tag);
             }
 
             //值更新 

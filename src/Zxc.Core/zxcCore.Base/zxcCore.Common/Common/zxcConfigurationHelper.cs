@@ -7,12 +7,12 @@ using System.IO;
 
 namespace zxcCore.Common
 {
-    public static class ConfigHelper
+    public static class zxcConfigHelper
     {
-        private static ConfigurationHelper ConfigurationHelper = null;
-        static ConfigHelper()
+        private static zxcConfigurationHelper ConfigurationHelper = null;
+        static zxcConfigHelper()
         {
-            ConfigurationHelper = new ConfigurationHelper();
+            ConfigurationHelper = new zxcConfigurationHelper();
         }
 
         /// <summary>
@@ -36,10 +36,10 @@ namespace zxcCore.Common
         }
     }
 
-    public class ConfigurationHelper
+    public class zxcConfigurationHelper
     {
         public IConfiguration config { get; set; }
-        public ConfigurationHelper(string fileName = "appsettings.json")
+        public zxcConfigurationHelper(string fileName = "appsettings.json")
         {
             var builder = new ConfigurationBuilder();       //创建config的builder
             builder.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(fileName);       //设置配置文件所在的路径加载配置文件信息

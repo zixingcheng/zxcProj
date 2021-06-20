@@ -3,7 +3,7 @@
 // Copyright @ 2021 广州易简生活科技有限公司.  版权所有.
 //===============================================================================
 // 文件名称： 
-// 功能描述：zxcRobot_Note_wx --机器人-积分管理(成长)
+// 功能描述：zxcRobot_Point_growth --机器人-积分管理(成长)
 // 创建标识：zxc   2021-06-16
 // 修改标识： 
 // 修改描述：
@@ -60,7 +60,7 @@ namespace zxcCore.zxcRobot.Robot
     }
 
 
-    /// <summary>机器人-消息回撤(成长)
+    /// <summary>机器人-积分管理(成长)
     /// </summary>
     public class zxcRobot_Point_growth : RobotBase
     {
@@ -164,14 +164,14 @@ namespace zxcCore.zxcRobot.Robot
                     string strMsg = string.Format("{0}{1}「{2}」{3} 个宝贝分.", strMidfix, strPerfix, pDataLog.PointsUser, strNumExChange);
                     strMsg = string.Format("{0}\n{1}：{2}{3}\n审核人：{4}\n当前分：{5} 宝贝分.", strMsg, strReason, pDataLog.PointsNote, strRemark, pDataLog.PointsUser_OP, pDataLog.PointsNow);
 
-                    ConsoleHelper.Debug(true, "宝贝分变动：\n{0}", strMsg);
+                    zxcConsoleHelper.Debug(true, "宝贝分变动：\n{0}", strMsg);
                     this.NotifyMsg(strMsg, msg, "宝贝分变动");
                     return true;
                 }
                 else
                 {
                     string strMsg = string.Format("兑换失败！{0}：{1}{2} 需要 {3} 宝贝分，当前 {4} 个宝贝分，不足以兑换.", strReason, pDataLog.PointsNote, strRemark, strNumExChange, pDataLog.PointsNow);
-                    ConsoleHelper.Debug(true, "宝贝分提示：\n{0}", strMsg);
+                    zxcConsoleHelper.Debug(true, "宝贝分提示：\n{0}", strMsg);
                     this.NotifyMsg(strMsg, msg, "宝贝分提示");
                 }
 

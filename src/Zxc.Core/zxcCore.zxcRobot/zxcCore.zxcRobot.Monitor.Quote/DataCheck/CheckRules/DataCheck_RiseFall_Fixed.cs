@@ -92,7 +92,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             string usrTo = _data._typeStock == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
             //this.NotifyMsg(msg, "");
             this.NotifyMsg(msg, "@*股票监测--" + usrTo);
-            ConsoleHelper.Debug(false, "DataCheck_RiseFall_Fixed: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.Time, msg);
+            zxcConsoleHelper.Debug(false, "DataCheck_RiseFall_Fixed: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.Time, msg);
             return bResult;
         }
 

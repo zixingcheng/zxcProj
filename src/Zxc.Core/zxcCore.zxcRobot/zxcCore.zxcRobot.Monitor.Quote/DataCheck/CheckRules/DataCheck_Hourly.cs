@@ -13,7 +13,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         #region 属性及构造
 
         //上个时间
-        protected internal DateTime _dtLast = TimeHelper.checkTimeD(DateTime.Now);
+        protected internal DateTime _dtLast = zxcTimeHelper.checkTimeD(DateTime.Now);
         protected internal DateTime _dtNow = DateTime.Now;
         protected internal int _timeInterval = 30;              //时间间隔（分钟）
 
@@ -38,7 +38,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             bool bResult = base.CheckData(dtTime, data, dataCache);
 
             //整点（30分钟）
-            _dtNow = TimeHelper.checkTimeM(dtTime);
+            _dtNow = zxcTimeHelper.checkTimeM(dtTime);
             if ((_dtNow - _dtLast).Minutes < 1) return bResult;
             if (_dtNow.Minute % _timeInterval != 0) return bResult;
             _dtLast = _dtNow;
@@ -51,7 +51,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             //输出、打印信息
             string usrTo = _data._typeStock == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
             this.NotifyMsg(msg, "@*股票监测--" + usrTo);
-            ConsoleHelper.Debug(false, "DataCheck_Hourly: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.Time, msg);
+            zxcConsoleHelper.Debug(false, "DataCheck_Hourly: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.Time, msg);
             return bResult;
         }
 

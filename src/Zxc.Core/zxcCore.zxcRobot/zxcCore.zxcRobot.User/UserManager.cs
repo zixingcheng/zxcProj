@@ -71,7 +71,7 @@ namespace zxcCore.zxcRobot.User
             }
 
             //消息平台信息初始
-            ConfigurationHelper configDataCache = new ConfigurationHelper("appsettings.json");
+            zxcConfigurationHelper configDataCache = new zxcConfigurationHelper("appsettings.json");
             string usrMsger_wx = _configDataCache.config["Msgerset:Msger_Wx:UsrName_Root"] + "";
             User_wx userWx = new User_wx()
             {
@@ -124,7 +124,7 @@ namespace zxcCore.zxcRobot.User
         /// <returns></returns>
         public User_zxc GetUser(Func<IEnumerable<User_zxc>, IEnumerable<User_zxc>> predicate)
         {
-            return Lambda.LambdaDo<User_zxc>(_userZxc, predicate).First();
+            return zxcLambda.LambdaDo<User_zxc>(_userZxc, predicate).First();
         }
         /// <summary>提取指定平台系统用户信息
         /// </summary>
@@ -162,9 +162,9 @@ namespace zxcCore.zxcRobot.User
             switch (userPlat)
             {
                 case "wx":
-                    return Lambda.LambdaDo<User_Base>(_userWx, predicate).FirstOrDefault();
+                    return zxcLambda.LambdaDo<User_Base>(_userWx, predicate).FirstOrDefault();
                 case "Sys":
-                    return Lambda.LambdaDo<User_Base>(_userWx, predicate).FirstOrDefault();
+                    return zxcLambda.LambdaDo<User_Base>(_userWx, predicate).FirstOrDefault();
                 default:
                     break;
             }

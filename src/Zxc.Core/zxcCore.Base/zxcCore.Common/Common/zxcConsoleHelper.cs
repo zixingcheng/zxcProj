@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace zxcCore.Common
 {
-    public static class ConsoleHelper
+    public static class zxcConsoleHelper
     {
         public static bool ps_CanDebug = true;
 

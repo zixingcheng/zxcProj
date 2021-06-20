@@ -13,7 +13,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         #region 属性及构造
 
         protected internal DataSwap_IOFiles _swapIOFiles = null;
-        protected internal ConfigurationHelper _configDataCache = new ConfigurationHelper("appsettings.json");
+        protected internal zxcConfigurationHelper _configDataCache = new zxcConfigurationHelper("appsettings.json");
         public DataMonitor_Msg()
         {
             string dirSwap = _configDataCache.config["DataCache.Swap:Monitor_Msg"] + "";

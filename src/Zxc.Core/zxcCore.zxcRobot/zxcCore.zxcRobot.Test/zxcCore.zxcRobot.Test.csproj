@@ -8,11 +8,15 @@
   <ItemGroup>
     <ProjectReference Include="..\..\zxcCore.zxcDataCache\zxcCore.zxcDataCache.MemeoryDB\zxcCore.zxcDataCache.MemeoryDB.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Monitor.Quote\zxcCore.zxcRobot.Monitor.Quote.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Robot\zxcCore.zxcRobot.Robot.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.User\zxcCore.zxcRobot.User.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings_zxcRobot_Quote.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="appsettings_zxcRobot_Point.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace zxcCore.Common
 {
-    public static class NetHelper
+    public static class zxcNetHelper
     {
         /// <summary>Post方式调用webAPI或页面
         /// </summary>

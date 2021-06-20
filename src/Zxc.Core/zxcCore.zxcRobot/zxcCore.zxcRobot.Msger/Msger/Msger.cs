@@ -42,7 +42,7 @@ namespace zxcCore.zxcRobot.Msger
         }
 
         //静态Msg配置信息
-        protected internal static ConfigurationHelper _configMsgSet = new ConfigurationHelper("appsettings.json");
+        protected internal static zxcConfigurationHelper _configMsgSet = new zxcConfigurationHelper("appsettings.json");
 
         public Msger(bool useApi = true, bool useGet = true, bool isBuffer = false, int numsBuffer = 100)
         {

@@ -39,7 +39,7 @@ namespace zxcCore.zxcRobot.Monitor.Msg
         public override bool HandleMsg_Do(Msger.Msg msg)
         {
             //打印信息
-            ConsoleHelper.Debug(true, "MsgHandle_Print:: {0}   ---{1}.", this.getMsg_Perfix(msg), msg.msgTime);
+            zxcConsoleHelper.Debug(true, "MsgHandle_Print:: {0}   ---{1}.", this.getMsg_Perfix(msg), msg.msgTime);
             //this.NotifyMsg(msg.msgContent, "@*测试群");
             return true;
         }

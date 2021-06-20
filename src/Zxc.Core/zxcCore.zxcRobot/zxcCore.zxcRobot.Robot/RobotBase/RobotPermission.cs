@@ -105,7 +105,7 @@ namespace zxcCore.zxcRobot.Robot
 
         /// <summary>配置文件信息
         /// </summary>
-        protected internal ConfigurationHelper _configDataCache = null;
+        protected internal zxcConfigurationHelper _configDataCache = null;
         protected internal string _configTag = "";      //设置标签
         protected internal string _configPerFix = "";   //设置前缀
         protected internal string _configMidFix = "";   //设置中缀
@@ -115,7 +115,7 @@ namespace zxcCore.zxcRobot.Robot
             _configMidFix = configMidFix;
             _configPerFix = configPerFix;
             _configTag = _configPerFix + "_" + _configMidFix;
-            _configDataCache = new ConfigurationHelper("appsettings_" + configPerFix + ".json");
+            _configDataCache = new zxcConfigurationHelper("appsettings_" + configPerFix + ".json");
             this.InitSetting(setting);
             this.Init();
         }

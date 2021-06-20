@@ -135,7 +135,7 @@ namespace zxcCore.zxcRobot.DataAnalysis
             typeMonitor monitorType = typeMonitor.NONE;
             typeMonitor2 monitorType2 = typeMonitor2.NONE;
             double dRatio = Math.Round(dDelta / this.Value_base, 6);
-            ConsoleHelper.Debug(true, "监测值：{0}-{1}，变动：{2}，时间：{3}", dValue0, value, dRatio, time.ToString("HH:mm:ss"));
+            zxcConsoleHelper.Debug(true, "监测值：{0}-{1}，变动：{2}，时间：{3}", dValue0, value, dRatio, time.ToString("HH:mm:ss"));
             if (dRatio == 0) return true;
 
             //识别变化方向
@@ -210,7 +210,7 @@ namespace zxcCore.zxcRobot.DataAnalysis
                     pArgs.Value = dValue0;
                     this.DataAnalyse_Trigger(this, pArgs);
                 }
-                ConsoleHelper.Debug(true, "{0}", msg.ToString());
+                zxcConsoleHelper.Debug(true, "{0}", msg.ToString());
                 //self.datasMonitor.append([index, valueLast, monitorType, self.state, hitLimit])
             }
 

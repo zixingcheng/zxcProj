@@ -8,7 +8,7 @@ using System.Text;
 
 namespace zxcCore.Extensions
 {
-    public class Lambda
+    public class zxcLambda
     {
         /// <summary>lambda操作（外部传入参数）
         /// </summary>
