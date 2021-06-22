@@ -22,6 +22,14 @@ namespace zxcCore.zxcRobot.Robot
     {
         #region 属性及构造
 
+        /// <summary>点数
+        /// </summary>
+        public int PointsNum
+        {
+            get; set;
+        }
+
+
         public CmdInfos_PointsGrowth(string[] strCmds, Power_Robot powerRobot) : base(strCmds, powerRobot)
         {
         }
@@ -33,8 +41,9 @@ namespace zxcCore.zxcRobot.Robot
             //"@新增 5分 放学自觉读书"
             if (strCmds.Length < 3)
             {
+                if (PowerRobot == null) return base.Init(strCmds);
                 Power_Robot_UserSet pUserSet = this.PowerRobot.UserSets.Find(e => e.SetTag == strCmds[0]);
-                if (pUserSet == null) return false;
+                if (pUserSet == null) return base.Init(strCmds);
 
                 CmdPermission = pUserSet.SetPermission;
                 PointsNum = Convert.ToInt32(pUserSet.SetValue);
@@ -55,6 +64,7 @@ namespace zxcCore.zxcRobot.Robot
                     if (NoteInfo.Contains("赠送"))
                     NoteLabel = "赠送";
             }
+            this.IsVaild = true;
             return base.Init(strCmds);
         }
     }
@@ -104,7 +114,6 @@ namespace zxcCore.zxcRobot.Robot
         {
             return true;
         }
-
         //初始机器人功能命令信息
         protected internal override RobotCmd_Infos _Init_CmdInfo(string[] strCmds, Power_Robot powerRobot)
         {
@@ -142,7 +151,7 @@ namespace zxcCore.zxcRobot.Robot
 
             //积分操作
             bool checkPoints = pRobotCmd.CmdInfos.NoteLabel == "兑换" ? true : false;
-            Data_PointsLog pDataLog = _growthPoints.Add_Points(pRobotCmd.CmdInfos, pPowerRobot.NameUserAlias, checkPoints);
+            Data_PointsLog pDataLog = _growthPoints.Add_Points((CmdInfos_PointsGrowth)pRobotCmd.CmdInfos, pPowerRobot.NameUserAlias, checkPoints);
             if (pDataLog != null)
             {
                 string strPerfix = pDataLog.PointExChange > 0 ? "恭喜！" : pDataLog.PointsNote_Label != "" ? "" : "很遗憾！";

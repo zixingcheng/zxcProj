@@ -69,6 +69,10 @@ namespace zxcCore.zxcRobot.Robot
 
             zxcRobot_Point_growth pRobot_Point_growth = new zxcRobot_Point_growth(null, "");
             _msgsHandler.InitMsgHandle(pRobot_Point_growth.Tag, pRobot_Point_growth);
+
+            zxcRobot_Quote_quantify pRobot_Quote_quantify = new zxcRobot_Quote_quantify(null, "");
+            _msgsHandler.InitMsgHandle(pRobot_Quote_quantify.Tag, pRobot_Quote_quantify);
+            
             return true;
         }
 

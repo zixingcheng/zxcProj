@@ -116,5 +116,18 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         {
             return string.Format("\n--zxcRobot(Stock) {0}", DateTime.Now.ToString("HH:mm:ss"));
         }
+        /// <summary>提取值字符串（含单位，指数没有单位）
+        /// </summary>
+        /// <returns></returns>
+        protected internal virtual string getValue_str(double dValue)
+        {
+            //组装消息
+            string tagUnit = _data._isIndex ? "" : "元";
+            int digits = _data._isIndex ? 3 : 2;
+            double value = _data.StockType == typeStock.Option ? dValue * 10000 : dValue;
+            string strValue = string.Format("{0}{1}", Math.Round(value, digits), tagUnit);
+            return strValue;
+        }
+
     }
 }

@@ -86,5 +86,31 @@ namespace zxcCore.zxcRobot.Quote
 
         }
 
+
+        /// <summary>查询行情标的信息
+        /// </summary>
+        /// <param name="stockID">标的编号</param>
+        /// <param name="stockName">标的名称</param>
+        /// <returns></returns>
+        public static StockInfo Get_StockInfo(string stockID, string stockName)
+        {
+            string stockTag = stockID;
+            if (!string.IsNullOrEmpty(stockTag))
+            {
+                StockInfo pStockInfo = QuoteManager._Quotes._stocksZxc.Find(e => e.StockName == stockTag || e.StockID == stockTag);
+                if (pStockInfo != null)
+                    return pStockInfo;
+            }
+
+            stockTag = stockName;
+            if (!string.IsNullOrEmpty(stockTag))
+            {
+                StockInfo pStockInfo = QuoteManager._Quotes._stocksZxc.Find(e => e.StockName == stockTag || e.StockID == stockTag);
+                if (pStockInfo != null)
+                    return pStockInfo;
+            }
+            return null;
+        }
+
     }
 }

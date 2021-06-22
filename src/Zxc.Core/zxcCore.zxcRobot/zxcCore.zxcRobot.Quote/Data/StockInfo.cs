@@ -83,6 +83,37 @@ namespace zxcCore.zxcRobot.Quote
             get; set;
         }
 
+        /// <summary>标的代码-标签
+        /// </summary>
+        public string StockID_Tag
+        {
+            get
+            {
+                return StockExchange.ToString() + "." + StockID;
+            }
+        }
+        /// <summary>标的代码-标签聚宽
+        /// </summary>
+        public string StockID_TagJQ
+        {
+            get
+            {
+                return StockID + "." + StockExchange.Get_AttrValue();
+            }
+        }
+        /// <summary>标的代码-标签新浪
+        /// </summary>
+        public string StockID_TagSina
+        {
+            get
+            {
+                //区分期权标签
+                if (StockType == typeStock.Option)
+                    return StockType.Get_Remark() + StockID;
+                return StockExchange.ToString() + StockID;
+            }
+        }
+
         /// <summary>是否停牌
         /// </summary>
         public bool IsSuspended

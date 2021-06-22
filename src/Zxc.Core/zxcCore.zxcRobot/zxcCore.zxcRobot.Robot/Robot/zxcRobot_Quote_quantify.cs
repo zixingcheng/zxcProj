@@ -8,9 +8,13 @@
 // 修改标识： 
 // 修改描述：
 //===============================================================================
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using zxcCore.Common;
+using zxcCore.zxcRobot.Monitor;
 using zxcCore.zxcRobot.Msger;
+using zxcCore.zxcRobot.Quote;
 using zxcCore.zxcRobot.Robot.Power;
 using zxcCore.zxcRobot.User;
 
@@ -22,6 +26,13 @@ namespace zxcCore.zxcRobot.Robot
     {
         #region 属性及构造
 
+        /// <summary>标的名称
+        /// </summary>
+        public string StockName
+        {
+            get; set;
+        }
+
         public CmdInfos_QuoteQuantify(string[] strCmds, Power_Robot powerRobot) : base(strCmds, powerRobot)
         {
         }
@@ -31,30 +42,18 @@ namespace zxcCore.zxcRobot.Robot
         public override bool Init(string[] strCmds)
         {
             //"@新增 5分 放学自觉读书"
-            if (strCmds.Length < 3)
+            if (strCmds.Length < 2)
             {
                 Power_Robot_UserSet pUserSet = this.PowerRobot.UserSets.Find(e => e.SetTag == strCmds[0]);
                 if (pUserSet == null) return false;
 
-                CmdPermission = pUserSet.SetPermission;
-                PointsNum = Convert.ToInt32(pUserSet.SetValue);
-                NoteInfo = pUserSet.SetTag;
-                NoteLabel = pUserSet.SetLabel;
-                Remark = pUserSet.Remark;
-                if (Remark == "" && strCmds.Length > 1)
-                    Remark = strCmds[1];
-                strCmds = new[] { strCmds[0], PointsNum.ToString(), NoteInfo, Remark };
+                //CmdPermission = pUserSet.SetPermission; 
             }
             else
             {
-                PointsNum = Convert.ToInt32(strCmds[1].Replace("分", ""));
-                NoteInfo = strCmds[2];
-                if (strCmds.Length > 3)
-                    NoteLabel = strCmds[3];
-                else
-                    if (NoteInfo.Contains("赠送"))
-                    NoteLabel = "赠送";
+                StockName = strCmds[1];
             }
+            this.IsVaild = true;
             return base.Init(strCmds);
         }
     }
@@ -66,14 +65,12 @@ namespace zxcCore.zxcRobot.Robot
     {
         #region 属性及构造
 
-        //成长宝贝点表
-        //protected internal DataTable_Points_Growth<Data_Points> _growthPoints = null;
-        //protected internal string _pointsType = "quantify";
+        protected internal string _urlAPI_QuoteQuery = "";          //行情实时查询接口
 
         public zxcRobot_Quote_quantify(IUser User, string setting) : base(User, "zxcRobot_Quote", "quantify", setting)
         {
-            _Title = "量化";
-            _tagAlias = "行情管理";
+            _Title = "行情量化";
+            _tagAlias = "行情量化";
             _CmdStr = "@@Quantify";  //启动命令
             _hasTitle = true;
             //_growthPoints = Robot_Manager._dbRobot._growthPoints;
@@ -88,6 +85,9 @@ namespace zxcCore.zxcRobot.Robot
             {
                 this.Done_Regist(User, new Msg(_CmdStr), true);
             }
+
+            //提取行情API配置
+            _urlAPI_QuoteQuery = _configDataCache.config["ZxcRobot.Quote:QuoteAPI:QueryAPI_Url"] + "";
         }
         ~zxcRobot_Quote_quantify()
         {
@@ -104,7 +104,6 @@ namespace zxcCore.zxcRobot.Robot
         {
             return true;
         }
-
         //初始机器人功能命令信息
         protected internal override RobotCmd_Infos _Init_CmdInfo(string[] strCmds, Power_Robot powerRobot)
         {
@@ -141,6 +140,32 @@ namespace zxcCore.zxcRobot.Robot
                 return false;
 
             //查询操作 
+            string stockName = ((CmdInfos_QuoteQuantify)pRobotCmd.CmdInfos).StockName;
+            StockInfo pStockInfo = QuoteManager.Get_StockInfo(stockName, "");
+
+            string statusCode;
+            string result = zxcNetHelper.Get_ByHttpClient(_urlAPI_QuoteQuery, pStockInfo.StockID_TagSina, out statusCode);
+
+
+            //循环解析文件json数据
+            List<Data_Quote_Swap> lstDataQuote = new List<Data_Quote_Swap>();
+            JObject jsonRes = JObject.Parse(result);
+            JArray jsonDatas = (JArray)jsonRes["datas"];
+            if (jsonDatas != null)
+            {
+                //循环生成数据对象
+                foreach (var jsonData in jsonDatas)
+                {
+                    Data_Quote_Swap pDataQuote = new Data_Quote_Swap();
+                    if (pDataQuote.FromJson(jsonData))
+                        lstDataQuote.Add(pDataQuote);
+
+                    string strMsg = pDataQuote.getMsg_Perfix();
+                    zxcConsoleHelper.Debug(true, "行情信息：\n{0}", strMsg);
+                    this.NotifyMsg(strMsg, msg, "行情信息");
+                }
+            }
+
 
             return false;
         }

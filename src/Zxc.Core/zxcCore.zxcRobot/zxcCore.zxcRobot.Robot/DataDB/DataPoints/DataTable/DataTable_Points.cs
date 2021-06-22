@@ -68,7 +68,7 @@ namespace zxcCore.zxcRobot.Robot.Power
         /// </summary>
         /// <param name="pGrowthPoints"></param>
         /// <returns></returns>
-        public virtual Data_PointsLog Add_Points(RobotCmd_Infos pGrowthPoints, string opUser = "", bool checkPoints = true)
+        public virtual Data_PointsLog Add_Points(CmdInfos_PointsGrowth pGrowthPoints, string opUser = "", bool checkPoints = true)
         {
             //查找用户信息
             Data_Points pDataPoints = this.Find(e => e.PointsType == _pointsType && e.PointsUser == pGrowthPoints.NoteUserTag && e.IsDel == false);

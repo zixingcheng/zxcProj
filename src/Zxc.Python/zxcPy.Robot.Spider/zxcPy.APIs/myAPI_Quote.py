@@ -88,7 +88,7 @@ class myAPI_Quote_SetQuery(myWeb.myAPI):
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
         if(spiderInfo != None):
             pMsg['result'] = True
-            pMsg['datas'] = spiderInfo.ToDict()
+            pMsg['datas'] = spiderInfo.ToDict() 
         return myData_Json.Trans_ToJson_str(pMsg)
 
 #API-行情查询
@@ -106,7 +106,8 @@ class myAPI_Quote_Query(myWeb.myAPI):
                 datas.append(x.toDict())
             pMsg['datas'] = datas
             pMsg['result'] = True
-        return myData_Json.Trans_ToJson_str(pMsg)
+        #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
+        return jsonify(pMsg) 
 
 
 #集中添加所有API

@@ -58,8 +58,10 @@ class myWeb_Config():
         """Development config class."""
         # Open the DEBUG
         DEBUG = True
+        JSON_AS_ASCII = False
         CSRF_ENABLED = True
         SECRET_KEY = 'you-will-never-guess'
+
 #Web接口类
 class myWeb(myThread.myThread): 
     def __init__(self, hostIP = "0.0.0.0", nPort = 5000, bDebug = True, webFolder = './', threaded = False, processes = 1):
@@ -102,7 +104,7 @@ class myWeb(myThread.myThread):
     def add_Web(self): 
         # 指定主页 URL='/' 的路由规则
         # 当访问 HTTP://server_ip/ GET(Default) 时，call home()
-        @self.app.route('/')
+        @self.app.route('/') 
         def home():
             return '<h1>Hello! There is zxcWeb...</h1>'  
              
@@ -223,7 +225,7 @@ class myAPI_p(myAPI):
 
 def main():
     # 创建新线程
-    pWeb = myWeb("192.168.24.108", 5000, True)
+    pWeb = myWeb("127.0.0.1", 5000, True)
     pWeb.add_API(myAPI, '/test')
     pWeb.add_API(myAPI_p, '/test/<param>')
 
@@ -232,7 +234,15 @@ def main():
     @pWeb.app.route("/hello")
     def hello():
         return "Hello...."
- 
+    
+    #使用jsonify模块来让网页直接显示json数据
+    @pWeb.app.route('/json')
+    def re_json():
+        #定义数据格式
+        json_dict={'id':10,'title':'flask的应用','content':'flask的json'}
+        #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
+        return jsonify(json_dict)
+
     pWeb.run()
 
     #pWeb.start()    #线程方式启动有问题

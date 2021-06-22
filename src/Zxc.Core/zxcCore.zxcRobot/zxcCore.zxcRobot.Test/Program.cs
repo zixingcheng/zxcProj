@@ -28,7 +28,7 @@ namespace zxcCore.zxcRobot.Test
             //TestDB();
 
             //消息交换测试
-            TestSwapMsg();
+            //TestSwapMsg();
 
             //行情库测试
             //typeStockExchange aaa = typeStockExchange.sh;

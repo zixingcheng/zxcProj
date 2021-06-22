@@ -16,10 +16,30 @@ using System.Xml.Linq;
 using zxcCore.Common;
 using zxcCore.zxcRobot.Monitor.Msg;
 using zxcCore.zxcRobot.Msger;
+using zxcCore.zxcRobot.Robot.Power;
 using zxcCore.zxcRobot.User;
 
 namespace zxcCore.zxcRobot.Robot
 {
+    /// <summary>命令信息集合-成长宝贝点
+    /// </summary>
+    public class CmdInfos_NoteWx : RobotCmd_Infos
+    {
+        #region 属性及构造
+
+        public CmdInfos_NoteWx(string[] strCmds, Power_Robot powerRobot) : base(strCmds, powerRobot)
+        {
+        }
+
+        #endregion
+
+        public override bool Init(string[] strCmds)
+        {
+            this.IsVaild = true;
+            return base.Init(strCmds);
+        }
+    }
+
     /// <summary>机器人-消息回撤(wx)
     /// </summary>
     public class zxcRobot_Note_wx : RobotBase
@@ -64,6 +84,11 @@ namespace zxcCore.zxcRobot.Robot
         public override bool Init_Setting(dynamic setting)
         {
             return true;
+        }
+        //初始机器人功能命令信息
+        protected internal override RobotCmd_Infos _Init_CmdInfo(string[] strCmds, Power_Robot powerRobot)
+        {
+            return new CmdInfos_NoteWx(strCmds, powerRobot);
         }
 
 

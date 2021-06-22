@@ -118,7 +118,7 @@ namespace zxcCore.zxcRobot.Msger
             {
                 if (string.IsNullOrEmpty(usrName)) return false;
                 if (string.IsNullOrEmpty(usrNameNick)) return false;
-                _IsUserGroup = usrName.Substring(0, 2) == "@*" ? true : usrNameNick.Substring(0, 2) == "@*" ? true : (groupID != "" ? true : false);
+                _IsUserGroup = usrName.Length > 2 && usrName.Substring(0, 2) == "@*" ? true : usrNameNick.Length > 2 && usrNameNick.Substring(0, 2) == "@*" ? true : (groupID != "" ? true : false);
                 return _IsUserGroup;
             }
             set

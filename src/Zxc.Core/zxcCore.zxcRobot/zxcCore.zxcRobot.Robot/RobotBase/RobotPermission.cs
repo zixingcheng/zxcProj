@@ -214,6 +214,8 @@ namespace zxcCore.zxcRobot.Robot
                     indusr++;
                     nameUser = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":usrsSet:" + indusr.ToString() + ":nameUser"];
                 }
+                if (IsValid_PersonalAll)
+                    this.Add_Permission(name, IsValid_GroupName, "", "", usrPlat, true, bindTag, "1", userSets);
 
                 ind++;
                 IsValid_GroupName = _configDataCache.config[path + ":IsValid_GroupNames:" + ind.ToString() + ":nameGroup"] + "";

@@ -77,6 +77,31 @@ namespace zxcCore.zxcRobot.Monitor
             this._isIndex = this.IsIndex();
             return true;
         }
+
+
+        public virtual string getMsg_Perfix()
+        {
+            //组装消息
+            string tagRF = Value_RF == 0 ? "平" : (Value_RF > 0 ? "涨" : "跌");
+            string tagUnit = _isIndex ? "" : "元";
+            int digits = _isIndex ? 3 : 2;
+            double value = StockType == typeStock.Option ? Value * 10000 : Value;
+            string msg = string.Format("{0}：{1}{2}, {3} {4}%.", StockName, Math.Round(value, digits), tagUnit, tagRF, Math.Round(Value_RF * 100, 2));
+            return msg;
+        }
+        /// <summary>提取值字符串（含单位，指数没有单位）
+        /// </summary>
+        /// <returns></returns>
+        public virtual string getValue_str(double dValue)
+        {
+            //组装消息
+            string tagUnit = _isIndex ? "" : "元";
+            int digits = _isIndex ? 3 : 2;
+            double value = StockType == typeStock.Option ? dValue * 10000 : dValue;
+            string strValue = string.Format("{0}{1}", Math.Round(value, digits), tagUnit);
+            return strValue;
+        }
+
     }
 
 }

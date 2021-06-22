@@ -30,6 +30,7 @@ namespace zxcCore.zxcRobot.Robot
             get { return _CmdTime; }
         }
 
+
         protected internal Msg _MsgInfo = null;
         /// <summary>原始消息内容
         /// </summary>
@@ -99,12 +100,6 @@ namespace zxcCore.zxcRobot.Robot
             set { _CmdPermission = value; }
         }
 
-        /// <summary>点数
-        /// </summary>
-        public int PointsNum
-        {
-            get; set;
-        }
 
         /// <summary>标记的用户标签
         /// </summary>
@@ -124,10 +119,15 @@ namespace zxcCore.zxcRobot.Robot
         {
             get; set;
         }
-
         /// <summary>备注信息
         /// </summary>
         public string Remark
+        {
+            get; set;
+        }
+        /// <summary>标识是否有效
+        /// </summary>
+        public bool IsVaild
         {
             get; set;
         }

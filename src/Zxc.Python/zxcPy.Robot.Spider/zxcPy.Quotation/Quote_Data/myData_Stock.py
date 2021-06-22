@@ -165,7 +165,7 @@ class Data_Stock(myQuote_Data.Quote_Data):
         dictValue["sell4Price"] = myData_Trans.To_Float(str(self.sell4Price))
         dictValue["sell5Volume"] = myData_Trans.To_Int(str(self.sell5Volume))
         dictValue["sell5Price"] = myData_Trans.To_Float(str(self.sell5Price))
-        dictValue["datetime"] = self.datetime
+        dictValue["datetime"] =  self.date + " " + self.time
         return dictValue
     #转为JsonStr
     def toJsonstr(self):

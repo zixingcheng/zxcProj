@@ -67,6 +67,9 @@ namespace zxcCore.zxcRobot.Robot
         protected internal string _configMidFix = "";
         protected internal bool _checkAllMsg = false;
         protected internal bool _hasTitle = false;
+        /// <summary>配置文件信息
+        /// </summary>
+        protected internal zxcConfigurationHelper _configDataCache = new zxcConfigurationHelper("appsettings.json");
         public RobotBase(IUser User, string tag, string configMidFix, string setting) : base(tag, setting)
         {
             _Title = "机器人基类";
@@ -141,8 +144,18 @@ namespace zxcCore.zxcRobot.Robot
             if (!_checkAllMsg && strCmd.Substring(0, 1) != "@") return null;
 
             //提取命令头
-            bool bStartCmd = strCmd == _CmdStr;
-            string perfixCmd = bStartCmd ? "@@" : "@";
+            string perfixCmd = strCmd.Substring(0, 2);
+            bool bStartCmd = strCmd.Length >= _CmdStr.Length && strCmd.Substring(0, _CmdStr.Length) == _CmdStr;
+            if (perfixCmd != "@@" && perfixCmd != "@*")
+            {
+                //@个人
+                if (!_checkAllMsg)
+                    return null;
+                else
+                    perfixCmd = "";
+            }
+
+            //解析命令
             string[] strCmds = strCmd.Split(perfixCmd);
             string strCmdtemp = strCmds.Length <= 1 ? strCmds[0] : strCmds[1];
             strCmds = strCmdtemp.Split(" ");
@@ -180,6 +193,7 @@ namespace zxcCore.zxcRobot.Robot
             //解析命令
             RobotCmd pRobotCmd = this.Init_CmdInfo(msg);
             if (pRobotCmd == null) return false;
+            if (!pRobotCmd.CmdInfos.IsVaild) return false;
 
             //剔除非命令触发（全命令触发类型）
             if (!_checkAllMsg && pRobotCmd.CmdInfos.Cmdstrs.Length <= 1)
