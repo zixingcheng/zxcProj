@@ -216,9 +216,10 @@ namespace zxcCore.zxcRobot.Msger
             var msgWx = new
             {
                 usrID = usrID,
-                usrName = usrName,
+                usrName = GetNameUser(),
                 usrNameNick = usrNameNick,
                 groupID = groupID,
+                groupName = GetNameGroup(),
                 usrPlat = usrPlat,
                 msgType = msgType,
                 msg = msg,

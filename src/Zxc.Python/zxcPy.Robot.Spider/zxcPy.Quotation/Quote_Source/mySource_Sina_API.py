@@ -103,10 +103,12 @@ class Source_Sina_API():
         vargs = info.split(',')
             
         # 区分股票与期权
-        if(stkid.count('CON_OP') == 1):
-            value = float(vargs[2])
-        else:
-            value = float(vargs[3])
+        value = 0
+        if(info != ""):
+            if(stkid.count('CON_OP') == 1):
+                value = float(vargs[2])
+            else:
+                value = float(vargs[3])
         return value
 
 

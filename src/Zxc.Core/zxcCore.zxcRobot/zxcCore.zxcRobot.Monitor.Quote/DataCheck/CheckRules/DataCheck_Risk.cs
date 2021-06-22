@@ -4,6 +4,7 @@ using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.zxcRobot.DataAnalysis;
 using zxcCore.Common;
+using zxcCore.zxcRobot.Quote;
 
 namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
@@ -42,7 +43,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             //数据初始
             if (this._dataAnalyse.Datas.Values.Count == 0)
             {
-                this._dataAnalyse.Init(_data.preClose, _data.preClose, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), _data.highPrice, _data.lowPrice, 0.0025);
+                this._dataAnalyse.Init(_data.Price_Per, _data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), _data.Price_High, _data.Price_Low, 0.0025);
                 return true;
             }
             else
@@ -82,9 +83,9 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 msg += this.getMsg_Suffix();
 
                 //输出、打印信息
-                string usrTo = _data._typeStock == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
+                string usrTo = _data.StockType == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
                 this.NotifyMsg(msg, "@*股票监测--" + usrTo);
-                zxcConsoleHelper.Debug(true, "DataCheck_Hourly:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.Time, msg);
+                zxcConsoleHelper.Debug(true, "DataCheck_Hourly:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
             }
         }
     }

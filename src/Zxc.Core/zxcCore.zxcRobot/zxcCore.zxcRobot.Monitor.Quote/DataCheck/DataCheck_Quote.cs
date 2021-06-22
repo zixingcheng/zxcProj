@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.zxcRobot.Msger;
+using zxcCore.zxcRobot.Quote;
 
 namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
@@ -21,7 +22,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         }
 
         protected internal JObject _setObj = null;
-        protected internal Data_Quote _data = null;
+        protected internal Data_Quote_Swap _data = null;
         public DataCheck_Quote(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache)
         {
             this.InitSetting(setting);
@@ -55,7 +56,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         public override bool CheckData(DateTime dtTime, T data, IDataCache<T> dataCache = null)
         {
             if (dataCache != null) this._DataCache = dataCache;
-            _data = (Data_Quote)Convert.ChangeType(data, typeof(Data_Quote));
+            _data = (Data_Quote_Swap)Convert.ChangeType(data, typeof(Data_Quote_Swap));
             return true;
         }
 
@@ -98,11 +99,11 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         protected internal virtual string getMsg_Perfix()
         {
             //组装消息
-            string tagRF = _data._valueRF == 0 ? "平" : (_data._valueRF > 0 ? "涨" : "跌");
+            string tagRF = _data.Value_RF == 0 ? "平" : (_data.Value_RF > 0 ? "涨" : "跌");
             string tagUnit = _data._isIndex ? "" : "元";
             int digits = _data._isIndex ? 3 : 2;
-            float value = _data._typeStock == typeStock.Option ? _data.Value * 10000 : _data.Value;
-            string msg = string.Format("{0}：{1}{2}, {3} {4}%.", _data.name, Math.Round(value, digits), tagUnit, tagRF, Math.Round(_data._valueRF * 100, 2));
+            double value = _data.StockType == typeStock.Option ? _data.Value * 10000 : _data.Value;
+            string msg = string.Format("{0}：{1}{2}, {3} {4}%.", _data.StockName, Math.Round(value, digits), tagUnit, tagRF, Math.Round(_data.Value_RF * 100, 2));
             return msg;
         }
         //提取返回消息-中缀

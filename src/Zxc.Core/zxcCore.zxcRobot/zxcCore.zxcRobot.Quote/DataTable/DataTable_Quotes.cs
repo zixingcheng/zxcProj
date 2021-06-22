@@ -6,16 +6,16 @@ using zxcCore.zxcDataCache.MemoryDB;
 
 namespace zxcCore.zxcRobot.Quote
 {
-    /// <summary>数据对象集类-标的信息表
+    /// <summary>数据对象集类-行情表
     /// </summary>
-    public class DataTable_Stocks<T> : Data_Table<T> where T : StockInfo
+    public class DataTable_Quotes<T> : Data_Table<T> where T : Data_Quote
     {
         #region 属性及构造
 
-        public DataTable_Stocks(string dtName = "dataTable_Stocks") : base(dtName)
+        public DataTable_Quotes(string dtName = "dataTable_Quotes") : base(dtName)
         {
             //this._dtName = string.IsNullOrEmpty(_dtName) ? "dataTable_Points" : _dtName;
-            this._isNoLog = true;
+            //this.Init_PointsLog();
         }
 
         #endregion

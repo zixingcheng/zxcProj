@@ -15,7 +15,8 @@ namespace zxcCore.zxcRobot.Msger
             _Tag = "Wx";
             _TypeMsg = typeMsger.wx;
             if (_useApi && _url == "")
-                _url = _configMsgSet.config["Msgerset:Msger_Wx:url_API"] + "";
+                _url = _configMsgSet.config["Msgerset:Msger_Wx:MsgAPI_Url"] + "";
+            _pathMsgSwap = _configMsgSet.config["Msgerset:Msger_Wx:MsgSwap_Out"] + "";
         }
         ~Msger_Wx()
         {
@@ -58,6 +59,10 @@ namespace zxcCore.zxcRobot.Msger
                     zxcNetHelper.Post_ByHttpClient(url, jsonMsg, out statusCode);
                 if (statusCode != "OK")
                     return false;
+            }
+            else
+            {
+                //直接文件交换
             }
             this.CacheMsg(msg);     //缓存消息
             return true;

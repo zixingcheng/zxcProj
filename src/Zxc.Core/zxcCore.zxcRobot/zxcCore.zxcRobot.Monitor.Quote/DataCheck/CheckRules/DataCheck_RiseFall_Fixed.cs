@@ -4,6 +4,7 @@ using System.Linq;
 using zpCore.zpDataCache.Memory;
 using zxcCore.Common;
 using zxcCore.zxcRobot.DataAnalysis;
+using zxcCore.zxcRobot.Quote;
 
 namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
@@ -47,10 +48,10 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             if (!_dataStics.IsInited)
             {
                 //修正最小生效间隔
-                double dValue_interval = _data._isIndex ? _valueRF_step * 0.4 : _data._typeStock == typeStock.Option ? _valueRF_step * 4.0 : _valueRF_step;
+                double dValue_interval = _data._isIndex ? _valueRF_step * 0.4 : _data.StockType == typeStock.Option ? _valueRF_step * 4.0 : _valueRF_step;
 
                 //初始统计信息
-                _dataStics.Init(_data._valueRF, _data.highPrice / _data.preClose - 1, _data.lowPrice / _data.preClose - 1, _data.Time, dValue_interval, _data.name);
+                _dataStics.Init(_data.Value_RF, _data.Price_High / _data.Price_Per - 1, _data.Price_Low / _data.Price_Per - 1, _data.DateTime, dValue_interval, _data.StockName);
 
                 //组装消息
                 msg += this.getMsg_Suffix();
@@ -58,7 +59,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             else
             {
                 //统计，无效退出
-                if (!_dataStics.Statistics(_data._valueRF, _data.Time)) return false;
+                if (!_dataStics.Statistics(_data.Value_RF, _data.DateTime)) return false;
 
                 //涨跌超区间处理
                 //int nTimes = 0;
@@ -89,10 +90,10 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             //}
 
             //输出、打印信息
-            string usrTo = _data._typeStock == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
+            string usrTo = _data.StockType == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
             //this.NotifyMsg(msg, "");
             this.NotifyMsg(msg, "@*股票监测--" + usrTo);
-            zxcConsoleHelper.Debug(false, "DataCheck_RiseFall_Fixed: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.Time, msg);
+            zxcConsoleHelper.Debug(false, "DataCheck_RiseFall_Fixed: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
             return bResult;
         }
 

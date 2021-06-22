@@ -22,6 +22,7 @@ namespace zxcCore.zxcRobot.Msger
             get { return _Tag; }
         }
 
+        protected internal string _pathMsgSwap = "";
         protected internal string _url = "";
         protected internal bool _useApi;
         protected internal bool _useGet;

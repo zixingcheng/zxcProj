@@ -27,6 +27,9 @@ namespace zxcCore.zxcRobot.Test
             //数据库测试
             //TestDB();
 
+            //消息交换测试
+            TestSwapMsg();
+
             //行情库测试
             //typeStockExchange aaa = typeStockExchange.sh;
             //Console.WriteLine( aaa.Get_AttrName());
@@ -195,7 +198,7 @@ namespace zxcCore.zxcRobot.Test
             Console.WriteLine(DateTime.Now + "::");
             foreach (var item in e.Datas)
             {
-                Monitor.Data_Quote pData = (Monitor.Data_Quote)item;
+                Monitor.Data_Quote_Swap pData = (Monitor.Data_Quote_Swap)item;
                 if (pData == null) continue;
                 //Console.WriteLine("**********" + pData.Time);
             }

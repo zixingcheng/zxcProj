@@ -6,9 +6,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\zpCore.zpDataCache\zpCore.zpDataCache.Memory\zpCore.zpDataCache.Memory.csproj" />
+    <ProjectReference Include="..\..\zxcCore.Base\zxcCore.Base\zxcCore.Base.csproj" />
     <ProjectReference Include="..\..\zxcCore.Base\zxcCore.Common\zxcCore.Common.csproj" />
     <ProjectReference Include="..\..\zxcCore.zxcDataCache\zxcCore.zxcDataCache.Swap\zxcCore.zxcDataCache.Swap.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Msger\zxcCore.zxcRobot.Msger.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.csproj" />
   </ItemGroup>
 
 </Project>

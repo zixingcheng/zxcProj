@@ -15,11 +15,11 @@ namespace zxcCore.zxcRobot.Quote
         none = 0,
         /// <summary>上海证券交易所
         /// </summary>
-        [EnumAttr("上海证券交易所", "XSHG"), EnumArea("cn"), EnumRemark("中国A股")]
+        [EnumAttr("上海证券交易所", "XSHG"), EnumArea("CN"), EnumRemark("中国A股")]
         sh = 1,
         /// <summary>深圳证券交易所
         /// </summary>
-        [EnumAttr("深圳证券交易所", "XSHE"), EnumArea("cn"), EnumRemark("中国A股")]
+        [EnumAttr("深圳证券交易所", "XSHE"), EnumArea("CN"), EnumRemark("中国A股")]
         sz = 2
     }
 
@@ -27,22 +27,22 @@ namespace zxcCore.zxcRobot.Quote
     /// </summary>
     public enum typeStock
     {
-        [Description("股票")]
+        [EnumAttr("股票", false), Description("股票")]
         /// <summary>股票
         /// </summary>
-        stock = 0,
-        [Description("指数")]
+        Stock = 0,
+        [EnumAttr("指数", true), Description("指数")]
         /// <summary>指数
         /// </summary>
-        index = 1,
-        [Description("ETF基金")]
+        Index = 1,
+        [EnumAttr("ETF基金", true), Description("ETF基金")]
         /// <summary>ETF基金
         /// </summary>
-        etf = 10,
-        [Description("期权")]
+        ETF = 10,
+        [EnumAttr("期权", false), Description("期权"), EnumRemark("CON_OP")]
         /// <summary>期权
         /// </summary>
-        opt = 20
+        Option = 20
     }
 
 
@@ -108,8 +108,9 @@ namespace zxcCore.zxcRobot.Quote
             string[] strTemps = strLine.Split(",");
             if (strTemps.Length < 5) return null;
 
+            string strStockType = strTemps[4] == "opt" ? "Option" : strTemps[4];
             typeStockExchange pStockExchange = (typeStockExchange)Enum.Parse(typeof(typeStockExchange), strTemps[0]);
-            typeStock pStockType = (typeStock)Enum.Parse(typeof(typeStock), strTemps[4]);
+            typeStock pStockType = (typeStock)Enum.Parse(typeof(typeStock), strStockType, true);
             StockInfo pStockInfo = new StockInfo()
             {
                 StockExchange = pStockExchange,
