@@ -24,6 +24,7 @@ from myGlobal import gol
 stocksInfo = gol._Get_Value('setsStock', None)
 quoteSource = gol._Get_Value('quoteSource')     #实例 行情对象
 setsSpider = gol._Get_Value('setsSpider')       #实例 爬虫设置 
+pSource = gol._Get_Value('quoteSource_API_JqData', None)
 
 
 
@@ -54,7 +55,9 @@ class myAPI_Stock_Query(myWeb.myAPI):
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
         pMsg['result'] = True
         pMsg['datas'] = jsonStocks._dict_
-        return myData_Json.Trans_ToJson_str(pMsg)
+        #return myData_Json.Trans_ToJson_str(pMsg)
+        #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
+        return jsonify(pMsg) 
 
 #API-行情设置
 class myAPI_Quote_Set(myWeb.myAPI): 
@@ -77,7 +80,9 @@ class myAPI_Quote_Set(myWeb.myAPI):
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
         if(bRes):
             pMsg['result'] = True
-        return myData_Json.Trans_ToJson_str(pMsg)
+        #return myData_Json.Trans_ToJson_str(pMsg)
+        #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
+        return jsonify(pMsg) 
 #API-行情设置查询
 class myAPI_Quote_SetQuery(myWeb.myAPI):
     def get(self):
@@ -89,21 +94,54 @@ class myAPI_Quote_SetQuery(myWeb.myAPI):
         if(spiderInfo != None):
             pMsg['result'] = True
             pMsg['datas'] = spiderInfo.ToDict() 
-        return myData_Json.Trans_ToJson_str(pMsg)
+        #return myData_Json.Trans_ToJson_str(pMsg)
+        #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
+        return jsonify(pMsg) 
 
-#API-行情查询
+#API-行情查询(实时、多个)
 class myAPI_Quote_Query(myWeb.myAPI):
     def get(self):
         # queryIDs=sh000001,sh601939
         global quoteSource
         ids = request.args.get('queryIDs', "")
-        lstReturn = quoteSource.query(parms = {'queryIDs' : ids})
+        lstReturn = quoteSource.query(params = {'queryIDs' : ids})
 
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
         if(lstReturn != None and len(lstReturn) > 0):
             datas = []
             for x in lstReturn:
                 datas.append(x.toDict())
+            pMsg['datas'] = datas
+            pMsg['result'] = True
+        #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
+        return jsonify(pMsg) 
+#API-行情查询(历史)
+class myAPI_Quote_QueryHistory(myWeb.myAPI):
+    def get(self):
+        # dataFrequency=1d&stockBars=1&stockTag="10003418.XSHG"
+        # {'dataFrequency': "1d", 'datetimeStart': "2021-06-23 09:00:00", 'stockTag': "10003418.XSHG"}
+        global quoteSource
+        stockTag = request.args.get('queryID', "")
+        dataFrequency = request.args.get('dataFrequency', "1d")
+        params = {'dataFrequency': dataFrequency, 'stockTag': "10003418.XSHG"}
+        
+        stockBars = myData_Trans.To_Int(request.args.get('stockBars', 0))
+        if(stockBars > 0):
+            params["stockBars"] = stockBars
+
+        timeEnd = request.args.get('datetimeEnd', "")
+        timeStart = request.args.get('datetimeStart', "")
+        if(timeEnd != ""): params["datetimeEnd"] = timeEnd
+        if(timeStart != ""): params["datetimeStart"] = timeStart
+            
+        #调用
+        lstReturn = quoteSource.queryHistory(checkTime = False, params = params)
+
+        pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
+        if(lstReturn != None and len(lstReturn) > 0):
+            datas = []
+            for x in lstReturn:
+                datas.append(x.toDict_Simple())
             pMsg['datas'] = datas
             pMsg['result'] = True
         #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
@@ -118,6 +156,7 @@ def add_APIs(pWeb):
     
     pWeb.add_API(myAPI_Stock_Query, '/zxcAPI/robot/stock/Query')
     pWeb.add_API(myAPI_Quote_Query, '/zxcAPI/robot/quote/Query')
+    pWeb.add_API(myAPI_Quote_QueryHistory, '/zxcAPI/robot/quote/QueryHistory')
 
     # 启动行情监测线程
     mySource_Control.initSource()

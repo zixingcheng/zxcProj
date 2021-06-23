@@ -16,7 +16,7 @@ mySystem.m_strFloders.append('/zxcPy.Quotation/Quote_Data')
 mySystem.m_strFloders.append('/zxcPy.Quotation/Quote_Listener')
 mySystem.Append_Us("", False)    
 import myIO, myData_Trans, myData_Json, myDebug
-import mySpider_Setting, myQuote_Data, myData_Stock, myQuote_Listener, myQuote_Source  
+import mySpider_Setting, myQuote, myQuote_Data, myData_Stock, myQuote_Listener, myQuote_Source  
 import mySource_Sina_Stock, mySource_JQData_Stock
 
 
@@ -24,12 +24,14 @@ import mySource_Sina_Stock, mySource_JQData_Stock
 #行情源--控制
 class Source_Control(myQuote_Source.Quote_Source):
     def __init__(self, params = ""):
-        myQuote_Source.Quote_Source.__init__(self, params, 'Control')                   #设置类型
+        myQuote_Source.Quote_Source.__init__(self, params, 'Control')                 #设置类型
 
         #初始行情源对象(多源)
         self.srcQuotes = {}
+        self.setsStock = gol._Get_Value('setsStock', myQuote.myStocks())              #标的信息
         self.srcQuotes['SinaAPI'] = gol._Get_Value('quoteSource_Sina', None)          #新浪源
         self.srcQuotes['JqDataAPI'] = gol._Get_Value('quoteSource_JqData', None)      #聚宽源
+
     def _Stoped(self):
         return False 
         
@@ -38,18 +40,28 @@ class Source_Control(myQuote_Source.Quote_Source):
         for x in self.srcQuotes.keys():
             self.srcQuotes[x].addListener(listener)
 
+
     #查询行情
-    def query(self, checkTime = True, nReturn = 0, parms = None): 
-        if(parms == None):
-            return self.srcQuotes['SinaAPI'].query(checkTime, nReturn)
-            #self.pQuotes['JqDataAPI'].query(checkTime, nReturn)
-        else:
-            typeAPI = parms.get('typeAPI', '')
-            if(typeAPI == ""): typeAPI = "SinaAPI"
-            api = self.srcQuotes.get(typeAPI, None)
-            if(api != None):
-                return api.query(checkTime, nReturn, parms)
+    def query(self, checkTime = True, nReturn = 0, params = None): 
+        apiQuote = self.getQuoteAPI(params)
+        if(apiQuote != None):
+            return apiQuote.query(checkTime, nReturn, params)
         return []
+    #查询行情-历史
+    def queryHistory(self, checkTime = True, nReturn = 0, params = None): 
+        apiQuote = self.srcQuotes['JqDataAPI']
+        if(apiQuote != None):
+            return apiQuote.query(checkTime, nReturn, params)
+        return []
+    
+    #提取行情API对象
+    def getQuoteAPI(self,parms = None): 
+        typeAPI = "SinaAPI"
+        if(parms != None and parms.get('typeAPI', '') != ""):
+            typeAPI = parms.get('typeAPI', 'SinaAPI')
+        return self.srcQuotes.get(typeAPI, self.srcQuotes['SinaAPI'])
+     
+
     
 #行情监听线程
 class Quote_Thread(threading.Thread):
@@ -94,7 +106,7 @@ class Quote_Thread(threading.Thread):
             try:
                 #发生错误时继续
                 parms = self.getParams();
-                lstReturn = self.source.query(parms = parms) 
+                lstReturn = self.source.query(params = parms) 
                 self.output(lstReturn)
                 time.sleep(self.interval)   
 
@@ -171,7 +183,9 @@ if __name__ == "__main__":
     
     # 单独查询，不纪录
     qd = pSource.query(False, 1, {"typeAPI" : "", "queryIDs" : "sh510050"}) 
-    
+    qd = pSource.queryHistory(False, 1, {'dataFrequency': "1d", 'stockBars': 1, 'stockTag': "10003418.XSHG"})
+    qd = pSource.queryHistory(False, 1, {'dataFrequency': "1d", 'datetimeStart': "2021-06-23 09:00:00", 'stockTag': "10003418.XSHG"}) 
+
     #线程执行   
     quoteStart()
 

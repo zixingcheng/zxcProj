@@ -40,6 +40,7 @@ namespace zxcCore.zxcRobot.Test
             //var aa = zxcEnumHelper.GetAttr<EnumAttr>(aaa).AttrName;
 
             //typeStockExchange.sh.GetEnumDescription()
+            
 
             StockInfo pStockInfo = QuoteManager._Quotes._stocksZxc.Find(e => e.StockName == "同花顺");
 

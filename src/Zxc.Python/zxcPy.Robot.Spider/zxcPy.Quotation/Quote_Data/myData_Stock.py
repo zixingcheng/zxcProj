@@ -167,6 +167,23 @@ class Data_Stock(myQuote_Data.Quote_Data):
         dictValue["sell5Price"] = myData_Trans.To_Float(str(self.sell5Price))
         dictValue["datetime"] =  self.date + " " + self.time
         return dictValue
+    #转为Dict
+    def toDict_Simple(self):
+        dictValue = {}
+        dictValue["idTag"] = myData.iif(self.idTag == "", self.id, self.idTag)
+        dictValue["id"] = self.id
+        dictValue["name"] = self.name
+        dictValue["openPrice"] = myData_Trans.To_Float(str(self.openPrice))
+        dictValue["preClose"] = myData_Trans.To_Float(str(self.preClose))
+        dictValue["lastPrice"] = myData_Trans.To_Float(str(self.lastPrice))
+        dictValue["highPrice"] = myData_Trans.To_Float(str(self.highPrice))
+        dictValue["lowPrice"] = myData_Trans.To_Float(str(self.lowPrice))
+        dictValue["buyPrice"] = myData_Trans.To_Float(str(self.buyPrice))
+        dictValue["sellPrice"] = myData_Trans.To_Float(str(self.sellPrice))
+        dictValue["tradeValume"] = myData_Trans.To_Int(str(self.tradeValume))
+        dictValue["tradeTurnover"] = myData_Trans.To_Float(str(self.tradeTurnover))
+        dictValue["datetime"] =  self.date + " " + self.time
+        return dictValue
     #转为JsonStr
     def toJsonstr(self):
         return myData_Json.Trans_ToJson_str(self.toDict())

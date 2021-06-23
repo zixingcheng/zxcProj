@@ -6,7 +6,7 @@ Created on  张斌 2019-08-28 14:58:00
 
     行情爬取--源基类-聚宽 API
 """
-import sys, os, mySystem 
+import sys, os, datetime, time, mySystem 
 import jqdatasdk
 jqdatasdk.auth('18002273029','zxcvbnm.123')     # 账户登陆
 
@@ -157,24 +157,31 @@ if __name__ == "__main__":
     print(pSource.getSecurities('index'))
 
     values = pSource.getPrice(security="600332.XSHG",frequency='1m',start_date='2020-02-05 09:00:00',end_date='2020-02-05 15:00:00')
-    lstPrices = []; strList = ""
+    lstPrices = []; strList = "" 
     for x in range(1,len(values)):
+        lstPrices.append('2020-02-05 09:32:00')
         lstPrices.append(values['open'][x])
+        lstPrices.append(values['close'][x])
+        lstPrices.append(values['high'][x])
+        lstPrices.append(values['low'][x])
+        lstPrices.append(values['volume'][x])
+        lstPrices.append(values['money'][x])
     print(str(lstPrices))
 
     # 提取50期权信息
     print("当天3000的期权信息：")
-    opt = pSource.getOptInfo(2900, "", 1)
+    opt = pSource.getOptInfo(3500, "", 1)
     print(opt)
     
-    print(pSource.getPrice(security=opt['code'],frequency='1m',start_date='2020-04-28 09:00:00',end_date='2020-04-28 15:00:00'))
+    print(pSource.getPrice(security=opt['code'],frequency='1m',start_date='2021-06-23 09:00:00',end_date='2021-06-23 15:00:00'))
+    print(pSource.getPrice_bars(security=opt['code'],count=100,unit='1m',end_date='2021-06-23 15:00:00'))
 
-    print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2020-04-28 15:00:00',include_now=False))
-    print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2020-04-28 15:00:00',include_now=True))
+    print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2021-06-23 15:00:00',include_now=False))
+    print(pSource.getPrice_bars(security=opt['code'],count=1,unit='1d',end_date='2021-06-23 15:00:00',include_now=True))
 
-    print(pSource.getPrice_avg(security='ddd',unit='1d',end_date='2020-04-28 15:00:00',include_now=True))
-    print(pSource.getPrice_avg(security=opt['code'],unit='1d',end_date='2020-04-28 15:00:00',include_now=True))
-    print(pSource.getPrice_avg_day(security=opt['code'],N=5,end_date='2020-04-28 15:00:00',include_now=True))
+    print(pSource.getPrice_avg(security='ddd',unit='1d',end_date='2021-06-23 15:00:00',include_now=True))
+    print(pSource.getPrice_avg(security=opt['code'],unit='1d',end_date='2021-06-23 15:00:00',include_now=True))
+    print(pSource.getPrice_avg_day(security=opt['code'],N=5,end_date='2021-06-23 15:00:00',include_now=True))
     
     
     print()

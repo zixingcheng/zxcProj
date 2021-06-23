@@ -16,6 +16,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 
         protected internal DataStatistics _dataStics = null;        //实时数据统计对象
 
+        protected internal double _value_last = 0;                  //涨跌幅-最后价格
         protected internal double _valueRF_last = 0;                //涨跌幅-最后
         protected internal double _valueRF_step = 0.005;            //涨跌幅监测间隔
         protected internal double _valueRF_step_last = 0;           //涨跌幅间隔-最后
@@ -55,6 +56,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 
                 //组装消息
                 msg += this.getMsg_Suffix();
+                _value_last = _data.Value;
             }
             else
             {
@@ -67,6 +69,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 //组装消息
                 msg += this.getMsg_Infix();
                 msg += this.getMsg_Suffix();
+                _value_last = _data.Value;
             }
 
             //ConsoleHelper.Debug("dataSticsInfo: 最大：{0},最小：{1}，前值：{2}", _dataStics.Max, _dataStics.Min, _dataStics.Value_last);
@@ -102,7 +105,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         {
             string tag0 = _dataStics.Value_delta > 0 ? "涨超" : "跌逾";
             int timeInterval = (int)Math.Ceiling(_dataStics.Duration_M);
-            return string.Format("\n{0}：{1}分钟{2} {3}%. 前值：{4}({5})%", _tagAlias, timeInterval, tag0, Math.Round(_dataStics.Value_delta * 100, 1), Math.Round(_dataStics.Value_last * 100, 2), this.getValue_str(_dataStics.Value_Original_last));
+            return string.Format("\n{0}：{1}分钟{2} {3}%. 前值：{4}%({5})", _tagAlias, timeInterval, tag0, Math.Round(_dataStics.Value_delta * 100, 1), Math.Round(_dataStics.Value_last * 100, 2), this.getValue_str(_value_last));
         }
 
     }

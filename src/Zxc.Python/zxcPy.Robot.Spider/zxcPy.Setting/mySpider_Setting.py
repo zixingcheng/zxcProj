@@ -23,27 +23,48 @@ spideTypes = {'webPage': "静态页面", 'quote': "股票行情"}
 class myTimeSets():
     class myTimeSet():
         def __init__(self, strSet, typeTime): 
+            self.setTimes = []
+            self.maxTime = 0
+            self.minTime = 0
             self.allVlid = False
-            self.InitBystr(strSet, typeTime)
+            self.InitBystr(strSet.replace(';', ','), typeTime)
         def InitBystr(self, strSet, typeTime): 
             self.values = []
             self.typeTime = typeTime
             if(strSet == "*"): 
                 self.allVlid = True
                 return 
+
+            #多个配置
             if(strSet.count(",") > 0): 
                 values = strSet.split(',')
                 for x in values:
-                    self.values.append(myData_Trans.To_Int(x))
+                    pSet = myTimeSets.myTimeSet(x, typeTime)
+                    self.setTimes.append(pSet)
+                    #self.values.append(myData_Trans.To_Int(x))
                 return
+
+            #区间配置
             if(strSet.count("-") > 0): 
                 temps = strSet.split('-')
-                self.values = range(myData_Trans.To_Int(temps[0]), myData_Trans.To_Int(temps[1]))
+                self.minTime = myData_Trans.To_Float(temps[0])
+                self.maxTime = myData_Trans.To_Float(temps[1])
+                #self.values = range(myData_Trans.To_Int(temps[0]), myData_Trans.To_Int(temps[1]))
                 return
-            self.values.append(myData_Trans.To_Int(strSet))
+            else:
+                if(strSet.count(".") > 0): 
+                    self.values.append(myData_Trans.To_Float(strSet))
+                else:
+                    self.values.append(myData_Trans.To_Int(strSet))
         #是否有效
         def IsValid(self, value):  
             if(self.allVlid): return True
+            if(self.maxTime > 0 and self.minTime > 0):
+                return self.minTime <= value and self.maxTime > value
+            if(len(self.setTimes) > 0): 
+                for x in self.setTimes:
+                    if(x.IsValid(value)):
+                        return True
             return value in self.values
     def __init__(self, tagSet, timeSets): 
         self.tagName = tagSet
@@ -61,7 +82,7 @@ class myTimeSets():
         if(dtTime == None):
             dtTime = datetime.datetime.now()
         weekday = myData_Trans.To_Int(dtTime.strftime("%w"))
-        return self.M.IsValid(dtTime.minute) and self.H.IsValid(dtTime.hour) and self.D.IsValid(dtTime.day) and self.m.IsValid(dtTime.month) and self.d.IsValid(weekday)
+        return self.M.IsValid(dtTime.minute) and (self.H.IsValid(dtTime.hour) or self.H.IsValid(dtTime.hour + dtTime.minute/60)) and self.D.IsValid(dtTime.day) and self.m.IsValid(dtTime.month) and self.d.IsValid(weekday)
 
 #爬虫--设置对象
 class mySpider_Setting():
@@ -88,9 +109,9 @@ class mySpider_Setting():
             self.spiderName = strSets[0]
             self.spiderTag = strSets[1]
             self.spiderUrl = strSets[2]
-            self.spiderRule = strSets[3].replace('，', ',')
+            self.spiderRule = strSets[3].replace(';', ',')
             self.isValid = myData_Trans.To_Bool(strSets[4]) 
-            self.timeSet = strSets[5]          #时间规则
+            self.timeSet = strSets[5].replace(';', ',')          #时间规则
             self.mark = strSets[6]
             self.InitRule()
         return True
@@ -106,9 +127,9 @@ class mySpider_Setting():
         pValues.append(self.spiderName)
         pValues.append(self.spiderTag)
         pValues.append(self.spiderUrl)
-        pValues.append(self.spiderRule)
+        pValues.append(self.spiderRule.replace(',', ';'))
         pValues.append(self.isValid)
-        pValues.append(self.timeSet)
+        pValues.append(self.timeSet.replace(',', ';'))
         pValues.append(self.mark)
         return pValues
     #转换信息字典
@@ -275,8 +296,8 @@ def _Find(setName, bCreatAuto = False):
 
 #主启动程序
 if __name__ == "__main__":
-    timeRule =  myTimeSets("", "00 15 * * 1,3,5")
-    timeRule.IsValid();
+    timeRule = myTimeSets("", "* 9.5-11.5;13-15 * * 1,3,5")
+    print(timeRule.IsValid());
 
     pSets = gol._Get_Value('setsSpider')
     

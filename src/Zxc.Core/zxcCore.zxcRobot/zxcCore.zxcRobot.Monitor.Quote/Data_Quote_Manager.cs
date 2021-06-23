@@ -179,5 +179,6 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         {
             return pData._exType + "_" + pData.StockID_Tag;
         }
+
     }
 }
