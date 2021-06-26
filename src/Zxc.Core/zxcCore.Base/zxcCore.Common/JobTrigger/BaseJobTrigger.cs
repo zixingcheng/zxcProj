@@ -75,6 +75,7 @@ namespace zxcCore.Common.JobTrigger
             }
             catch (Exception e)
             {
+                zxcConsoleHelper.Debug(true, "错误信息：{0}", e.ToString());
                 //LogUtil.Error($"启动定时任务({nameof(GetType)})时出错，信息：{e}");
             }
             return Task.CompletedTask;
@@ -93,6 +94,7 @@ namespace zxcCore.Common.JobTrigger
             }
             catch (Exception e)
             {
+                zxcConsoleHelper.Debug(true, "错误信息：{0}", e.ToString());
                 //LogUtil.Error($"停止定时任务({nameof(GetType)})时出错，信息：{e}");
             }
             return Task.CompletedTask;

@@ -7,19 +7,6 @@ namespace zpCore.zpDataCache.Memory
     /// </summary>
     public interface IData_Factors : IData_Factor
     {
-        /// <summary>唯一编码-自定义，便于快速遍历
-        /// </summary>
-        string ID { get; set; }
-        /// <summary>因子编码
-        /// </summary>
-        string Code { get; set; }
-        /// <summary>因子名称-非必须
-        /// </summary>
-        string Name { get; set; }
-        /// <summary>因子标准-非必须
-        /// </summary>
-        string Standard { get; set; }
-
         /// <summary>因子集
         /// </summary>
         Dictionary<string, IData_Factor> Factors { get; set; }

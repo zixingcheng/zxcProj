@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using zxcCore.Common;
 using zxcCore.zxcRobot.Monitor;
 using zxcCore.zxcRobot.Msger;
-using zxcCore.zxcRobot.Quote;
+using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.zxcRobot.Robot.Power;
 using zxcCore.zxcRobot.User;
 

@@ -16,6 +16,11 @@ namespace zxcCore.Common
         public static bool ps_CanDebug = true;
 
         //打印信息输出
+        public static void Print(string format, params object[] arg)
+        {
+            Print(false, format, arg);
+        }
+        //打印信息输出
         public static void Print(bool printTime, string format, params object[] arg)
         {
             if (printTime)
@@ -23,6 +28,11 @@ namespace zxcCore.Common
             Console.WriteLine(" * " + format, arg);
         }
 
+        //调试信息输出
+        public static void Debug(string format, params object[] arg)
+        {
+            Debug(false, format, arg);
+        }
         //调试信息输出
         public static void Debug(bool printTime, string format, params object[] arg)
         {
@@ -32,6 +42,11 @@ namespace zxcCore.Common
         }
 
 
+        //错误信息输出
+        public static void Error(string format, params object[] arg)
+        {
+            Error(false, format, arg);
+        }
         //错误信息输出
         public static void Error(bool printTime, string format, params object[] arg)
         {

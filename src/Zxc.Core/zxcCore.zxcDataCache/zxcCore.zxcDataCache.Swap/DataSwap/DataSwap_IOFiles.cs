@@ -35,7 +35,7 @@ namespace zxcCore.zxcDataCache.Swap
 
         public override List<dynamic> SwapData_In(int nStepSwaps, out AckInfo ackInfo)
         {
-            int result = 0, nums = 0;
+            int nums = 0;
             ackInfo = null;
             List<string> errs = new List<string>();
             List<dynamic> lstDatas = new List<dynamic>();

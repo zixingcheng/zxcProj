@@ -356,17 +356,17 @@ namespace zxcCore.zxcRobot.Robot
                 {
                     if (bRegistOut == false)
                     {
-                        strReturn += "已注册" + this._Title_User_Opened() + "  -- " + _Cmds[0].CmdTime.ToString() + ".";
+                        strReturn += "已注册." + this._Title_User_Opened() + "  -- " + _Cmds[0].CmdTime.ToString() + ".";
                     }
                     else
                     {
-                        strReturn += "已注销" + this._Title_User_Opened() + "  -- " + _Cmds[_Cmds.Count - 1].CmdTime.ToString() + ".";
+                        strReturn += "已注销." + this._Title_User_Opened() + "  -- " + _Cmds[_Cmds.Count - 1].CmdTime.ToString() + ".";
                     }
                 }
                 else
                 {
                     this._Permission.IsRunning = false;      //标识运行结束
-                    strReturn += "已关闭" + this._Title_User_Opened() + "  -- " + _Cmds[0].CmdTime.ToString() + ".";
+                    strReturn += "已关闭." + this._Title_User_Opened() + "  -- " + _Cmds[0].CmdTime.ToString() + ".";
                 }
             }
             else
@@ -374,7 +374,7 @@ namespace zxcCore.zxcRobot.Robot
                 this.Init_Setting("");                       //初始基础信息
                 this._Permission.IsRunning = true;           //标识运行
                 this._Permission.TimeStartRun = DateTime.Now;
-                strReturn += "已注册" + this._Title_User_Opened() + "  -- " + _Cmds[_Cmds.Count - 1].CmdTime.ToString() + ".";
+                strReturn += "已注册." + this._Title_User_Opened() + "  -- " + _Cmds[_Cmds.Count - 1].CmdTime.ToString() + ".";
             }
 
             zxcConsoleHelper.Print(false, strTitle);
