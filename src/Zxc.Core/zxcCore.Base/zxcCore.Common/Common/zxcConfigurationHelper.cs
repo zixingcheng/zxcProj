@@ -9,7 +9,7 @@ namespace zxcCore.Common
 {
     public static class zxcConfigHelper
     {
-        private static zxcConfigurationHelper ConfigurationHelper = null;
+        public readonly static zxcConfigurationHelper ConfigurationHelper = null;
         static zxcConfigHelper()
         {
             ConfigurationHelper = new zxcConfigurationHelper();

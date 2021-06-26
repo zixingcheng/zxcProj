@@ -3,7 +3,7 @@
 // Copyright @ 2021 广州易简生活科技有限公司.  版权所有.
 //===============================================================================
 // 文件名称： 
-// 功能描述：zxcRobot --行情数据类
+// 功能描述：Quote_Datas --行情数据库类
 // 创建标识：zxc   2021-06-20
 // 修改标识： 
 // 修改描述：
@@ -21,9 +21,9 @@ namespace zxcCore.zxcRobot.Quote.Data
 {
     /// <summary>用户管理类
     /// </summary>
-    public class QuoteManager : Data_DB
+    public class Quote_Datas : Data_DB
     {
-        public static readonly QuoteManager _Quotes = new QuoteManager("");
+        public static readonly Quote_Datas _Datas = new Quote_Datas("");
 
         #region 属性及构造
 
@@ -36,7 +36,7 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// 
         public DataTable_Quotes<Data_Quote> _quoteZxc { get; set; }
 
-        protected internal QuoteManager(string dirBase) : base(dirBase, typePermission_DB.Normal, true, "/Datas/DB_Quote")
+        protected internal Quote_Datas(string dirBase) : base(dirBase, typePermission_DB.Normal, true, "/Datas/DB_Quote")
         {
             this.InitStock_system();
         }
@@ -97,7 +97,7 @@ namespace zxcCore.zxcRobot.Quote.Data
             string stockTag = stockID;
             if (!string.IsNullOrEmpty(stockTag))
             {
-                StockInfo pStockInfo = QuoteManager._Quotes._stocksZxc.Find(e => e.StockName == stockTag || e.StockID == stockTag);
+                StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == stockTag || e.StockID == stockTag);
                 if (pStockInfo != null)
                     return pStockInfo;
             }
@@ -105,7 +105,7 @@ namespace zxcCore.zxcRobot.Quote.Data
             stockTag = stockName;
             if (!string.IsNullOrEmpty(stockTag))
             {
-                StockInfo pStockInfo = QuoteManager._Quotes._stocksZxc.Find(e => e.StockName == stockTag || e.StockID == stockTag);
+                StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == stockTag || e.StockID == stockTag);
                 if (pStockInfo != null)
                     return pStockInfo;
             }

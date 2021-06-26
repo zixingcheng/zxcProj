@@ -33,17 +33,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcRobot.Monitor.Qu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataQoute", "DataQoute", "{E50D1C5B-CF7E-41EC-BFCF-A4ED50AAE779}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zxcCore.zxcRobot.Quote.DataAnalysis", "zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.DataAnalysis\zxcCore.zxcRobot.Quote.DataAnalysis.csproj", "{9965EE71-92A6-4EDC-A3CB-793F2685A825}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcRobot.Quote.DataAnalysis", "zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.DataAnalysis\zxcCore.zxcRobot.Quote.DataAnalysis.csproj", "{9965EE71-92A6-4EDC-A3CB-793F2685A825}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zxcCore.zxcRobot.Quote.Quantify", "zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.Quantify\zxcCore.zxcRobot.Quote.Quantify.csproj", "{FF5246B9-265B-4CB1-A4A2-16F39E51EE9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcRobot.Quote.Quantify", "zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.Quantify\zxcCore.zxcRobot.Quote.Quantify.csproj", "{FF5246B9-265B-4CB1-A4A2-16F39E51EE9C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAnalysis", "DataAnalysis", "{1AAFDD0C-9463-4EEF-BF2F-78AB8EB74F52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zxcCore.zxcData.DataAnalysis", "..\zxcCore.zxcData\zxcCore.zxcData.DataAnalysis\zxcCore.zxcData.DataAnalysis.csproj", "{822A56B4-E281-43CF-B913-68275733B44B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zxcCore.zxcRobot.Quote", "zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.csproj", "{9149B6A0-28FA-477E-81C0-9BB097A8891D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcData.DataAnalysis", "..\zxcCore.zxcData\zxcCore.zxcData.DataAnalysis\zxcCore.zxcData.DataAnalysis.csproj", "{822A56B4-E281-43CF-B913-68275733B44B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcRobot.Quote.Data", "zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.Data\zxcCore.zxcRobot.Quote.Data.csproj", "{64604A3D-DE93-40D9-AB80-2F41EE26E809}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zxcCore.zxcRobot.Quote", "zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.csproj", "{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -165,14 +165,6 @@ Global
 		{822A56B4-E281-43CF-B913-68275733B44B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{822A56B4-E281-43CF-B913-68275733B44B}.Release|x64.ActiveCfg = Release|Any CPU
 		{822A56B4-E281-43CF-B913-68275733B44B}.Release|x64.Build.0 = Release|Any CPU
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D}.Debug|x64.Build.0 = Debug|Any CPU
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D}.Release|x64.ActiveCfg = Release|Any CPU
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D}.Release|x64.Build.0 = Release|Any CPU
 		{64604A3D-DE93-40D9-AB80-2F41EE26E809}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{64604A3D-DE93-40D9-AB80-2F41EE26E809}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64604A3D-DE93-40D9-AB80-2F41EE26E809}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -181,6 +173,14 @@ Global
 		{64604A3D-DE93-40D9-AB80-2F41EE26E809}.Release|Any CPU.Build.0 = Release|Any CPU
 		{64604A3D-DE93-40D9-AB80-2F41EE26E809}.Release|x64.ActiveCfg = Release|Any CPU
 		{64604A3D-DE93-40D9-AB80-2F41EE26E809}.Release|x64.Build.0 = Release|Any CPU
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}.Debug|x64.Build.0 = Debug|Any CPU
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}.Release|x64.ActiveCfg = Release|Any CPU
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -197,8 +197,8 @@ Global
 		{9965EE71-92A6-4EDC-A3CB-793F2685A825} = {E50D1C5B-CF7E-41EC-BFCF-A4ED50AAE779}
 		{FF5246B9-265B-4CB1-A4A2-16F39E51EE9C} = {E50D1C5B-CF7E-41EC-BFCF-A4ED50AAE779}
 		{822A56B4-E281-43CF-B913-68275733B44B} = {1AAFDD0C-9463-4EEF-BF2F-78AB8EB74F52}
-		{9149B6A0-28FA-477E-81C0-9BB097A8891D} = {E50D1C5B-CF7E-41EC-BFCF-A4ED50AAE779}
 		{64604A3D-DE93-40D9-AB80-2F41EE26E809} = {E50D1C5B-CF7E-41EC-BFCF-A4ED50AAE779}
+		{A7B8DB98-FA0A-4F17-AC8D-F99A558F13C8} = {E50D1C5B-CF7E-41EC-BFCF-A4ED50AAE779}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6AF3A8F3-C496-48E8-ACA3-963F42506F2A}

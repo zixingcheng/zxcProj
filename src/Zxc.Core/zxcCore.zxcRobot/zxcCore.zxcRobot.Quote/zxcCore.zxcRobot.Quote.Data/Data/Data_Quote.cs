@@ -215,7 +215,7 @@ namespace zxcCore.zxcRobot.Quote.Data
         }
         protected internal virtual bool Check_StockInfo()
         {
-            StockInfo pStockInfo = QuoteManager._Quotes._stocksZxc.Find(e => e.StockName == StockName || e.StockID == StockID);
+            StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == StockName || e.StockID == StockID);
             if (pStockInfo == null)
                 return false;
 

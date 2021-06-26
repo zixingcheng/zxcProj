@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -11,7 +11,7 @@
     <ProjectReference Include="..\zxcCore.zxcRobot.Monitor\zxcCore.zxcRobot.Monitor.Msg\zxcCore.zxcRobot.Monitor.Msg.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Monitor\zxcCore.zxcRobot.Monitor.Quote\zxcCore.zxcRobot.Monitor.Quote.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Msger\zxcCore.zxcRobot.Msger.csproj" />
-    <ProjectReference Include="..\zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.Data\zxcCore.zxcRobot.Quote.Data.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.User\zxcCore.zxcRobot.User.csproj" />
   </ItemGroup>
 

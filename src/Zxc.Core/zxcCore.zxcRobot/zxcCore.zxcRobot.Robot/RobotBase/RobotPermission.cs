@@ -363,7 +363,7 @@ namespace zxcCore.zxcRobot.Robot
             if (string.IsNullOrEmpty(usrID) || usrPlat == "None")
                 return false;
 
-            User_zxc usr = UserManager._Users.GetUser(usrID, usrID, usrPlat);
+            User_zxc usr = User_Manager._Users.GetUser(usrID, usrID, usrPlat);
             if (usr != null)
             {
                 if (IsShieldSys && usr.usrType == typeUser.sysadmin)

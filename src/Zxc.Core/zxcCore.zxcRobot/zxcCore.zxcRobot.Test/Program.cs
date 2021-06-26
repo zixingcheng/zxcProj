@@ -42,7 +42,7 @@ namespace zxcCore.zxcRobot.Test
             //typeStockExchange.sh.GetEnumDescription()
             
 
-            StockInfo pStockInfo = QuoteManager._Quotes._stocksZxc.Find(e => e.StockName == "同花顺");
+            StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == "同花顺");
 
             //机器人测试
             MsgerHelper.Msger.MsgCached += new MsgCached_EventHandler(Program.MsgCached_EventHandler);
@@ -159,7 +159,7 @@ namespace zxcCore.zxcRobot.Test
 
             Func<IEnumerable<User_zxc>, IEnumerable<User_zxc>> expr1 =
                    l => l.Where(n => n.usrName == "admin");
-            User_zxc usr = UserManager._Users.GetUser(expr1);
+            User_zxc usr = User_Manager._Users.GetUser(expr1);
 
 
             //初始数据分析对象

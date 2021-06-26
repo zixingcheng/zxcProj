@@ -8,12 +8,10 @@
 // 修改标识： 
 // 修改描述：
 //===============================================================================
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using zxcCore.Common;
-using zxcCore.zxcRobot.Monitor;
 using zxcCore.zxcRobot.Msger;
+using zxcCore.zxcRobot.Quote;
 using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.zxcRobot.Robot.Power;
 using zxcCore.zxcRobot.User;
@@ -65,9 +63,6 @@ namespace zxcCore.zxcRobot.Robot
     {
         #region 属性及构造
 
-        protected internal string _urlAPI_QuoteQuery = "";          //行情实时查询接口
-        protected internal string _urlAPI_QuoteQueryHistory = "";   //行情实时历史查询接口
-
         public zxcRobot_Quote_quantify(IUser User, string setting) : base(User, "zxcRobot_Quote", "quantify", setting)
         {
             _Title = "行情量化";
@@ -86,10 +81,6 @@ namespace zxcCore.zxcRobot.Robot
             {
                 this.Done_Regist(User, new Msg(_CmdStr), true);
             }
-
-            //提取行情API配置
-            _urlAPI_QuoteQuery = _configDataCache.config["ZxcRobot.Quote:QuoteAPI:QueryAPI_Url"] + "";
-            _urlAPI_QuoteQueryHistory = _configDataCache.config["ZxcRobot.Quote:QuoteAPI:QueryHistoryAPI_Url"] + "";
         }
         ~zxcRobot_Quote_quantify()
         {
@@ -141,49 +132,24 @@ namespace zxcCore.zxcRobot.Robot
             if (!this._Check_Permission_usr(pPermission, msg, pPowerRobot))
                 return false;
 
-            //查询标的 
-            string[] stockNames = ((CmdInfos_QuoteQuantify)pRobotCmd.CmdInfos).StockName.Split(".");
-            StockInfo pStockInfo = QuoteManager.Get_StockInfo(stockNames[0], stockNames.Length > 1 ? stockNames[1] : "");
-            if (pStockInfo == null)
+
+            //提取行情API配置
+            string stockName = ((CmdInfos_QuoteQuantify)pRobotCmd.CmdInfos).StockName;
+            List<Data_Quote> lstDataQuote = Quote_Manager._Quotes.Query.QuoteReal(stockName);
+            if (lstDataQuote == null)
+            {
+                this.NotifyMsg(string.Format("行情(stockName)查询识别！", stockName), msg, "行情信息");
                 return false;
-
-            //调用接口
-            string statusCode;
-            string result = zxcNetHelper.Get_ByHttpClient(_urlAPI_QuoteQuery, pStockInfo.StockID_TagSina, out statusCode);
-
-            //返回解析
-            JObject jsonRes = JObject.Parse(result);
-            if (jsonRes["result"].ToString() == "False")
-            {
-                //接口失败，调用历史接口查询
-                string param = pStockInfo.StockID_TagJQ + "&dataFrequency=1d&stockBars=1";
-                result = zxcNetHelper.Get_ByHttpClient(_urlAPI_QuoteQueryHistory, param, out statusCode);
-
-                //再次解析
-                jsonRes = JObject.Parse(result);
-                if (jsonRes["result"].ToString() == "false")
-                    return false;
             }
 
-            //循环解析文件json数据
-            List<Data_Quote_Swap> lstDataQuote = new List<Data_Quote_Swap>();
-            JArray jsonDatas = (JArray)jsonRes["datas"];
-            if (jsonDatas != null)
+            //循环生成数据对象
+            foreach (var pQuote in lstDataQuote)
             {
-                //循环生成数据对象
-                foreach (var jsonData in jsonDatas)
-                {
-                    Data_Quote_Swap pDataQuote = new Data_Quote_Swap();
-                    if (pDataQuote.FromJson(jsonData))
-                        lstDataQuote.Add(pDataQuote);
-
-                    string strMsg = pDataQuote.GetMsg_Perfix();
-                    zxcConsoleHelper.Debug(true, "行情信息：\n{0}", strMsg);
-                    this.NotifyMsg(strMsg, msg, "行情信息");
-                }
+                string strMsg = pQuote.GetMsg_Perfix();
+                zxcConsoleHelper.Debug(true, "行情信息：\n{0}", strMsg);
+                this.NotifyMsg(strMsg, msg, "行情信息");
             }
-
-            return false;
+            return true;
         }
 
     }
