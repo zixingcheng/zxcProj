@@ -66,6 +66,7 @@ namespace zxcCore.zxcRobot.Robot
         #region 属性及构造
 
         protected internal string _urlAPI_QuoteQuery = "";          //行情实时查询接口
+        protected internal string _urlAPI_QuoteQueryHistory = "";   //行情实时历史查询接口
 
         public zxcRobot_Quote_quantify(IUser User, string setting) : base(User, "zxcRobot_Quote", "quantify", setting)
         {
@@ -88,6 +89,7 @@ namespace zxcCore.zxcRobot.Robot
 
             //提取行情API配置
             _urlAPI_QuoteQuery = _configDataCache.config["ZxcRobot.Quote:QuoteAPI:QueryAPI_Url"] + "";
+            _urlAPI_QuoteQueryHistory = _configDataCache.config["ZxcRobot.Quote:QuoteAPI:QueryHistoryAPI_Url"] + "";
         }
         ~zxcRobot_Quote_quantify()
         {
@@ -139,17 +141,32 @@ namespace zxcCore.zxcRobot.Robot
             if (!this._Check_Permission_usr(pPermission, msg, pPowerRobot))
                 return false;
 
-            //查询操作 
-            string stockName = ((CmdInfos_QuoteQuantify)pRobotCmd.CmdInfos).StockName;
-            StockInfo pStockInfo = QuoteManager.Get_StockInfo(stockName, "");
+            //查询标的 
+            string[] stockNames = ((CmdInfos_QuoteQuantify)pRobotCmd.CmdInfos).StockName.Split(".");
+            StockInfo pStockInfo = QuoteManager.Get_StockInfo(stockNames[0], stockNames.Length > 1 ? stockNames[1] : "");
+            if (pStockInfo == null)
+                return false;
 
+            //调用接口
             string statusCode;
             string result = zxcNetHelper.Get_ByHttpClient(_urlAPI_QuoteQuery, pStockInfo.StockID_TagSina, out statusCode);
 
+            //返回解析
+            JObject jsonRes = JObject.Parse(result);
+            if (jsonRes["result"].ToString() == "False")
+            {
+                //接口失败，调用历史接口查询
+                string param = pStockInfo.StockID_TagJQ + "&dataFrequency=1d&stockBars=1";
+                result = zxcNetHelper.Get_ByHttpClient(_urlAPI_QuoteQueryHistory, param, out statusCode);
+
+                //再次解析
+                jsonRes = JObject.Parse(result);
+                if (jsonRes["result"].ToString() == "false")
+                    return false;
+            }
 
             //循环解析文件json数据
             List<Data_Quote_Swap> lstDataQuote = new List<Data_Quote_Swap>();
-            JObject jsonRes = JObject.Parse(result);
             JArray jsonDatas = (JArray)jsonRes["datas"];
             if (jsonDatas != null)
             {
@@ -160,12 +177,11 @@ namespace zxcCore.zxcRobot.Robot
                     if (pDataQuote.FromJson(jsonData))
                         lstDataQuote.Add(pDataQuote);
 
-                    string strMsg = pDataQuote.getMsg_Perfix();
+                    string strMsg = pDataQuote.GetMsg_Perfix();
                     zxcConsoleHelper.Debug(true, "行情信息：\n{0}", strMsg);
                     this.NotifyMsg(strMsg, msg, "行情信息");
                 }
             }
-
 
             return false;
         }

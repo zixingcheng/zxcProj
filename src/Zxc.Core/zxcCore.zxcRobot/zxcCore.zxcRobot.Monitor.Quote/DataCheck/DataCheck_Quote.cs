@@ -100,10 +100,9 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         {
             //组装消息
             string tagRF = _data.Value_RF == 0 ? "平" : (_data.Value_RF > 0 ? "涨" : "跌");
-            string tagUnit = _data._isIndex ? "" : "元";
-            int digits = _data._isIndex ? 3 : 2;
-            double value = _data.StockType == typeStock.Option ? _data.Value * 10000 : _data.Value;
-            string msg = string.Format("{0}：{1}{2}, {3} {4}%.", _data.StockName, Math.Round(value, digits), tagUnit, tagRF, Math.Round(_data.Value_RF * 100, 2));
+            string tagUnit = _data.IsIndex() ? "" : "元";
+            int digits = _data.IsIndex() ? 3 : 2;
+            string msg = string.Format("{0}：{1}{2}, {3} {4}%.", _data.StockName, Math.Round(_data.Value, digits), tagUnit, tagRF, Math.Round(_data.Value_RF * 100, 2));
             return msg;
         }
         //提取返回消息-中缀
@@ -122,10 +121,9 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         protected internal virtual string getValue_str(double dValue)
         {
             //组装消息
-            string tagUnit = _data._isIndex ? "" : "元";
-            int digits = _data._isIndex ? 3 : 2;
-            double value = _data.StockType == typeStock.Option ? dValue * 10000 : dValue;
-            string strValue = string.Format("{0}{1}", Math.Round(value, digits), tagUnit);
+            string tagUnit = _data.IsIndex() ? "" : "元";
+            int digits = _data.IsIndex() ? 3 : 2;
+            string strValue = string.Format("{0}{1}", Math.Round(dValue, digits), tagUnit);
             return strValue;
         }
 

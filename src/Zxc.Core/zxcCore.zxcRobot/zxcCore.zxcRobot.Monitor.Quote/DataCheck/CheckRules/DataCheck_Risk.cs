@@ -17,6 +17,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         //数据分析对象 
         protected internal DataAnalyse _dataAnalyse = null;
         protected DataAnalyse_EventArgs _eventArgs = null;
+        protected internal double _valueDelta = 0.0025;         //涨跌拐点判断范围
 
         public DataCheck_Risk(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
         {
@@ -43,7 +44,9 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             //数据初始
             if (this._dataAnalyse.Datas.Values.Count == 0)
             {
-                this._dataAnalyse.Init(_data.Price_Per, _data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), _data.Price_High, _data.Price_Low, 0.0025);
+                //修正最小生效间隔
+                double valueDelta = _data.IsIndex() ? _valueDelta * 1 : _data.StockType == typeStock.Option ? _valueDelta * 16.0 : _valueDelta * 2;
+                this._dataAnalyse.Init(_data.Price_Per, _data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), _data.Price_High, _data.Price_Low, valueDelta);
                 return true;
             }
             else
@@ -62,7 +65,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 if (_eventArgs.MonitorType == typeMonitor.BREAK)
                 {
                     string tag0 = _eventArgs.MonitorType2 > 0 ? "上涨拐点" : "下降拐点";
-                    strMsg = string.Format("\n{0}：{1}({2}).", _tagAlias, tag0, Math.Round(_eventArgs.Value, 3));
+                    strMsg = string.Format("\n{0}：{1}({2}).", _tagAlias, tag0, this.getValue_str(_eventArgs.Value));
                 }
             }
             return strMsg;
@@ -83,10 +86,11 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 msg += this.getMsg_Suffix();
 
                 //输出、打印信息
-                string usrTo = _data.StockType == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
+                string usrTo = _data.StockType == typeStock.Option ? "期权行情" : _data.IsIndex() ? "大盘行情" : "自选行情";
                 this.NotifyMsg(msg, "@*股票监测--" + usrTo);
-                zxcConsoleHelper.Debug(true, "DataCheck_Hourly:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
+                zxcConsoleHelper.Debug(true, "DataCheck_Risk:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
             }
         }
+
     }
 }

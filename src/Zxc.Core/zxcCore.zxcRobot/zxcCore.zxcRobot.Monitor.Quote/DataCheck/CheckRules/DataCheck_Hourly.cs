@@ -50,7 +50,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             msg += this.getMsg_Suffix();
 
             //输出、打印信息
-            string usrTo = _data.StockType == typeStock.Option ? "期权行情" : _data._isIndex ? "大盘行情" : "自选行情";
+            string usrTo = _data.StockType == typeStock.Option ? "期权行情" : _data.IsIndex() ? "大盘行情" : "自选行情";
             this.NotifyMsg(msg, "@*股票监测--" + usrTo);
             zxcConsoleHelper.Debug(false, "DataCheck_Hourly: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
             return bResult;

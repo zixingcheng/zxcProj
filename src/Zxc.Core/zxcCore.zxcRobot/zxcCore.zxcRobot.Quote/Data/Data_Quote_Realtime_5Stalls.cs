@@ -8,6 +8,7 @@
 // 修改标识： 
 // 修改描述：
 //===============================================================================
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using zxcCore.Common;
@@ -153,6 +154,36 @@ namespace zxcCore.zxcRobot.Quote
         }
 
         #endregion
+
+
+        //对象转换-由json对象
+        public override bool FromJson(JObject jsonData, typeQuoteTime quoteTime)
+        {
+            this.Volume_Buy1 = (int)zxcTransHelper.ToDouble(jsonData["buy1Volume"]);
+            this.Price_Buy1 = zxcTransHelper.ToDouble(jsonData["buy1Price"]);
+            this.Volume_Buy2 = (int)zxcTransHelper.ToDouble(jsonData["buy2Volume"]);
+            this.Price_Buy2 = zxcTransHelper.ToDouble(jsonData["buy2Price"]);
+            this.Volume_Buy3 = (int)zxcTransHelper.ToDouble(jsonData["buy3Volume"]);
+            this.Price_Buy3 = zxcTransHelper.ToDouble(jsonData["buy3Price"]);
+            this.Volume_Buy4 = (int)zxcTransHelper.ToDouble(jsonData["buy4Volume"]);
+            this.Price_Buy4 = zxcTransHelper.ToDouble(jsonData["buy4Price"]);
+            this.Volume_Buy5 = (int)zxcTransHelper.ToDouble(jsonData["buy5Volume"]);
+            this.Price_Buy5 = zxcTransHelper.ToDouble(jsonData["buy5Price"]);
+
+            this.Volume_Sell1 = (int)zxcTransHelper.ToDouble(jsonData["sell1Volume"]);
+            this.Price_Sell1 = zxcTransHelper.ToDouble(jsonData["sell1Price"]);
+            this.Volume_Sell2 = (int)zxcTransHelper.ToDouble(jsonData["sell2Volume"]);
+            this.Price_Sell2 = zxcTransHelper.ToDouble(jsonData["sell2Price"]);
+            this.Volume_Sell3 = (int)zxcTransHelper.ToDouble(jsonData["sell3Volume"]);
+            this.Price_Sell3 = zxcTransHelper.ToDouble(jsonData["sell3Price"]);
+            this.Volume_Sell4 = (int)zxcTransHelper.ToDouble(jsonData["sell4Volume"]);
+            this.Price_Sell4 = zxcTransHelper.ToDouble(jsonData["sell4Price"]);
+            this.Volume_Sell5 = (int)zxcTransHelper.ToDouble(jsonData["sell5Volume"]);
+            this.Price_Sell5 = zxcTransHelper.ToDouble(jsonData["sell5Price"]);
+            this.DateTime = Convert.ToDateTime(jsonData["datetime"]);
+
+            return base.FromJson(jsonData, quoteTime);
+        }
 
     }
 

@@ -8,8 +8,10 @@
 // 修改标识： 
 // 修改描述：
 //===============================================================================
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using zxcCore.Common;
 using zxcCore.Extensions;
 using zxcCore.zxcDataCache.MemoryDB;
 
@@ -54,27 +56,6 @@ namespace zxcCore.zxcRobot.Quote
             get
             {
                 return StockExchange.ToString() + "." + StockID;
-            }
-        }
-        /// <summary>标的代码-标签聚宽
-        /// </summary>
-        public string StockID_TagJQ
-        {
-            get
-            {
-                return StockID + "." + StockExchange.Get_AttrValue();
-            }
-        }
-        /// <summary>标的代码-标签新浪
-        /// </summary>
-        public string StockID_TagSina
-        {
-            get
-            {
-                //区分期权标签
-                if (StockType == typeStock.Option)
-                    return StockType.Get_Remark() + StockID;
-                return StockExchange.ToString() + StockID;
             }
         }
 
@@ -148,6 +129,13 @@ namespace zxcCore.zxcRobot.Quote
             get; set;
         }
 
+        /// <summary>数据来源平台
+        /// </summary>
+        public typeQuotePlat QuotePlat
+        {
+            get; set;
+        }
+
 
         protected internal double _value;
         /// <summary>当前价格
@@ -172,9 +160,11 @@ namespace zxcCore.zxcRobot.Quote
             }
         }
 
+        protected internal bool _isIndex { get; set; }  //师傅为指数
         protected internal bool _isInitAll = false;     //是否已初始全部数据
         public Data_Quote()
         {
+
         }
         ~Data_Quote()
         {
@@ -183,14 +173,31 @@ namespace zxcCore.zxcRobot.Quote
 
         #endregion
 
+
+        /// <summary>标的代码-标签聚宽
+        /// </summary>
+        public string GetStockID_TagJQ()
+        {
+            return StockID + "." + StockExchange.Get_AttrValue();
+        }
+        /// <summary>标的代码-标签新浪
+        /// </summary>
+        public string GetStockID_TagSina()
+        {
+            //区分期权标签
+            if (StockType == typeStock.Option)
+                return StockType.Get_Remark() + StockID;
+            return StockExchange.ToString() + StockID;
+        }
+
         /// <summary>是否为指数
         /// </summary>
         /// <returns></returns>
         public virtual bool IsIndex()
         {
-            return (bool)this.StockType.Get_AttrValue();
+            this._isIndex = (bool)this.StockType.Get_AttrValue();
+            return _isIndex;
         }
-
 
         /// <summary>初始全部值(简单换算数据)
         /// </summary>
@@ -203,6 +210,7 @@ namespace zxcCore.zxcRobot.Quote
             this._valueRF = this._value / this.Price_Per - 1;           //当前价格涨跌幅
             this.Price_Avg = this.TradeTurnover / this.TradeValume;     //均价（累计，如果当前时间段，注意重写）
 
+            this.IsIndex();
             return this.Check_StockInfo();
         }
         protected internal virtual bool Check_StockInfo()
@@ -219,6 +227,66 @@ namespace zxcCore.zxcRobot.Quote
             return true;
         }
 
+        //提取固定行情消息头
+        public virtual string GetMsg_Perfix()
+        {
+            //组装消息
+            string tagRF = Value_RF == 0 ? "平" : (Value_RF > 0 ? "涨" : "跌");
+            string tagUnit = _isIndex ? "" : "元";
+            int digits = _isIndex ? 3 : 2;
+            string msg = string.Format("{0}：{1}{2}, {3} {4}%.", StockName, Math.Round(Value, digits), tagUnit, tagRF, Math.Round(Value_RF * 100, 2));
+            return msg;
+        }
+        /// <summary>提取值字符串（含单位，指数没有单位）
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetValue_str(double dValue)
+        {
+            //组装消息
+            string tagUnit = _isIndex ? "" : "元";
+            int digits = _isIndex ? 3 : 2;
+            string strValue = string.Format("{0}{1}", Math.Round(dValue, digits), tagUnit);
+            return strValue;
+        }
+
+
+        //对象转换-由json对象
+        public new bool FromJson(dynamic jsonData)
+        {
+            return FromJson(jsonData, typeQuoteTime.none);
+        }
+        //对象转换-由json对象
+        public virtual bool FromJson(JObject jsonData, typeQuoteTime quoteTime)
+        {
+            //this.StockID_Tag = Convert.ToString(jsonData["idTag"]); 
+            this.StockID = Convert.ToString(jsonData["id"]);
+            this.StockName = Convert.ToString(jsonData["name"]);
+            this.Price_Open = zxcTransHelper.ToDouble(jsonData["openPrice"]);
+            this.Price_Per = zxcTransHelper.ToDouble(jsonData["preClose"]);
+            this.Price_Close = zxcTransHelper.ToDouble(jsonData["lastPrice"]);
+            this.Price_High = zxcTransHelper.ToDouble(jsonData["highPrice"]);
+            this.Price_Low = zxcTransHelper.ToDouble(jsonData["lowPrice"]);
+            this.TradeValume = (int)zxcTransHelper.ToDouble(jsonData["tradeValume"]);
+            this.TradeTurnover = zxcTransHelper.ToDouble(jsonData["tradeTurnover"]);
+
+            this.DateTime = Convert.ToDateTime(jsonData["datetime"]);
+
+            this.QuoteTimeType = quoteTime;
+            if (quoteTime == typeQuoteTime.none)
+            {
+                string strQuoteTimeType = jsonData["quoteTimeType"] + "";
+                if (strQuoteTimeType != "")
+                    this.QuoteTimeType = (typeQuoteTime)Enum.Parse(typeof(typeQuoteTime), strQuoteTimeType);
+            }
+
+            string strQuotePlat = jsonData["quotePlat"] + "";
+            if (strQuotePlat != "")
+                this.QuotePlat = (typeQuotePlat)Enum.Parse(typeof(typeQuotePlat), strQuotePlat);
+
+            //同步标的信息,初始全部值
+            this.Init_ValueAll();
+            return true;
+        }
 
         public virtual dynamic ToDict()
         {

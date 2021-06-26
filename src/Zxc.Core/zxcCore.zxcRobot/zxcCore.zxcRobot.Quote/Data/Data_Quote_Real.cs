@@ -8,6 +8,7 @@
 // 修改标识： 
 // 修改描述：
 //===============================================================================
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using zxcCore.Common;
@@ -44,6 +45,15 @@ namespace zxcCore.zxcRobot.Quote
         }
 
         #endregion
+
+
+        //对象转换-由json对象
+        public virtual bool FromJson(JObject jsonData, typeQuoteTime quoteTime)
+        {
+            this.Price_Buy = zxcTransHelper.ToDouble(jsonData["buyPrice"]);
+            this.Price_Sell = zxcTransHelper.ToDouble(jsonData["sellPrice"]);
+            return base.FromJson(jsonData, quoteTime);
+        }
 
     }
 

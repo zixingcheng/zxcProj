@@ -27,6 +27,7 @@ class Source_JQData_Stock(myQuote_Source.Quote_Source):
         myQuote_Source.Quote_Source.__init__(self, params, 'JqDataAPI')         #设置类型
         self.pSource = gol._Get_Value('quoteSource_API_JqData', None)
         self.setsStock = gol._Get_Value('setsStock', myQuote.myStocks())        #标的信息
+        self.quoteTimes = {"1m": "m1", "5m": "m5", "15m": "m15", "30m": "m30", "60m": "m60", "120m": "m120", "1d": "day", "1w": "week", "1M": "month", "1Y": "year"}
         pass
 
     #查询行情
@@ -66,11 +67,11 @@ class Source_JQData_Stock(myQuote_Source.Quote_Source):
         for x in range(0, len(_values)):
             #数据处理
             try: 
-                dataInfo = {'setInfo': pStock, "values": _values, "ind": x, "_isBar": _isBar}
+                dataInfo = {'setInfo': pStock, "values": _values, "ind": x, "_isBar": _isBar, "dataFrequency": self.quoteTimes.get(dataFrequency, "none")}
                 dataQuote = self.newData_ByInfo(dataInfo, checkTime) 
                 if(dataQuote == None):  continue
                 
-                if(nNum >= 0):
+                if(nNum > 0 or nReturn <= 0):
                     lstReturn.append(dataQuote)
                     nNum= nNum - 1
                 self.notifyListeners(dataQuote)
@@ -86,10 +87,10 @@ class Source_JQData_Stock(myQuote_Source.Quote_Source):
     def newData_ByInfo(self, dataInfo, checkTime = True):    
         #解析所有返回数据 
         #dataInfo = {'setInfo': pStock, "values": _values, "ind": x}
-        if len(dataInfo['values']) == 1 : 
-            _values = dataInfo['values']
-            _stockInfo = dataInfo['setInfo']
-            _ind = dataInfo['ind']
+        _values = dataInfo['values']
+        _stockInfo = dataInfo['setInfo']
+        _ind = dataInfo['ind']
+        if _ind < len(dataInfo['values']): 
             _isBar = dataInfo['_isBar']
             times = myData.iif(_stockInfo.type == "opt", 10000, 1)
 
@@ -142,6 +143,8 @@ class Source_JQData_Stock(myQuote_Source.Quote_Source):
 
             #设置数据
             qd.value = qd.lastPrice
+            qd.quotePlat = 'JQDataAPI'
+            qd.quoteTimeType = dataInfo['dataFrequency']
             return qd
         return None
     #生成数据集对象--未完成

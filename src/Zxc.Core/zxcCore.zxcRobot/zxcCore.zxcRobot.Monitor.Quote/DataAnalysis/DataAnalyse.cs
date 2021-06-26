@@ -226,5 +226,6 @@ namespace zxcCore.zxcRobot.DataAnalysis
             //this.DataStatistics.Statistics(this.Value_last, this.Time_last);   //向前修正到节点
             return true;
         }
+
     }
 }

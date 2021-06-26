@@ -55,6 +55,8 @@ class Data_Stock(myQuote_Data.Quote_Data):
         self.sell5Price = ''
         self.date = ''
         self.time = ''
+        self.quotePlat = 'SinaAPI'
+        self.quoteTimeType = 'real'
         self.dataList = []
         self.priceOpen = 0      #开盘价格
         self.priceBase = 0      #前一收盘价格
@@ -92,7 +94,10 @@ class Data_Stock(myQuote_Data.Quote_Data):
             + ', sell5Volume=' + str(self.sell5Volume)  \
             + ', sell5Price=' + str(self.sell5Price)  \
             + ', date=' + self.date  \
-            + ', time=' + self.time
+            + ', time=' + self.time  \
+            + ', quotePlat=' + self.quotePlat  \
+            + ', quoteTimeType=' + self.quoteTimeType 
+            
     
     #序列化--csv列头
     @staticmethod
@@ -166,6 +171,8 @@ class Data_Stock(myQuote_Data.Quote_Data):
         dictValue["sell5Volume"] = myData_Trans.To_Int(str(self.sell5Volume))
         dictValue["sell5Price"] = myData_Trans.To_Float(str(self.sell5Price))
         dictValue["datetime"] =  self.date + " " + self.time
+        dictValue["quotePlat"] = self.quotePlat
+        dictValue["quoteTimeType"] = self.quoteTimeType
         return dictValue
     #转为Dict
     def toDict_Simple(self):
@@ -183,6 +190,8 @@ class Data_Stock(myQuote_Data.Quote_Data):
         dictValue["tradeValume"] = myData_Trans.To_Int(str(self.tradeValume))
         dictValue["tradeTurnover"] = myData_Trans.To_Float(str(self.tradeTurnover))
         dictValue["datetime"] =  self.date + " " + self.time
+        dictValue["quotePlat"] = self.quotePlat
+        dictValue["quoteTimeType"] = self.quoteTimeType
         return dictValue
     #转为JsonStr
     def toJsonstr(self):

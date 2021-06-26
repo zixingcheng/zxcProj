@@ -59,5 +59,6 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             }
             return true;
         }
+
     }
 }

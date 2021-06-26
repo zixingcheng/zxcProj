@@ -81,42 +81,43 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
                 #                    申买量一 ，申买价二，申买量二，申买价三，申买量三，申买价四，申买量四，申买价五，申买量五，行情时间，主力合约标识，状态码， 
                 #                    标的证券类型，标的股票，期权合约简称，振幅(38)，最高价，最低价，成交量，成交额，分红调整标志，昨结算价，认购认沽标志，
                 #                    到期日，剩余天数，虚实值标志，内在价值，时间价值
+                nTimes = 10000
                 qd.id = stkid[7:] 
                 qd.idTag = "sh." + qd.id
                 qd.rawline = info
-                qd.buyPrice = vargs[1]
-                qd.lastPrice = vargs[2]
-                qd.sellPrice = vargs[3]
+                qd.buyPrice = vargs[1] * nTimes
+                qd.lastPrice = vargs[2] * nTimes
+                qd.sellPrice = vargs[3] * nTimes
 
-                qd.preClose = vargs[8]
-                qd.openPrice = vargs[9]
+                qd.preClose = vargs[8] * nTimes
+                qd.openPrice = vargs[9] * nTimes
             
-                qd.sell5Price = vargs[12]
+                qd.sell5Price = vargs[12] * nTimes
                 qd.sell5Volume = vargs[13]
-                qd.sell4Price = vargs[14]
+                qd.sell4Price = vargs[14] * nTimes
                 qd.sell4Volume = vargs[15]
-                qd.sell3Price = vargs[16]
+                qd.sell3Price = vargs[16] * nTimes
                 qd.sell3Volume = vargs[17]
-                qd.sell2Price = vargs[18]
+                qd.sell2Price = vargs[18] * nTimes
                 qd.sell2Volume = vargs[19]
-                qd.sell1Price = vargs[20]
+                qd.sell1Price = vargs[20] * nTimes
                 qd.sell1Volume = vargs[21]
-                qd.buy1Price = vargs[22]
+                qd.buy1Price = vargs[22] * nTimes
                 qd.buy1Volume = vargs[23]
-                qd.buy2Price = vargs[24]
+                qd.buy2Price = vargs[24] * nTimes
                 qd.buy2Volume = vargs[25]
-                qd.buy3Price = vargs[26]
+                qd.buy3Price = vargs[26] * nTimes
                 qd.buy3Volume = vargs[27]
-                qd.buy4Price = vargs[28]
+                qd.buy4Price = vargs[28] * nTimes
                 qd.buy4Volume = vargs[29]
-                qd.buy5Price = vargs[30]
+                qd.buy5Price = vargs[30] * nTimes
                 qd.buy5Volume = vargs[31]
                 qd.date = vargs[32].split(' ')[0]
                 qd.time = vargs[32].split(' ')[1]
 
                 qd.name = vargs[37]
-                qd.highPrice = vargs[39]
-                qd.lowPrice = vargs[40]
+                qd.highPrice = vargs[39] * nTimes
+                qd.lowPrice = vargs[40] * nTimes
                 qd.tradeValume = vargs[41]
                 qd.tradeTurnover = vargs[42] 
             else:
@@ -168,6 +169,8 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
 
             #设置数据
             qd.value = myData_Trans.To_Float(qd.lastPrice)
+            qd.quotePlat = 'SinaAPI'
+            qd.quoteTimeType = 'real'
             return qd
         return None
   

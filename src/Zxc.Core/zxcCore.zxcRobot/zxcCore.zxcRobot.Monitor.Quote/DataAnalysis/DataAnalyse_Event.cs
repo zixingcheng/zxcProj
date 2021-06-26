@@ -77,4 +77,5 @@ namespace zxcCore.zxcRobot.DataAnalysis
 
         #endregion
     }
+
 }
