@@ -14,6 +14,7 @@ using zxcCore.zxcDataCache.MemoryDB;
 using zxcCore.zxcDataCache.MemoryDB.Test;
 using zxcCore.zxcRobot.Robot;
 using zxcCore.zxcRobot.Msger;
+using zxcCore.zxcRobot.Quote;
 using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.Common;
 using System.ComponentModel;
@@ -39,10 +40,12 @@ namespace zxcCore.zxcRobot.Test
             //Console.WriteLine(typeStockExchange.none.Get_AttrName());
             //var aa = zxcEnumHelper.GetAttr<EnumAttr>(aaa).AttrName;
 
-            //typeStockExchange.sh.GetEnumDescription()
-            
 
+            //DataTable_Quotes<Data_Quote> pData_Quotes = Quote_Datas._Datas[pStockInfo.StockID_Tag];
             StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == "同花顺");
+            QuoteData pQuoteData = Quote_Manager._Quotes[pStockInfo.StockID_Tag];
+            pQuoteData.Query(DateTime.Now);
+
 
             //机器人测试
             MsgerHelper.Msger.MsgCached += new MsgCached_EventHandler(Program.MsgCached_EventHandler);

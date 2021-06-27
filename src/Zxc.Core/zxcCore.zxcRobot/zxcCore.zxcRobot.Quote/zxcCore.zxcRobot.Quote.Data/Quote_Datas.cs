@@ -31,14 +31,25 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// </summary>
         /// 
         public DataTable_Stocks<StockInfo> _stocksZxc { get; set; }
-        /// <summary>库表--zxc行情数据表
+
+        /// <summary>库表--zxc行情数据表集合
         /// </summary>
-        /// 
-        public DataTable_Quotes<Data_Quote> _quoteZxc { get; set; }
+        protected internal Dictionary<string, DataTable_Quotes<Data_Quote>> _quotesZxc = null;
+
+        /// <summary>行情数据表(历史)
+        /// </summary>
+        /// <param name="stockTag"></param>
+        /// <returns></returns>
+        public DataTable_Quotes<Data_Quote> this[string stockTag]
+        {
+            get { return this.Get_QuoteData(stockTag); }
+        }
+
 
         protected internal Quote_Datas(string dirBase) : base(dirBase, typePermission_DB.Normal, true, "/Datas/DB_Quote")
         {
             this.InitStock_system();
+            this._quotesZxc = new Dictionary<string, DataTable_Quotes<Data_Quote>>();
         }
 
         #endregion
@@ -50,7 +61,6 @@ namespace zxcCore.zxcRobot.Quote.Data
 
             //初始表信息
             _stocksZxc = new DataTable_Stocks<StockInfo>(); this.InitDBModel(_stocksZxc);
-            _quoteZxc = new DataTable_Quotes<Data_Quote>(); this.InitDBModel(_quoteZxc);
         }
 
         /// <summary>初始系统标的信息
@@ -86,13 +96,36 @@ namespace zxcCore.zxcRobot.Quote.Data
 
         }
 
+        /// <summary>初始系统标的信息
+        /// </summary>
+        protected internal DataTable_Quotes<Data_Quote> InitQuote_zxc(StockInfo pStockInfo)
+        {
+            if (pStockInfo == null) return null;
 
+            DataTable_Quotes<Data_Quote> quoteZxc = new DataTable_Quotes<Data_Quote>(pStockInfo.StockID_Tag, pStockInfo);
+            this.InitDBModel(quoteZxc);
+
+            _quotesZxc.Add(pStockInfo.StockID_Tag, quoteZxc);
+            return quoteZxc;
+        }
+
+
+        /// <summary>查询行情标的信息
+        /// </summary>
+        /// <param name="stockTag">标的编号(名称，或标识)</param>
+        /// <returns></returns>
+        public StockInfo Get_StockInfo(string stockTag)
+        {
+            string[] stockNames = stockTag.Split(".");
+            StockInfo pStockInfo = this.Get_StockInfo(stockNames[0], stockNames.Length > 1 ? stockNames[1] : "");
+            return pStockInfo;
+        }
         /// <summary>查询行情标的信息
         /// </summary>
         /// <param name="stockID">标的编号</param>
         /// <param name="stockName">标的名称</param>
         /// <returns></returns>
-        public static StockInfo Get_StockInfo(string stockID, string stockName)
+        public StockInfo Get_StockInfo(string stockID, string stockName)
         {
             string stockTag = stockID;
             if (!string.IsNullOrEmpty(stockTag))
@@ -110,6 +143,28 @@ namespace zxcCore.zxcRobot.Quote.Data
                     return pStockInfo;
             }
             return null;
+        }
+
+
+        /// <summary>查询行情标的信息
+        /// </summary>
+        /// <param name="stockID">标的编号</param>
+        /// <param name="stockName">标的名称</param>
+        /// <returns></returns>
+        protected internal DataTable_Quotes<Data_Quote> Get_QuoteData(string stockTag)
+        {
+            //校检标识 
+            StockInfo pStockInfo = Quote_Datas._Datas.Get_StockInfo(stockTag);
+            if (pStockInfo == null)
+                return null;
+
+            DataTable_Quotes<Data_Quote> pData_Quotes = null;
+            if (_quotesZxc.TryGetValue(pStockInfo.StockID_Tag, out pData_Quotes))
+                return pData_Quotes;
+
+            //初始行情表
+            pData_Quotes = this.InitQuote_zxc(pStockInfo);
+            return pData_Quotes;
         }
 
     }

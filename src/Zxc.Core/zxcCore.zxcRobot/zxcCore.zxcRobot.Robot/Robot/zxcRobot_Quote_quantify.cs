@@ -135,7 +135,7 @@ namespace zxcCore.zxcRobot.Robot
 
             //提取行情API配置
             string stockName = ((CmdInfos_QuoteQuantify)pRobotCmd.CmdInfos).StockName;
-            List<Data_Quote> lstDataQuote = Quote_Manager._Quotes.Query.QuoteReal(stockName);
+            List<Data_Quote> lstDataQuote = Quote_Manager._Quotes.QuoteQuery.Query(stockName);
             if (lstDataQuote == null)
             {
                 this.NotifyMsg(string.Format("行情(stockName)查询识别！", stockName), msg, "行情信息");

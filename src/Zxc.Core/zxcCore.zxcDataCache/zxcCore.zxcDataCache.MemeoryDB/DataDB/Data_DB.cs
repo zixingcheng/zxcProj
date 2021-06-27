@@ -81,6 +81,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
 
         #endregion
 
+
         /// <summary>数据库模型创建
         /// </summary>
         protected virtual void OnDBModelCreating()

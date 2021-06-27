@@ -19,7 +19,7 @@ namespace zxcCore.zxcRobot.Quote.Data
 
     /// <summary>行情数据类-实时
     /// </summary>
-    public class Data_Quote_Realtime : Data_Quote
+    public class Data_Quote_Realtime : Data_Quote_Info
     {
         #region 属性及构造
 

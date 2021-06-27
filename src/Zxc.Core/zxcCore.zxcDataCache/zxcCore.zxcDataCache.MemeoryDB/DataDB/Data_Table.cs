@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using zxcCore.Common;
 
 namespace zxcCore.zxcDataCache.MemoryDB
 {
@@ -181,7 +182,7 @@ namespace zxcCore.zxcDataCache.MemoryDB
         /// <summary>更新对象集
         /// </summary>
         /// <param name="collection"></param>
-        public virtual void UpdateRange(IEnumerable<T> collection)
+        public virtual void UpdateRange(IEnumerable<T> collection, bool bCacheData = true)
         {
             if (!this.CheckPermission(typePermission_DB.Modifiable))
                 throw (new Exception("没有写入权限"));
@@ -189,7 +190,8 @@ namespace zxcCore.zxcDataCache.MemoryDB
             {
                 this.SetValue(item, typePermission_DB.Modifiable, true);
             }
-            this.SaveChanges_ToCache(collection);
+            if (bCacheData && !this.IsTempTable())
+                this.SaveChanges_ToCache(collection);
         }
 
         /// <summary>设置对象
@@ -298,7 +300,8 @@ namespace zxcCore.zxcDataCache.MemoryDB
                 //同步缓存数据
                 string[] files = this.SyncChanges(isForce);
 
-                File.WriteAllText(_dbPath, strJson);
+                if (zxcIOHelper.checkPath(_dbPath))
+                    File.WriteAllText(_dbPath, strJson);
 
                 //清理缓存数据
                 this.SyncChanges_Clean(files);
@@ -316,7 +319,8 @@ namespace zxcCore.zxcDataCache.MemoryDB
             path = Path.GetFullPath(path);
 
             string strJson = Newtonsoft.Json.JsonConvert.SerializeObject(item);
-            File.WriteAllText(path, "[\r\n" + strJson + "\r\n]");
+            if (zxcIOHelper.checkPath(path))
+                File.WriteAllText(path, "[\r\n" + strJson + "\r\n]");
             return true;
         }
         /// <summary>保存修改-缓存到文件
@@ -329,7 +333,8 @@ namespace zxcCore.zxcDataCache.MemoryDB
             path = Path.GetFullPath(path);
 
             string strJson = Newtonsoft.Json.JsonConvert.SerializeObject(collection);
-            File.WriteAllText(path, strJson);
+            if (zxcIOHelper.checkPath(path))
+                File.WriteAllText(path, strJson);
             return true;
         }
 

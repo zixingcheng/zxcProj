@@ -25,17 +25,42 @@ namespace zxcCore.zxcRobot.Quote
 
         #region 属性及构造
 
-        protected internal QuoteQuery _Query = new QuoteQuery();
-        /// <summary>查询对象
+        /// <summary>行情数据对象集
         /// </summary>
-        public QuoteQuery Query
+        protected internal Dictionary<string, QuoteData> _quoteDatas = null;
+        /// <summary>提取股票信息
+        /// </summary>
+        /// <param name="stockName"></param>
+        /// <returns></returns>
+        public QuoteData this[string stockTag]
         {
-            get { return _Query; }
+            get
+            {
+                return this.Get_QuoteData(stockTag);
+            }
+        }
+
+
+        protected internal QuoteQuery _QuoteQuery = new QuoteQuery();
+        /// <summary>行情查询对象
+        /// </summary>
+        public QuoteQuery QuoteQuery
+        {
+            get { return _QuoteQuery; }
+        }
+
+        protected internal StockQuery _Stocks = new StockQuery();
+        /// <summary>标的查询对象
+        /// </summary>
+        public StockQuery Stocks
+        {
+            get { return _Stocks; }
         }
 
 
         public Quote_Manager()
         {
+            _quoteDatas = new Dictionary<string, QuoteData>();
         }
         ~Quote_Manager()
         {
@@ -44,6 +69,31 @@ namespace zxcCore.zxcRobot.Quote
 
         #endregion
 
+
+        /// <summary>获取行情对象
+        /// <param name="stockTag">标的标识</param>
+        /// <returns></returns>
+        protected internal QuoteData Get_QuoteData(string stockTag)
+        {
+            //校检标识 
+            stockTag = Quote_Manager._Quotes.Stocks.Check_StockTag(stockTag);
+            if (stockTag == "") return null;
+
+            //提取行情对象
+            QuoteData pDataQuote = null;
+            if (_quoteDatas.TryGetValue(stockTag, out pDataQuote))
+                return pDataQuote;
+
+
+            //提取库表
+            DataTable_Quotes<Data_Quote> pData_Quotes = Quote_Datas._Datas[stockTag];
+            if (pData_Quotes == null) return null;
+
+            //初始行情对象
+            pDataQuote = new QuoteData(pData_Quotes);
+            _quoteDatas.Add(pDataQuote.StockInfo.StockID_Tag, pDataQuote);
+            return pDataQuote;
+        }
 
     }
 }

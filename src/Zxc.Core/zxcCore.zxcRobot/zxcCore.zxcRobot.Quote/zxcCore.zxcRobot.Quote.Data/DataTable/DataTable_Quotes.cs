@@ -12,10 +12,18 @@ namespace zxcCore.zxcRobot.Quote.Data
     {
         #region 属性及构造
 
-        public DataTable_Quotes(string dtName = "dataTable_Quotes") : base(dtName)
+        /// <summary>标的信息
+        /// </summary>
+        public StockInfo StockInfo
+        {
+            get; set;
+        }
+
+        public DataTable_Quotes(string dtName, StockInfo stockInfo) : base("dataTable_Quotes/" + dtName)
         {
             //this._dtName = string.IsNullOrEmpty(_dtName) ? "dataTable_Points" : _dtName;
             //this.Init_PointsLog();
+            StockInfo = stockInfo;
         }
 
         #endregion
@@ -35,7 +43,7 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// <returns></returns>
         public override List<T> Query_Sames(T item)
         {
-            return this.FindAll(e => (e.UID == item.UID && e.IsDel == false) || (e.StockID == item.StockID && e.StockExchange == item.StockExchange && e.IsDel == false));
+            return this.FindAll(e => (e.UID == item.UID && e.IsDel == false) || (e.DateTime == item.DateTime && e.QuoteTimeType == item.QuoteTimeType && e.IsDel == false));
         }
 
     }

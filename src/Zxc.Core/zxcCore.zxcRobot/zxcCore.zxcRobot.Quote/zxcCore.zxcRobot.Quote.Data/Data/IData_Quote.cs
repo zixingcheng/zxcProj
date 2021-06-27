@@ -77,20 +77,16 @@ namespace zxcCore.zxcRobot.Quote.Data
     }
 
 
-    /// <summary>行情数据接口
+    /// <summary>行情数据接口-基础数据
     /// </summary>
     public interface IData_Quote
     {
-        string StockID { get; set; }
-        string StockName { get; set; }
-        typeStock StockType { get; set; }
-        typeStockExchange StockExchange { get; set; }
-
-        string StockID_Tag { get; }
-
         double Price_Per { get; set; }
         double Price_Open { get; set; }
         double Price_Close { get; set; }
+
+        double Price_Limit_H { get; set; }
+        double Price_Limit_L { get; set; }
 
         double Price_High { get; set; }
         double Price_Low { get; set; }
@@ -100,13 +96,13 @@ namespace zxcCore.zxcRobot.Quote.Data
 
         DateTime DateTime { get; set; }
         bool IsSuspended { get; set; }
-        typeQuotePlat QuotePlat { get; set; }
 
+        typeQuotePlat QuotePlat { get; set; }
         typeQuoteTime QuoteTimeType { get; set; }
+
         double Value { get; }
         double Value_RF { get; }
 
-        bool IsIndex();
         bool FromJson(JObject jsonData, typeQuoteTime quoteTime);
     }
 
