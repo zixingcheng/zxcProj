@@ -193,8 +193,8 @@ namespace zxcCore.zxcRobot.Quote.Data
             this.Price_Per = zxcTransHelper.ToDouble(jsonData["preClose"]);
             this.Price_Close = zxcTransHelper.ToDouble(jsonData["lastPrice"]);
 
-            this.Price_Limit_H = zxcTransHelper.ToDouble(jsonData["lastPrice"]);
-            this.Price_Limit_L = zxcTransHelper.ToDouble(jsonData["lastPrice"]);
+            this.Price_Limit_H = zxcTransHelper.ToDouble(jsonData["high_limit"]);
+            this.Price_Limit_L = zxcTransHelper.ToDouble(jsonData["low_limit"]);
 
             this.Price_High = zxcTransHelper.ToDouble(jsonData["highPrice"]);
             this.Price_Low = zxcTransHelper.ToDouble(jsonData["lowPrice"]);
@@ -203,7 +203,7 @@ namespace zxcCore.zxcRobot.Quote.Data
             this.TradeTurnover = zxcTransHelper.ToDouble(jsonData["tradeTurnover"]);
 
             this.DateTime = Convert.ToDateTime(jsonData["datetime"]);
-            this.IsSuspended = Convert.ToBoolean(jsonData["paused"]);
+            this.IsSuspended = zxcTransHelper.ToBoolean(jsonData["paused"]);
 
             this.QuoteTimeType = quoteTime;
             if (quoteTime == typeQuoteTime.none)

@@ -8,6 +8,7 @@
 // 修改标识： 
 // 修改描述：
 //===============================================================================
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using System.Text;
 using zxcCore.Common;
 using zxcCore.Extensions;
 using zxcCore.zxcRobot.Quote.Data;
+using zxcCore.zxcRobot.Quote.JQData;
 
 namespace zxcCore.zxcRobot.Quote
 {
@@ -148,14 +150,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <returns></returns>
         protected internal List<Data_Quote> QuoteReal_JQDataAPI(StockInfo pStockInfo)
         {
-            //调用接口
-            string statusCode;
-            string param = pStockInfo.StockID_TagJQ + "&dataFrequency=1d&stockBars=1";
-            string result = zxcNetHelper.Get_ByHttpClient(_urlAPI_QuoteQueryHistory, param, out statusCode);
-
-            //返回解析
-            JObject jsonRes = JObject.Parse(result);
-            return this.TransTo_Data_Quotes(jsonRes, typeQuoteTime.real);
+            return this.QuoteHistory(pStockInfo, DateTime.Now, 1, typeQuoteTime.day);
         }
 
 
@@ -197,8 +192,13 @@ namespace zxcCore.zxcRobot.Quote
         {
             if (pStockInfo == null) return null;
 
-            //调用接口-聚宽
-            List<Data_Quote> lstQuote = this.QuoteHistory_JQDataAPI(pStockInfo, endTime, quoteBars, quoteTime);
+            //调用接口-聚宽zxc
+            List<Data_Quote> lstQuote = this.QuoteHistory_JQDataAPI_zxc(pStockInfo, endTime, quoteBars, quoteTime);
+            if (lstQuote == null || lstQuote.Count == 0)
+            {
+                //聚宽zxc接口失败，改用聚宽python接口
+                lstQuote = this.QuoteHistory_JQDataAPI(pStockInfo, endTime, quoteBars, quoteTime);
+            }
             return lstQuote;
         }
         /// <summary>查询历史行情 
@@ -212,11 +212,29 @@ namespace zxcCore.zxcRobot.Quote
         {
             if (pStockInfo == null) return null;
 
-            //调用接口-聚宽
-            List<Data_Quote> lstQuote = this.QuoteHistory_JQDataAPI(pStockInfo, startTime, endTime, quoteTime);
+            //调用接口-聚宽zxc
+            List<Data_Quote> lstQuote = this.QuoteHistory_JQDataAPI_zxc(pStockInfo, startTime, endTime, quoteTime);
+            if (lstQuote == null || lstQuote.Count == 0)
+            {
+                //聚宽zxc接口失败，改用聚宽python接口
+                lstQuote = this.QuoteHistory_JQDataAPI(pStockInfo, startTime, endTime, quoteTime);
+            }
             return lstQuote;
         }
 
+        /// <summary>查询历史行情(聚宽API)
+        /// </summary>
+        /// <param name="pStockInfo">标的信息</param>
+        /// <param name="endTime">结束时间</param>
+        /// <param name="quoteTime">时间类型</param>
+        /// <param name="quoteBars">数据条数</param>
+        /// <returns></returns>
+        protected internal List<Data_Quote> QuoteHistory_JQDataAPI_zxc(StockInfo pStockInfo, DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day)
+        {
+            //调用接口
+            JObject jsonRes = Quote_JQData._APIs.Get_Price(pStockInfo.StockID_TagJQ, endTime.ToString("yyyy-MM-dd HH:mm:ss"), quoteBars, quoteTime.Get_AttrValue() + "");
+            return this.TransTo_Data_Quotes(jsonRes, quoteTime);
+        }
         /// <summary>查询历史行情(聚宽API)
         /// </summary>
         /// <param name="pStockInfo">标的信息</param>
@@ -233,6 +251,19 @@ namespace zxcCore.zxcRobot.Quote
 
             //返回解析
             JObject jsonRes = JObject.Parse(result);
+            return this.TransTo_Data_Quotes(jsonRes, quoteTime);
+        }
+        /// <summary>查询历史行情(聚宽API)
+        /// </summary>
+        /// <param name="pStockInfo">标的信息</param>
+        /// <param name="startTime">开始时间</param>
+        /// <param name="endTime">结束时间</param>
+        /// <param name="quoteTime">时间类型</param>
+        /// <returns></returns>
+        protected internal List<Data_Quote> QuoteHistory_JQDataAPI_zxc(StockInfo pStockInfo, DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day)
+        {
+            //调用接口
+            JObject jsonRes = Quote_JQData._APIs.Get_Price(pStockInfo.StockID_TagJQ, startTime, endTime, quoteTime.Get_AttrValue() + "");
             return this.TransTo_Data_Quotes(jsonRes, quoteTime);
         }
         /// <summary>查询历史行情(聚宽API)
@@ -263,6 +294,7 @@ namespace zxcCore.zxcRobot.Quote
         protected internal List<Data_Quote> TransTo_Data_Quotes(JObject jsonRes, typeQuoteTime quoteTime)
         {
             //数据检查
+            if (jsonRes == null) return null;
             if (jsonRes["result"].ToString() == "False")
                 return null;
 
@@ -272,6 +304,7 @@ namespace zxcCore.zxcRobot.Quote
             if (jsonDatas != null)
             {
                 //循环生成数据对象
+                string platSrc = jsonRes["datasPlat"] + "";
                 foreach (var jsonData in jsonDatas)
                 {
                     Data_Quote pDataQuote = null;
@@ -283,11 +316,19 @@ namespace zxcCore.zxcRobot.Quote
                             pDataQuote = new Data_Quote_Realtime_5Stalls();
                             break;
                         default:
-                            pDataQuote = new Data_Quote_Info();
+                            //pDataQuote = new Data_Quote_Info();
+                            pDataQuote = new Data_Quote();
                             break;
                     }
-
                     if (pDataQuote == null) continue;
+
+                    //转换为行情数据对象
+                    //if (platSrc == typeQuotePlat.JQDataAPI_zxc.ToString())
+                    //{
+                    //    pDataQuote = JsonConvert.DeserializeObject<Data_Quote_Info>(JsonConvert.SerializeObject(jsonData));
+                    //    pDataQuote.QuoteTimeType = quoteTime;
+                    //    lstDataQuote.Add(pDataQuote);
+                    //}
                     if (pDataQuote.FromJson(jsonData))
                     {
                         pDataQuote.QuoteTimeType = quoteTime;

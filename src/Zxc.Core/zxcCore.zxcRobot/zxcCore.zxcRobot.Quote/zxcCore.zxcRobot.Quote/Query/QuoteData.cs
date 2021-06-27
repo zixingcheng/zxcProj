@@ -57,7 +57,7 @@ namespace zxcCore.zxcRobot.Quote
             if (endTime == DateTime.MinValue) endTime = DateTime.Now;
 
             //查询库表
-            List<Data_Quote> lstQuote = _dtQuote.FindAll(e => e.DateTime <= endTime && e.QuoteTimeType == quoteTime && e.IsDel == false).OrderBy(t => t.DateTime).Take(quoteBars).ToList();
+            List<Data_Quote> lstQuote = _dtQuote.FindAll(e => e.DateTime <= endTime && e.QuoteTimeType == quoteTime && e.IsDel == false).OrderByDescending(t => t.DateTime).Take(quoteBars).ToList();
 
             //查询失败-启动数据检查更新
             if (autoUpdate && lstQuote.Count == 0)

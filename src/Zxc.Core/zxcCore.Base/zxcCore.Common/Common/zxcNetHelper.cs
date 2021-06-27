@@ -7,6 +7,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace zxcCore.Common
@@ -17,14 +18,18 @@ namespace zxcCore.Common
         /// </summary>
         /// <param name="url">url地址</param>
         /// <param name="postData">json格式数据</param>
-        /// <param name="statusCode">状态码</param>
+        /// <param name="statusCode">状态码</param
+        /// <param name="charSet">编码格式</param>
+        /// <param name="headers">请求头</param>
         /// <returns></returns>
-        public static string Post_ByHttpClient(string url, string postData, out string statusCode)
+        public static string Post_ByHttpClient(string url, string postData, out string statusCode, string charSet = "utf-8", string headers = "application/json")
         {
             //设置Http的正文、内容标头、字符
-            HttpContent httpContent = new StringContent(postData);
-            httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-            httpContent.Headers.ContentType.CharSet = "utf-8";
+            HttpContent httpContent = new StringContent(postData, Encoding.UTF8, "application/json");
+            if (headers != "application/json")
+                httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            if (charSet != "utf-8")
+                httpContent.Headers.ContentType.CharSet = "utf-8";
 
             string result = string.Empty;
             using (HttpClient httpClient = new HttpClient())

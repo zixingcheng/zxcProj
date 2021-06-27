@@ -66,14 +66,18 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// <summary>无
         /// </summary>
         none = 0,
-        [EnumAttr("新浪API", false), Description("新浪API")]
-        /// <summary>新浪API
+        [EnumAttr("zxc聚宽API", true), Description("zxc聚宽API")]
+        /// <summary>zxc聚宽API
         /// </summary>
-        SinaAPI = 1,
+        JQDataAPI_zxc = 1,
         [EnumAttr("聚宽API", true), Description("聚宽API")]
         /// <summary>聚宽API
         /// </summary>
         JQDataAPI = 2,
+        [EnumAttr("新浪API", false), Description("新浪API")]
+        /// <summary>新浪API
+        /// </summary>
+        SinaAPI = 3
     }
 
 

@@ -109,11 +109,13 @@ namespace zxcCore.zxcRobot.Quote.Data
         }
         protected internal virtual bool Check_StockInfo()
         {
-            StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == StockName || e.StockID == StockID);
+            StockInfo pStockInfo = Quote_Datas._Datas.Get_StockInfo(StockID, StockName);
             if (pStockInfo == null)
                 return false;
 
             //同步信息
+            StockName = pStockInfo.StockName;
+            StockID = pStockInfo.StockID;
             StockType = pStockInfo.StockType;
             StockExchange = pStockInfo.StockExchange;
             if (StockType == typeStock.Index)

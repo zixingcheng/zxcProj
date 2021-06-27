@@ -16,5 +16,17 @@ namespace zxcCore.Common
             return Math.Round(dValue, decimals);
         }
 
+        /// <summary>转换为Boolean
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static bool ToBoolean(dynamic data)
+        {
+            string strData = data + "";
+            strData = strData.ToLower();
+
+            return strData == "1" || strData == "true" ? true : false;
+        }
+
     }
 }
