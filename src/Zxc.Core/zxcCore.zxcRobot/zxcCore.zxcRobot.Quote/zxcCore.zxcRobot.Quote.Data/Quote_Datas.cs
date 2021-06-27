@@ -29,8 +29,11 @@ namespace zxcCore.zxcRobot.Quote.Data
 
         /// <summary>库表--zxc标的信息数据表
         /// </summary>
-        /// 
         public DataTable_Stocks<StockInfo> _stocksZxc { get; set; }
+        /// <summary>库表--zxc标的监测设置表
+        /// </summary>
+        public DataTable_MonitorSets<MonitorSet> _setsMoitor { get; set; }
+
 
         /// <summary>库表--zxc行情数据表集合
         /// </summary>
@@ -61,6 +64,7 @@ namespace zxcCore.zxcRobot.Quote.Data
 
             //初始表信息
             _stocksZxc = new DataTable_Stocks<StockInfo>(); this.InitDBModel(_stocksZxc);
+            _setsMoitor = new DataTable_MonitorSets<MonitorSet>(); this.InitDBModel(_setsMoitor);
         }
 
         /// <summary>初始系统标的信息

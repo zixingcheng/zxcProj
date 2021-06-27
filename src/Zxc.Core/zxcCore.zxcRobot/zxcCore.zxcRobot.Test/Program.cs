@@ -32,26 +32,14 @@ namespace zxcCore.zxcRobot.Test
             //消息交换测试
             //TestSwapMsg();
 
-            //行情库测试
-            //typeStockExchange aaa = typeStockExchange.sh;
-            //Console.WriteLine( aaa.Get_AttrName());
-            //Console.WriteLine(aaa.Get_AttrValue());
-            //Console.WriteLine(aaa.Get_Description());
-            //Console.WriteLine(aaa.Get_Remark());
-            //Console.WriteLine(typeStockExchange.none.Get_AttrName());
-            //var aa = zxcEnumHelper.GetAttr<EnumAttr>(aaa).AttrName;
+            //行情库测试 
+            //StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == "同花顺");
+            //QuoteData pQuoteData = Quote_Manager._Quotes[pStockInfo.StockID_Tag];
+            //Quote_JQData._APIs.Get_TradeDays(DateTime.Now.AddDays(-3), DateTime.Now);
+            //pQuoteData.Query(DateTime.Now.AddDays(-2), DateTime.Now);
+            //pQuoteData.Query(DateTime.Now);
+            //pQuoteData.Query();
 
-
-            //DataTable_Quotes<Data_Quote> pData_Quotes = Quote_Datas._Datas[pStockInfo.StockID_Tag];
-            StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == "同花顺");
-            QuoteData pQuoteData = Quote_Manager._Quotes[pStockInfo.StockID_Tag];
-            Quote_JQData._APIs.Get_TradeDays(DateTime.Now.AddDays(-3), DateTime.Now);
-            pQuoteData.Query(DateTime.Now.AddDays(-2), DateTime.Now);
-            pQuoteData.Query(DateTime.Now);
-            pQuoteData.Query();
-
-
-            Program_Test_JQData.QuerySecurityInfo();
 
             //机器人测试
             MsgerHelper.Msger.MsgCached += new MsgCached_EventHandler(Program.MsgCached_EventHandler);

@@ -15,11 +15,16 @@ namespace zxcCore.zxcRobot.Monitor.Quote
     {
         #region 属性及构造
 
+        /// <summary>监测设置管理对象
+        /// </summary>
+        public MonitorSet_Manage _MonitorSets = new MonitorSet_Manage();
+
         protected internal DataSwap_IOFiles _swapIOFiles = null;
         protected internal DataCheck_Msger_Quote _msger = null;
         protected internal DataCaches_Manager _managerCaches = null;
         protected internal Dictionary<string, bool> _dictQuotes = null;
         protected internal zxcConfigurationHelper _configDataCache = new zxcConfigurationHelper("appsettings.json");
+
         public Data_Quote_Manager()
         {
             _dictQuotes = new Dictionary<string, bool>();

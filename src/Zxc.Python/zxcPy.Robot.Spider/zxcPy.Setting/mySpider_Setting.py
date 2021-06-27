@@ -253,8 +253,9 @@ class mySpider_Settings():
             pSet.spiderTag = dictSet.get("spiderTag", pSet.spiderTag)
             pSet.spiderUrl = dictSet.get("spiderUrl", pSet.spiderUrl)
             pSet.spiderRule = dictSet.get("spiderRule", pSet.spiderRule)
-            pSet.timeSet = dictSet.get("spiderRule", pSet.timeSet)
+            pSet.timeSet = dictSet.get("timeSet", pSet.timeSet)
             bResult = pSet.InitRule();
+            bResult = True
         pSet.isValid = myData_Trans.To_Bool(dictSet.get("isValid", str(pSet.isValid)))      
         pSet.mark = dictSet.get("mark", pSet.mark)
 

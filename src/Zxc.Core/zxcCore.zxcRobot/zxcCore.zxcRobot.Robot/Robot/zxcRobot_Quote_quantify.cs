@@ -118,13 +118,15 @@ namespace zxcCore.zxcRobot.Robot
             {
                 case "股票":
                     return _Done_Quote_query(msg, pRobotCmd);
+                case "股票监测":
+                    return _Done_Quote_MonitorSet(msg, pRobotCmd);
                 default:
                     break;
             }
             return false;
         }
 
-        //积分添加
+        //股票查询
         protected internal bool _Done_Quote_query(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.ReadOnly)
         {
             //用户权限判断
@@ -146,6 +148,44 @@ namespace zxcCore.zxcRobot.Robot
             foreach (var pQuote in lstDataQuote)
             {
                 string strMsg = pQuote.GetMsg_Perfix();
+                zxcConsoleHelper.Debug(true, "行情信息：\n{0}", strMsg);
+                this.NotifyMsg(strMsg, msg, "行情信息");
+            }
+            return true;
+        }
+
+        //积分添加
+        protected internal bool _Done_Quote_MonitorSet(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.ReadOnly)
+        {
+            //用户权限判断
+            Power_Robot pPowerRobot = pRobotCmd.CmdInfos.PowerRobot;
+            if (!this._Check_Permission_usr(pPermission, msg, pPowerRobot))
+                return false;
+
+
+            //提取行情API配置
+            string stockName = ((CmdInfos_QuoteQuantify)pRobotCmd.CmdInfos).StockName;
+            if (string.IsNullOrEmpty(stockName))
+            {
+                this.NotifyMsg("未指定标的名称，无法配置！", msg, "行情信息");
+                return false;
+            }
+
+            //检查标的信息
+            bool isValid = stockName.Substring(0, 1) != "-";
+            stockName = stockName.Replace("+", "").Replace("-", "");
+            StockInfo pStockInfo = Quote_Manager._Quotes.Stocks.Get_StockInfo(stockName);
+            if (pStockInfo == null)
+            {
+                this.NotifyMsg(string.Format("标的({0})未识别！情检查确认。", stockName), msg, "行情信息");
+                return false;
+            }
+
+            //更新API监测配置
+            if (Robot_Manager._Manager._managerQuote._MonitorSets.Updata_APISets(pStockInfo.StockID_TagSina, isValid))
+            {
+                MonitorSet pSet = Robot_Manager._Manager._managerQuote._MonitorSets.Get_MonitorSet(pStockInfo.StockID_TagSina);
+                string strMsg = string.Format("标的({0}) {1} 行情监测。", pStockInfo.StockName, pSet.IsValid ? "已启动" : "已暂停");
                 zxcConsoleHelper.Debug(true, "行情信息：\n{0}", strMsg);
                 this.NotifyMsg(strMsg, msg, "行情信息");
             }

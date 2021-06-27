@@ -66,12 +66,14 @@ class myAPI_Quote_Set(myWeb.myAPI):
         #?setInfo={'spiderName': "ceshi2", 'spiderTag': 'webPage', 'spiderUrl': "", "spiderRule": "", 'isValid':'False', 'isDel':'True', "timeSet" : "* * * * *", 'mark':'测试设置' }
         #?setInfo={'spiderName': "sh000001", 'spiderTag': 'quote', 'spiderUrl': "", "spiderRule": "", 'isValid':'True', 'isDel':'False', "timeSet" : "* 9-20 * * 1-6", 'mark':'测试设置' }
         params = request.args.get('setInfo', "{}")
-        setInfo = myData_Trans.Tran_ToDict(params)
+        setInfo = myData_Json.Trans_ToJson(params)
+
+        #setInfo = myData_Trans.Tran_ToDict(params)
         bRes = not (setInfo.get("spiderName", "") == "")
         bRemove = myData_Trans.To_Bool(setInfo.get('isDel', "False"))
         if(setInfo.get("timeSet", None) == None):
             setInfo['timeSet'] = "* 9-15 * * 1-5"
-
+            
         if(bRes and bRemove):
             bRes = setsSpider._Remove(setInfo['spiderName'])
         else:
@@ -80,6 +82,9 @@ class myAPI_Quote_Set(myWeb.myAPI):
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
         if(bRes):
             pMsg['result'] = True
+            spiderInfo = setsSpider._Find(setInfo["spiderName"])
+            if(spiderInfo.isValid and not spiderInfo.isDeled):
+                pMsg['datas'] = [spiderInfo.ToDict()] 
         #return myData_Json.Trans_ToJson_str(pMsg)
         #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
         return jsonify(pMsg) 
@@ -88,12 +93,21 @@ class myAPI_Quote_SetQuery(myWeb.myAPI):
     def get(self):
         # http://127.0.0.1:8666/zxcAPI/robot/stock/QuoteSet/Query?spiderName=sh000001
         spiderName = request.args.get('spiderName', "")
-        spiderInfo = setsSpider._Find(spiderName)
+        lstSets = []
+        if(spiderName == ""):
+            for x in setsSpider.setList:
+                spiderInfo = setsSpider._Find(x)
+                if(spiderInfo.isValid and not spiderInfo.isDeled):
+                    lstSets.append(spiderInfo.ToDict())
+        else:
+            spiderInfo = setsSpider._Find(spiderName)
+            if(spiderInfo.isValid and not spiderInfo.isDeled):
+                lstSets.append(spiderInfo.ToDict())
         
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
         if(spiderInfo != None):
             pMsg['result'] = True
-            pMsg['datas'] = spiderInfo.ToDict() 
+            pMsg['datas'] = lstSets 
         #return myData_Json.Trans_ToJson_str(pMsg)
         #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
         return jsonify(pMsg) 
