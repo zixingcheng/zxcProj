@@ -36,7 +36,7 @@ namespace zxcCore.zxcRobot.Quote.Data
             get; set;
         }
 
-        public Data_Quote_Realtime()
+        public Data_Quote_Realtime(StockInfo stockInfo = null) : base(stockInfo)
         {
         }
         ~Data_Quote_Realtime()

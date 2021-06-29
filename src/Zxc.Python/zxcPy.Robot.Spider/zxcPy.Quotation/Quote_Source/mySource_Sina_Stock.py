@@ -32,15 +32,16 @@ class Source_Sina_Stock(myQuote_Source.Quote_Source):
         if(parms != None):
             if(parms.get('queryIDs', None) != None): 
                 strParams = parms['queryIDs']
-
         if(strParams == ""): strParams = self.params
-        print("\n查询ID列表：", strParams)
-        url = host + strParams
 
+        res = ""
+        if(strParams != ""): 
+            print("\n查询ID列表：", strParams)
+            url = host + strParams
 
-        req = urllib.request.Request(url)
-        res_data = urllib.request.urlopen(req)
-        res = res_data.read().decode(encoding = "gbk")
+            req = urllib.request.Request(url)
+            res_data = urllib.request.urlopen(req)
+            res = res_data.read().decode(encoding = "gbk")
         
         #返回组
         nNum = nReturn

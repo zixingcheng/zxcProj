@@ -25,7 +25,7 @@ namespace zxcCore.zxcRobot.Monitor
 
         public string _exType { get; set; }
 
-        public Data_Quote_Swap()
+        public Data_Quote_Swap(StockInfo stockInfo = null) : base(stockInfo)
         {
         }
 

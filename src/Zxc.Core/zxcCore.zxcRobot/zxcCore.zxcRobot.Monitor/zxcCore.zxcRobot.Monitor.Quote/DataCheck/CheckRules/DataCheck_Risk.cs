@@ -46,7 +46,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             if (this._dataAnalyse.Datas.Values.Count == 0)
             {
                 //修正最小生效间隔
-                double valueDelta = _data.IsIndex() ? _valueDelta * 1 : _data.StockType == typeStock.Option ? _valueDelta * 16.0 : _valueDelta * 2;
+                double valueDelta = _data.IsIndex() ? _valueDelta * 1.5 : _data.StockType == typeStock.Option ? _valueDelta * 20.0 : _valueDelta * 3;
                 this._dataAnalyse.Init(_data.Price_Per, _data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), _data.Price_High, _data.Price_Low, valueDelta);
                 return true;
             }

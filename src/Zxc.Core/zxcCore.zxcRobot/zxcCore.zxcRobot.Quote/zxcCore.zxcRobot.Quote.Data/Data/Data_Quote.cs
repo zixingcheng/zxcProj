@@ -136,10 +136,11 @@ namespace zxcCore.zxcRobot.Quote.Data
             }
         }
 
-        protected internal bool _isInitAll = false;     //是否已初始全部数据
-        public Data_Quote()
+        protected internal bool _isInitAll = false;         //是否已初始全部数据
+        protected internal StockInfo _stockInfo = null;     //绑定的标的信息
+        public Data_Quote(StockInfo stockInfo = null)
         {
-
+            _stockInfo = stockInfo;
         }
         ~Data_Quote()
         {
@@ -169,6 +170,15 @@ namespace zxcCore.zxcRobot.Quote.Data
         //提取固定行情消息头
         public virtual string GetMsg_Perfix()
         {
+            if (_stockInfo != null)
+            {
+                //组装消息
+                string tagRF = Value_RF == 0 ? "平" : (Value_RF > 0 ? "涨" : "跌");
+                string tagUnit = _stockInfo.StockType == typeStock.Index ? "" : "元";
+                int digits = _stockInfo.StockType == typeStock.Index ? 3 : 2;
+                string msg = string.Format("{0}：{1}{2}, {3} {4}%.", _stockInfo.StockName, Math.Round(Value, digits), tagUnit, tagRF, Math.Round(Value_RF * 100, 2));
+                return msg;
+            }
             return "";
         }
         /// <summary>提取值字符串（含单位，指数没有单位）

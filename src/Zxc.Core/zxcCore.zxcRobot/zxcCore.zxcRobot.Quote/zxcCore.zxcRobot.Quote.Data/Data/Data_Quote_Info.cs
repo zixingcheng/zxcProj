@@ -61,7 +61,7 @@ namespace zxcCore.zxcRobot.Quote.Data
 
 
         protected internal bool _isIndex { get; set; }  //师傅为指数
-        public Data_Quote_Info()
+        public Data_Quote_Info(StockInfo stockInfo = null) : base(stockInfo)
         {
 
         }

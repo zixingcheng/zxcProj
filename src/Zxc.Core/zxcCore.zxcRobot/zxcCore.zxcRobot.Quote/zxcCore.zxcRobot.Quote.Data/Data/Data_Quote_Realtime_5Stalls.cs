@@ -145,7 +145,7 @@ namespace zxcCore.zxcRobot.Quote.Data
             get; set;
         }
 
-        public Data_Quote_Realtime_5Stalls()
+        public Data_Quote_Realtime_5Stalls(StockInfo stockInfo = null) : base(stockInfo)
         {
         }
         ~Data_Quote_Realtime_5Stalls()

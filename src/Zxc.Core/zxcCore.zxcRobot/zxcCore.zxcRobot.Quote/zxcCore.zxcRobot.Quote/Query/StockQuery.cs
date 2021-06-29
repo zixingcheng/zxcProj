@@ -53,9 +53,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <returns></returns>
         public StockInfo Get_StockInfo(string stockTag)
         {
-            string[] stockNames = stockTag.Split(".");
-            StockInfo pStockInfo = Quote_Datas._Datas.Get_StockInfo(stockNames[0], stockNames.Length > 1 ? stockNames[1] : "");
-            return pStockInfo;
+            return Quote_Datas._Datas.Get_StockInfo(stockTag);
         }
 
 

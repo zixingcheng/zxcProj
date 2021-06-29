@@ -142,7 +142,7 @@ namespace zxcCore.zxcRobot.Quote
 
             //返回解析
             JObject jsonRes = JObject.Parse(result);
-            return this.TransTo_Data_Quotes(jsonRes, typeQuoteTime.real);
+            return this.TransTo_Data_Quotes(jsonRes, typeQuoteTime.real, pStockInfo);
         }
         /// <summary>查询实时行情(聚宽API)
         /// </summary>
@@ -233,7 +233,7 @@ namespace zxcCore.zxcRobot.Quote
         {
             //调用接口
             JObject jsonRes = Quote_JQData._APIs.Get_Price(pStockInfo.StockID_TagJQ, endTime.ToString("yyyy-MM-dd HH:mm:ss"), quoteBars, quoteTime.Get_AttrValue() + "");
-            return this.TransTo_Data_Quotes(jsonRes, quoteTime);
+            return this.TransTo_Data_Quotes(jsonRes, quoteTime, pStockInfo);
         }
         /// <summary>查询历史行情(聚宽API)
         /// </summary>
@@ -251,7 +251,7 @@ namespace zxcCore.zxcRobot.Quote
 
             //返回解析
             JObject jsonRes = JObject.Parse(result);
-            return this.TransTo_Data_Quotes(jsonRes, quoteTime);
+            return this.TransTo_Data_Quotes(jsonRes, quoteTime, pStockInfo);
         }
         /// <summary>查询历史行情(聚宽API)
         /// </summary>
@@ -264,7 +264,7 @@ namespace zxcCore.zxcRobot.Quote
         {
             //调用接口
             JObject jsonRes = Quote_JQData._APIs.Get_Price(pStockInfo.StockID_TagJQ, startTime, endTime, quoteTime.Get_AttrValue() + "");
-            return this.TransTo_Data_Quotes(jsonRes, quoteTime);
+            return this.TransTo_Data_Quotes(jsonRes, quoteTime, pStockInfo);
         }
         /// <summary>查询历史行情(聚宽API)
         /// </summary>
@@ -282,7 +282,7 @@ namespace zxcCore.zxcRobot.Quote
 
             //返回解析
             JObject jsonRes = JObject.Parse(result);
-            return this.TransTo_Data_Quotes(jsonRes, quoteTime);
+            return this.TransTo_Data_Quotes(jsonRes, quoteTime, pStockInfo);
         }
 
 
@@ -291,7 +291,7 @@ namespace zxcCore.zxcRobot.Quote
         /// </summary>
         /// <param name="jsonRes">json行情数据对象</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> TransTo_Data_Quotes(JObject jsonRes, typeQuoteTime quoteTime)
+        protected internal List<Data_Quote> TransTo_Data_Quotes(JObject jsonRes, typeQuoteTime quoteTime, StockInfo pStockInfo = null)
         {
             //数据检查
             if (jsonRes == null) return null;
@@ -313,11 +313,10 @@ namespace zxcCore.zxcRobot.Quote
                         case typeQuoteTime.none:
                             break;
                         case typeQuoteTime.real:
-                            pDataQuote = new Data_Quote_Realtime_5Stalls();
+                            pDataQuote = new Data_Quote_Realtime_5Stalls(pStockInfo);
                             break;
                         default:
-                            //pDataQuote = new Data_Quote_Info();
-                            pDataQuote = new Data_Quote();
+                            pDataQuote = new Data_Quote(pStockInfo);
                             break;
                     }
                     if (pDataQuote == null) continue;

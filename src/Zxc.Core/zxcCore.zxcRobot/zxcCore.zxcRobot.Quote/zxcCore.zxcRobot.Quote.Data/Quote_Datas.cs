@@ -120,6 +120,13 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// <returns></returns>
         public StockInfo Get_StockInfo(string stockTag)
         {
+            if (stockTag.Contains("."))
+            {
+                StockInfo poStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockID_Tag == stockTag || e.StockID_TagSina == stockTag);
+                if (poStockInfo != null)
+                    return poStockInfo;
+            }
+
             string[] stockNames = stockTag.Split(".");
             StockInfo pStockInfo = this.Get_StockInfo(stockNames[0], stockNames.Length > 1 ? stockNames[1] : "");
             return pStockInfo;
