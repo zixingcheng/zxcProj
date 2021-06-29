@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\zpCore.zpDataCache\zpCore.zpDataCache.Memory\zpCore.zpDataCache.Memory.csproj" />
     <ProjectReference Include="..\..\..\zxcCore.Base\zxcCore.Base\zxcCore.Base.csproj" />
     <ProjectReference Include="..\..\..\zxcCore.Base\zxcCore.Common\zxcCore.Common.csproj" />
-    <ProjectReference Include="..\..\..\zxcCore.zxcDataCache\zxcCore.zxcDataCache.Swap\zxcCore.zxcDataCache.Swap.csproj" />
-    <ProjectReference Include="..\..\..\zxcCore.zxcData\zxcCore.zxcData.DataAnalysis\zxcCore.zxcData.DataAnalysis.csproj" />
+    <ProjectReference Include="..\..\..\zxcCore.zxcData\zxcCore.zxcData.Analysis\zxcCore.zxcData.Analysis.csproj" />
+    <ProjectReference Include="..\..\..\zxcCore.zxcData\zxcCore.zxcData.Cache\zxcCore.zxcData.Cache.Memory\zxcCore.zxcData.Cache.Memory.csproj" />
+    <ProjectReference Include="..\..\..\zxcCore.zxcData\zxcCore.zxcData.Cache\zxcCore.zxcData.Cache.Swap\zxcCore.zxcData.Cache.Swap.csproj" />
     <ProjectReference Include="..\..\zxcCore.zxcRobot.Msger\zxcCore.zxcRobot.Msger.csproj" />
     <ProjectReference Include="..\..\zxcCore.zxcRobot.Quote\zxcCore.zxcRobot.Quote.Data\zxcCore.zxcRobot.Quote.Data.csproj" />
   </ItemGroup>

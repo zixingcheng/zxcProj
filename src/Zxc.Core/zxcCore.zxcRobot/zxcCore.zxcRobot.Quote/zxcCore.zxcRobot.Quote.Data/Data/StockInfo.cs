@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using zxcCore.Extensions;
-using zxcCore.zxcDataCache.MemoryDB;
+using zxcCore.zxcData.Cache.MemoryDB;
 
 namespace zxcCore.zxcRobot.Quote.Data
 {

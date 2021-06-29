@@ -10,7 +10,7 @@
 //===============================================================================
 using System;
 using zxcCore.Extensions;
-using zpCore.zpDataCache.Memory;
+using zxcCore.zxcData.Cache.Memory;
 using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.Common;
 using Newtonsoft.Json.Linq;
@@ -33,10 +33,10 @@ namespace zxcCore.zxcRobot.Monitor
 
 
         //对象转换-由json对象
-        public override bool FromJson(JObject jsonData, typeQuoteTime quoteTime)
+        public override bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime)
         {
             //基类初始
-            bool bResult = base.FromJson(jsonData, quoteTime);
+            bool bResult = base.FromJsonObj(jsonData, quoteTime);
             if (bResult)
             {
                 this.QuoteTimeType = typeQuoteTime.real;                //标识为实时数据

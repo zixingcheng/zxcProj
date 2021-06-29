@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using zxcCore.Common;
 using zxcCore.Extensions;
-using zxcCore.zxcDataCache.MemoryDB;
+using zxcCore.zxcData.Cache.MemoryDB;
 
 namespace zxcCore.zxcRobot.Quote.Data
 {
@@ -183,10 +183,10 @@ namespace zxcCore.zxcRobot.Quote.Data
         //对象转换-由json对象
         public new bool FromJson(dynamic jsonData)
         {
-            return FromJson(jsonData, typeQuoteTime.none);
+            return FromJsonObj(jsonData, typeQuoteTime.none);
         }
         //对象转换-由json对象
-        public virtual bool FromJson(JObject jsonData, typeQuoteTime quoteTime)
+        public virtual bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime)
         {
             //this.StockID_Tag = Convert.ToString(jsonData["idTag"]); 
             this.Price_Open = zxcTransHelper.ToDouble(jsonData["openPrice"]);

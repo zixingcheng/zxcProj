@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using zpCore.zpDataCache.Memory;
 using zxcCore.Common;
 
 namespace zxcCore.zxcRobot.Monitor.Msg

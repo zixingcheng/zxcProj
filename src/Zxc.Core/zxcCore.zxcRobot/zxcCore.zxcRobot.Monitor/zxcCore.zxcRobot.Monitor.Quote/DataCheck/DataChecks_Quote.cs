@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using zpCore.zpDataCache.Memory;
+using zxcCore.zxcData.Cache.Memory;
 
 namespace zxcCore.zxcRobot.Monitor.DataCheck
 {

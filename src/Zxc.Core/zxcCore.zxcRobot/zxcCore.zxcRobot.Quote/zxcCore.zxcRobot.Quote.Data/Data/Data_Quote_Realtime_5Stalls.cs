@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using zxcCore.Common;
-using zxcCore.zxcDataCache.MemoryDB;
+using zxcCore.zxcData.Cache.MemoryDB;
 
 namespace zxcCore.zxcRobot.Quote.Data
 {
@@ -157,7 +157,7 @@ namespace zxcCore.zxcRobot.Quote.Data
 
 
         //对象转换-由json对象
-        public override bool FromJson(JObject jsonData, typeQuoteTime quoteTime)
+        public override bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime)
         {
             this.Volume_Buy1 = (int)zxcTransHelper.ToDouble(jsonData["buy1Volume"]);
             this.Price_Buy1 = zxcTransHelper.ToDouble(jsonData["buy1Price"]);
@@ -182,7 +182,7 @@ namespace zxcCore.zxcRobot.Quote.Data
             this.Price_Sell5 = zxcTransHelper.ToDouble(jsonData["sell5Price"]);
             this.DateTime = Convert.ToDateTime(jsonData["datetime"]);
 
-            return base.FromJson(jsonData, quoteTime);
+            return base.FromJsonObj(jsonData, quoteTime);
         }
 
     }

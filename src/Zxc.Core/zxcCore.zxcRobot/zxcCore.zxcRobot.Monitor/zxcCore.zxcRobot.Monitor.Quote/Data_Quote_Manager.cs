@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using zpCore.zpDataCache.Memory;
-using zxcCore.zxcDataCache.Swap;
+using zxcCore.zxcData.Cache.Memory;
+using zxcCore.zxcData.Cache.Swap;
 using zxcCore.Common;
 using zxcCore.zxcRobot.Monitor.DataCheck;
 using System.Reflection;

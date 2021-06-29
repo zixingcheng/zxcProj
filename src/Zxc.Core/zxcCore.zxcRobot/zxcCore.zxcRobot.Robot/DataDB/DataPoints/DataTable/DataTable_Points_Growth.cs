@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using zxcCore.zxcDataCache.MemoryDB;
+using zxcCore.zxcData.Cache.MemoryDB;
 using zxcCore.zxcRobot.User;
 
 namespace zxcCore.zxcRobot.Robot.Power

@@ -4,8 +4,4 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\zxcCore.zxcRobot.Quote.DataAnalysis\zxcCore.zxcRobot.Quote.DataAnalysis.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using zpCore.zpDataCache.Memory;
+using zxcCore.zxcData.Cache.Memory;
 using zxcCore.Common;
-using zxcCore.zxcData.DataAnalysis;
+using zxcCore.zxcData.Analysis;
 using zxcCore.zxcRobot.Quote;
 using zxcCore.zxcRobot.Quote.Data;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using zxcCore.Common;
-using zxcCore.zxcDataCache.MemoryDB;
+using zxcCore.zxcData.Cache.MemoryDB;
 using zxcCore.zxcRobot.Monitor.Msg;
 using zxcCore.zxcRobot.Msger;
 using zxcCore.zxcRobot.Robot.Power;

@@ -9,7 +9,7 @@
 // 修改描述：
 //===============================================================================
 using System.Collections.Generic;
-using zxcCore.zxcDataCache.MemoryDB;
+using zxcCore.zxcData.Cache.MemoryDB;
 using zxcCore.zxcRobot.Monitor.Msg;
 using zxcCore.zxcRobot.Monitor.Quote;
 using zxcCore.zxcRobot.Robot.Power;

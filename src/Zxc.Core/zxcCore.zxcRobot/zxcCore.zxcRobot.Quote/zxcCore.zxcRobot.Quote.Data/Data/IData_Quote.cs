@@ -107,7 +107,7 @@ namespace zxcCore.zxcRobot.Quote.Data
         double Value { get; }
         double Value_RF { get; }
 
-        bool FromJson(JObject jsonData, typeQuoteTime quoteTime);
+        bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime);
     }
 
 }

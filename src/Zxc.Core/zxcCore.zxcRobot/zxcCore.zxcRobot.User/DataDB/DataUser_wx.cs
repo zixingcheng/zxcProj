@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using zxcCore.zxcRobot.User;
 
-namespace zxcCore.zxcDataCache.MemoryDB
+namespace zxcCore.zxcData.Cache.MemoryDB
 {
     /// <summary>数据对象集类-表
     /// </summary>

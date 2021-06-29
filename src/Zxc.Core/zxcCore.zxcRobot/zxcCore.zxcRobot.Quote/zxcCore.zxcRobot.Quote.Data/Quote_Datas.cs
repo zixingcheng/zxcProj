@@ -15,7 +15,7 @@ using System.IO;
 using System.Linq;
 using zxcCore.Common;
 using zxcCore.Extensions;
-using zxcCore.zxcDataCache.MemoryDB;
+using zxcCore.zxcData.Cache.MemoryDB;
 
 namespace zxcCore.zxcRobot.Quote.Data
 {
