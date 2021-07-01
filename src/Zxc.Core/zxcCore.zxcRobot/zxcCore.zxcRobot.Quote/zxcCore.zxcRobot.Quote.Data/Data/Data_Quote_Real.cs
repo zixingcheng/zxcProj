@@ -50,9 +50,13 @@ namespace zxcCore.zxcRobot.Quote.Data
         //对象转换-由json对象
         public override bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime)
         {
-            this.Price_Buy = zxcTransHelper.ToDouble(jsonData["buyPrice"]);
-            this.Price_Sell = zxcTransHelper.ToDouble(jsonData["sellPrice"]);
-            return base.FromJsonObj(jsonData, quoteTime);
+            if(base.FromJsonObj(jsonData, quoteTime))
+            {
+                this.Price_Buy = zxcTransHelper.ToDouble(jsonData["buyPrice"]) * _valueTimes;
+                this.Price_Sell = zxcTransHelper.ToDouble(jsonData["sellPrice"]) * _valueTimes;
+                return true;
+            }
+            return false;
         }
 
     }

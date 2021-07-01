@@ -247,13 +247,13 @@ class mySpider_Settings():
         #初始设置集
         pSet = self._Find(name)
         if(pSet == None):
-            pSet = mySpider_Setting(name, dictSet.get("spiderTag", ""), dictSet.get("spiderUrl", ""), dictSet.get("spiderRule", ""), dictSet.get("timeSet", ""))
+            pSet = mySpider_Setting(name, dictSet.get("spiderTag", "") + "", dictSet.get("spiderUrl", "") + "", dictSet.get("spiderRule", "" + ""), dictSet.get("timeSet", "") + "")
             bResult = self._Index(pSet)
         else:
-            pSet.spiderTag = dictSet.get("spiderTag", pSet.spiderTag)
-            pSet.spiderUrl = dictSet.get("spiderUrl", pSet.spiderUrl)
-            pSet.spiderRule = dictSet.get("spiderRule", pSet.spiderRule)
-            pSet.timeSet = dictSet.get("timeSet", pSet.timeSet)
+            pSet.spiderTag = dictSet.get("spiderTag", pSet.spiderTag + "")
+            pSet.spiderUrl = dictSet.get("spiderUrl", pSet.spiderUrl + "")
+            pSet.spiderRule = dictSet.get("spiderRule", pSet.spiderRule + "")
+            pSet.timeSet = dictSet.get("timeSet", pSet.timeSet + "")
             bResult = pSet.InitRule();
             bResult = True
         pSet.isValid = myData_Trans.To_Bool(dictSet.get("isValid", str(pSet.isValid)))      

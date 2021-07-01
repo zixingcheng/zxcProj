@@ -109,7 +109,12 @@ namespace zxcCore.zxcRobot.Quote.Data
         }
         protected internal virtual bool Check_StockInfo()
         {
-            StockInfo pStockInfo = Quote_Datas._Datas.Get_StockInfo(StockID, StockName);
+            StockInfo pStockInfo = _stockInfo;
+            if (pStockInfo == null)
+            {
+                pStockInfo = Quote_Datas._Datas.Get_StockInfo(StockID, StockName);
+                _stockInfo = pStockInfo;
+            }
             if (pStockInfo == null)
                 return false;
 
@@ -151,7 +156,9 @@ namespace zxcCore.zxcRobot.Quote.Data
         {
             this.StockID = Convert.ToString(jsonData["id"]);
             this.StockName = Convert.ToString(jsonData["name"]);
-            return base.FromJsonObj(jsonData, quoteTime);
+            if (this.Check_StockInfo())
+                return base.FromJsonObj(jsonData, quoteTime);
+            return false;
         }
 
     }

@@ -100,11 +100,11 @@ namespace zxcCore.zxcRobot.Quote.Data
         {
             var msgWx = new
             {
-                spiderName = this.SpiderName,
-                spiderRule = this.SpiderRule,
-                spiderTag = this.SpiderTag,
-                spiderUrl = this.SpiderUrl,
-                timeSet = this.TimeSet,
+                spiderName = this.SpiderName + "",
+                spiderRule = this.SpiderRule + "",
+                spiderTag = this.SpiderTag + "",
+                spiderUrl = this.SpiderUrl + "",
+                timeSet = this.TimeSet + "",
                 mark = this.Mark,
                 isValid = this.IsValid.ToString(),
                 isDel = (!this.IsValid).ToString()

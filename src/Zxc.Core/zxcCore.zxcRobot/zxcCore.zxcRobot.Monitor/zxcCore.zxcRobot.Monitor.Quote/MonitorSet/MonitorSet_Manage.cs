@@ -96,7 +96,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                     SpiderName = spiderName,
                     SpiderTag = spiderTag,
                     Mark = mark,
-                    TimeSet = timeSet != "" ? timeSet : "* 9.5-11.5;13-15.1 * * 1-6"
+                    TimeSet = timeSet != "" ? timeSet : "* 9.45-11.5;13-15.1 * * 1-6"
                 };
             pSet.IsValid = isValid;
             return pSet;
@@ -156,7 +156,9 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             if (setsInfo == null) return false;
             foreach (var item in setsInfo)
             {
-                Quote_Datas._Datas._setsMoitor.Add(item);
+                StockInfo pStockInfo = Quote_Datas._Datas.Get_StockInfo(item.SpiderName);
+                if (pStockInfo != null)
+                    Quote_Datas._Datas._setsMoitor.Add(item);
             }
             return true;
         }

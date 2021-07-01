@@ -136,6 +136,7 @@ namespace zxcCore.zxcRobot.Quote.Data
             }
         }
 
+        protected internal double _valueTimes = 1;          //实际值与原始值倍数（期权为10000倍）
         protected internal bool _isInitAll = false;         //是否已初始全部数据
         protected internal StockInfo _stockInfo = null;     //绑定的标的信息
         public Data_Quote(StockInfo stockInfo = null)
@@ -198,17 +199,21 @@ namespace zxcCore.zxcRobot.Quote.Data
         //对象转换-由json对象
         public virtual bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime)
         {
+            //修正倍数
+            if (_stockInfo != null && _stockInfo.StockType == typeStock.Option)
+                _valueTimes = 10000;
+
             //this.StockID_Tag = Convert.ToString(jsonData["idTag"]); 
-            this.Price_Open = zxcTransHelper.ToDouble(jsonData["openPrice"]);
-            this.Price_Per = zxcTransHelper.ToDouble(jsonData["preClose"]);
-            this.Price_Close = zxcTransHelper.ToDouble(jsonData["lastPrice"]);
+            this.Price_Open = zxcTransHelper.ToDouble(jsonData["openPrice"]) * _valueTimes;
+            this.Price_Per = zxcTransHelper.ToDouble(jsonData["preClose"]) * _valueTimes;
+            this.Price_Close = zxcTransHelper.ToDouble(jsonData["lastPrice"]) * _valueTimes;
 
-            this.Price_Limit_H = zxcTransHelper.ToDouble(jsonData["high_limit"]);
-            this.Price_Limit_L = zxcTransHelper.ToDouble(jsonData["low_limit"]);
+            this.Price_Limit_H = zxcTransHelper.ToDouble(jsonData["high_limit"]) * _valueTimes;
+            this.Price_Limit_L = zxcTransHelper.ToDouble(jsonData["low_limit"]) * _valueTimes;
 
-            this.Price_High = zxcTransHelper.ToDouble(jsonData["highPrice"]);
-            this.Price_Low = zxcTransHelper.ToDouble(jsonData["lowPrice"]);
-            this.Price_Avg = zxcTransHelper.ToDouble(jsonData["avg"]);
+            this.Price_High = zxcTransHelper.ToDouble(jsonData["highPrice"]) * _valueTimes;
+            this.Price_Low = zxcTransHelper.ToDouble(jsonData["lowPrice"]) * _valueTimes;
+            this.Price_Avg = zxcTransHelper.ToDouble(jsonData["avg"]) * _valueTimes;
             this.TradeValume = (int)zxcTransHelper.ToDouble(jsonData["tradeValume"]);
             this.TradeTurnover = zxcTransHelper.ToDouble(jsonData["tradeTurnover"]);
 

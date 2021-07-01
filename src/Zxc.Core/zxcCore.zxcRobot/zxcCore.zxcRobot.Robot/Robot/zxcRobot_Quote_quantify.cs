@@ -116,9 +116,9 @@ namespace zxcCore.zxcRobot.Robot
             string strCmd = pRobotCmd.CmdInfos.Cmdstr;
             switch (strCmd)
             {
-                case "股票":
+                case "行情":
                     return _Done_Quote_query(msg, pRobotCmd);
-                case "股票监测":
+                case "行情监测":
                     return _Done_Quote_MonitorSet(msg, pRobotCmd);
                 default:
                     break;
@@ -126,7 +126,7 @@ namespace zxcCore.zxcRobot.Robot
             return false;
         }
 
-        //股票查询
+        //行情查询
         protected internal bool _Done_Quote_query(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.ReadOnly)
         {
             //用户权限判断

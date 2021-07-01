@@ -6,7 +6,7 @@ Created on  张斌 2018-05-03 14:58:00
 
     行情爬取-数据对象 
 """
-import sys, os, json, datetime, mySystem 
+import sys, os, json, datetime, math, mySystem 
 
 #引用根目录类文件夹--必须，否则非本地目录起动时无法找到自定义类
 mySystem.m_strFloders.append('/zxcPy.Quotation')
@@ -141,35 +141,35 @@ class Data_Stock(myQuote_Data.Quote_Data):
         dictValue["idTag"] = myData.iif(self.idTag == "", self.id, self.idTag)
         dictValue["id"] = self.id
         dictValue["name"] = self.name
-        dictValue["openPrice"] = myData_Trans.To_Float(str(self.openPrice))
-        dictValue["preClose"] = myData_Trans.To_Float(str(self.preClose))
-        dictValue["lastPrice"] = myData_Trans.To_Float(str(self.lastPrice))
-        dictValue["highPrice"] = myData_Trans.To_Float(str(self.highPrice))
-        dictValue["lowPrice"] = myData_Trans.To_Float(str(self.lowPrice))
-        dictValue["buyPrice"] = myData_Trans.To_Float(str(self.buyPrice))
-        dictValue["sellPrice"] = myData_Trans.To_Float(str(self.sellPrice))
+        dictValue["openPrice"] = self.toValueFloat(str(self.openPrice))
+        dictValue["preClose"] = self.toValueFloat(str(self.preClose))
+        dictValue["lastPrice"] = self.toValueFloat(str(self.lastPrice))
+        dictValue["highPrice"] = self.toValueFloat(str(self.highPrice))
+        dictValue["lowPrice"] = self.toValueFloat(str(self.lowPrice))
+        dictValue["buyPrice"] = self.toValueFloat(str(self.buyPrice))
+        dictValue["sellPrice"] = self.toValueFloat(str(self.sellPrice))
         dictValue["tradeValume"] = myData_Trans.To_Int(str(self.tradeValume))
-        dictValue["tradeTurnover"] = myData_Trans.To_Float(str(self.tradeTurnover))
+        dictValue["tradeTurnover"] = self.toValueFloat(str(self.tradeTurnover))
         dictValue["buy1Volume"] = myData_Trans.To_Int(str(self.buy1Volume))
-        dictValue["buy1Price"] = myData_Trans.To_Float(str(self.buy1Price))
+        dictValue["buy1Price"] = self.toValueFloat(str(self.buy1Price))
         dictValue["buy2Volume"] = myData_Trans.To_Int(str(self.buy2Volume))
-        dictValue["buy2Price"] = myData_Trans.To_Float(str(self.buy2Price))
+        dictValue["buy2Price"] = self.toValueFloat(str(self.buy2Price))
         dictValue["buy3Volume"] = myData_Trans.To_Int(str(self.buy3Volume))
-        dictValue["buy3Price"] = myData_Trans.To_Float(str(self.buy3Price))
+        dictValue["buy3Price"] = self.toValueFloat(str(self.buy3Price))
         dictValue["buy4Volume"] = myData_Trans.To_Int(str(self.buy4Volume))
-        dictValue["buy4Price"] = myData_Trans.To_Float(str(self.buy4Price))
+        dictValue["buy4Price"] = self.toValueFloat(str(self.buy4Price))
         dictValue["buy5Volume"] = myData_Trans.To_Int(str(self.buy5Volume))
-        dictValue["buy5Price"] = myData_Trans.To_Float(str(self.buy5Price))
+        dictValue["buy5Price"] = self.toValueFloat(str(self.buy5Price))
         dictValue["sell1Volume"] = myData_Trans.To_Int(str(self.sell1Volume))
-        dictValue["sell1Price"] = myData_Trans.To_Float(str(self.sell1Price))
+        dictValue["sell1Price"] = self.toValueFloat(str(self.sell1Price))
         dictValue["sell2Volume"] = myData_Trans.To_Int(str(self.sell2Volume))
-        dictValue["sell2Price"] = myData_Trans.To_Float(str(self.sell2Price))
+        dictValue["sell2Price"] = self.toValueFloat(str(self.sell2Price))
         dictValue["sell3Volume"] = myData_Trans.To_Int(str(self.sell3Volume))
-        dictValue["sell3Price"] = myData_Trans.To_Float(str(self.sell3Price))
+        dictValue["sell3Price"] = self.toValueFloat(str(self.sell3Price))
         dictValue["sell4Volume"] = myData_Trans.To_Int(str(self.sell4Volume))
-        dictValue["sell4Price"] = myData_Trans.To_Float(str(self.sell4Price))
+        dictValue["sell4Price"] = self.toValueFloat(str(self.sell4Price))
         dictValue["sell5Volume"] = myData_Trans.To_Int(str(self.sell5Volume))
-        dictValue["sell5Price"] = myData_Trans.To_Float(str(self.sell5Price))
+        dictValue["sell5Price"] = self.toValueFloat(str(self.sell5Price))
         dictValue["datetime"] =  self.date + " " + self.time
         dictValue["quotePlat"] = self.quotePlat
         dictValue["quoteTimeType"] = self.quoteTimeType
@@ -180,15 +180,15 @@ class Data_Stock(myQuote_Data.Quote_Data):
         dictValue["idTag"] = myData.iif(self.idTag == "", self.id, self.idTag)
         dictValue["id"] = self.id
         dictValue["name"] = self.name
-        dictValue["openPrice"] = myData_Trans.To_Float(str(self.openPrice))
-        dictValue["preClose"] = myData_Trans.To_Float(str(self.preClose))
-        dictValue["lastPrice"] = myData_Trans.To_Float(str(self.lastPrice))
-        dictValue["highPrice"] = myData_Trans.To_Float(str(self.highPrice))
-        dictValue["lowPrice"] = myData_Trans.To_Float(str(self.lowPrice))
-        dictValue["buyPrice"] = myData_Trans.To_Float(str(self.buyPrice))
-        dictValue["sellPrice"] = myData_Trans.To_Float(str(self.sellPrice))
+        dictValue["openPrice"] = self.toValueFloat(str(self.openPrice))
+        dictValue["preClose"] = self.toValueFloat(str(self.preClose))
+        dictValue["lastPrice"] = self.toValueFloat(str(self.lastPrice))
+        dictValue["highPrice"] = self.toValueFloat(str(self.highPrice))
+        dictValue["lowPrice"] = self.toValueFloat(str(self.lowPrice))
+        dictValue["buyPrice"] = self.toValueFloat(str(self.buyPrice))
+        dictValue["sellPrice"] = self.toValueFloat(str(self.sellPrice))
         dictValue["tradeValume"] = myData_Trans.To_Int(str(self.tradeValume))
-        dictValue["tradeTurnover"] = myData_Trans.To_Float(str(self.tradeTurnover))
+        dictValue["tradeTurnover"] = self.toValueFloat(str(self.tradeTurnover))
         dictValue["datetime"] =  self.date + " " + self.time
         dictValue["quotePlat"] = self.quotePlat
         dictValue["quoteTimeType"] = self.quoteTimeType
@@ -196,7 +196,11 @@ class Data_Stock(myQuote_Data.Quote_Data):
     #转为JsonStr
     def toJsonstr(self):
         return myData_Json.Trans_ToJson_str(self.toDict())
-
+    
+    #转换为浮点值
+    def toValueFloat(self, value):
+        value = myData_Trans.To_Float(str(value))
+        return round(value, 6)
     #转换为值组
     def toValueList(self):
         dtNow = self.getTime(False)

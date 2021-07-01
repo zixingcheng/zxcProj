@@ -109,7 +109,7 @@ namespace zxcCore.zxcRobot.Quote.Data
             {
                 //区分期权标签
                 if (StockType == typeStock.Option)
-                    return StockType.Get_Remark() + StockID;
+                    return StockType.Get_Remark() + "_" + StockID;
                 return StockExchange.ToString() + StockID;
             }
         }

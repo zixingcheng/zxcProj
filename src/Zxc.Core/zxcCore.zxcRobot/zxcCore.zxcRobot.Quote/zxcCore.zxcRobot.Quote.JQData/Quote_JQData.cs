@@ -60,6 +60,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
                 {"paused", "paused" },
                 {"high_limit", "high_limit" },
                 {"low_limit", "low_limit" },
+                {"open_interest", "open_interest" },
                 {"avg", "avg" },
                 {"pre_close", "preClose" }
             };
@@ -90,7 +91,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
         protected internal bool Check_Token()
         {
             //当天有效
-            if (string.IsNullOrEmpty(_jqQPI_Token) && (_jqQPI_Token_Time.Day - DateTime.Now.Day) < 0)
+            if (string.IsNullOrEmpty(_jqQPI_Token) || (_jqQPI_Token_Time.Day - DateTime.Now.Day) > 0)
             {
                 //重新获取token
                 _jqQPI_Token = this.Get_Token();
@@ -99,7 +100,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
                 _jqQPI_Token_Time = DateTime.Now;
                 _urlAPI_QueryCount = this.Get_QueryCount();
             }
-            return false;
+            return true;
         }
         /// <summary>获取平台Token
         /// </summary>
@@ -145,6 +146,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
         protected internal int Get_QueryCount()
         {
             //生成JSON请求信息
+            if (!this.Check_Token()) return -1;
             string jsonParam = JsonConvert.SerializeObject(new
             {
                 method = "get_query_count",
@@ -170,6 +172,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
         public JObject Get_Price(string codeTag, string endTime = "", int bars = 1, string barUnit = "1d", string fqrefTime = "")
         {
             //生成JSON请求信息
+            if (!this.Check_Token()) return null;
             string jsonParam = JsonConvert.SerializeObject(new
             {
                 method = "get_price",
@@ -198,6 +201,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
         public JObject Get_Price(string codeTag, DateTime startTime, DateTime endTime, string barUnit = "1d", string fqrefTime = "")
         {
             //生成JSON请求信息
+            if (!this.Check_Token()) return null;
             string jsonParam = JsonConvert.SerializeObject(new
             {
                 method = "get_price_period",
@@ -225,6 +229,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
         public string[] Get_TradeDays(DateTime startTime, DateTime endTime)
         {
             //生成JSON请求信息
+            if (!this.Check_Token()) return null;
             string jsonParam = JsonConvert.SerializeObject(new
             {
                 method = "get_trade_days",

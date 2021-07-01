@@ -129,6 +129,10 @@ namespace zxcCore.zxcRobot.Quote.Data
 
             string[] stockNames = stockTag.Split(".");
             StockInfo pStockInfo = this.Get_StockInfo(stockNames[0], stockNames.Length > 1 ? stockNames[1] : "");
+            if (pStockInfo == null && stockNames.Length == 1)
+            {
+                pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockID_Tag == stockTag || e.StockID_TagSina == stockTag);
+            }
             return pStockInfo;
         }
         /// <summary>查询行情标的信息
@@ -138,7 +142,8 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// <returns></returns>
         public StockInfo Get_StockInfo(string stockID, string stockName)
         {
-            string stockTag = stockID;
+            //优先名称-避免编号有重复
+            string stockTag = stockName;
             if (!string.IsNullOrEmpty(stockTag))
             {
                 StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == stockTag || e.StockID == stockTag);
@@ -146,7 +151,7 @@ namespace zxcCore.zxcRobot.Quote.Data
                     return pStockInfo;
             }
 
-            stockTag = stockName;
+            stockTag = stockID;
             if (!string.IsNullOrEmpty(stockTag))
             {
                 StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == stockTag || e.StockID == stockTag);
