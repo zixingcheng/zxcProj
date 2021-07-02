@@ -54,7 +54,7 @@ namespace zxcCore.zxcRobot.Test
         private static void TestSwapMsg()
         {
             Console.WriteLine("Hello World!");
-            Data_Quote_Manager pManager = new Data_Quote_Manager();
+            QuoteMonitor pManager = new QuoteMonitor();
             pManager.Start(-1, 1);
 
             //string dirSwap = @"D:\myCode\zxcProj\src\Zxc.Python\zxcPy.Robot.Spider\Data\Swaps";
@@ -156,7 +156,7 @@ namespace zxcCore.zxcRobot.Test
 
             Func<IEnumerable<User_zxc>, IEnumerable<User_zxc>> expr1 =
                    l => l.Where(n => n.usrName == "admin");
-            User_zxc usr = User_Manager._Users.GetUser(expr1);
+            User_zxc usr = User_Manager._Manager.GetUser(expr1);
 
 
             //初始数据分析对象
@@ -173,7 +173,7 @@ namespace zxcCore.zxcRobot.Test
             }
 
             Console.WriteLine("Hello World!");
-            Data_Quote_Manager pManager = new Data_Quote_Manager();
+            QuoteMonitor_Manager pManager = new QuoteMonitor_Manager();
             pManager.Start(-1, 1);
 
 

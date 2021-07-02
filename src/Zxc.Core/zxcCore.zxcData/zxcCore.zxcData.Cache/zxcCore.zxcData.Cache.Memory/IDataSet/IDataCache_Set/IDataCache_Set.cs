@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
+    /// <summary>时间间隔
+    /// </summary>
     public enum typeTimeFrequency
     {
         None = 0,
@@ -13,8 +15,10 @@ namespace zxcCore.zxcData.Cache.Memory
         Minute_10 = 600,
         Minute_15 = 900,
         Minute_30 = 1800,
-        Hour = 3600,
-        Day = 86400
+        Minute_60 = 3600,
+        Minute_120 = 7200,
+        Day = 86400,
+        Week = 604800
     }
 
     /// <summary>数据缓存设置对象类
@@ -109,5 +113,12 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="dtBase"></param>
         /// <returns></returns>
         DateTime CheckTime(DateTime dtBase);
+        /// <summary>时间有效性检查
+        /// </summary>
+        /// <param name="dtBase"></param>
+        /// <returns></returns>
+        bool IsVaildTime(DateTime dtTime);
+
     }
+
 }

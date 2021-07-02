@@ -11,7 +11,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-风险监测信息
     /// </summary>
-    public class DataCheck_Risk<T> : DataCheck_Quote<T>
+    public class QuoteCheck_Risk<T> : DataCheck_Quote<T>
     {
         #region 属性及构造
 
@@ -20,13 +20,13 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         protected DataAnalyse_KeyPoints_EventArgs _eventArgs = null;
         protected internal double _valueDelta = 0.0025;         //涨跌拐点判断范围
 
-        public DataCheck_Risk(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
+        public QuoteCheck_Risk(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
         {
             _tagAlias = "风控提醒";
             _dataAnalyse = new DataAnalyse_KeyPoints(tagName);
             _dataAnalyse.DataAnalyse_Trigger += new DataAnalyse_KeyPoints_EventHandler(EventHandler_DataAnalyse_Trigger);
         }
-        ~DataCheck_Risk()
+        ~QuoteCheck_Risk()
         {
             // 缓存数据？
         }
@@ -58,7 +58,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         }
 
 
-        protected internal override string getMsg_Infix()
+        protected internal new string getMsg_Infix()
         {
             string strMsg = "";
             if (_eventArgs != null)

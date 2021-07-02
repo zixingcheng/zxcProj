@@ -54,6 +54,7 @@ namespace zxcCore.zxcData.Cache.Memory
 
         #endregion
 
+
         public virtual bool InitSetting(dynamic setting)
         {
             return true;
@@ -108,5 +109,6 @@ namespace zxcCore.zxcData.Cache.Memory
             }
             return true;
         }
+
     }
 }

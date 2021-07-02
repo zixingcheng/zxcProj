@@ -10,7 +10,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-涨跌幅度固定监测
     /// </summary>
-    public class DataCheck_RiseFall_Fixed<T> : DataCheck_Quote<T>
+    public class QuoteCheck_RiseFall_Fixed<T> : DataCheck_Quote<T>
     {
         #region 属性及构造
 
@@ -23,12 +23,12 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         protected internal DateTime _timeRF_last = DateTime.Now;    //涨跌幅时间-最后
         protected internal int _timeInterval_last = 0;              //涨跌幅时间间隔-最后
         protected internal int _nNums = 0;                          //监测次数
-        public DataCheck_RiseFall_Fixed(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
+        public QuoteCheck_RiseFall_Fixed(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
         {
             _tagAlias = "涨跌幅度";
             _dataStics = new DataStatistics();
         }
-        ~DataCheck_RiseFall_Fixed()
+        ~QuoteCheck_RiseFall_Fixed()
         {
             // 缓存数据？
         }
@@ -100,7 +100,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         }
 
 
-        protected internal override string getMsg_Infix()
+        protected internal new string getMsg_Infix()
         {
             string tag0 = _dataStics.Value_delta > 0 ? "涨超" : "跌逾";
             int timeInterval = (int)Math.Ceiling(_dataStics.Duration_M);

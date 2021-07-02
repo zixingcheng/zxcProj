@@ -165,9 +165,6 @@ namespace zxcCore.zxcData.Cache.Memory
                 case typeTimeFrequency.Day:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, 0, 0, 0);
                     break;
-                case typeTimeFrequency.Hour:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, 0, 0);
-                    break;
                 case typeTimeFrequency.Minute_1:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, dtBase.Minute, 0);
                     break;
@@ -177,13 +174,43 @@ namespace zxcCore.zxcData.Cache.Memory
                 case typeTimeFrequency.Minute_10:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 10.0) * 10, 0);
                     break;
-                case typeTimeFrequency.Second_30:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, dtBase.Minute, (int)Math.Floor(dtBase.Second / 30.0) * 30);
+                case typeTimeFrequency.Minute_15:
+                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 15.0) * 15, 0);
                     break;
+                case typeTimeFrequency.Minute_30:
+                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 30.0) * 30, 0);
+                    break;
+                case typeTimeFrequency.Minute_60:
+                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, 0, 0);
+                    break;
+                //case typeTimeFrequency.Minute_120:
+                //    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, 0, 0);
+                //    break;
+                //case typeTimeFrequency.Second_30:
+                //    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, dtBase.Minute, (int)Math.Floor(dtBase.Second / 30.0) * 30);
+                //    break;
+                //case typeTimeFrequency.Week:
+                //    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, 0, 0, 0);
+                //    break;
                 default:
                     break;
             }
             return dtTime;
+        }
+
+        public bool IsVaildTime(DateTime dtTime)
+        {
+            bool isVaild = false;
+            int nSecond = (int)((dtTime - this._dtLast).TotalSeconds);
+            switch (_Time_Frequency)
+            {
+                case typeTimeFrequency.Day:
+
+                //    break;
+                default:
+                    break;
+            }
+            return isVaild;
         }
         public string GetTagName(typeTimeFrequency typeTimeFrequency, string strTag = "")
         {
@@ -191,5 +218,6 @@ namespace zxcCore.zxcData.Cache.Memory
             string tag = _Info_Factor.ID + "_" + typeTimeFrequency + (_tagName == "" ? "" : "_" + _tagName);
             return tag;
         }
+
     }
 }

@@ -9,7 +9,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-整点行情信息
     /// </summary>
-    public class DataCheck_Hourly<T> : DataCheck_Quote<T>
+    public class QuoteCheck_Hourly<T> : DataCheck_Quote<T>
     {
         #region 属性及构造
 
@@ -18,11 +18,11 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         protected internal DateTime _dtNow = DateTime.Now;
         protected internal int _timeInterval = 30;              //时间间隔（分钟）
 
-        public DataCheck_Hourly(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
+        public QuoteCheck_Hourly(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
         {
             _tagAlias = "整点播报";
         }
-        ~DataCheck_Hourly()
+        ~QuoteCheck_Hourly()
         {
             // 缓存数据？
         }
@@ -57,7 +57,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         }
 
 
-        protected internal override string getMsg_Infix()
+        protected internal new string getMsg_Infix()
         {
             return string.Format("\n{0}：{1}", _tagAlias, _dtNow.ToString("HH:mm:00"));
         }

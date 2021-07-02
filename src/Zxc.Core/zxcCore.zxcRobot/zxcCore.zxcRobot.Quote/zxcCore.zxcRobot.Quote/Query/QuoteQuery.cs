@@ -53,7 +53,7 @@ namespace zxcCore.zxcRobot.Quote
         public List<Data_Quote> Query(string stockTag)
         {
             //查询标的行情对象
-            QuoteData pQuoteData = Quote_Manager._Quotes[stockTag];
+            QuoteData pQuoteData = Quote_Manager._Manager[stockTag];
             if (pQuoteData == null) return null;
 
             return pQuoteData.Query();
@@ -78,7 +78,7 @@ namespace zxcCore.zxcRobot.Quote
         public List<Data_Quote> Query(string stockTag, DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day, bool autoUpdate = true)
         {
             //查询标的行情对象
-            QuoteData pQuoteData = Quote_Manager._Quotes[stockTag];
+            QuoteData pQuoteData = Quote_Manager._Manager[stockTag];
             if (pQuoteData == null) return null;
 
             return pQuoteData.Query(endTime, quoteBars, quoteTime, autoUpdate);
@@ -94,7 +94,7 @@ namespace zxcCore.zxcRobot.Quote
         public List<Data_Quote> Query(string stockTag, DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day, bool autoUpdate = true)
         {
             //查询标的行情对象
-            QuoteData pQuoteData = Quote_Manager._Quotes[stockTag];
+            QuoteData pQuoteData = Quote_Manager._Manager[stockTag];
             if (pQuoteData == null) return null;
 
             return pQuoteData.Query(startTime, endTime, quoteTime, autoUpdate);
@@ -109,7 +109,7 @@ namespace zxcCore.zxcRobot.Quote
         protected internal List<Data_Quote> QuoteReal(string stockTag)
         {
             //查询标的 
-            StockInfo pStockInfo = Quote_Manager._Quotes.Stocks.Get_StockInfo(stockTag);
+            StockInfo pStockInfo = Quote_Manager._Manager.Stocks.Get_StockInfo(stockTag);
             return this.QuoteReal(pStockInfo);
         }
         /// <summary>查询实时行情
@@ -165,7 +165,7 @@ namespace zxcCore.zxcRobot.Quote
         protected internal List<Data_Quote> QuoteHistory(string stockTag, DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day)
         {
             //查询标的 
-            StockInfo pStockInfo = Quote_Manager._Quotes.Stocks.Get_StockInfo(stockTag);
+            StockInfo pStockInfo = Quote_Manager._Manager.Stocks.Get_StockInfo(stockTag);
             return this.QuoteHistory(pStockInfo, endTime, quoteBars, quoteTime);
         }
         /// <summary>查询历史行情 
@@ -178,7 +178,7 @@ namespace zxcCore.zxcRobot.Quote
         protected internal List<Data_Quote> QuoteHistory(string stockTag, DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day)
         {
             //查询标的 
-            StockInfo pStockInfo = Quote_Manager._Quotes.Stocks.Get_StockInfo(stockTag);
+            StockInfo pStockInfo = Quote_Manager._Manager.Stocks.Get_StockInfo(stockTag);
             return this.QuoteHistory(pStockInfo, startTime, endTime, quoteTime);
         }
         /// <summary>查询历史行情 

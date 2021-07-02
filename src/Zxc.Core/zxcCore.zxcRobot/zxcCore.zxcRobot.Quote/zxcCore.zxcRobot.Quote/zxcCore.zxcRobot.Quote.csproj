@@ -12,4 +12,8 @@
     <ProjectReference Include="..\zxcCore.zxcRobot.Quote.JQData\zxcCore.zxcRobot.Quote.JQData.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Analysis\" />
+  </ItemGroup>
+
 </Project>

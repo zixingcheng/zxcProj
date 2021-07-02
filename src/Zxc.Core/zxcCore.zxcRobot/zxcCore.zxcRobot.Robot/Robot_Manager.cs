@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using zxcCore.zxcData.Cache.MemoryDB;
 using zxcCore.zxcRobot.Monitor.Msg;
 using zxcCore.zxcRobot.Monitor.Quote;
+using zxcCore.zxcRobot.Quote;
 using zxcCore.zxcRobot.Robot.Power;
 
 namespace zxcCore.zxcRobot.Robot
@@ -31,9 +32,6 @@ namespace zxcCore.zxcRobot.Robot
         /// <summary>消息处理对象
         /// </summary>
         protected internal MsgsHandler _msgsHandler = new MsgsHandler("zxcRobot");
-        /// <summary>行情数据管理对象
-        /// </summary>
-        protected internal Data_Quote_Manager _managerQuote = new Data_Quote_Manager();
         /// <summary>是否初始
         /// </summary>
         protected internal bool _isInited = false;
@@ -84,12 +82,12 @@ namespace zxcCore.zxcRobot.Robot
         //消息交换对象监测开始
         public bool Start()
         {
-            return _msgSwaper.Start() && _managerQuote.Start(-1, 1);
+            return _msgSwaper.Start() && Quote_Manager._Manager.StartMonitor();
         }
         //消息交换对象监测结束
         public bool Stop()
         {
-            return _msgSwaper.Stop();
+            return _msgSwaper.Stop() && Quote_Manager._Manager.StopMonitor();
         }
 
     }

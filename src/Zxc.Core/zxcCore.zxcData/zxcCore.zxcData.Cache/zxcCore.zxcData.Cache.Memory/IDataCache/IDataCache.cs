@@ -86,5 +86,6 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="data">数据</param>
         /// <returns></returns>
         bool CheckData(DateTime dtTime, T data);
+
     }
 }

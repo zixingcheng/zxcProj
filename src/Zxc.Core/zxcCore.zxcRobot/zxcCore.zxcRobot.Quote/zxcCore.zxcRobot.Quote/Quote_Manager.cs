@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using zxcCore.Common;
+using zxcCore.zxcData.Cache.Memory;
+using zxcCore.zxcRobot.Monitor.Quote;
 using zxcCore.zxcRobot.Quote.Data;
 
 namespace zxcCore.zxcRobot.Quote
@@ -21,7 +23,7 @@ namespace zxcCore.zxcRobot.Quote
     {
         /// <summary>全局行情管理器
         /// </summary>
-        public static readonly Quote_Manager _Quotes = new Quote_Manager();
+        public static readonly Quote_Manager _Manager = new Quote_Manager();
 
         #region 属性及构造
 
@@ -58,6 +60,17 @@ namespace zxcCore.zxcRobot.Quote
         }
 
 
+        /// <summary>行情数据监测管理对象
+        /// </summary>
+        protected internal QuoteMonitor _Monitor = new QuoteMonitor();
+        /// <summary>行情数据监测管理对象
+        /// </summary>
+        public QuoteMonitor QuoteMonitor
+        {
+            get { return _Monitor; }
+        }
+
+
         public Quote_Manager()
         {
             _quoteDatas = new Dictionary<string, QuoteData>();
@@ -70,13 +83,25 @@ namespace zxcCore.zxcRobot.Quote
         #endregion
 
 
+        //行情监测开始
+        public bool StartMonitor()
+        {
+            return _Monitor.Start(-1, 1);
+        }
+        //行情监测结束
+        public bool StopMonitor()
+        {
+            return _Monitor.Stop();
+        }
+
+
         /// <summary>获取行情对象
         /// <param name="stockTag">标的标识</param>
         /// <returns></returns>
         protected internal QuoteData Get_QuoteData(string stockTag)
         {
             //校检标识 
-            stockTag = Quote_Manager._Quotes.Stocks.Check_StockTag(stockTag);
+            stockTag = Quote_Manager._Manager.Stocks.Check_StockTag(stockTag);
             if (stockTag == "") return null;
 
             //提取行情对象

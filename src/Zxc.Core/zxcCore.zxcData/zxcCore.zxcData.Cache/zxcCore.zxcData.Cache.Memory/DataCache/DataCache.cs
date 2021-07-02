@@ -86,6 +86,7 @@ namespace zxcCore.zxcData.Cache.Memory
             return datas.Count;
         }
 
+
         public bool SetData(DateTime dtTime, T data)
         {
             //未做重复性验证 
@@ -182,5 +183,6 @@ namespace zxcCore.zxcData.Cache.Memory
             }
             return true;
         }
+
     }
 }
