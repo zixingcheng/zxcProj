@@ -10,6 +10,17 @@ namespace zxcCore.zxcData.Cache.Memory
     {
         #region 属性及构造
 
+        /// <summary>缓存数据初始装载事件
+        /// </summary>
+        public event DataCacheLoad_EventHandler DataCache_Load;
+        /// <summary>缓存数据检查对象初始事件
+        /// </summary>
+        public event DataCacheChecksInitial_EventHandler DataChecks_Initial;
+        /// <summary>缓存数据变动事件
+        /// </summary>
+        public event DataCacheChange_EventHandler DataCache_Change;
+
+
         protected internal string _id = "";
         public string ID
         {
@@ -34,24 +45,33 @@ namespace zxcCore.zxcData.Cache.Memory
 
         /// <summary>数据缓存集
         /// </summary>
-        Dictionary<DateTime, T> _DataCaches = null;
-        public Dictionary<DateTime, T> DataCaches
+        Dictionary<DateTime, CacheInfo<T>> _DataCaches = null;
+        public Dictionary<DateTime, CacheInfo<T>> DataCaches
         {
             get { return _DataCaches; }
         }
 
+
+        ///// <summary>数据缓存集
+        ///// </summary>
+        //Dictionary<DateTime, T> _DataCaches = null;
+        //public Dictionary<DateTime, T> DataCaches
+        //{
+        //    get { return _DataCaches; }
+        //}
         //List<T> _DataCaches = null;
         //public List<T> DataCaches
         //{
         //    get { return _DataCaches; }
         //}
-
         public DataCache(string tagName, typeTimeFrequency typeTimeFrequency, int cacheNums, IDataCache_Set srcDataCache_Set, IDataChecks dataChecks = null)
         {
-            _DataCaches = new Dictionary<DateTime, T>();
+            _DataCaches = new Dictionary<DateTime, CacheInfo<T>>();
             _DataCache_Set = new DataCache_Set(tagName, srcDataCache_Set.Time_Base, typeTimeFrequency, cacheNums, srcDataCache_Set.Info_Factor, srcDataCache_Set);
             _id = _DataCache_Set.ID;
             _DataChecks = dataChecks;
+
+            //初始数据
             this.Init(DateTime.Now);
         }
         ~DataCache()
@@ -64,6 +84,7 @@ namespace zxcCore.zxcData.Cache.Memory
 
         #endregion
 
+
         public int Init(DateTime dtData)
         {
             _DataCaches.Clear();
@@ -72,7 +93,7 @@ namespace zxcCore.zxcData.Cache.Memory
             for (int i = this._DataCache_Set.Sum_Step - 1; i >= 0; i--)
             {
                 DateTime dtTime = this._DataCache_Set.Time_End.AddSeconds(-i * this._DataCache_Set.Time_Step);
-                this._DataCaches.Add(dtTime, default(T));
+                this.InitDataCache(dtTime, default(T));
             }
             return this._DataCache_Set.Sum_Step;
         }
@@ -80,20 +101,57 @@ namespace zxcCore.zxcData.Cache.Memory
         {
             foreach (KeyValuePair<DateTime, T> data in datas)
             {
-                DateTime dtTime_Check = _DataCache_Set.CheckTime(data.Key);
-                _DataCaches[dtTime_Check] = data.Value;
+                this.InitDataCache(data.Key, data.Value);
             }
             return datas.Count;
+        }
+        public CacheInfo<T> InitDataCache(DateTime dtTime, T data, bool bAdd = true)
+        {
+            DateTime dtTime_Check = _DataCache_Set.CheckTime(dtTime);
+            CacheInfo<T> pCacheInfo = new CacheInfo<T>(dtTime, data);
+
+            //执行添加
+            if (bAdd)
+                if (!this.SetData(pCacheInfo))
+                    return null;
+            return pCacheInfo;
         }
 
 
         public bool SetData(DateTime dtTime, T data)
         {
             //未做重复性验证 
-            //this._DataCache_Set.Can_Refesh
-            DateTime dtTime_Check = _DataCache_Set.CheckTime(dtTime);
-            _DataCaches[dtTime_Check] = data;
-            return this.SetLastTime(dtTime_Check) && this.CheckData(dtTime, data);
+            CacheInfo<T> pCacheInfo = this.InitDataCache(dtTime, data);
+            if (pCacheInfo == null)
+                return false;
+            return true;
+        }
+        public bool SetData(CacheInfo<T> pCacheInfo)
+        {
+            if (pCacheInfo == null) return false;
+
+            //缓存数据对象
+            pCacheInfo.IsNewDataTime = this.DataCache_Set.IsNewDataTime(pCacheInfo.DateTime);     // 数据变动状态判断
+            _DataCaches[pCacheInfo.DateTime] = pCacheInfo;
+
+
+            //数据变更事件
+            if (this.DataCache_Change != null)
+            {
+                DataCache_Event pArgs = new DataCache_Event(this, pCacheInfo);
+                try
+                {
+                    this.DataCache_Change(null, pArgs);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+
+            //更新数据设置与检查执行
+            bool bResult = this.SetLastTime(pCacheInfo.DateTime) && this.CheckData(pCacheInfo.DateTime, pCacheInfo.Data);
+            return bResult;
         }
         public bool SetLastTime(DateTime dtLast)
         {
@@ -112,9 +170,9 @@ namespace zxcCore.zxcData.Cache.Memory
         {
             DateTime dtTime_Check = _DataCache_Set.CheckTime(dtTime);
 
-            T value;
+            CacheInfo<T> value;
             _DataCaches.TryGetValue(dtTime_Check, out value);
-            return value;
+            return value.Data;
         }
         public List<T> GetDatas(DateTime dtStart, DateTime dtEnd)
         {
@@ -180,6 +238,42 @@ namespace zxcCore.zxcData.Cache.Memory
 
                 pDataCheck.InitDataCache(this);
                 _DataChecks.InitDataCheck<T>(tagName, pDataCheck, isCanCover);
+            }
+            return true;
+        }
+
+
+        //触发数据装载事件--便于外部统一装载数据
+        public bool Event_DataCache_Load()
+        {
+            if (this.DataCache_Load != null)
+            {
+                DataCache_Event pArgs = new DataCache_Event(this, null); 
+                try
+                {
+                    this.DataCache_Load(null, pArgs);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            return true;
+        }
+        //缓存数据检查对象初始事件--便于外部统一设置检查对象
+        public bool Event_DataChecks_Initial()
+        {
+            if (this.DataChecks_Initial != null)
+            {
+                DataCache_Event pArgs = new DataCache_Event(this, null); ;
+                try
+                {
+                    this.DataChecks_Initial(null, pArgs);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
             return true;
         }

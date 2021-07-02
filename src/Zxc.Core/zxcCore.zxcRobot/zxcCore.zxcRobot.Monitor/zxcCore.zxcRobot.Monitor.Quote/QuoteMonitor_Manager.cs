@@ -46,6 +46,13 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             _managerCaches.Init(DateTime.Now);
 
             this.InitDataSawp();        //初始数据交换对象信息
+
+            //事件注册
+            _managerCaches.DataCache_Load += new DataCacheLoad_EventHandler(EventHandler_DataCacheLoad);
+            _managerCaches.DataCacheChecks_Initial += new DataCacheChecksInitial_EventHandler(EventHandler_DataCacheChecksInitial);
+            _managerCaches.DataCache_Change += new DataCacheChange_EventHandler(EventHandler_DataCacheChange);
+            _managerCaches.DataCachesChecks_Initial += new DataCachesChecksInitial_EventHandler(EventHandler_DataCachesChecksInitial);
+            _managerCaches.DataCachesManageChecks_Initial += new DataCachesManageChecksInitial_EventHandler(EventHandler_DataCachesManageChecksInitial);
         }
         ~QuoteMonitor_Manager()
         {
@@ -109,14 +116,16 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 //初始数据所有缓存对象
                 foreach (var item in _setsDataCache)
                 {
-                    _managerCaches.InitDataCache<Data_Quote_Swap>(pFactors, pFactor, "", item.Key, item.Value);
+                    //提取数据缓存对象、及检查对象集
+                    IDataCache<Data_Quote_Swap> poDataCache = _managerCaches.GetDataCache<Data_Quote_Swap>(pFactors, pFactor, "", item.Key, true, item.Value);
+                    //_managerCaches.InitDataCache<Data_Quote_Swap>(pFactors, pFactor, "", item.Key, item.Value);
                 }
 
                 //初始规则信息集合-Caches
-                bResult = this.InitDataChecks_Caches(pFactors, pFactor);
+                //bResult = this.InitDataChecks_Caches(pFactors, pFactor);
 
                 //初始规则信息集合-Cache
-                bResult = bResult && this.InitDataChecks_Cache(pFactors, pFactor, data);
+                //bResult = bResult && this.InitDataChecks_Cache(pFactors, pFactor, data);
                 _dictQuotes[_getTag(data)] = true;
                 return bResult;
             }
@@ -130,10 +139,10 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             _dictQuotes.TryGetValue(tag, out bInited);
             if (!bInited)
                 this.InitDataCache(pData);
-            return this.SetDataCache_Values(pData);
+            return this.SetDataCache_ValueChecks(pData);
         }
         //设置缓存数据对象
-        public virtual bool SetDataCache_Values(Data_Quote_Swap pData)
+        public virtual bool SetDataCache_ValueChecks(Data_Quote_Swap pData)
         {
             //默认只设置最底级数据，
             bool bResult = _managerCaches.SetData<Data_Quote_Swap>(pData._exType, pData.StockID_Tag, "", pData.DateTime, pData, typeTimeFrequency.Second);
@@ -158,8 +167,9 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         }
 
 
-        //初始规则信息集合-Caches
-        public virtual bool InitDataChecks_Caches(IData_Factors pFactors, IData_Factor pFactor)
+
+        //初始规则信息集合-Caches-弃用
+        private bool InitDataChecks_Caches(IData_Factors pFactors, IData_Factor pFactor)
         {
             IDataCaches dataCaches = _managerCaches.GetDataCaches(pFactors, pFactor);
             IDataChecks poDataChecks_Caches = new DataChecks_Quote(dataCaches.ID, dataCaches);
@@ -167,8 +177,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
             return bResult;
         }
-        //初始规则信息集合-Cache
-        public virtual bool InitDataChecks_Cache(IData_Factors pFactors, IData_Factor pFactor, Data_Quote_Swap data)
+        //初始规则信息集合-Cache-弃用
+        private bool InitDataChecks_Cache(IData_Factors pFactors, IData_Factor pFactor, Data_Quote_Swap data)
         {
             //数据缓存集检查
             IDataCaches dataCaches = _managerCaches.GetDataCaches(pFactors, pFactor);
@@ -179,9 +189,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             bool bResult = this.InitDataChecks_CheckAll(dataCaches);
             return bResult;
         }
-
-        //初始规则信息集合-全部
-        public virtual bool InitDataChecks_CheckAll(IDataCaches dataCaches)
+        //初始规则信息集合-全部-弃用
+        private bool InitDataChecks_CheckAll(IDataCaches dataCaches)
         {
             bool bResult = true;
             foreach (var item in _setsDataCache)
@@ -190,8 +199,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             }
             return bResult;
         }
-        //初始规则信息集合-指定时间级别
-        public virtual bool InitDataChecks_Check(IDataCaches dataCaches, typeTimeFrequency timeFrequency)
+        //初始规则信息集合-指定时间级别-弃用
+        private bool InitDataChecks_Check(IDataCaches dataCaches, typeTimeFrequency timeFrequency)
         {
             //数据缓存集检查
             if (dataCaches == null) return false;
@@ -205,6 +214,9 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             bResult = bResult && this.InitDataCheck(poDataChecks_Cache, timeFrequency);
             return bResult;
         }
+
+
+
         //初始数据检查对象集合-分钟级别
         public virtual bool InitDataCheck(IDataChecks pDataChecks, typeTimeFrequency timeFrequency)
         {
@@ -238,11 +250,11 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             }
             return true;
         }
-
         //初始数据检查对象
         public virtual bool InitDataCheck_Instance(IDataChecks pDataChecks, Type dest_ClassType)
         {
             if (pDataChecks == null) return false;
+
             string setting = "";
             var instance = this.CreateData_CheckObj<Data_Quote_Swap>(dest_ClassType, null, setting);
             DataCheck_Quote<Data_Quote_Swap> pDataCheck = (DataCheck_Quote<Data_Quote_Swap>)instance;
@@ -277,6 +289,51 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 //    continue;
                 //ConsoleHelper.Debug("\t**********" + pData.Time);
             }
+        }
+
+        //缓存数据初始装载事件
+        public virtual void EventHandler_DataCacheLoad(object sender, DataCache_Event e)
+        {
+
+        }
+        //缓存数据检查对象初始事件
+        public virtual void EventHandler_DataCacheChecksInitial(object sender, DataCache_Event e)
+        {
+            //提取数据缓存对象、及检查对象集
+            IDataCache<Data_Quote_Swap> poDataCache = (IDataCache<Data_Quote_Swap>)e.DataCache;
+            if (poDataCache != null)
+            {
+                IDataChecks poDataChecks_Cache = poDataCache.DataChecks;
+                if (poDataChecks_Cache == null)
+                    poDataChecks_Cache = new DataChecks_Quote(poDataCache.ID, poDataCache, null, _msger);
+
+                //初始检查集
+                bool bResult = poDataCache.InitDataChecks(poDataChecks_Cache);
+                bResult = bResult && this.InitDataCheck(poDataChecks_Cache, poDataCache.DataCache_Set.Time_Frequency);
+            }
+        }
+        //缓存数据变动事件
+        public virtual void EventHandler_DataCacheChange(object sender, DataCache_Event e)
+        {
+
+        }
+        //缓存数据集检查对象初始事件
+        public virtual void EventHandler_DataCachesChecksInitial(object sender, DataCaches_Event e)
+        {
+            DataCaches dataCaches = e.DataCaches;
+            if (dataCaches != null)
+            {
+                IDataChecks poDataChecks_Caches = dataCaches.DataChecks;
+                if (poDataChecks_Caches == null)
+                    poDataChecks_Caches = new DataChecks_Quote(dataCaches.ID, dataCaches);
+
+                bool bResult = dataCaches.InitDataChecks(poDataChecks_Caches);
+            }
+        }
+        //缓存数据集管理对象检查对象初始事件
+        public virtual void EventHandler_DataCachesManageChecksInitial(object sender, DataCachesManage_Event e)
+        {
+            //忽略
         }
 
 

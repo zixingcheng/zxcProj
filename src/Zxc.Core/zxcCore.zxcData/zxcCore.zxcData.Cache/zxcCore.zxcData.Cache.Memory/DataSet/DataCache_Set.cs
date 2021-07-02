@@ -88,6 +88,8 @@ namespace zxcCore.zxcData.Cache.Memory
             set { _canRefesh = value; }
         }
 
+
+        DateTime _dtDataNow;        //当前数据时间步    
         public DataCache_Set(string tagName, DateTime dtBase, typeTimeFrequency typeTimeFrequency, int cacheNums, IData_Factor infoFactor, IDataCache_Set srcDataCache_Set = null) : base(tagName)
         {
             if (tagName == "") tagName = infoFactor.ID;
@@ -114,6 +116,10 @@ namespace zxcCore.zxcData.Cache.Memory
             _dtEnd = CheckTime(dtBase); ;
             _dtStart = _dtEnd.AddSeconds(-_dtStep * (_sumStep - 1));
             _indStep = this.GetInd(_dtEnd);
+
+            DateTime dtNow = DateTime.Now.AddDays(-1);
+            _dtLast = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, 0, 0, 0);
+            _dtDataNow = _dtLast;
             return true;
         }
         public bool Inited()
@@ -197,21 +203,22 @@ namespace zxcCore.zxcData.Cache.Memory
             }
             return dtTime;
         }
-
-        public bool IsVaildTime(DateTime dtTime)
+        public bool IsNewDataTime(DateTime dtTime)
         {
             bool isVaild = false;
-            int nSecond = (int)((dtTime - this._dtLast).TotalSeconds);
-            switch (_Time_Frequency)
-            {
-                case typeTimeFrequency.Day:
+            int nSeconds = (int)typeTimeFrequency.Day;
+            int nDeltas = (int)((dtTime - this._dtDataNow).TotalSeconds);
 
-                //    break;
-                default:
-                    break;
+            //有效性判断
+            if (nDeltas > nSeconds)
+            {
+                isVaild = true;
+                _dtDataNow = dtTime;
             }
             return isVaild;
         }
+
+
         public string GetTagName(typeTimeFrequency typeTimeFrequency, string strTag = "")
         {
             _tagName = strTag;

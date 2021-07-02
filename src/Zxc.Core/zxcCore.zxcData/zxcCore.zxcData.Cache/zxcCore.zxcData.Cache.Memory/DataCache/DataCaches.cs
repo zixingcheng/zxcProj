@@ -10,6 +10,11 @@ namespace zxcCore.zxcData.Cache.Memory
     {
         #region 属性及构造
 
+        /// <summary>缓存数据检查对象初始事件
+        /// </summary>
+        public event DataCachesChecksInitial_EventHandler DataChecks_Initial;
+
+
         string _id = "";
         public string ID
         {
@@ -46,7 +51,6 @@ namespace zxcCore.zxcData.Cache.Memory
             _DataCache_Set = new DataCache_Set(info_Factor.ID, srcDataCache_Set.Time_Base, typeTimeFrequency.None, 0, info_Factor, srcDataCache_Set);
             _id = _DataCache_Set.ID;
             dataChecks = _DataChecks;
-
             _DataCaches = new Dictionary<string, IDataCache>();
         }
         ~DataCaches()
@@ -69,7 +73,7 @@ namespace zxcCore.zxcData.Cache.Memory
                 _DataCaches[data.ID] = data;
                 return true;
             }
-            return false;
+            return true;
         }
         public IDataCache<T> GetDataCache<T>(string tagName, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None, bool autoInit = false, int cacheNums = 1)
         {
@@ -107,6 +111,7 @@ namespace zxcCore.zxcData.Cache.Memory
             return true;
         }
 
+
         public bool CheckData()
         {
             //以检查集的方式统一管理--观察者模式
@@ -124,6 +129,7 @@ namespace zxcCore.zxcData.Cache.Memory
                 {
                     if (this._DataChecks.Parent.DataCaches_Manage != null)
                     {
+                        //递归上级检查处理
                         bResult = this._DataChecks.Parent.DataCaches_Manage.CheckData<T>(dtTime, data, this);
                     }
                 }
@@ -132,10 +138,11 @@ namespace zxcCore.zxcData.Cache.Memory
             return false;
         }
 
-        // 初始单个
-        public void Init_Set(IDataSet setInfo)
-        {
-        }
+
+        //// 初始单个
+        //public void Init_Set(IDataSet setInfo)
+        //{
+        //}
         //public List<typeTimeFrequency> GetTimeFrequencys()
         //{
         //    List<typeTimeFrequency> types = new List<typeTimeFrequency>();
@@ -155,5 +162,25 @@ namespace zxcCore.zxcData.Cache.Memory
         {
             return this.DataCache_Set.GetTagName(typeTimeFrequency, strTag);
         }
+
+
+        //缓存数据检查对象初始事件--便于外部统一设置检查对象
+        public bool Event_DataChecks_Initial()
+        {
+            if (this.DataChecks_Initial != null)
+            {
+                DataCaches_Event pArgs = new DataCaches_Event(this); 
+                try
+                {
+                    this.DataChecks_Initial(null, pArgs);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            return true;
+        }
+
     }
 }

@@ -16,6 +16,7 @@ namespace zxcCore.zxcData.Cache.Swap
         /// </summary>
         public event DataSwapChange_EventHandler SwapData_Change;
 
+
         protected internal bool _is_Running = false;
         public bool Is_Running
         {
@@ -61,6 +62,7 @@ namespace zxcCore.zxcData.Cache.Swap
         }
 
         #endregion
+
 
         /// <summary>开始数据交换
         /// </summary>

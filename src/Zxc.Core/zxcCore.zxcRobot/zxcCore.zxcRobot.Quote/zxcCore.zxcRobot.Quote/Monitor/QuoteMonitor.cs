@@ -73,12 +73,11 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 case typeTimeFrequency.None:
                     break;
                 case typeTimeFrequency.Second:
+                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_RiseFall_Fixed<Data_Quote_Swap>));
                     break;
                 case typeTimeFrequency.Second_30:
                     break;
                 case typeTimeFrequency.Minute_1:
-                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Hourly<Data_Quote_Swap>));
-                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_RiseFall_Fixed<Data_Quote_Swap>));
                     this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk<Data_Quote_Swap>));
                     break;
                 case typeTimeFrequency.Minute_5:
@@ -90,6 +89,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 case typeTimeFrequency.Minute_30:
                     break;
                 case typeTimeFrequency.Minute_60:
+                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Hourly<Data_Quote_Swap>));
                     break;
                 case typeTimeFrequency.Minute_120:
                     break;

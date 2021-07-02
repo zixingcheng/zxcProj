@@ -113,11 +113,11 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="dtBase"></param>
         /// <returns></returns>
         DateTime CheckTime(DateTime dtBase);
-        /// <summary>时间有效性检查
+        /// <summary>检查是否为新数据时间
         /// </summary>
         /// <param name="dtBase"></param>
         /// <returns></returns>
-        bool IsVaildTime(DateTime dtTime);
+        bool IsNewDataTime(DateTime dtTime);
 
     }
 

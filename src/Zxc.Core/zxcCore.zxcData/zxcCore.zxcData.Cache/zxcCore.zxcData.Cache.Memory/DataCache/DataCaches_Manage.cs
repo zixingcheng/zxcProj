@@ -9,6 +9,11 @@ namespace zxcCore.zxcData.Cache.Memory
     {
         #region 属性及构造
 
+        /// <summary>缓存数据检查对象初始事件
+        /// </summary>
+        public event DataCachesManageChecksInitial_EventHandler DataChecks_Initial;
+
+
         public string Tag { get; }
 
         /// <summary>因子缓存数据设置对象
@@ -71,7 +76,7 @@ namespace zxcCore.zxcData.Cache.Memory
                 _DataCaches[data.ID] = data;
                 return true;
             }
-            return false;
+            return true;
         }
         public bool InitDataCache<T>(IData_Factor infoFactor, string tagName, typeTimeFrequency typeTimeFrequency, int cacheNums)
         {
@@ -170,5 +175,25 @@ namespace zxcCore.zxcData.Cache.Memory
             }
             return true;
         }
+
+
+        //缓存数据检查对象初始事件--便于外部统一设置检查对象
+        public bool Event_DataChecks_Initial()
+        {
+            if (this.DataChecks_Initial != null)
+            {
+                DataCachesManage_Event pArgs = new DataCachesManage_Event(this); 
+                try
+                {
+                    this.DataChecks_Initial(null, pArgs);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            return true;
+        }
+
     }
 }

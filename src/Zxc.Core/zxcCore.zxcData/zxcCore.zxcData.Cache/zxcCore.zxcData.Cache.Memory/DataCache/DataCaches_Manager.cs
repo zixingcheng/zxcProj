@@ -9,6 +9,23 @@ namespace zxcCore.zxcData.Cache.Memory
     {
         #region 属性及构造
 
+        /// <summary>缓存数据初始装载事件
+        /// </summary>
+        public event DataCacheLoad_EventHandler DataCache_Load;
+        /// <summary>缓存数据检查对象初始事件
+        /// </summary>
+        public event DataCacheChecksInitial_EventHandler DataCacheChecks_Initial;
+        /// <summary>缓存数据变动事件
+        /// </summary>
+        public event DataCacheChange_EventHandler DataCache_Change;
+        /// <summary>缓存数据集检查对象初始事件
+        /// </summary>
+        public event DataCachesChecksInitial_EventHandler DataCachesChecks_Initial;
+        /// <summary>缓存数据集管理对象检查对象初始事件
+        /// </summary>
+        public event DataCachesManageChecksInitial_EventHandler DataCachesManageChecks_Initial;
+
+
         /// <summary>因子缓存数据设置对象-主要用于统一信息
         /// </summary>
         IDataCache_Set _DataCache_Set = null;
@@ -69,23 +86,44 @@ namespace zxcCore.zxcData.Cache.Memory
             return _isInited;
         }
         // 初始单个数据缓存集管理类（集中管理，如数采仪为一个集中管理类）
-        public bool InitDataCaches_Manage(IData_Factors infoFactors)
+        public bool InitDataCaches_Manage(IData_Factors infoFactors, bool useEvent = false)
         {
             if (_isInited == false) return false;
             if (this.GetDataCaches_Manage(infoFactors) == null)
             {
                 DataCaches_Manage dataManage = new DataCaches_Manage(infoFactors, _DataCache_Set);
                 _DataCaches_Manages[dataManage.Tag] = dataManage;
+
+                //注册检查集初始事件
+                if (useEvent)
+                {
+                    dataManage.DataChecks_Initial += new DataCachesManageChecksInitial_EventHandler(EventHandler_DataCachesManageChecksInitial);
+                    dataManage.Event_DataChecks_Initial();
+                }
                 return true;
             }
-            return false;
+            return true;
         }
         // 按因子对象初始因子数据缓存集
-        public bool InitDataCaches(IData_Factors infoFactors, IData_Factor infoFactor)
+        public bool InitDataCaches(IData_Factors infoFactors, IData_Factor infoFactor, bool useEvent = false)
         {
-            //提取管理类
-            IDataCaches_Manage dataManage = this.GetDataCaches_Manage(infoFactors, true);
-            return this._IndexFactors(infoFactors, infoFactor) && dataManage.InitDataCaches(infoFactor);
+            if (_isInited == false) return false;
+            IDataCaches_Manage dataManage = this.GetDataCaches_Manage(infoFactors);
+            if (dataManage == null) return false;
+
+            if (dataManage.GetDataCaches(infoFactor, false) == null)
+            {
+                DataCaches dataCaches = (DataCaches)dataManage.GetDataCaches(infoFactor, true);
+
+                //注册检查集初始事件
+                if (useEvent)
+                {
+                    dataCaches.DataChecks_Initial += new DataCachesChecksInitial_EventHandler(EventHandler_DataCachesChecksInitial);
+                    dataCaches.Event_DataChecks_Initial();
+                }
+                return this._IndexFactors(infoFactors, infoFactor);
+            }
+            return true;
         }
         /// <summary>按因子对象初始因子数据缓存对象
         /// 
@@ -97,20 +135,51 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="typeTimeFrequency">数据频率</param>
         /// <param name="cacheNums">缓存数据数量</param>
         /// <returns></returns>
-        public bool InitDataCache<T>(IData_Factors infoFactors, IData_Factor infoFactor, string tagName, typeTimeFrequency typeTimeFrequency, int cacheNums)
+        public bool InitDataCache<T>(IData_Factors infoFactors, IData_Factor infoFactor, string tagName, typeTimeFrequency typeTimeFrequency, int cacheNums, bool useEvent = false)
         {
-            //提取管理类
-            IDataCaches_Manage dataManage = this.GetDataCaches_Manage(infoFactors, true);
-            return this._IndexFactors(infoFactors, infoFactor) &&
-                        dataManage.InitDataCache<T>(infoFactor, tagName, typeTimeFrequency, cacheNums);
-        }
-        public int InitDataCache_Data<T>(IData_Factors infoFactors, IData_Factor infoFactor, string tagName, typeTimeFrequency typeTimeFrequency, Dictionary<DateTime, T> datas)
-        {
-            //提取管理类
-            IDataCache<T> dataCache = GetDataCache<T>(infoFactors, infoFactor, tagName, typeTimeFrequency);
-            if (dataCache == null) return -1;
+            if (_isInited == false) return false;
+            DataCaches dataCaches = (DataCaches)this.GetDataCaches(infoFactors, infoFactor);
+            if (dataCaches == null) return false;
 
-            return dataCache.InitDatas(datas);
+            if (dataCaches.GetDataCache<T>(tagName, typeTimeFrequency) == null)
+            {
+                DataCache<T> dataCache = (DataCache<T>)dataCaches.GetDataCache<T>(tagName, typeTimeFrequency, true, cacheNums);
+
+                //注册事件
+                if (useEvent)
+                {
+                    dataCache.DataCache_Load += new DataCacheLoad_EventHandler(EventHandler_DataCacheLoad);
+                    dataCache.DataChecks_Initial += new DataCacheChecksInitial_EventHandler(EventHandler_DataCacheChecksInitial);
+                    dataCache.DataCache_Change += new DataCacheChange_EventHandler(EventHandler_DataCacheChange);
+                    dataCache.Event_DataCache_Load();
+                    dataCache.Event_DataChecks_Initial();
+                }
+                return this._IndexFactors(infoFactors, infoFactor);
+            }
+            return true;
+        }
+        public int InitDataCache_Data<T>(IData_Factors infoFactors, IData_Factor infoFactor, string tagName, typeTimeFrequency typeTimeFrequency, Dictionary<DateTime, T> datas, bool useEvent = false)
+        {
+            if (_isInited == false) return -1;
+            DataCaches dataCaches = (DataCaches)this.GetDataCaches(infoFactors, infoFactor);
+            if (dataCaches == null) return -1;
+
+            if (dataCaches.GetDataCache<T>(tagName, typeTimeFrequency) == null)
+            {
+                DataCache<T> dataCache = (DataCache<T>)dataCaches.GetDataCache<T>(tagName, typeTimeFrequency, true, 0);
+
+                //注册事件
+                if (useEvent)
+                {
+                    dataCache.DataCache_Load += new DataCacheLoad_EventHandler(EventHandler_DataCacheLoad);
+                    dataCache.DataChecks_Initial += new DataCacheChecksInitial_EventHandler(EventHandler_DataCacheChecksInitial);
+                    dataCache.DataCache_Change += new DataCacheChange_EventHandler(EventHandler_DataCacheChange);
+                    dataCache.Event_DataCache_Load();
+                    dataCache.Event_DataChecks_Initial();
+                }
+                return dataCache.InitDatas(datas);
+            }
+            return -1;
         }
 
 
@@ -178,7 +247,7 @@ namespace zxcCore.zxcData.Cache.Memory
             }
             if (autoInit && dataManage == null)
             {
-                if (InitDataCaches_Manage(infoFactors))
+                if (this.InitDataCaches_Manage(infoFactors, autoInit))
                     return GetDataCaches_Manage(infoFactors);
             }
             return dataManage;
@@ -193,9 +262,16 @@ namespace zxcCore.zxcData.Cache.Memory
         {
             //提取管理类
             IDataCaches_Manage dataManage = this.GetDataCaches_Manage(infoFactors, autoInit);
-            if (dataManage == null) return null;
+            if (dataManage == null) 
+                return null;
 
-            return dataManage.GetDataCaches(infoFactor, autoInit);
+            IDataCaches dataCaches = dataManage.GetDataCaches(infoFactor, false);
+            if (autoInit && dataCaches == null)
+            {
+                if (this.InitDataCaches(infoFactors, infoFactor, autoInit))
+                    return GetDataCaches(infoFactors, infoFactor);
+            }
+            return dataCaches;
         }
         /// <summary>按因子对象集、因子对象提取缓存数据对象
         /// </summary>
@@ -210,11 +286,20 @@ namespace zxcCore.zxcData.Cache.Memory
         public IDataCache<T> GetDataCache<T>(IData_Factors infoFactors, IData_Factor infoFactor, string strTag = "", typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None, bool autoInit = false, int cacheNums = 1)
         {
             IDataCaches dataCaches = this.GetDataCaches(infoFactors, infoFactor, autoInit);
-            if (dataCaches == null) return null;
+            if (dataCaches == null) 
+                return null;
 
-            IDataCache<T> data = dataCaches.GetDataCache<T>(strTag, typeTimeFrequency, autoInit, cacheNums);
-            return data;
+            IDataCache<T> dataCache = dataCaches.GetDataCache<T>(strTag, typeTimeFrequency);
+            if (autoInit && dataCache == null)
+            {
+                if (this.InitDataCache<T>(infoFactors, infoFactor, strTag, typeTimeFrequency, cacheNums, autoInit))
+                    return GetDataCache<T>(infoFactors, infoFactor);
+            }
+
+            //事件触发
+            return dataCache;
         }
+
 
         /// <summary>按因子对象集、因子对象等设置缓存数据
         /// </summary>
@@ -325,5 +410,88 @@ namespace zxcCore.zxcData.Cache.Memory
             if (pFactors == null) return null;
             return pFactors.GetData_Factor(strTag);
         }
+
+
+        //缓存数据初始装载事件
+        public virtual void EventHandler_DataCacheLoad(object sender, DataCache_Event e)
+        {
+            //事件转发-外部实现
+            if (this.DataCache_Load != null)
+            {
+                try
+                {
+                    this.DataCache_Load(sender, e);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+        //缓存数据检查对象初始事件
+        public virtual void EventHandler_DataCacheChecksInitial(object sender, DataCache_Event e)
+        {
+            //事件转发-外部实现
+            if (this.DataCacheChecks_Initial != null)
+            {
+                try
+                {
+                    this.DataCacheChecks_Initial(sender, e);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+        //缓存数据变动事件
+        public virtual void EventHandler_DataCacheChange(object sender, DataCache_Event e)
+        {
+            //事件转发-外部实现
+            if (this.DataCache_Change != null)
+            {
+                try
+                {
+                    this.DataCache_Change(sender, e);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+        //缓存数据集检查对象初始事件
+        public virtual void EventHandler_DataCachesChecksInitial(object sender, DataCaches_Event e)
+        {
+            //事件转发-外部实现
+            if (this.DataCachesChecks_Initial != null)
+            {
+                try
+                {
+                    this.DataCachesChecks_Initial(sender, e);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+        //缓存数据集管理对象检查对象初始事件
+        public virtual void EventHandler_DataCachesManageChecksInitial(object sender, DataCachesManage_Event e)
+        {
+            //事件转发-外部实现
+            if (this.DataCachesManageChecks_Initial != null)
+            {
+                try
+                {
+                    this.DataCachesManageChecks_Initial(sender, e);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
     }
 }
