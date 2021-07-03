@@ -140,6 +140,7 @@ namespace zxcCore.zxcData.Cache.MemoryDB
             Data_Table<T> dtTemp = this.OnDBModelCreating<T>(objDataModel);
             foreach (var item in dtTemp)
             {
+                item.Init();        //主动调用初始操作，避免初始不完全     
                 objDataModel.Add(item, false, false, true);
             }
             objDataModel._dbPath = dtTemp._dbPath;

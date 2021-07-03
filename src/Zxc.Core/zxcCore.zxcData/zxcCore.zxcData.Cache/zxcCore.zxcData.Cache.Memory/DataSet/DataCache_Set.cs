@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using zxcCore.Common;
 using zxcCore.Enums;
 using zxcCore.Extensions;
 
@@ -167,43 +168,7 @@ namespace zxcCore.zxcData.Cache.Memory
 
         public DateTime CheckTime(DateTime dtBase)
         {
-            DateTime dtTime = dtBase;
-            switch (_Time_Frequency)
-            {
-                case typeTimeFrequency.day:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, 0, 0, 0);
-                    break;
-                case typeTimeFrequency.m1:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, dtBase.Minute, 0);
-                    break;
-                case typeTimeFrequency.m5:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 5.0) * 5, 0);
-                    break;
-                case typeTimeFrequency.m10:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 10.0) * 10, 0);
-                    break;
-                case typeTimeFrequency.m15:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 15.0) * 15, 0);
-                    break;
-                case typeTimeFrequency.m30:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 30.0) * 30, 0);
-                    break;
-                case typeTimeFrequency.m60:
-                    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, 0, 0);
-                    break;
-                //case typeTimeFrequency.Minute_120:
-                //    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, 0, 0);
-                //    break;
-                //case typeTimeFrequency.Second_30:
-                //    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, dtBase.Minute, (int)Math.Floor(dtBase.Second / 30.0) * 30);
-                //    break;
-                //case typeTimeFrequency.Week:
-                //    dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, 0, 0, 0);
-                //    break;
-                default:
-                    break;
-            }
-            return dtTime;
+            return zxcTimeHelper.CheckTime(dtBase, _Time_Frequency);
         }
         public bool IsNewDataTime(DateTime dtTime)
         {

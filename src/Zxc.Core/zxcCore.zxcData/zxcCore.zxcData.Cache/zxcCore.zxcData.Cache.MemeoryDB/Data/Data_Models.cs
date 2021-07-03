@@ -52,10 +52,15 @@ namespace zxcCore.zxcData.Cache.MemoryDB
         #endregion
 
 
+        public virtual bool Init(dynamic poData = null)
+        {
+            return true;
+        }
         public object Clone()
         {
             return MemberwiseClone();
         }
+
 
         public virtual dynamic ToJson()
         {

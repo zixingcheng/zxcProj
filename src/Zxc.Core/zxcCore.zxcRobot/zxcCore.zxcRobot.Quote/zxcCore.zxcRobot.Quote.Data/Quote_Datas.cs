@@ -30,6 +30,9 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// <summary>库表--zxc标的信息数据表
         /// </summary>
         public DataTable_Stocks<StockInfo> _stocksZxc { get; set; }
+        /// <summary>库表--zxc标的信息数据操作记录表
+        /// </summary>
+        public DataTable_LogQuotes<LogData_Quote> _quotesLog { get; set; }
         /// <summary>库表--zxc标的监测设置表
         /// </summary>
         public DataTable_MonitorSets<MonitorSet> _setsMoitor { get; set; }

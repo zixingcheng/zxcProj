@@ -27,5 +27,6 @@ namespace zxcCore.zxcData.Cache.MemoryDB
         /// <summary>备注
         /// </summary>
         public string Remarks { get; set; }
+
     }
 }

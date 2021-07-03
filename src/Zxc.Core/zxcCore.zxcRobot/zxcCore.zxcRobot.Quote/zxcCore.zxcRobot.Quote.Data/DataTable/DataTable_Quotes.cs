@@ -24,9 +24,65 @@ namespace zxcCore.zxcRobot.Quote.Data
             //this._dtName = string.IsNullOrEmpty(_dtName) ? "dataTable_Points" : _dtName;
             //this.Init_PointsLog();
             StockInfo = stockInfo;
+            this._isNoDel = true;
         }
 
         #endregion
+
+
+        /// <summary>更新行情日志信息
+        /// </summary>
+        /// <param name="collection">行情数据集</param>
+        /// <param name="isDel">是否为删除</param>
+        /// <returns></returns>
+        public virtual bool Updata_LogQuote(IEnumerable<T> collection, bool isDel = false)
+        {
+            //计算行情数据时间段范围
+            Data_Quote pQuote = collection.First();
+            if (pQuote == null) return false;
+            StockInfo pStockInfo = pQuote.GetStockInfo();
+            if (pStockInfo == null) return false;
+
+            //更新日志
+            DateTime dtMax = collection.Max(e => e.DateTime);
+            DateTime dtMin = collection.Min(e => e.DateTime);
+            return Quote_Datas._Datas._quotesLog.Updata_LogQuote(pStockInfo.StockID_Tag, dtMin, dtMax, pQuote.QuoteTimeType, pQuote.QuotePlat, isDel);
+        }
+
+
+
+        /// <summary>添加对象集-剔除存在
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="isUnique">唯一性检查</param>
+        public override bool AddRange(IEnumerable<T> collection, bool isUnique = true, bool bUpdata = false, bool bCacheData = true)
+        {
+            bool bResult = base.AddRange(collection, isUnique, bUpdata, bCacheData);
+            if (bResult == false) return bResult;
+
+            return this.Updata_LogQuote(collection);
+        }
+        /// <summary>删除对象集
+        /// </summary>
+        /// <param name="collection"></param>
+        public override bool DeleteRange(IEnumerable<T> collection)
+        {
+            bool bResult = base.DeleteRange(collection);
+            if (bResult == false) return bResult;
+
+            return this.Updata_LogQuote(collection);
+        }
+        /// <summary>更新对象集
+        /// </summary>
+        /// <param name="collection"></param>
+        public override bool UpdateRange(IEnumerable<T> collection, bool bCacheData = true)
+        {
+            bool bResult = base.UpdateRange(collection, bCacheData);
+            if (bResult == false) return bResult;
+
+            return this.Updata_LogQuote(collection);
+        }
+
 
 
         /// <summary>对象是否存在

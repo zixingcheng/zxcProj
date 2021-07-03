@@ -105,25 +105,22 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         }
 
 
-
-        //缓存数据初始装载事件--载入数据
-        public override void EventHandler_DataCacheLoad(object sender, DataCache_Event e)
+        //缓存数据初始装载数据
+        public virtual int DataCacheLoad(IDataCache pDataCache)
         {
-            typeTimeFrequency timeFrequency = e.DataCache.DataCache_Set.Time_Frequency;
-            if (timeFrequency == typeTimeFrequency.real) return;
+            typeTimeFrequency timeFrequency = pDataCache.DataCache_Set.Time_Frequency;
+            if (timeFrequency == typeTimeFrequency.real) return 0;
             DataCache<Data_Quote> dataCache = (DataCache<Data_Quote>)e.DataCache;
-            if (dataCache == null) return;
+            if (dataCache == null) return 0;
 
             //校正行情标的
-            IData_Factor pFactor = dataCache.DataCache_Set.Info_Factor;
-            StockInfo pStockInfo = Quote_Manager._Manager.Stocks.Get_StockInfo(pFactor.ID);
-            if (pStockInfo == null) return;
+            IDataCache_Set pSet = dataCache.DataCache_Set;
+            StockInfo pStockInfo = Quote_Manager._Manager.Stocks.Get_StockInfo(pSet.Info_Factor.ID);
+            if (pStockInfo == null) return 0;
 
             //查询数据
-            int nBars = dataCache.DataCache_Set.Sum_Step;
-            DateTime dtEnd = dataCache.DataCache_Set.Time_End;
-            List<Data_Quote> lstQuotes = QuoteQuery._Query.QuoteHistory(pStockInfo, dtEnd, nBars, timeFrequency);
-            if (lstQuotes.Count == nBars)
+            List<Data_Quote> lstQuotes = QuoteQuery._Query.QuoteHistory(pStockInfo, pSet.Time_End, pSet.Sum_Step, timeFrequency);
+            if (lstQuotes.Count == pSet.Sum_Step)
             {
                 //重新初始数据
                 Dictionary<DateTime, Data_Quote> poData_Quotes = new Dictionary<DateTime, Data_Quote>();
@@ -132,7 +129,17 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                     poData_Quotes[item.DateTime] = item;
                 }
                 dataCache.InitDatas(poData_Quotes, true, true);
+                return pSet.Sum_Step;
             }
+            return 0;
+        }
+
+
+        //缓存数据初始装载事件--载入数据
+        public override void EventHandler_DataCacheLoad(object sender, DataCache_Event e)
+        {
+            //载入缓存数据
+            int nNums = this.DataCacheLoad(e.DataCache);
         }
         //缓存数据变动事件
         public override void EventHandler_DataCacheChange(object sender, DataCache_Event e)

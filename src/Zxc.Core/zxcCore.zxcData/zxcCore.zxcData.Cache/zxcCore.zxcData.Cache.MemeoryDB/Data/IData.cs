@@ -10,6 +10,11 @@ namespace zxcCore.zxcData.Cache.MemoryDB
         /// </summary>
         string UID { get; set; }
 
+        /// <summary>数据初始
+        /// </summary>
+        /// <param name="poData"></param>
+        /// <returns></returns>
+        bool Init(dynamic poData = null);
         /// <summary>对象转为Json对象
         /// </summary>
         dynamic ToJson();
