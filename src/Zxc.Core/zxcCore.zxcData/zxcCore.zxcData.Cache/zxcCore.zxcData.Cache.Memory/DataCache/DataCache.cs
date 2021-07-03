@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using zxcCore.Enums;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
@@ -93,40 +94,45 @@ namespace zxcCore.zxcData.Cache.Memory
             for (int i = this._DataCache_Set.Sum_Step - 1; i >= 0; i--)
             {
                 DateTime dtTime = this._DataCache_Set.Time_End.AddSeconds(-i * this._DataCache_Set.Time_Step);
-                this.InitDataCache(dtTime, default(T));
+                this.InitDataCache(dtTime, default(T), true, false, true);
             }
             return this._DataCache_Set.Sum_Step;
         }
-        public int InitDatas(Dictionary<DateTime, T> datas)
+        public int InitDatas(Dictionary<DateTime, T> datas, bool bFixedData = false, bool bIniting = false)
         {
+            if (bIniting)
+                _DataCaches.Clear();
+
             foreach (KeyValuePair<DateTime, T> data in datas)
             {
-                this.InitDataCache(data.Key, data.Value);
+                this.InitDataCache(data.Key, data.Value, true, bFixedData, bIniting);
             }
             return datas.Count;
         }
-        public CacheInfo<T> InitDataCache(DateTime dtTime, T data, bool bAdd = true)
+        public CacheInfo<T> InitDataCache(DateTime dtTime, T data, bool bAdd = true, bool bFixedData = false, bool bIniting = false)
         {
             DateTime dtTime_Check = _DataCache_Set.CheckTime(dtTime);
             CacheInfo<T> pCacheInfo = new CacheInfo<T>(dtTime, data);
+            if (bFixedData)
+                pCacheInfo.SetData_Fixed();
 
             //执行添加
             if (bAdd)
-                if (!this.SetData(pCacheInfo))
+                if (!this.SetData(pCacheInfo, bIniting))
                     return null;
             return pCacheInfo;
         }
 
 
-        public bool SetData(DateTime dtTime, T data)
+        public bool SetData(DateTime dtTime, T data, bool bFixedData = false, bool bIniting = false)
         {
             //未做重复性验证 
-            CacheInfo<T> pCacheInfo = this.InitDataCache(dtTime, data);
+            CacheInfo<T> pCacheInfo = this.InitDataCache(dtTime, data, true, bFixedData, bIniting);
             if (pCacheInfo == null)
                 return false;
             return true;
         }
-        public bool SetData(CacheInfo<T> pCacheInfo)
+        public bool SetData(CacheInfo<T> pCacheInfo, bool bIniting = false)
         {
             if (pCacheInfo == null) return false;
 
@@ -136,7 +142,7 @@ namespace zxcCore.zxcData.Cache.Memory
 
 
             //数据变更事件
-            if (this.DataCache_Change != null)
+            if (!bIniting && this.DataCache_Change != null)
             {
                 DataCache_Event pArgs = new DataCache_Event(this, pCacheInfo);
                 try
@@ -248,7 +254,7 @@ namespace zxcCore.zxcData.Cache.Memory
         {
             if (this.DataCache_Load != null)
             {
-                DataCache_Event pArgs = new DataCache_Event(this, null); 
+                DataCache_Event pArgs = new DataCache_Event(this, null);
                 try
                 {
                     this.DataCache_Load(null, pArgs);

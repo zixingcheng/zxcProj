@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using zxcCore.Enums;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
@@ -52,7 +53,7 @@ namespace zxcCore.zxcData.Cache.Memory
         public DataCaches_Manage(IData_Factors info_Factors, IDataCache_Set srcDataCache_Set, IDataChecks dataChecks = null)
         {
             Tag = info_Factors.ID;
-            _DataCache_Set = new DataCache_Set(Tag, srcDataCache_Set.Time_Base, typeTimeFrequency.None, 0, info_Factors, srcDataCache_Set);
+            _DataCache_Set = new DataCache_Set(Tag, srcDataCache_Set.Time_Base, typeTimeFrequency.none, 0, info_Factors, srcDataCache_Set);
             _DataChecks = dataChecks;
             _DataCaches = new Dictionary<string, IDataCaches>();
         }
@@ -107,7 +108,7 @@ namespace zxcCore.zxcData.Cache.Memory
             }
             return dataCaches;
         }
-        public IDataCache<T> GetDataCache<T>(IData_Factor infoFactor, string strTag = "", typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None, bool autoInit = false, int cacheNums = 1)
+        public IDataCache<T> GetDataCache<T>(IData_Factor infoFactor, string strTag = "", typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none, bool autoInit = false, int cacheNums = 1)
         {
             IDataCaches dataCaches = GetDataCaches(infoFactor, autoInit);
             if (dataCaches == null) return null;
@@ -117,14 +118,14 @@ namespace zxcCore.zxcData.Cache.Memory
         }
 
 
-        public bool SetData<T>(IData_Factor infoFactor, string strTag, DateTime dtTime, T data, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None)
+        public bool SetData<T>(IData_Factor infoFactor, string strTag, DateTime dtTime, T data, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none)
         {
             IDataCache<T> dataCache = GetDataCache<T>(infoFactor, strTag, typeTimeFrequency);
             if (dataCache == null) return false;
 
             return dataCache.SetData(dtTime, data);
         }
-        public T GetData<T>(IData_Factor infoFactor, string strTag, DateTime dtTime, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None)
+        public T GetData<T>(IData_Factor infoFactor, string strTag, DateTime dtTime, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none)
         {
             IDataCache<T> dataCache = GetDataCache<T>(infoFactor, strTag, typeTimeFrequency);
             if (dataCache == null) return default(T);

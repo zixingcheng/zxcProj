@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using zxcCore.Enums;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
@@ -81,7 +82,7 @@ namespace zxcCore.zxcData.Cache.Memory
             this._DataCaches_Manages.Clear();
 
             //初始顶层 DataCache_Set，主要用于时间信息同步
-            _DataCache_Set = new DataCache_Set("DataCaches_Manager", dtBase, typeTimeFrequency.None, -1, null);
+            _DataCache_Set = new DataCache_Set("DataCaches_Manager", dtBase, typeTimeFrequency.none, -1, null);
             _isInited = true;
             return _isInited;
         }
@@ -283,17 +284,17 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="autoInit">不存在时是否自定初始</param>
         /// <param name="cacheNums">缓存数据数量，autoInit为false时无效</param>
         /// <returns></returns>
-        public IDataCache<T> GetDataCache<T>(IData_Factors infoFactors, IData_Factor infoFactor, string strTag = "", typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None, bool autoInit = false, int cacheNums = 1)
+        public IDataCache<T> GetDataCache<T>(IData_Factors infoFactors, IData_Factor infoFactor, string strTag = "", typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none, bool autoInit = false, int cacheNums = 1)
         {
             IDataCaches dataCaches = this.GetDataCaches(infoFactors, infoFactor, autoInit);
-            if (dataCaches == null) 
+            if (dataCaches == null)
                 return null;
 
             IDataCache<T> dataCache = dataCaches.GetDataCache<T>(strTag, typeTimeFrequency);
             if (autoInit && dataCache == null)
             {
                 if (this.InitDataCache<T>(infoFactors, infoFactor, strTag, typeTimeFrequency, cacheNums, autoInit))
-                    return GetDataCache<T>(infoFactors, infoFactor);
+                    return GetDataCache<T>(infoFactors, infoFactor, strTag, typeTimeFrequency);
             }
 
             //事件触发
@@ -311,7 +312,7 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="data">数据(int等或class对象)</param>
         /// <param name="typeTimeFrequency">时间频率</param>
         /// <returns></returns>
-        public bool SetData<T>(IData_Factors infoFactors, IData_Factor infoFactor, string strTag, DateTime dtTime, T data, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None)
+        public bool SetData<T>(IData_Factors infoFactors, IData_Factor infoFactor, string strTag, DateTime dtTime, T data, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none)
         {
             IDataCache<T> dataCache = this.GetDataCache<T>(infoFactors, infoFactor, strTag, typeTimeFrequency);
             if (dataCache == null) return false;
@@ -327,7 +328,7 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="dtTime">数据时间</param>
         /// <param name="typeTimeFrequency">时间频率</param>
         /// <returns></returns>
-        public T GetData<T>(IData_Factors infoFactors, IData_Factor infoFactor, string strTag, DateTime dtTime, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None)
+        public T GetData<T>(IData_Factors infoFactors, IData_Factor infoFactor, string strTag, DateTime dtTime, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none)
         {
             IDataCache<T> dataCache = this.GetDataCache<T>(infoFactors, infoFactor, strTag, typeTimeFrequency);
             if (dataCache == null) return default(T);
@@ -346,7 +347,7 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="data">数据(int等或class对象)</param>
         /// <param name="typeTimeFrequency">时间频率</param>
         /// <returns></returns>
-        public bool SetData<T>(string tagFactors, string tagFactor, string strTag, DateTime dtTime, T data, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None)
+        public bool SetData<T>(string tagFactors, string tagFactor, string strTag, DateTime dtTime, T data, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none)
         {
             IData_Factors dataFactors = this._GetFactors(tagFactors);
             if (dataFactors != null)
@@ -366,7 +367,7 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="dtTime">数据时间</param>
         /// <param name="typeTimeFrequency">时间频率</param>
         /// <returns></returns>
-        public T GetData<T>(string tagFactors, string tagFactor, string strTag, DateTime dtTime, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None)
+        public T GetData<T>(string tagFactors, string tagFactor, string strTag, DateTime dtTime, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none)
         {
             IData_Factors dataFactors = this._GetFactors(tagFactors);
             if (dataFactors != null)

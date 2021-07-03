@@ -57,6 +57,16 @@ namespace zxcCore.Extensions
             return pEnumAttr == null ? null : pEnumAttr.AttrValue;
         }
 
+        /// <summary>获取枚举的自定义值
+        /// </summary>
+        /// <param name="emValue"></param>
+        /// <returns></returns>
+        public static object Get_Value(this Enum emValue)
+        {
+            EnumValue pEnumValue = GetAttr<EnumValue>(emValue);
+            return pEnumValue == null ? null : pEnumValue.Value;
+        }
+
         /// <summary>获取枚举的自定义区域
         /// </summary>
         /// <param name="emValue"></param>
@@ -96,6 +106,19 @@ namespace zxcCore.Extensions
         {
             this.AttrName = attrName;
             this.AttrValue = attrValue;
+        }
+
+    }
+
+    /// <summary>Enum特性（值）
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class EnumValue : Attribute
+    {
+        public object Value { get; set; }
+        public EnumValue(object value)
+        {
+            this.Value = value;
         }
 
     }

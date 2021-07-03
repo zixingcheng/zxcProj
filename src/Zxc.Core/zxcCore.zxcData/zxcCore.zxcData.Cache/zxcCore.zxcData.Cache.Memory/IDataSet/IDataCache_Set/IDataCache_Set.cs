@@ -1,26 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using zxcCore.Enums;
+using zxcCore.Extensions;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
-    /// <summary>时间间隔
-    /// </summary>
-    public enum typeTimeFrequency
-    {
-        None = 0,
-        Second = 1,
-        Second_30 = 30,
-        Minute_1 = 60,
-        Minute_5 = 300,
-        Minute_10 = 600,
-        Minute_15 = 900,
-        Minute_30 = 1800,
-        Minute_60 = 3600,
-        Minute_120 = 7200,
-        Day = 86400,
-        Week = 604800
-    }
-
     /// <summary>数据缓存设置对象类
     /// </summary>
     public interface IDataCache_Set : IDataSet

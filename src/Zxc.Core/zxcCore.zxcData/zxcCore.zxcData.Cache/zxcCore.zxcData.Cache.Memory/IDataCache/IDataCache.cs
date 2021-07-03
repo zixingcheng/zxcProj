@@ -51,14 +51,18 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <summary>初始数据(加载后的缓存数据统一初始，不参与判断等处理)
         /// </summary>
         /// <param name="datas"></param>
+        /// <param name="bFixedData">是否非临时数据</param>
+        /// <param name="bIniting">是否数据初始中</param>
         /// <returns></returns>
-        int InitDatas(Dictionary<DateTime, T> datas);
+        int InitDatas(Dictionary<DateTime, T> datas, bool bFixedData = false, bool bIniting = false);
         /// <summary>按时间标识设置数据
         /// </summary>
         /// <param name="dtTime"></param>
         /// <param name="data"></param>
+        /// <param name="bFixedData">是否非临时数据</param>
+        /// <param name="bIniting">是否数据初始中</param>
         /// <returns></returns>
-        bool SetData(DateTime dtTime, T data);
+        bool SetData(DateTime dtTime, T data, bool bFixedData = false, bool bIniting = false);
         //bool SetData(DateTime dtData, T value);
         /// <summary>设置最后数据缓存时间
         /// </summary>

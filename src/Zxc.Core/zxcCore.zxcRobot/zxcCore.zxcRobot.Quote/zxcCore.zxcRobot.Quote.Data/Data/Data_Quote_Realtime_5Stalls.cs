@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using zxcCore.Common;
+using zxcCore.Enums;
 using zxcCore.zxcData.Cache.MemoryDB;
 
 namespace zxcCore.zxcRobot.Quote.Data
@@ -157,7 +158,7 @@ namespace zxcCore.zxcRobot.Quote.Data
 
 
         //对象转换-由json对象
-        public override bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime)
+        public override bool FromJsonObj(JObject jsonData, typeTimeFrequency quoteTime)
         {
             if (base.FromJsonObj(jsonData, quoteTime))
             {

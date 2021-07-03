@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using zxcCore.Enums;
+using zxcCore.Extensions;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
@@ -21,7 +23,7 @@ namespace zxcCore.zxcData.Cache.Memory
         {
             get { return _Info_Factor; }
         }
-        typeTimeFrequency _Time_Frequency = typeTimeFrequency.None;
+        typeTimeFrequency _Time_Frequency = typeTimeFrequency.none;
         public typeTimeFrequency Time_Frequency
         {
             get { return _Time_Frequency; }
@@ -98,7 +100,7 @@ namespace zxcCore.zxcData.Cache.Memory
             _tagName = tagName;
             _Time_Frequency = typeTimeFrequency;
             _sumStep = cacheNums;
-            _dtStep = (int)_Time_Frequency;
+            _dtStep = (int)_Time_Frequency.Get_Value();
             _dtBase = dtBase;
             _Parent = srcDataCache_Set;
             this.InitTime(dtBase, typeTimeFrequency);
@@ -168,25 +170,25 @@ namespace zxcCore.zxcData.Cache.Memory
             DateTime dtTime = dtBase;
             switch (_Time_Frequency)
             {
-                case typeTimeFrequency.Day:
+                case typeTimeFrequency.day:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, 0, 0, 0);
                     break;
-                case typeTimeFrequency.Minute_1:
+                case typeTimeFrequency.m1:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, dtBase.Minute, 0);
                     break;
-                case typeTimeFrequency.Minute_5:
+                case typeTimeFrequency.m5:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 5.0) * 5, 0);
                     break;
-                case typeTimeFrequency.Minute_10:
+                case typeTimeFrequency.m10:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 10.0) * 10, 0);
                     break;
-                case typeTimeFrequency.Minute_15:
+                case typeTimeFrequency.m15:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 15.0) * 15, 0);
                     break;
-                case typeTimeFrequency.Minute_30:
+                case typeTimeFrequency.m30:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, (int)Math.Floor(dtBase.Minute / 30.0) * 30, 0);
                     break;
-                case typeTimeFrequency.Minute_60:
+                case typeTimeFrequency.m60:
                     dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, dtBase.Hour, 0, 0);
                     break;
                 //case typeTimeFrequency.Minute_120:
@@ -206,7 +208,7 @@ namespace zxcCore.zxcData.Cache.Memory
         public bool IsNewDataTime(DateTime dtTime)
         {
             bool isVaild = false;
-            int nSeconds = (int)typeTimeFrequency.Day;
+            int nSeconds = (int)typeTimeFrequency.day;
             int nDeltas = (int)((dtTime - this._dtDataNow).TotalSeconds);
 
             //有效性判断

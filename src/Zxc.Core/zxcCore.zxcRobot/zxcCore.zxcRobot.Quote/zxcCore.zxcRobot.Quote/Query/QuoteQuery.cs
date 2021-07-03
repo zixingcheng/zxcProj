@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using zxcCore.Common;
+using zxcCore.Enums;
 using zxcCore.Extensions;
 using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.zxcRobot.Quote.JQData;
@@ -75,7 +76,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteTime">行情时间类型</param>
         /// <param name="autoUpdate">是否自动更新本地库表</param>
         /// <returns></returns>
-        public List<Data_Quote> Query(string stockTag, DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day, bool autoUpdate = true)
+        public List<Data_Quote> Query(string stockTag, DateTime endTime, int quoteBars = 1, typeTimeFrequency quoteTime = typeTimeFrequency.day, bool autoUpdate = true)
         {
             //查询标的行情对象
             QuoteData pQuoteData = Quote_Manager._Manager[stockTag];
@@ -91,7 +92,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteTime">行情时间类型</param>
         /// <param name="autoUpdate">是否自动更新本地库表</param>
         /// <returns></returns>
-        public List<Data_Quote> Query(string stockTag, DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day, bool autoUpdate = true)
+        public List<Data_Quote> Query(string stockTag, DateTime startTime, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.day, bool autoUpdate = true)
         {
             //查询标的行情对象
             QuoteData pQuoteData = Quote_Manager._Manager[stockTag];
@@ -142,7 +143,7 @@ namespace zxcCore.zxcRobot.Quote
 
             //返回解析
             JObject jsonRes = JObject.Parse(result);
-            return this.TransTo_Data_Quotes(jsonRes, typeQuoteTime.real, pStockInfo);
+            return this.TransTo_Data_Quotes(jsonRes, typeTimeFrequency.real, pStockInfo);
         }
         /// <summary>查询实时行情(聚宽API)
         /// </summary>
@@ -150,7 +151,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <returns></returns>
         protected internal List<Data_Quote> QuoteReal_JQDataAPI(StockInfo pStockInfo)
         {
-            return this.QuoteHistory(pStockInfo, DateTime.Now, 1, typeQuoteTime.day);
+            return this.QuoteHistory(pStockInfo, DateTime.Now, 1, typeTimeFrequency.day);
         }
 
 
@@ -162,7 +163,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteBars">数据条数</param>
         /// <param name="quoteTime">时间类型</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> QuoteHistory(string stockTag, DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day)
+        protected internal List<Data_Quote> QuoteHistory(string stockTag, DateTime endTime, int quoteBars = 1, typeTimeFrequency quoteTime = typeTimeFrequency.day)
         {
             //查询标的 
             StockInfo pStockInfo = Quote_Manager._Manager.Stocks.Get_StockInfo(stockTag);
@@ -175,7 +176,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="endTime">结束时间</param>
         /// <param name="quoteTime">时间类型</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> QuoteHistory(string stockTag, DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day)
+        protected internal List<Data_Quote> QuoteHistory(string stockTag, DateTime startTime, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.day)
         {
             //查询标的 
             StockInfo pStockInfo = Quote_Manager._Manager.Stocks.Get_StockInfo(stockTag);
@@ -188,13 +189,13 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteBars">数据条数</param>
         /// <param name="quoteTime">时间类型</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> QuoteHistory(StockInfo pStockInfo, DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day)
+        protected internal List<Data_Quote> QuoteHistory(StockInfo pStockInfo, DateTime endTime, int quoteBars = 1, typeTimeFrequency quoteTime = typeTimeFrequency.day)
         {
             if (pStockInfo == null) return null;
 
             //调用接口-聚宽zxc
             List<Data_Quote> lstQuote = this.QuoteHistory_JQDataAPI_zxc(pStockInfo, endTime, quoteBars, quoteTime);
-            if (lstQuote == null || lstQuote.Count == 0)
+            if (lstQuote == null || lstQuote.Count == quoteBars)
             {
                 //聚宽zxc接口失败，改用聚宽python接口
                 lstQuote = this.QuoteHistory_JQDataAPI(pStockInfo, endTime, quoteBars, quoteTime);
@@ -208,7 +209,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="endTime">结束时间</param>
         /// <param name="quoteTime">时间类型</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> QuoteHistory(StockInfo pStockInfo, DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day)
+        protected internal List<Data_Quote> QuoteHistory(StockInfo pStockInfo, DateTime startTime, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.day)
         {
             if (pStockInfo == null) return null;
 
@@ -229,7 +230,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteTime">时间类型</param>
         /// <param name="quoteBars">数据条数</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> QuoteHistory_JQDataAPI_zxc(StockInfo pStockInfo, DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day)
+        protected internal List<Data_Quote> QuoteHistory_JQDataAPI_zxc(StockInfo pStockInfo, DateTime endTime, int quoteBars = 1, typeTimeFrequency quoteTime = typeTimeFrequency.day)
         {
             //调用接口
             JObject jsonRes = Quote_JQData._APIs.Get_Price(pStockInfo.StockID_TagJQ, endTime.ToString("yyyy-MM-dd HH:mm:ss"), quoteBars, quoteTime.Get_AttrValue() + "");
@@ -242,7 +243,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteTime">时间类型</param>
         /// <param name="quoteBars">数据条数</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> QuoteHistory_JQDataAPI(StockInfo pStockInfo, DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day)
+        protected internal List<Data_Quote> QuoteHistory_JQDataAPI(StockInfo pStockInfo, DateTime endTime, int quoteBars = 1, typeTimeFrequency quoteTime = typeTimeFrequency.day)
         {
             //调用接口
             string statusCode;
@@ -260,7 +261,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="endTime">结束时间</param>
         /// <param name="quoteTime">时间类型</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> QuoteHistory_JQDataAPI_zxc(StockInfo pStockInfo, DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day)
+        protected internal List<Data_Quote> QuoteHistory_JQDataAPI_zxc(StockInfo pStockInfo, DateTime startTime, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.day)
         {
             //调用接口
             JObject jsonRes = Quote_JQData._APIs.Get_Price(pStockInfo.StockID_TagJQ, startTime, endTime, quoteTime.Get_AttrValue() + "");
@@ -273,7 +274,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="endTime">结束时间</param>
         /// <param name="quoteTime">时间类型</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> QuoteHistory_JQDataAPI(StockInfo pStockInfo, DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day)
+        protected internal List<Data_Quote> QuoteHistory_JQDataAPI(StockInfo pStockInfo, DateTime startTime, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.day)
         {
             //调用接口
             string statusCode;
@@ -291,7 +292,7 @@ namespace zxcCore.zxcRobot.Quote
         /// </summary>
         /// <param name="jsonRes">json行情数据对象</param>
         /// <returns></returns>
-        protected internal List<Data_Quote> TransTo_Data_Quotes(JObject jsonRes, typeQuoteTime quoteTime, StockInfo pStockInfo = null)
+        protected internal List<Data_Quote> TransTo_Data_Quotes(JObject jsonRes, typeTimeFrequency quoteTime, StockInfo pStockInfo = null)
         {
             //数据检查
             if (jsonRes == null) return null;
@@ -310,9 +311,9 @@ namespace zxcCore.zxcRobot.Quote
                     Data_Quote pDataQuote = null;
                     switch (quoteTime)
                     {
-                        case typeQuoteTime.none:
+                        case typeTimeFrequency.none:
                             break;
-                        case typeQuoteTime.real:
+                        case typeTimeFrequency.real:
                             pDataQuote = new Data_Quote_Realtime_5Stalls(pStockInfo);
                             break;
                         default:

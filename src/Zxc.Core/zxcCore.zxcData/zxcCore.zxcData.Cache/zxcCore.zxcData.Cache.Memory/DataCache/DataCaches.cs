@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using zxcCore.Enums;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
@@ -48,7 +49,7 @@ namespace zxcCore.zxcData.Cache.Memory
 
         public DataCaches(IData_Factor info_Factor, IDataCache_Set srcDataCache_Set, IDataChecks dataChecks = null)
         {
-            _DataCache_Set = new DataCache_Set(info_Factor.ID, srcDataCache_Set.Time_Base, typeTimeFrequency.None, 0, info_Factor, srcDataCache_Set);
+            _DataCache_Set = new DataCache_Set(info_Factor.ID, srcDataCache_Set.Time_Base, typeTimeFrequency.none, 0, info_Factor, srcDataCache_Set);
             _id = _DataCache_Set.ID;
             dataChecks = _DataChecks;
             _DataCaches = new Dictionary<string, IDataCache>();
@@ -75,7 +76,7 @@ namespace zxcCore.zxcData.Cache.Memory
             }
             return true;
         }
-        public IDataCache<T> GetDataCache<T>(string tagName, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None, bool autoInit = false, int cacheNums = 1)
+        public IDataCache<T> GetDataCache<T>(string tagName, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none, bool autoInit = false, int cacheNums = 1)
         {
             IDataCache data = null;
             string tag = this.GetTagName(typeTimeFrequency, tagName);

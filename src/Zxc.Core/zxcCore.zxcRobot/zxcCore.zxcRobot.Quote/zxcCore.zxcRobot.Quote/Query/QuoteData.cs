@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using zxcCore.Common;
+using zxcCore.Enums;
 using zxcCore.Extensions;
 using zxcCore.zxcRobot.Quote.Data;
 
@@ -51,7 +52,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteTime">行情时间类型</param>
         /// <param name="autoUpdate">是否自动更新本地库表</param>
         /// <returns></returns>
-        public List<Data_Quote> Query(DateTime endTime, int quoteBars = 1, typeQuoteTime quoteTime = typeQuoteTime.day, bool autoUpdate = true)
+        public List<Data_Quote> Query(DateTime endTime, int quoteBars = 1, typeTimeFrequency quoteTime = typeTimeFrequency.day, bool autoUpdate = true)
         {
             //修正时间
             if (endTime == DateTime.MinValue) endTime = DateTime.Now;
@@ -74,7 +75,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteTime">行情时间类型</param>
         /// <param name="autoUpdate">是否自动更新本地库表</param>
         /// <returns></returns>
-        public List<Data_Quote> Query(DateTime startTime, DateTime endTime, typeQuoteTime quoteTime = typeQuoteTime.day, bool autoUpdate = true)
+        public List<Data_Quote> Query(DateTime startTime, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.day, bool autoUpdate = true)
         {
             //修正时间
             if (endTime == DateTime.MinValue) endTime = DateTime.Now;

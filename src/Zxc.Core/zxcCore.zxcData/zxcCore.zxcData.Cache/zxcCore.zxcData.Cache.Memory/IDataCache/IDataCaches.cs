@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using zxcCore.Enums;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
@@ -34,7 +35,7 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="autoInit">不存在时是否自定初始</param>
         /// <param name="cacheNums">缓存数据数量，autoInit为false时无效</param>
         /// <returns></returns>
-        IDataCache<T> GetDataCache<T>(string tagName, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None, bool autoInit = false, int cacheNums = 1);
+        IDataCache<T> GetDataCache<T>(string tagName, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none, bool autoInit = false, int cacheNums = 1);
         /// <summary>提取标识，统一标识格式
         /// </summary>
         /// <param name="typeTimeFrequency">时间频率</param>

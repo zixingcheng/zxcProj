@@ -14,6 +14,7 @@ using zxcCore.zxcData.Cache.Memory;
 using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.Common;
 using Newtonsoft.Json.Linq;
+using zxcCore.Enums;
 
 namespace zxcCore.zxcRobot.Monitor
 {
@@ -36,13 +37,13 @@ namespace zxcCore.zxcRobot.Monitor
 
 
         //对象转换-由json对象
-        public override bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime)
+        public override bool FromJsonObj(JObject jsonData, typeTimeFrequency quoteTime)
         {
             //基类初始
             bool bResult = base.FromJsonObj(jsonData, quoteTime);
             if (bResult)
             {
-                this.QuoteTimeType = typeQuoteTime.real;                //标识为实时数据
+                this.QuoteTimeType = typeTimeFrequency.real;                //标识为实时数据
                 this._exType = this.StockExchange.ToString();
             }
             return bResult;

@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using zxcCore.Common;
+using zxcCore.Enums;
 using zxcCore.Extensions;
 using zxcCore.zxcData.Cache.MemoryDB;
 
@@ -89,7 +90,7 @@ namespace zxcCore.zxcRobot.Quote.Data
 
         /// <summary>行情数据时间类型
         /// </summary>
-        public typeQuoteTime QuoteTimeType
+        public typeTimeFrequency QuoteTimeType
         {
             get; set;
         }
@@ -168,6 +169,11 @@ namespace zxcCore.zxcRobot.Quote.Data
         }
 
 
+        //提取标的信息
+        public virtual StockInfo GetStockInfo()
+        {
+            return _stockInfo;
+        }
         //提取固定行情消息头
         public virtual string GetMsg_Perfix()
         {
@@ -194,10 +200,10 @@ namespace zxcCore.zxcRobot.Quote.Data
         //对象转换-由json对象
         public new bool FromJson(dynamic jsonData)
         {
-            return FromJsonObj(jsonData, typeQuoteTime.none);
+            return FromJsonObj(jsonData, typeTimeFrequency.none);
         }
         //对象转换-由json对象
-        public virtual bool FromJsonObj(JObject jsonData, typeQuoteTime quoteTime)
+        public virtual bool FromJsonObj(JObject jsonData, typeTimeFrequency quoteTime)
         {
             //修正倍数
             if (_stockInfo != null && _stockInfo.StockType == typeStock.Option)
@@ -221,11 +227,11 @@ namespace zxcCore.zxcRobot.Quote.Data
             this.IsSuspended = zxcTransHelper.ToBoolean(jsonData["paused"]);
 
             this.QuoteTimeType = quoteTime;
-            if (quoteTime == typeQuoteTime.none)
+            if (quoteTime == typeTimeFrequency.none)
             {
                 string strQuoteTimeType = jsonData["quoteTimeType"] + "";
                 if (strQuoteTimeType != "")
-                    this.QuoteTimeType = (typeQuoteTime)Enum.Parse(typeof(typeQuoteTime), strQuoteTimeType);
+                    this.QuoteTimeType = (typeTimeFrequency)Enum.Parse(typeof(typeTimeFrequency), strQuoteTimeType);
             }
 
             string strQuotePlat = jsonData["quotePlat"] + "";

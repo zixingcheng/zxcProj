@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using zxcCore.Enums;
 
 namespace zxcCore.zxcData.Cache.Memory
 {
@@ -52,7 +53,7 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="autoInit">不存在时是否自定初始</param>
         /// <param name="cacheNums">缓存数据数量，autoInit为false时无效</param>
         /// <returns></returns>
-        IDataCache<T> GetDataCache<T>(IData_Factor infoFactor, string strTag = "", typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None, bool autoInit = false, int cacheNums = 1);
+        IDataCache<T> GetDataCache<T>(IData_Factor infoFactor, string strTag = "", typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none, bool autoInit = false, int cacheNums = 1);
 
         /// <summary>按因子对象设置缓存数据
         /// </summary>
@@ -63,7 +64,7 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="data">数据</param>
         /// <param name="typeTimeFrequency">时间频率</param>
         /// <returns></returns>
-        bool SetData<T>(IData_Factor infoFactor, string strTag, DateTime dtTime, T data, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None);
+        bool SetData<T>(IData_Factor infoFactor, string strTag, DateTime dtTime, T data, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none);
         /// <summary>按因子对象提取缓存数据
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -72,7 +73,7 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <param name="dtTime">时间</param>
         /// <param name="typeTimeFrequency">时间频率</param>
         /// <returns></returns>
-        T GetData<T>(IData_Factor infoFactor, string strTag, DateTime dtTime, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.None);
+        T GetData<T>(IData_Factor infoFactor, string strTag, DateTime dtTime, typeTimeFrequency typeTimeFrequency = typeTimeFrequency.none);
 
 
         /// <summary>初始数据检查集

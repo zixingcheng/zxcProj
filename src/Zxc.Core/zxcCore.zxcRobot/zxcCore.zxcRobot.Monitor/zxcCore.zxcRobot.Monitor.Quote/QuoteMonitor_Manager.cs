@@ -16,6 +16,8 @@ using zxcCore.Common;
 using zxcCore.zxcRobot.Monitor.DataCheck;
 using System.Reflection;
 using zxcCore.zxcRobot.Monitor.Msger;
+using zxcCore.Enums;
+using zxcCore.zxcRobot.Quote.Data;
 
 namespace zxcCore.zxcRobot.Monitor.Quote
 {
@@ -71,8 +73,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             _swapIOFiles.SwapData_Change += new DataSwapChange_EventHandler(EventHandler_DataSwapChange);
 
             //初始时间频率信息
-            this.InitData_TimeFrequency(typeTimeFrequency.Second, 30 * 12);
-            this.InitData_TimeFrequency(typeTimeFrequency.Minute_1, 6 * 60);
+            this.InitData_TimeFrequency(typeTimeFrequency.real, 30 * 12);
+            this.InitData_TimeFrequency(typeTimeFrequency.m1, 6 * 60);
             return true;
         }
         //初始时间频率信息
@@ -94,30 +96,39 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
 
         //统一初始数据缓存相关
-        public virtual bool InitDataCache(Data_Quote_Swap data)
+        public virtual bool InitDataCache(Data_Quote pData)
         {
-            if (data == null) return false;
+            if (pData == null) return false;
+            StockInfo stockInfo = pData.GetStockInfo();
+            if (stockInfo == null) return false;
 
+            string exType = stockInfo.StockExchange.ToString();
             bool bExist = true, bResult = true;
-            IData_Factors pFactors = _managerCaches._GetFactors(data._exType);
+            IData_Factors pFactors = _managerCaches._GetFactors(exType);
             if (pFactors == null)
             {
                 //提取信息
-                pFactors = new Data_Factors(data._exType, data._exType, "", "");
+                pFactors = new Data_Factors(exType, exType, "", "");
                 bExist = false;
             }
 
-            IData_Factor pFactor = pFactors.GetData_Factor(data.StockID_Tag);
+            IData_Factor pFactor = pFactors.GetData_Factor(stockInfo.StockID_Tag);
             if (bExist == false || pFactor == null)
             {
                 //提取信息
-                pFactor = new Data_Factor(data.StockID_Tag, data.StockID_Tag, data.StockName, "");
+                pFactor = new Data_Factor(stockInfo.StockID_Tag, stockInfo.StockID_Tag, stockInfo.StockName, "");
 
                 //初始数据所有缓存对象
                 foreach (var item in _setsDataCache)
                 {
                     //提取数据缓存对象、及检查对象集
-                    IDataCache<Data_Quote_Swap> poDataCache = _managerCaches.GetDataCache<Data_Quote_Swap>(pFactors, pFactor, "", item.Key, true, item.Value);
+                    IDataCache poDataCache = null;
+                    if (item.Key == typeTimeFrequency.real)
+                        poDataCache = _managerCaches.GetDataCache<Data_Quote_Swap>(pFactors, pFactor, "", item.Key, true, item.Value);
+                    else
+                        poDataCache = _managerCaches.GetDataCache<Data_Quote>(pFactors, pFactor, "", item.Key, true, item.Value);
+
+                    //IDataCache<Data_Quote> poDataCache = _managerCaches.GetDataCache<Data_Quote>(pFactors, pFactor, "", item.Key, true, item.Value);
                     //_managerCaches.InitDataCache<Data_Quote_Swap>(pFactors, pFactor, "", item.Key, item.Value);
                 }
 
@@ -126,13 +137,13 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
                 //初始规则信息集合-Cache
                 //bResult = bResult && this.InitDataChecks_Cache(pFactors, pFactor, data);
-                _dictQuotes[_getTag(data)] = true;
+                _dictQuotes[_getTag(pData)] = true;
                 return bResult;
             }
             return false;
         }
         //设置缓存数据对象
-        public virtual bool SetDataCache(Data_Quote_Swap pData)
+        public virtual bool SetDataCache(Data_Quote pData)
         {
             bool bInited = false;
             string tag = _getTag(pData);
@@ -142,26 +153,31 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             return this.SetDataCache_ValueChecks(pData);
         }
         //设置缓存数据对象
-        public virtual bool SetDataCache_ValueChecks(Data_Quote_Swap pData)
+        public virtual bool SetDataCache_ValueChecks(Data_Quote pData)
         {
+            StockInfo stockInfo = pData.GetStockInfo();
+            if (stockInfo == null) return false;
+
+
             //默认只设置最底级数据，
-            bool bResult = _managerCaches.SetData<Data_Quote_Swap>(pData._exType, pData.StockID_Tag, "", pData.DateTime, pData, typeTimeFrequency.Second);
+            string exType = stockInfo.StockExchange.ToString();
+            bool bResult = _managerCaches.SetData<Data_Quote>(exType, stockInfo.StockID_Tag, "", pData.DateTime, pData, typeTimeFrequency.real);
 
             foreach (var item in _setsDataCache)
             {
-                if (item.Key != typeTimeFrequency.Second)
+                if (item.Key != typeTimeFrequency.real)
                 {
-                    Data_Quote_Swap dataCheck = this.SetDataCache_ValueCheck(pData, item.Key);
+                    Data_Quote dataCheck = this.SetDataCache_ValueCheck(pData, item.Key);
                     if (dataCheck != null)
                     {
-                        bResult = bResult && _managerCaches.SetData<Data_Quote_Swap>(dataCheck._exType, dataCheck.StockID_Tag, "", dataCheck.DateTime, dataCheck, item.Key);
+                        bResult = bResult && _managerCaches.SetData<Data_Quote>(exType, stockInfo.StockID_Tag, "", dataCheck.DateTime, dataCheck, item.Key);
                     }
                 }
             }
             return bResult;
         }
         //设置缓存数据对象-修正
-        public virtual Data_Quote_Swap SetDataCache_ValueCheck(Data_Quote_Swap pData, typeTimeFrequency timeFrequency)
+        public virtual Data_Quote SetDataCache_ValueCheck(Data_Quote pData, typeTimeFrequency timeFrequency)
         {
             return pData;
         }
@@ -178,7 +194,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             return bResult;
         }
         //初始规则信息集合-Cache-弃用
-        private bool InitDataChecks_Cache(IData_Factors pFactors, IData_Factor pFactor, Data_Quote_Swap data)
+        private bool InitDataChecks_Cache(IData_Factors pFactors, IData_Factor pFactor, Data_Quote data)
         {
             //数据缓存集检查
             IDataCaches dataCaches = _managerCaches.GetDataCaches(pFactors, pFactor);
@@ -222,28 +238,28 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         {
             switch (timeFrequency)
             {
-                case typeTimeFrequency.None:
+                case typeTimeFrequency.none:
                     break;
-                case typeTimeFrequency.Second:
+                case typeTimeFrequency.real:
                     this.InitDataCheck_Instance(pDataChecks, typeof(DataCheck_Print<Data_Quote_Swap>));
                     break;
-                case typeTimeFrequency.Second_30:
+                case typeTimeFrequency.s30:
                     break;
-                case typeTimeFrequency.Minute_1:
+                case typeTimeFrequency.m1:
                     break;
-                case typeTimeFrequency.Minute_5:
+                case typeTimeFrequency.m5:
                     break;
-                case typeTimeFrequency.Minute_10:
+                case typeTimeFrequency.m10:
                     break;
-                case typeTimeFrequency.Minute_15:
+                case typeTimeFrequency.m15:
                     break;
-                case typeTimeFrequency.Minute_30:
+                case typeTimeFrequency.m30:
                     break;
-                case typeTimeFrequency.Minute_60:
+                case typeTimeFrequency.m60:
                     break;
-                case typeTimeFrequency.Minute_120:
+                case typeTimeFrequency.m120:
                     break;
-                case typeTimeFrequency.Day:
+                case typeTimeFrequency.day:
                     break;
                 default:
                     break;
@@ -279,7 +295,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             //ConsoleHelper.Debug(false, DateTime.Now + "::");
             foreach (var item in e.Datas)
             {
-                Data_Quote_Swap pData = (Data_Quote_Swap)item;
+                Data_Quote pData = (Data_Quote)item;
                 if (pData == null) continue;
 
                 this.SetDataCache(pData);
@@ -327,6 +343,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 if (poDataChecks_Caches == null)
                     poDataChecks_Caches = new DataChecks_Quote(dataCaches.ID, dataCaches);
 
+                //初始检查集--未具体初始检查对象
                 bool bResult = dataCaches.InitDataChecks(poDataChecks_Caches);
             }
         }
@@ -338,9 +355,10 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
 
         //提取对象标识名
-        protected internal virtual string _getTag(Data_Quote_Swap pData)
+        protected internal virtual string _getTag(Data_Quote pData)
         {
-            return pData._exType + "_" + pData.StockID_Tag;
+            StockInfo pStockInfo = pData.GetStockInfo();
+            return pStockInfo.StockExchange.ToString() + "_" + pStockInfo.StockID_Tag;
         }
 
     }

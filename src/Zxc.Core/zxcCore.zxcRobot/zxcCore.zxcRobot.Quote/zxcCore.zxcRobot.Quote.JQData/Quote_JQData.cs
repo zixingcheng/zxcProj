@@ -263,6 +263,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
             //映射接口字段到行情属性
             string[] strLines = strData.Split("\n");
             string[] strHeads = strLines[0].Split(",");
+            if (strHeads.Length < 4) return null;
             for (int j = 0; j < strHeads.Length; j++)
             {
                 strHeads[j] = _mapFields[strHeads[j]];
