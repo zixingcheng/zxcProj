@@ -121,7 +121,7 @@ class myAPI_Quote_Query(myWeb.myAPI):
         lstReturn = quoteSource.query(params = {'queryIDs' : ids})
 
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
-        if(lstReturn != None and len(lstReturn) > 0):
+        if(lstReturn != None):
             datas = []
             for x in lstReturn:
                 datas.append(x.toDict())
@@ -139,7 +139,7 @@ class myAPI_Quote_QueryHistory(myWeb.myAPI):
         dataFrequency = request.args.get('dataFrequency', "1d")
         params = {'dataFrequency': dataFrequency, 'stockTag': "10003418.XSHG"}
         
-        stockBars = myData_Trans.To_Int(request.args.get('stockBars', 0))
+        stockBars = myData_Trans.To_Int(request.args.get('stockBars', "0"))
         if(stockBars > 0):
             params["stockBars"] = stockBars
 
@@ -152,7 +152,7 @@ class myAPI_Quote_QueryHistory(myWeb.myAPI):
         lstReturn = quoteSource.queryHistory(checkTime = False, params = params)
 
         pMsg = copy.deepcopy(gol._Get_Setting('Return_strFormat', {}))
-        if(lstReturn != None and len(lstReturn) > 0):
+        if(lstReturn != None):
             datas = []
             for x in lstReturn:
                 datas.append(x.toDict_Simple())

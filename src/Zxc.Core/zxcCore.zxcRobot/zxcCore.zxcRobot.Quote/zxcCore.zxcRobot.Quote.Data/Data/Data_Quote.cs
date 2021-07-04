@@ -168,12 +168,37 @@ namespace zxcCore.zxcRobot.Quote.Data
             return _isInitAll;
         }
 
+        /// <summary>是否为指数
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool IsIndex()
+        {
+            if (_stockInfo == null) return false;
+            return (bool)_stockInfo.StockType.Get_AttrValue();
+        }
 
         //提取标的信息
         public virtual StockInfo GetStockInfo()
         {
             return _stockInfo;
         }
+        /// <summary>提取标的类型
+        /// </summary>
+        /// <returns></returns>
+        public virtual typeStock GetStockType()
+        {
+            if (_stockInfo == null) return typeStock.Stock;
+            return _stockInfo.StockType;
+        }
+        /// <summary>提取标的名称
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetStockName()
+        {
+            if (_stockInfo == null) return "";
+            return _stockInfo.StockName;
+        }
+
         //提取固定行情消息头
         public virtual string GetMsg_Perfix()
         {
@@ -193,7 +218,11 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// <returns></returns>
         public virtual string GetValue_str(double dValue)
         {
-            return "";
+            string tagUnit = _stockInfo.StockType == typeStock.Index ? "" : "元";
+            int digits = _stockInfo.StockType == typeStock.Index ? 3 : 2;
+
+            string strValue = string.Format("{0}{1}", Math.Round(dValue, digits), tagUnit);
+            return strValue;
         }
 
 

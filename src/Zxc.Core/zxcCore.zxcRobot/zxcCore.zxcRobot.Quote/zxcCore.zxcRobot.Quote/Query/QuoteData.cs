@@ -31,6 +31,7 @@ namespace zxcCore.zxcRobot.Quote
             get; set;
         }
 
+
         protected internal DataTable_Quotes<Data_Quote> _dtQuote = null;    //行情库表对象
         public QuoteData(DataTable_Quotes<Data_Quote> pData_Quotes)
         {
@@ -45,6 +46,16 @@ namespace zxcCore.zxcRobot.Quote
         #endregion
 
 
+        /// <summary>查询行情(实时日数据)
+        /// </summary>
+        /// <returns></returns>
+        public List<Data_Quote> Query()
+        {
+            //调用接口查询
+            List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteReal(StockInfo);
+            return lstQuote;
+        }
+
         /// <summary>查询行情(历史)
         /// </summary>
         /// <param name="endTime">结束时间</param>
@@ -57,15 +68,16 @@ namespace zxcCore.zxcRobot.Quote
             //修正时间
             if (endTime == DateTime.MinValue) endTime = DateTime.Now;
 
+            //自动更新修正数据
+            if (autoUpdate)
+            {
+                if (!this.Query_Check(DateTime.MinValue, endTime, quoteBars, quoteTime, true))
+                    return null;
+            }
+
+
             //查询库表
             List<Data_Quote> lstQuote = _dtQuote.FindAll(e => e.DateTime <= endTime && e.QuoteTimeType == quoteTime && e.IsDel == false).OrderByDescending(t => t.DateTime).Take(quoteBars).ToList();
-
-            //查询失败-启动数据检查更新
-            if (autoUpdate && lstQuote.Count == 0)
-            {
-                lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, endTime, quoteBars, quoteTime);
-                this.UpdateRange(lstQuote);
-            }
             return lstQuote;
         }
         /// <summary>查询行情(历史)
@@ -82,35 +94,93 @@ namespace zxcCore.zxcRobot.Quote
             if (startTime == DateTime.MinValue)
                 return Query(endTime, 1, quoteTime, autoUpdate);
 
+            //自动更新修正数据
+            if (autoUpdate)
+            {
+                if (!this.Query_Check(startTime, endTime, 0, quoteTime, true))
+                    return null;
+            }
+
+
             //查询库表
             List<Data_Quote> lstQuote = _dtQuote.FindAll(e => e.DateTime <= endTime && e.DateTime >= startTime && e.QuoteTimeType == quoteTime && e.IsDel == false).OrderBy(t => t.DateTime).ToList();
-
-            //查询失败-启动数据检查更新
-            if (autoUpdate && lstQuote.Count == 0)
-            {
-                lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, startTime, endTime, quoteTime);
-                this.UpdateRange(lstQuote);
-            }
             return lstQuote;
         }
 
-        /// <summary>查询行情(实时日数据)
-        /// </summary>
-        /// <returns></returns>
-        public List<Data_Quote> Query()
+        protected internal bool Query_Check(DateTime startTime, DateTime endTime, int quoteBars = 0, typeTimeFrequency quoteTime = typeTimeFrequency.day, bool autoUpdate = true)
         {
-            //调用接口查询
-            List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteReal(StockInfo);
-            return lstQuote;
+            //提取日志信息、及修正时间
+            LogData_Quote pLog = Quote_Datas._Datas._quotesLog.Get_LogQuote(StockInfo.StockID_Tag, quoteTime);
+
+            if (endTime == DateTime.MinValue) endTime = pLog.DateTime_Max;
+            if (startTime == DateTime.MinValue) startTime = pLog.DateTime_Min;
+            DateTime dtStart = startTime;
+            DateTime dtEnd = endTime;
+
+
+            //行情数据日志时间区间校正
+            bool bResult = false;
+            List<Data_Quote> pQuotes_max = new List<Data_Quote>();
+            if (pLog.DateTime_Max < endTime)
+            {
+                //最大时间为结束时间，日志最大时间为最小时间
+                DateTime dtMin = pLog.DateTime_Max;
+                DateTime dtMax = endTime;
+                dtEnd = dtMax;
+
+                pQuotes_max = QuoteQuery._Query.QuoteHistory(StockInfo, dtMin, dtMax, quoteTime);
+                bResult = false;
+            }
+
+            List<Data_Quote> pQuotes_min = new List<Data_Quote>();
+            if (pLog.DateTime_Min > startTime)
+            {
+                //最小时间为开始时间，日志最小时间为最大时间
+                DateTime dtMin = startTime;
+                DateTime dtMax = pLog.DateTime_Min;
+                dtStart = dtMin;
+
+                pQuotes_min = QuoteQuery._Query.QuoteHistory(StockInfo, dtMin, dtMax, quoteTime);
+                bResult = false;
+            }
+
+            //数据自动更新
+            if (autoUpdate)
+            {
+                pQuotes_max.Union(pQuotes_min);
+                bResult = this.UpdateRange(pQuotes_max);
+
+                //数据量校检及自动更新补全
+                if (quoteBars > 0)
+                {
+                    int nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.DateTime >= dtStart && e.QuoteTimeType == quoteTime && e.IsDel == false);
+                    if (nCount < quoteBars)
+                    {
+                        //全部重新取
+                        List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtEnd, quoteBars, quoteTime);
+                        bResult = this.UpdateRange(lstQuote);
+                    }
+                    else
+                    {
+                        bResult = quoteBars == nCount;
+
+                        //日志信息不匹配，直接更新
+                        if (dtStart != pLog.DateTime_Min || dtEnd != pLog.DateTime_Max)
+                            bResult = Quote_Datas._Datas._quotesLog.Updata_LogQuote(StockInfo.StockID_Tag, dtStart, dtEnd, quoteTime);
+                    }
+                }
+                return bResult;
+            }
+            return true;
         }
 
 
         /// <summary>更新对象集
         /// </summary>
         /// <param name="collection"></param>
-        protected internal virtual void UpdateRange(List<Data_Quote> collection)
+        protected internal virtual bool UpdateRange(List<Data_Quote> collection)
         {
-            this._dtQuote.AddRange(collection);
+            return this._dtQuote.AddRange(collection, true, true);
         }
 
     }

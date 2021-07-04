@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using zxcCore.Common;
 using zxcCore.zxcData.Cache.Memory;
+using zxcCore.zxcRobot.Quote.Data;
 
 namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
@@ -41,10 +42,13 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             bool bResult = true;
             foreach (KeyValuePair<string, IDataCheck> check in _DataChecks)
             {
-                DataCheck_Quote<T> dataCheck = (DataCheck_Quote<T>)check.Value;
+                DataCheck_Quote<Data_Quote> dataCheck = (DataCheck_Quote<Data_Quote>)check.Value;
                 if (dataCheck == null) continue;
                 if (!dataCheck.IsValid) continue;
-                bResult = dataCheck.CheckData(dtTime, data, dataCache) && bResult;
+
+                Data_Quote pQuote = (Data_Quote)zxcReflectionHelper.ConvertToObject(data, typeof(Data_Quote));
+                if (pQuote != null)
+                    bResult = dataCheck.CheckData(dtTime, pQuote, (IDataCache<Data_Quote>)dataCache) && bResult;
             }
             return bResult;
         }

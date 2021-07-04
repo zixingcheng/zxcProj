@@ -11,7 +11,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-风险监测信息
     /// </summary>
-    public class QuoteCheck_Risk<T> : DataCheck_Quote<T>
+    public class QuoteCheck_Risk<T> : DataCheck_Quote<T> where T : Data_Quote
     {
         #region 属性及构造
 
@@ -46,7 +46,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             if (this._dataAnalyse.Datas.Values.Count == 0)
             {
                 //修正最小生效间隔
-                double valueDelta = _data.IsIndex() ? _valueDelta * 1.5 : _data.StockType == typeStock.Option ? _valueDelta * 20.0 : _valueDelta * 3;
+                double valueDelta = _data.IsIndex() ? _valueDelta * 1.5 : _data.GetStockType() == typeStock.Option ? _valueDelta * 20.0 : _valueDelta * 3;
                 this._dataAnalyse.Init(_data.Price_Per, _data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), _data.Price_High, _data.Price_Low, valueDelta);
                 return true;
             }

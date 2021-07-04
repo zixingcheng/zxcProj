@@ -9,7 +9,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-整点行情信息
     /// </summary>
-    public class QuoteCheck_Hourly<T> : DataCheck_Quote<T>
+    public class QuoteCheck_Hourly<T> : DataCheck_Quote<T> where T : Data_Quote
     {
         #region 属性及构造
 

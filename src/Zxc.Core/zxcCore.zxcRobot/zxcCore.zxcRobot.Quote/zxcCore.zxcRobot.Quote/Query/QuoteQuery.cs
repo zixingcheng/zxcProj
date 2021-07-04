@@ -195,7 +195,7 @@ namespace zxcCore.zxcRobot.Quote
 
             //调用接口-聚宽zxc
             List<Data_Quote> lstQuote = this.QuoteHistory_JQDataAPI_zxc(pStockInfo, endTime, quoteBars, quoteTime);
-            if (lstQuote == null || lstQuote.Count == quoteBars)
+            if (lstQuote == null || lstQuote.Count != quoteBars)
             {
                 //聚宽zxc接口失败，改用聚宽python接口
                 lstQuote = this.QuoteHistory_JQDataAPI(pStockInfo, endTime, quoteBars, quoteTime);
@@ -218,7 +218,8 @@ namespace zxcCore.zxcRobot.Quote
             if (lstQuote == null || lstQuote.Count == 0)
             {
                 //聚宽zxc接口失败，改用聚宽python接口
-                lstQuote = this.QuoteHistory_JQDataAPI(pStockInfo, startTime, endTime, quoteTime);
+                if ((endTime - startTime).TotalDays > 1)
+                    lstQuote = this.QuoteHistory_JQDataAPI(pStockInfo, startTime, endTime, quoteTime);
             }
             return lstQuote;
         }

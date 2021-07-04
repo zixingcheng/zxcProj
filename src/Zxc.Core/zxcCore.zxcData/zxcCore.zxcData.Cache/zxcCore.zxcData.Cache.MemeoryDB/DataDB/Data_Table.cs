@@ -127,6 +127,7 @@ namespace zxcCore.zxcData.Cache.MemoryDB
         /// <param name="isUnique">唯一性检查</param>
         public virtual bool Add(T item, bool isUnique = true, bool bUpdata = false, bool bMultiple = false, bool bCacheData = true)
         {
+            if (item == null) return false;
             if (!this.CheckPermission(typePermission_DB.Writable))
                 throw (new Exception("没有写入权限"));
 
@@ -151,6 +152,7 @@ namespace zxcCore.zxcData.Cache.MemoryDB
         /// <param name="isUnique">唯一性检查</param>
         public virtual bool AddRange(IEnumerable<T> collection, bool isUnique = true, bool bUpdata = false, bool bCacheData = true)
         {
+            if (collection == null || collection.Count() == 0) return false;
             if (!this.CheckPermission(typePermission_DB.Writable))
                 throw (new Exception("没有写入权限"));
 
@@ -169,6 +171,7 @@ namespace zxcCore.zxcData.Cache.MemoryDB
         /// <param name="collection"></param>
         public virtual bool DeleteRange(IEnumerable<T> collection)
         {
+            if (collection == null || collection.Count() == 0) return false;
             if (_isNoDel) return false;
             if (!this.CheckPermission(typePermission_DB.Deleteable))
                 throw (new Exception("没有删除权限"));
@@ -194,6 +197,7 @@ namespace zxcCore.zxcData.Cache.MemoryDB
         /// <param name="collection"></param>
         public virtual bool UpdateRange(IEnumerable<T> collection, bool bCacheData = true)
         {
+            if (collection == null || collection.Count() == 0) return false;
             if (!this.CheckPermission(typePermission_DB.Modifiable))
                 throw (new Exception("没有写入权限"));
 

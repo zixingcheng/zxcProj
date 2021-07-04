@@ -54,8 +54,14 @@ namespace zxcCore.zxcRobot.Quote.Data
 
         protected internal Quote_Datas(string dirBase) : base(dirBase, typePermission_DB.Normal, true, "/Datas/DB_Quote")
         {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
             this.InitStock_system();
             this._quotesZxc = new Dictionary<string, DataTable_Quotes<Data_Quote>>();
+
+            watch.Stop();
+            zxcConsoleHelper.Print("内存数据库::行情数据 \n   >> 已初始.  -- {1}, 耗时：{0} 秒.", watch.Elapsed.TotalSeconds, DateTime.Now.ToString());
         }
 
         #endregion
@@ -92,15 +98,10 @@ namespace zxcCore.zxcRobot.Quote.Data
                 }
 
                 //加入标的表
-                Stopwatch watch = new Stopwatch();
-                watch.Start();
                 _stocksZxc.Clear();
                 _stocksZxc.AddRange(lstStockInfo, false, false, false);
                 _stocksZxc.SaveChanges(true);
-                watch.Stop();
-                zxcConsoleHelper.Print("内存数据库::行情数据(initial) \n   >> 已初始.  -- {1}, 耗时：{0} 秒.", watch.Elapsed.TotalSeconds, DateTime.Now.ToString());
             }
-
         }
 
         /// <summary>初始系统标的信息
@@ -112,6 +113,8 @@ namespace zxcCore.zxcRobot.Quote.Data
             DataTable_Quotes<Data_Quote> quoteZxc = new DataTable_Quotes<Data_Quote>(pStockInfo.StockID_Tag, pStockInfo);
             this.InitDBModel(quoteZxc);
 
+            //行情日志表(延迟加载)
+            _quotesLog = new DataTable_LogQuotes<LogData_Quote>(); this.InitDBModel(_quotesLog);
             _quotesZxc.Add(pStockInfo.StockID_Tag, quoteZxc);
             return quoteZxc;
         }

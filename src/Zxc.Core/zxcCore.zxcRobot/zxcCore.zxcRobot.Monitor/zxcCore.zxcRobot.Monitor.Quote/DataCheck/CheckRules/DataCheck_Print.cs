@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using zxcCore.zxcData.Cache.Memory;
 using zxcCore.Common;
+using zxcCore.zxcRobot.Quote.Data;
 
 namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-打印行情信息
     /// </summary>
-    public class DataCheck_Print<T> : DataCheck_Quote<T>
+    public class DataCheck_Print<T> : DataCheck_Quote<T> where T : Data_Quote
     {
         #region 属性及构造
 

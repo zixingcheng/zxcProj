@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using zxcCore.Common;
 using zxcCore.Extensions;
@@ -30,12 +31,20 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
         public MonitorSet_Manage()
         {
-            //提取行情API配置
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+
+            ////提取行情API配置
             _urlAPI_Set = zxcConfigHelper.ConfigurationHelper.config["ZxcRobot.Quote:QuoteAPI_Monitor:SetAPI_Url"] + "";
             _urlAPI_SetQuery = zxcConfigHelper.ConfigurationHelper.config["ZxcRobot.Quote:QuoteAPI_Monitor:SetQueryAPI_Url"] + "";
 
             //同步本地配置信息到Python接口
             this.SyncData_MonitorSet();
+
+
+            watch.Stop();
+            zxcConsoleHelper.Print("行情监测设置::同步数据 \n   >> 已同步.  -- {1}, 耗时：{0} 秒.", watch.Elapsed.TotalSeconds, DateTime.Now.ToString());
         }
         ~MonitorSet_Manage()
         {

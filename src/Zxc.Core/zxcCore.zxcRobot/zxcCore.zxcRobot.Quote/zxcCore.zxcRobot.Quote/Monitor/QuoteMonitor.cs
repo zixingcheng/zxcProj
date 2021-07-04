@@ -43,8 +43,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         public override bool InitDataSawp()
         {
             string dirSwap = _configDataCache.config["DataCache.Swap:Monitor_Quote"] + "";
-            //_swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 0, typeof(Data_Quote_Swap), "", false);
-            _swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 60 * 5, typeof(Data_Quote_Swap), "", true);      //忽略5分钟前数据
+            _swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 0, typeof(Data_Quote_Swap), "", false);
+            //_swapIOFiles = new DataSwap_IOFiles("Quote", dirSwap, 60 * 5, typeof(Data_Quote_Swap), "", true);      //忽略5分钟前数据
             _swapIOFiles.SwapData_Change += new DataSwapChange_EventHandler(EventHandler_DataSwapChange);
 
 
@@ -76,12 +76,12 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 case typeTimeFrequency.none:
                     break;
                 case typeTimeFrequency.real:
-                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_RiseFall_Fixed<Data_Quote_Swap>));
+                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_RiseFall_Fixed<Data_Quote>));
                     break;
                 case typeTimeFrequency.s30:
                     break;
                 case typeTimeFrequency.m1:
-                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk<Data_Quote_Swap>));
+                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk<Data_Quote>));
                     break;
                 case typeTimeFrequency.m5:
                     break;
@@ -90,7 +90,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 case typeTimeFrequency.m15:
                     break;
                 case typeTimeFrequency.m30:
-                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Hourly<Data_Quote_Swap>));
+                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Hourly<Data_Quote>));
                     break;
                 case typeTimeFrequency.m60:
                     break;
@@ -109,9 +109,13 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         public virtual int DataCacheLoad(IDataCache pDataCache)
         {
             typeTimeFrequency timeFrequency = pDataCache.DataCache_Set.Time_Frequency;
-            if (timeFrequency == typeTimeFrequency.real) return 0;
-            DataCache<Data_Quote> dataCache = (DataCache<Data_Quote>)e.DataCache;
+            DataCache<Data_Quote> dataCache = (DataCache<Data_Quote>)pDataCache;
             if (dataCache == null) return 0;
+            if (timeFrequency == typeTimeFrequency.real)
+            {
+                dataCache.InitDatas(null, false, true);
+                return 0;
+            }
 
             //校正行情标的
             IDataCache_Set pSet = dataCache.DataCache_Set;
@@ -119,7 +123,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             if (pStockInfo == null) return 0;
 
             //查询数据
-            List<Data_Quote> lstQuotes = QuoteQuery._Query.QuoteHistory(pStockInfo, pSet.Time_End, pSet.Sum_Step, timeFrequency);
+            List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, pSet.Time_End, pSet.Sum_Step, timeFrequency, true);
             if (lstQuotes.Count == pSet.Sum_Step)
             {
                 //重新初始数据
@@ -128,8 +132,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 {
                     poData_Quotes[item.DateTime] = item;
                 }
-                dataCache.InitDatas(poData_Quotes, true, true);
-                return pSet.Sum_Step;
+                return dataCache.InitDatas(poData_Quotes, true, true);
             }
             return 0;
         }
@@ -144,6 +147,11 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         //缓存数据变动事件
         public override void EventHandler_DataCacheChange(object sender, DataCache_Event e)
         {
+            CacheInfo<Data_Quote> pCacheInfo = (CacheInfo<Data_Quote>)e.CacheInfo;
+            if (pCacheInfo.Data.QuoteTimeType == typeTimeFrequency.real)
+            {
+                this.SetData(pCacheInfo.Data, typeTimeFrequency.m15);
+            }
 
         }
 

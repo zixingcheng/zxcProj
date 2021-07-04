@@ -17,7 +17,15 @@ namespace zxcCore.zxcData.Cache.Memory
         ///// </summary>
         ////List<T> DataCaches { get; }
         ////Dictionary<DateTime, IData<T>> DataCaches { get; }
+        /// <summary>数据检查集
+        /// </summary>
+        IDataChecks DataChecks { get; }
 
+        /// <summary>按指定时间初始缓存数据
+        /// </summary>
+        /// <param name="dtData"></param>
+        /// <returns></returns>
+        int Init(DateTime dtData);
 
         /// <summary>初始数据检查集
         /// </summary>
@@ -30,6 +38,12 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <returns></returns>
         bool InitDataCheck(string tagName, IDataCheck dataCheck, bool isCanCover = false);
 
+        /// <summary>设置最后数据缓存时间
+        /// </summary>
+        /// <param name="dtLast"></param>
+        /// <returns></returns>
+        bool SetLastTime(DateTime dtLast);
+
         /// <summary>缓存数据检查接口
         /// </summary>
         bool CheckData();
@@ -39,15 +53,6 @@ namespace zxcCore.zxcData.Cache.Memory
     /// </summary>
     public interface IDataCache<T> : IDataCache
     {
-        /// <summary>数据检查集
-        /// </summary>
-        IDataChecks DataChecks { get; }
-
-        /// <summary>按指定时间初始缓存数据
-        /// </summary>
-        /// <param name="dtData"></param>
-        /// <returns></returns>
-        int Init(DateTime dtData);
         /// <summary>初始数据(加载后的缓存数据统一初始，不参与判断等处理)
         /// </summary>
         /// <param name="datas"></param>
@@ -64,12 +69,6 @@ namespace zxcCore.zxcData.Cache.Memory
         /// <returns></returns>
         bool SetData(DateTime dtTime, T data, bool bFixedData = false, bool bIniting = false);
         //bool SetData(DateTime dtData, T value);
-        /// <summary>设置最后数据缓存时间
-        /// </summary>
-        /// <param name="dtLast"></param>
-        /// <returns></returns>
-        bool SetLastTime(DateTime dtLast);
-
 
         /// <summary>提取缓存数据
         /// </summary>

@@ -40,15 +40,15 @@ namespace zxcCore.zxcRobot.Quote.Data
             if (!isDel)
             {
                 if (pLog.DateTime_Max == pLog.DateTime_Min
-                    || (pLog.DateTime_Max > dtTime_Start && pLog.DateTime_Max < dtTime_End)
-                    || (pLog.DateTime_Min > dtTime_Start && pLog.DateTime_Min < dtTime_End))
+                    || !(pLog.DateTime_Min <= dtTime_Start && dtTime_Start <= pLog.DateTime_Max)
+                    || !(pLog.DateTime_Min <= dtTime_End && dtTime_End <= pLog.DateTime_Max))
                 {
                     //更新记录时间区间
                     if (pLog.DateTime_Min > dtTime_Start)
                         pLog.DateTime_Min = dtTime_Start;
                     if (pLog.DateTime_Max < dtTime_End)
                         pLog.DateTime_Max = dtTime_End;
-                    this.Add((T)pLog, true, true);
+                    return this.Add((T)pLog, true, true);
                 }
             }
             else
@@ -104,7 +104,7 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// <returns></returns>
         public override List<T> Query_Sames(T item)
         {
-            return this.FindAll(e => (e.UID == item.UID && e.IsDel == false) || (e.StockID_Tag == item.StockID_Tag && e.IsDel == false));
+            return this.FindAll(e => (e.UID == item.UID && e.IsDel == false) || (e.StockID_Tag == item.StockID_Tag && e.QuoteTimeType == item.QuoteTimeType && e.IsDel == false));
         }
 
     }

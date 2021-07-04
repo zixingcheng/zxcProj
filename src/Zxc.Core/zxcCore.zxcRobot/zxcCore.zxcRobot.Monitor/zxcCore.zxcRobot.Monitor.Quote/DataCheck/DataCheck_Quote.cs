@@ -10,7 +10,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-行情基类
     /// </summary>
-    public class DataCheck_Quote<T> : DataCheck<T>
+    public class DataCheck_Quote<T> : DataCheck<T> where T : Data_Quote
     {
         #region 属性及构造
 
@@ -22,7 +22,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         }
 
         protected internal JObject _setObj = null;
-        protected internal Data_Quote_Swap _data = null;
+        protected internal Data_Quote _data = null;
         public DataCheck_Quote(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache)
         {
             this.InitSetting(setting);
@@ -55,8 +55,9 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         //数据检查实现（具化数据对象及缓存）-使用基类
         public override bool CheckData(DateTime dtTime, T data, IDataCache<T> dataCache = null)
         {
-            if (dataCache != null) this._DataCache = dataCache;
-            _data = (Data_Quote_Swap)Convert.ChangeType(data, typeof(Data_Quote_Swap));
+            if (dataCache != null)
+                this._DataCache = dataCache;
+            _data = data;
             return true;
         }
 
@@ -98,12 +99,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         //提取返回消息-前缀
         protected internal virtual string getMsg_Perfix()
         {
-            //组装消息
-            string tagRF = _data.Value_RF == 0 ? "平" : (_data.Value_RF > 0 ? "涨" : "跌");
-            string tagUnit = _data.IsIndex() ? "" : "元";
-            int digits = _data.IsIndex() ? 3 : 2;
-            string msg = string.Format("{0}：{1}{2}, {3} {4}%.", _data.StockName, Math.Round(_data.Value, digits), tagUnit, tagRF, Math.Round(_data.Value_RF * 100, 2));
-            return msg;
+            return _data.GetMsg_Perfix();
         }
         //提取返回消息-中缀
         protected internal virtual string getMsg_Infix()
@@ -119,7 +115,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         //数据分析触发事件
         protected internal virtual string getUser_str()
         {
-            string usrTo = _data.StockType == typeStock.Option ? "期权行情" : _data.IsIndex() ? "大盘行情" : "自选行情";
+            string usrTo = _data.GetStockType() == typeStock.Option ? "期权行情" : _data.IsIndex() ? "大盘行情" : "自选行情";
             usrTo = "@*股票监测--" + usrTo;
             return usrTo;
         }
@@ -129,11 +125,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         /// <returns></returns>
         protected internal virtual string getValue_str(double dValue)
         {
-            //组装消息
-            string tagUnit = _data.IsIndex() ? "" : "元";
-            int digits = _data.IsIndex() ? 3 : 2;
-            string strValue = string.Format("{0}{1}", Math.Round(dValue, digits), tagUnit);
-            return strValue;
+            return _data.GetValue_str(dValue);
         }
 
     }

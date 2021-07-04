@@ -10,7 +10,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 {
     /// <summary>数据检查-涨跌幅度固定监测
     /// </summary>
-    public class QuoteCheck_RiseFall_Fixed<T> : DataCheck_Quote<T>
+    public class QuoteCheck_RiseFall_Fixed<T> : DataCheck_Quote<T> where T : Data_Quote
     {
         #region 属性及构造
 
@@ -49,10 +49,10 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             if (!_dataStics.IsInited)
             {
                 //修正最小生效间隔
-                double dValue_interval = _data.IsIndex() ? _valueRF_step * 0.4 : _data.StockType == typeStock.Option ? _valueRF_step * 4.0 : _valueRF_step;
+                double dValue_interval = _data.IsIndex() ? _valueRF_step * 0.4 : _data.GetStockType() == typeStock.Option ? _valueRF_step * 4.0 : _valueRF_step;
 
                 //初始统计信息
-                _dataStics.Init(_data.Value_RF, _data.Price_High / _data.Price_Per - 1, _data.Price_Low / _data.Price_Per - 1, _data.DateTime, dValue_interval, _data.StockName);
+                _dataStics.Init(_data.Value_RF, _data.Price_High / _data.Price_Per - 1, _data.Price_Low / _data.Price_Per - 1, _data.DateTime, dValue_interval, _data.GetStockName());
 
                 //组装消息
                 msg += this.getMsg_Suffix();

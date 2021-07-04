@@ -102,6 +102,7 @@ namespace zxcCore.zxcData.Cache.Memory
         {
             if (bIniting)
                 _DataCaches.Clear();
+            if (datas == null) return -1;
 
             foreach (KeyValuePair<DateTime, T> data in datas)
             {
@@ -214,7 +215,7 @@ namespace zxcCore.zxcData.Cache.Memory
             //以检查集的方式统一管理--观察者模式
             if (_DataChecks != null)
             {
-                bool bResult = _DataChecks.CheckDatas(dtTime, data, this);
+                bool bResult = _DataChecks.CheckDatas<T>(dtTime, data, this);
                 if (bResult && this._DataChecks.Parent != null)
                 {
                     if (this._DataChecks.Parent.DataCaches != null)
