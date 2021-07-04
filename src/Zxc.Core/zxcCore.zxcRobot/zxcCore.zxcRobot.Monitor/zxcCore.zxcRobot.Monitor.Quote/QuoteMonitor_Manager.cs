@@ -276,7 +276,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             if (pDataChecks == null) return false;
 
             string setting = "";
-            var instance = this.CreateData_CheckObj<Data_Quote>(dest_ClassType, null, setting);
+            var instance = this.CreateData_CheckObj<Data_Quote>(dest_ClassType, (IDataCache<Data_Quote>)pDataChecks.DataCache, setting);
             DataCheck_Quote<Data_Quote> pDataCheck = (DataCheck_Quote<Data_Quote>)instance;
             if (pDataCheck != null)
             {

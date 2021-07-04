@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DataAnalysis\" />
+    <ProjectReference Include="..\..\..\zxcCore.zxcData\zxcCore.zxcData.Analysis\zxcCore.zxcData.Analysis.csproj" />
+    <ProjectReference Include="..\..\..\zxcCore.zxcData\zxcCore.zxcData.Cache\zxcCore.zxcData.Cache.Memory\zxcCore.zxcData.Cache.Memory.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.Quote.Data\zxcCore.zxcRobot.Quote.Data.csproj" />
   </ItemGroup>
 
 </Project>

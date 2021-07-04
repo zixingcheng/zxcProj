@@ -88,6 +88,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 case typeTimeFrequency.m10:
                     break;
                 case typeTimeFrequency.m15:
+                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk_Quantify<Data_Quote>));
                     break;
                 case typeTimeFrequency.m30:
                     this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Hourly<Data_Quote>));
@@ -106,7 +107,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
 
         //缓存数据初始装载数据
-        public virtual int DataCacheLoad(IDataCache pDataCache)
+        public virtual int DataCacheLoad(IDataCache pDataCache, DateTime dtEnd, int nCaches = -1)
         {
             typeTimeFrequency timeFrequency = pDataCache.DataCache_Set.Time_Frequency;
             DataCache<Data_Quote> dataCache = (DataCache<Data_Quote>)pDataCache;
@@ -123,7 +124,9 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             if (pStockInfo == null) return 0;
 
             //查询数据
-            List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, pSet.Time_End, pSet.Sum_Step, timeFrequency, true);
+            dtEnd = dtEnd == DateTime.MinValue ? pSet.Time_End : dtEnd;
+            nCaches = nCaches < 0 ? pSet.Sum_Step : nCaches;
+            List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd, nCaches, timeFrequency, true);
             if (lstQuotes.Count == pSet.Sum_Step)
             {
                 //重新初始数据
@@ -142,7 +145,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         public override void EventHandler_DataCacheLoad(object sender, DataCache_Event e)
         {
             //载入缓存数据
-            int nNums = this.DataCacheLoad(e.DataCache);
+            int nNums = this.DataCacheLoad(e.DataCache, DateTime.MinValue);
         }
         //缓存数据变动事件
         public override void EventHandler_DataCacheChange(object sender, DataCache_Event e)
@@ -150,7 +153,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             CacheInfo<Data_Quote> pCacheInfo = (CacheInfo<Data_Quote>)e.CacheInfo;
             if (pCacheInfo.Data.QuoteTimeType == typeTimeFrequency.real)
             {
-                this.SetData(pCacheInfo.Data, typeTimeFrequency.m15);
+                if (pCacheInfo.Data.GetStockName() == "50ETF")
+                    this.SetData(pCacheInfo.Data, typeTimeFrequency.m15);
             }
 
         }

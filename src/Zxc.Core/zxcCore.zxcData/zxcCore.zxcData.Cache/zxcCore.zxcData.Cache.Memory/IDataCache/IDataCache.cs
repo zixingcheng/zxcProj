@@ -53,6 +53,8 @@ namespace zxcCore.zxcData.Cache.Memory
     /// </summary>
     public interface IDataCache<T> : IDataCache
     {
+        Dictionary<DateTime, CacheInfo<T>> DataCaches { get; }
+
         /// <summary>初始数据(加载后的缓存数据统一初始，不参与判断等处理)
         /// </summary>
         /// <param name="datas"></param>

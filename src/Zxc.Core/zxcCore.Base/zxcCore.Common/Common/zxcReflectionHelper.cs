@@ -7,6 +7,20 @@ namespace zxcCore.Common
     public static class zxcReflectionHelper
     {
 
+        /// <summary>创建对象-泛型实现
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dest_ClassType"></param>
+        /// <param name="paramsObj"></param>
+        /// <returns></returns>
+        public static object CreateObj<T>(Type dest_ClassType, object[] paramsObj)
+        {
+            if (dest_ClassType == null) return null;
+            var instance = Activator.CreateInstance(dest_ClassType, paramsObj);
+            return instance;
+        }
+
+
         /// <summary>将一个对象转换为指定类型
         /// </summary>
         /// <param name="obj">待转换的对象</param>

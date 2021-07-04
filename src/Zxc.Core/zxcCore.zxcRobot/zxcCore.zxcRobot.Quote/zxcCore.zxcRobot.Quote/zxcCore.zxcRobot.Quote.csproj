@@ -10,6 +10,7 @@
     <ProjectReference Include="..\..\zxcCore.zxcRobot.Monitor\zxcCore.zxcRobot.Monitor.Quote\zxcCore.zxcRobot.Monitor.Quote.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Quote.Data\zxcCore.zxcRobot.Quote.Data.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Quote.JQData\zxcCore.zxcRobot.Quote.JQData.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcRobot.Quote.Quantify\zxcCore.zxcRobot.Quote.Quantify.csproj" />
   </ItemGroup>
 
   <ItemGroup>
