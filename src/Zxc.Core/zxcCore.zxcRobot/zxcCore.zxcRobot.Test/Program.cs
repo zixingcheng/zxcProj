@@ -27,7 +27,7 @@ namespace zxcCore.zxcRobot.Test
         static void Main(string[] args)
         {
             //数据分析
-            DataAnalyse();
+            //DataAnalyse();
 
             //数据库测试
             //TestDB();

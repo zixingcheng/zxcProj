@@ -24,6 +24,10 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>是否固定分隔点
         /// </summary>
         public virtual bool IsHitPoint { get { return _IsHitPoint; } }
+        protected internal bool _IsValid = false;
+        /// <summary>是否有效
+        /// </summary>
+        public virtual bool IsValid { get { return _IsValid; } }
 
 
 

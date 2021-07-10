@@ -74,6 +74,8 @@ namespace zxcCore.zxcData.Analysis
             get { return _IsInited; }
         }
 
+
+        protected internal bool _useConsole = false;
         public DataStatistics()
         {
             Time = DateTime.MinValue;
@@ -115,7 +117,8 @@ namespace zxcCore.zxcData.Analysis
             Value_Original = valueBase;
             Value_Original_last = valueBase;
             Value_last = value; Time_last = time;
-            zxcConsoleHelper.Debug(false, "***Debug*** {7}: {0} (修正：{6})，前值：{2}，差值：{1}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", valueBase, value - valueBase, double.NaN, times * Value_interval, Value_interval, times, value, Tag);
+            if (_useConsole)
+                zxcConsoleHelper.Debug(false, "***Debug*** {7}: {0} (修正：{6})，前值：{2}，差值：{1}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", valueBase, value - valueBase, double.NaN, times * Value_interval, Value_interval, times, value, Tag);
 
             _IsInited = true;
             return _IsInited;
@@ -133,23 +136,20 @@ namespace zxcCore.zxcData.Analysis
                 Value_delta = delta;
                 if (Value_interval > 0)
                 {
-                    value = Math.Floor((value - Value_Original_last) / Value_interval) * Value_interval + Value_Original_last;
+                    value = Math.Floor((value - Value_last) / Value_interval) * Value_interval + Value_last;
                     times = (int)Math.Floor(Math.Abs(delta / Value_interval)) * delta < 0 ? -1 : 1;
                     Value_delta = times * Value_interval;
-
-                    if (Math.Abs(times) > 1)
-                    {
-                        int a = 0;
-                    }
                 }
 
                 //不到最小间隔，忽略
                 if (Math.Abs(delta) < Value_interval)
                 {
                     value = Value;
-                    zxcConsoleHelper.Debug(false, "***Debug***{7}: {0} (修正：{6})，前值：{1}，差值：{2}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, 0, Value_interval, 0, value, Tag);
+                    if (_useConsole)
+                        zxcConsoleHelper.Debug(false, "***Debug***{7}: {0} (修正：{6})，前值：{1}，差值：{2}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, 0, Value_interval, 0, value, Tag);
                 }
                 else
+                    if (_useConsole)
                     zxcConsoleHelper.Debug(false, "***Debug***{7}: {0} (修正：{6})，前值：{1}，差值：{2}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, Value_delta, Value_interval, times, value, Tag);
             }
 

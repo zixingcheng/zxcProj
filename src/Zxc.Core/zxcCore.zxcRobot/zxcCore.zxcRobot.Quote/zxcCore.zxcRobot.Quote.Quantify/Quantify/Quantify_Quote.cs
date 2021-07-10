@@ -20,25 +20,26 @@ namespace zxcCore.zxcRobot.Quote.Quantify
 {
     /// <summary>行情量化分析
     /// </summary>
-    public class Quantify_Quote : DataAnalyse_Trend
+    public class Quantify_Quote
     {
         #region 属性及构造
 
-        public string Tag
-        {
-            get { return _tag; }
-        }
+        //public string Tag
+        //{
+        //    get { return _tag; }
+        //}
 
 
         protected internal IDataCache<Data_Quote> _DataCache = null;           //缓存数据对象
-        protected internal Dictionary<typeIndex, Index> _Indexs = null;
-        public Quantify_Quote(string tagName, IDataCache<Data_Quote> dataCache) : base(dataCache.DataCache_Set.Time_Frequency)
+        protected internal Dictionary<typeIndex, QuantifyIndex> _QuantifyIndexs = null;
+        public Quantify_Quote(string tagName, IDataCache<Data_Quote> dataCache)
         {
-            _Indexs = new Dictionary<typeIndex, Index>();
+            _QuantifyIndexs = new Dictionary<typeIndex, QuantifyIndex>();
             _DataCache = dataCache;
         }
 
         #endregion
+
 
 
         /// <summary>初始指标对象
@@ -48,15 +49,30 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         /// <returns></returns>
         public virtual bool Init_Index(typeIndex typeIndex, int n = 14)
         {
-            bool bResult = true;
             if (_DataCache == null) return false;
+            QuantifyIndex pIndex = this.Get_Index(typeIndex);
 
             //初始指标对象
-            //var aa = new Index_CCI<Data_Quote>(_DataCache.DataCaches, n, _DataCache.DataCache_Set.Time_Frequency);
-            Index pIndex = (Index)zxcReflectionHelper.CreateObj<Data_Quote>((Type)typeIndex.Get_AttrValue(), new object[] { _DataCache.DataCaches, n, _DataCache.DataCache_Set.Time_Frequency });
-            pIndex.Calculate_All();
-            _Indexs[typeIndex] = pIndex;
+            if (pIndex == null)
+            {
+                pIndex = (QuantifyIndex)zxcReflectionHelper.CreateObj<Data_Quote>((Type)typeIndex.Get_AttrValue(), new object[] { _DataCache.DataCaches, n, _DataCache.DataCache_Set.Time_Frequency });
+                pIndex.DataAnalyse_Trend_Trigger += new DataAnalyse_Trend_EventHandler(DataAnalyse_QuantifyIndex_EventHandler);
+
+                //分析全部
+                pIndex.Calculate_All(true);
+                _QuantifyIndexs[typeIndex] = pIndex;
+            }
             return true;
+        }
+        //提取量化因子对象
+        public virtual QuantifyIndex Get_Index(typeIndex typeIndex)
+        {
+            QuantifyIndex pIndex = null;
+            if (!_QuantifyIndexs.TryGetValue(typeIndex, out pIndex))
+            {
+                return null;
+            }
+            return pIndex;
         }
 
 
@@ -64,11 +80,23 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         public virtual bool Calculate(DateTime dtTime, Data_Quote data)
         {
             bool bResult = true;
-            foreach (KeyValuePair<typeIndex, Index> index in _Indexs)
+            foreach (KeyValuePair<typeIndex, QuantifyIndex> quoteIndex in _QuantifyIndexs)
             {
-                bResult = bResult && (index.Value.Calculate(dtTime, data) != double.NaN);
+                bResult = bResult && (quoteIndex.Value.Calculate(dtTime, data) != double.NaN);
             }
             return bResult;
+        }
+
+
+        //量化因子触发事件
+        protected internal void DataAnalyse_QuantifyIndex_EventHandler(object sender, DataAnalyse_Trend_EventArgs e)
+        {
+            Console.WriteLine(DateTime.Now + "::");
+            if (e.Data.LabelInfo.DataTrend_KeyPoint == typeDataTrend_KeyPoint.INFLECTION)
+            {
+
+            }
+
         }
 
     }

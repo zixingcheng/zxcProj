@@ -22,8 +22,9 @@ namespace zxcCore.zxcData.Analysis
         public DataTrend_Index Data { get { return _data; } }
 
 
-        public DataAnalyse_Trend_EventArgs()
+        public DataAnalyse_Trend_EventArgs(DataTrend_Index data = null)
         {
+            _data = data;
         }
         ~DataAnalyse_Trend_EventArgs()
         {

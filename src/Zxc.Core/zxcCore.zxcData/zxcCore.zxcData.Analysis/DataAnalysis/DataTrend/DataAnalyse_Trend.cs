@@ -71,7 +71,7 @@ namespace zxcCore.zxcData.Analysis
 
         /// <summary>是否已经初始
         /// </summary>
-        bool _IsInited = false;
+        protected internal bool _IsInited = false;
         public bool IsInited
         {
             get { return _IsInited; }
@@ -80,8 +80,9 @@ namespace zxcCore.zxcData.Analysis
 
         protected internal int _indTag = 0;
         protected internal string _tag = "";
-        protected internal bool _useFixed = false;
         protected internal double _valueDelta_half = 0;
+        protected internal bool _useFixed = false;
+        protected internal bool _useConsole = false;
         public DataAnalyse_Trend(typeTimeFrequency valueTimeType)
         {
             _tag = "DataAnalyse_Index";
@@ -101,7 +102,7 @@ namespace zxcCore.zxcData.Analysis
         /// <param name="min">最小值</param>
         /// <param name="valueDelta">数据变化幅度有效值</param>
         /// <returns></returns>
-        public virtual bool Init(double valueBase, DateTime dtTime, double valueDelta = 0.0025, double valueMax = double.MinValue, double valueMin = double.MaxValue)
+        public virtual bool Init(double valueBase, DateTime dtTime, double valueDelta = 0.0025, double valueMax = double.MinValue, double valueMin = double.MaxValue, double valueSetp = double.NaN)
         {
             if (_IsInited) return true;
             this._valueDelta = valueDelta;
@@ -109,7 +110,7 @@ namespace zxcCore.zxcData.Analysis
             this._valueBase = this.Create_IndexData(valueBase, dtTime);
             this._value = _valueBase;
             this._valueLast = _valueBase;
-            this._valueStep = Math.Round(this._valueDelta * this._valueBase.Value, 8);  //计算有效值步长（对应有效值区间）
+            this._valueStep = valueSetp != double.NaN ? valueSetp : Math.Round(this._valueDelta * this._valueBase.Value, 8);  //计算有效值步长（对应有效值区间）
 
             this.lstDataStatistics = new List<DataStatistics>();
             this.InitStatistics(_valueBase.Value, _valueBase.Time, valueMax, valueMin);
@@ -132,6 +133,7 @@ namespace zxcCore.zxcData.Analysis
         {
             this._dataStatistics = new DataStatistics();
             this._dataStatistics.Init(value, time, this._valueStep, _indTag.ToString(), valueMax, valueMin);
+            this._dataStatistics._useConsole = this._useConsole;
             this.lstDataStatistics.Add(this._dataStatistics);
 
             _valueMax = _dataStatistics.Max;
@@ -142,11 +144,11 @@ namespace zxcCore.zxcData.Analysis
 
 
         //数据分析（趋势、趋势详情、关键点信息等）
-        public virtual bool Analysis(double value, DateTime time)
+        public virtual bool Analysis(double value, DateTime time, bool bVaild = true)
         {
             //实例数据
             DataTrend_Index pData = this.Create_IndexData(value, time, this._valueLast);
-
+            pData._IsValid = bVaild;
 
             //数据处理
             if (this.dataHandle(pData))
@@ -207,6 +209,7 @@ namespace zxcCore.zxcData.Analysis
             {
                 //bResult = bResult && dataHandle_DataTrend_Detail(pDataSetp);
                 bResult = bResult && dataHandle_DataKeyPoint(pDataSetp, data);
+                bResult = bResult && dataHandle_User(pDataSetp, data);
             }
             if (bResult)
                 bResult = this.dataHandle_Event(pDataSetp);
@@ -311,7 +314,8 @@ namespace zxcCore.zxcData.Analysis
             double dRatio = Math.Round(pLabelInfo.Difference / this._valueBase.Value, 6);
 
             pLabelInfo.Difference_Ratio = dRatio;
-            zxcConsoleHelper.Debug(true, "监测值：{1} ({0})，变动：{2}，时间：{3}", Math.Round(data.Value, 6), dataLast_Recursion.Value, dRatio, data.Time.ToString("HH:mm:ss"));
+            if (_useConsole)
+                zxcConsoleHelper.Debug(true, "监测值：{1} ({0})，变动：{2}，时间：{3}", Math.Round(data.Value, 6), dataLast_Recursion.Value, dRatio, data.Time.ToString("HH:mm:ss"));
             if (dRatio == 0) return true;
 
 
@@ -357,27 +361,41 @@ namespace zxcCore.zxcData.Analysis
             }
             return true;
         }
+        //数据处理--自定义
+        protected virtual bool dataHandle_User(DataTrend_Index data, DataTrend_Index dataLast_Recursion = null)
+        {
+            return true;
+        }
 
         //数据处理事件
         protected virtual bool dataHandle_Event(DataTrend_Index data)
         {
             //组装消息
-            if (this.DataAnalyse_Trend_Trigger != null)
+            if (data._IsValid && this.DataAnalyse_Trend_Trigger != null)
             {
-                DataAnalyse_Trend_EventArgs pArgs = new DataAnalyse_Trend_EventArgs()
-                {
-                    _data = data
-                };
+                DataAnalyse_Trend_EventArgs pArgs = this.dataHandle_EventArgs(data);
                 this.DataAnalyse_Trend_Trigger(this, pArgs);
+                return true;
+            }
+            return true;
+        }
+        //数据处理事件返回对象
+        protected virtual DataAnalyse_Trend_EventArgs dataHandle_EventArgs(DataTrend_Index data)
+        {
+            //组装消息
+            DataAnalyse_Trend_EventArgs pArgs = new DataAnalyse_Trend_EventArgs()
+            {
+                _data = data
+            };
 
-                //输出信息
+            //输出信息
+            if (_useConsole)
+            {
                 double profit = data.LabelInfo.Value_Profit;
                 var msg = new { DataTrend = data.LabelInfo.DataTrend, DataTrend_Detail = data.LabelInfo.DataTrend_Detail, DataTrend_KeyPoint = data.LabelInfo.DataTrend_KeyPoint, hitLimit = data.IsHitPoint, Value = data.Value, Ratio = data.LabelInfo.Difference_Ratio, Profit = profit };
                 zxcConsoleHelper.Debug(true, "{0}", msg.ToString());
-
-                return true;
             }
-            return false;
+            return pArgs;
         }
 
 
@@ -401,6 +419,16 @@ namespace zxcCore.zxcData.Analysis
         {
             double profit = Math.Round(data.Value / this._valueBase.Value - 1, decimals);
             return profit;
+        }
+
+
+        //设置输出状态
+        protected virtual bool setConsoleState(bool useConsole)
+        {
+            this._useConsole = useConsole;
+            if (this._dataStatistics != null)
+                this._dataStatistics._useConsole = useConsole;
+            return true;
         }
 
 
