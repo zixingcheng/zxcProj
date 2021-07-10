@@ -11,22 +11,26 @@ namespace zxcCore.zxcData.Analysis
     {
         #region 属性及构造
 
-        /// <summary>当前值
+        protected internal double _Value = 0;
+        /// <summary>当前标签（对应指标名称）
         /// </summary>
-        public double Value { get; set; }
-        /// <summary>当前值时间
+        public double Value { get { return _Value; } }
+
+        protected internal DateTime _Time = DateTime.MinValue;
+        /// <summary>当前标签（对应指标名称）
         /// </summary>
-        public DateTime Time { get; set; }
+        public DateTime Time { get { return _Time; } }
+
 
         public Data(double value)
         {
-            Value = value;
-            Time = DateTime.Now;
+            _Value = value;
+            _Time = DateTime.Now;
         }
         public Data(double value, DateTime time)
         {
-            Value = value;
-            Time = time;
+            _Value = value;
+            _Time = time;
         }
 
         #endregion
@@ -67,4 +71,5 @@ namespace zxcCore.zxcData.Analysis
         #endregion
 
     }
+
 }

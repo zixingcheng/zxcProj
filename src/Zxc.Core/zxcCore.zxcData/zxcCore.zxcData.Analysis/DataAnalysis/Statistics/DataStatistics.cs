@@ -8,7 +8,7 @@ namespace zxcCore.zxcData.Analysis
     /// <summary>数据统计
     /// </summary>
     /// 
-    public class DataStatistics : IDataStatistics
+    public class DataStatistics
     {
         #region 属性及构造
 
@@ -18,9 +18,15 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>最大值
         /// </summary>
         public double Max { get; set; }
+        /// <summary>最大值-原始值
+        /// </summary>
+        public double Max_Original { get; set; }
         /// <summary>最小值
         /// </summary>
         public double Min { get; set; }
+        /// <summary>最小值-原始值
+        /// </summary>
+        public double Min_Original { get; set; }
         /// <summary>当前值-修正值
         /// </summary>
         public double Value { get; set; }
@@ -49,7 +55,7 @@ namespace zxcCore.zxcData.Analysis
 
         /// <summary>数据生效与前值的数据差（间隔倍数）
         /// </summary>
-        public double Value_delta { get; set; }
+        protected double Value_delta = 0;
         /// <summary>生效数据间隔
         /// </summary>
         public double Value_interval { get; set; }
@@ -77,27 +83,41 @@ namespace zxcCore.zxcData.Analysis
         #endregion
 
 
-        //数据初始实现
-        public virtual bool Init(double value, double max, double min, DateTime time, double interval = 0, string tag = "")
+        /// <summary>统计数据初始
+        /// </summary>
+        /// <param name="valueBase">基础值(不参与计算)</param>
+        /// <param name="time">基时间</param>
+        /// <param name="interval">有效数据间隔</param>
+        /// <param name="tag">标签</param>
+        /// <param name="valueMax">最大值</param>
+        /// <param name="valueMin">最小值</param>
+        /// <returns></returns>
+        public virtual bool Init(double valueBase, DateTime time, double interval = 0, string tag = "", double valueMax = double.MinValue, double valueMin = double.MaxValue)
         {
             Tag = tag;
-            Max = max; Max_last = max;
-            Min = min; Min_last = min;
-            Value_interval = Math.Round(interval, 4);
-            double value0 = value;
-            int times = 0;
+            Max = valueMax; Max_last = valueMax;
+            Min = valueMin; Min_last = valueMin;
+            Min_Original = valueBase; Max_Original = valueBase;
+            Value_interval = Math.Round(interval, 8);
+
 
             //值修正为区间大小倍数
+            int times = 0;
+            double value = valueBase;
             if (Value_interval > 0)
             {
-                times = (int)Math.Round(value / Value_interval);
-                value = times * Value_interval;
+                //value = Math.Round(value / Value_interval) * Value_interval;
+                //times = (int)Math.Round(value / Value_interval);
+                //Value_delta = 0;
             }
-            _IsInited = this.Statistics(value, time);
 
-            Value_Original_last = value0;
+            Value = value;
+            Value_Original = valueBase;
+            Value_Original_last = valueBase;
             Value_last = value; Time_last = time;
-            zxcConsoleHelper.Debug(false, "****** {7}: {0}，差值：{1}，前值：{2}，当前：{6}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, value0, 0, value, Value_interval, times, value, Tag);
+            zxcConsoleHelper.Debug(false, "***Debug*** {7}: {0} (修正：{6})，前值：{2}，差值：{1}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", valueBase, value - valueBase, double.NaN, times * Value_interval, Value_interval, times, value, Tag);
+
+            _IsInited = true;
             return _IsInited;
         }
         //数据统计实现
@@ -108,29 +128,29 @@ namespace zxcCore.zxcData.Analysis
             int times = 0;
             if (_IsInited && Value_interval >= 0)
             {
-                double delta = value - Value;
-
                 //值修正为区间大小倍数
+                double delta = Math.Round(value - Value, 8);
                 Value_delta = delta;
                 if (Value_interval > 0)
                 {
-                    value = Math.Round(value / Value_interval) * Value_interval;
-                    times = (int)Math.Round(delta / Value_interval);
+                    value = Math.Floor((value - Value_Original_last) / Value_interval) * Value_interval + Value_Original_last;
+                    times = (int)Math.Floor(Math.Abs(delta / Value_interval)) * delta < 0 ? -1 : 1;
                     Value_delta = times * Value_interval;
+
+                    if (Math.Abs(times) > 1)
+                    {
+                        int a = 0;
+                    }
                 }
 
                 //不到最小间隔，忽略
-                if (Math.Abs(delta) <= Value_interval)
+                if (Math.Abs(delta) < Value_interval)
                 {
-                    //ConsoleHelper.Debug("***###{7: {0}，差值：{2}，前值：{1}，当前：{6}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value_last, delta, Value_delta, Value_interval, times, Value,Tag);
-                    return false;
+                    value = Value;
+                    zxcConsoleHelper.Debug(false, "***Debug***{7}: {0} (修正：{6})，前值：{1}，差值：{2}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, 0, Value_interval, 0, value, Tag);
                 }
-
-                //if (delta < 0)
-                //{
-                //    int a = 0;
-                //}
-                zxcConsoleHelper.Debug(false, "******{7}: {0}，差值：{2}，前值：{1}，当前：{6}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, Value_delta, Value_interval, times, value, Tag);
+                else
+                    zxcConsoleHelper.Debug(false, "***Debug***{7}: {0} (修正：{6})，前值：{1}，差值：{2}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, Value_delta, Value_interval, times, value, Tag);
             }
 
             //值更新 
@@ -156,8 +176,19 @@ namespace zxcCore.zxcData.Analysis
                 Min_last = Min;
                 Min = value;
             }
+
+            //统计-原始值
+            if (Value_Original > Max_Original)
+            {
+                Max_Original = Value_Original;
+            }
+            else if (Value_Original < Min_Original)
+            {
+                Min_Original = Value_Original;
+            }
             return true;
         }
 
     }
+
 }

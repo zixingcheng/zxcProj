@@ -46,10 +46,10 @@ namespace zxcCore.zxcData.Analysis
         public Datas Datas { get; set; }
         /// <summary>数据统计对象
         /// </summary>
-        protected DataStatistics DataStatistics { get; set; }
+        protected DataStatistics2 DataStatistics { get; set; }
         /// <summary>数据统计对象集（阶段）
         /// </summary>
-        protected List<DataStatistics> lstDataStatistics { get; set; }
+        protected List<DataStatistics2> lstDataStatistics { get; set; }
 
         /// <summary>是否已经初始
         /// </summary>
@@ -79,7 +79,7 @@ namespace zxcCore.zxcData.Analysis
             this.Time_last = time;
 
             this.Datas = new Datas(Tag);
-            this.lstDataStatistics = new List<DataStatistics>();
+            this.lstDataStatistics = new List<DataStatistics2>();
             this.InitDataStatistics(value, time, max, min);
 
             //缓存及统计数据
@@ -89,8 +89,8 @@ namespace zxcCore.zxcData.Analysis
         //初始统计对象-阶段
         public virtual bool InitDataStatistics(double value, DateTime time, double max, double min)
         {
-            this.DataStatistics = new DataStatistics();
-            this.DataStatistics.Init(value, max, min, time, 0, Tag);
+            this.DataStatistics = new DataStatistics2();
+            this.DataStatistics.Init(value, max, min, time, Value_delta, Tag);
 
             this.lstDataStatistics.Add(this.DataStatistics);
             return true;
