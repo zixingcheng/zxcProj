@@ -33,6 +33,11 @@ namespace zxcCore.zxcData.Cache.Memory
             get { return _standard; }
             set { _standard = value; }
         }
+        public DateTime DateTime
+        {
+            get; set;
+        }
+
 
         Dictionary<string, IData_Factor> _factors = null;
         public Dictionary<string, IData_Factor> Factors

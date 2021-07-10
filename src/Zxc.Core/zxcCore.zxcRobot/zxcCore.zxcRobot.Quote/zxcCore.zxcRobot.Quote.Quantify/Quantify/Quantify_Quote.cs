@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using zxcCore.Common;
 using zxcCore.Extensions;
+using zxcCore.zxcData.Analysis;
 using zxcCore.zxcData.Cache.Memory;
 using zxcCore.zxcRobot.Quote.Data;
 
@@ -19,11 +20,10 @@ namespace zxcCore.zxcRobot.Quote.Quantify
 {
     /// <summary>行情量化分析
     /// </summary>
-    public class Quantify_Quote
+    public class Quantify_Quote : DataAnalyse_Trend
     {
         #region 属性及构造
 
-        protected internal string _tag = "";
         public string Tag
         {
             get { return _tag; }
@@ -32,7 +32,7 @@ namespace zxcCore.zxcRobot.Quote.Quantify
 
         protected internal IDataCache<Data_Quote> _DataCache = null;           //缓存数据对象
         protected internal Dictionary<typeIndex, Index> _Indexs = null;
-        public Quantify_Quote(string tagName, IDataCache<Data_Quote> dataCache)
+        public Quantify_Quote(string tagName, IDataCache<Data_Quote> dataCache) : base(dataCache.DataCache_Set.Time_Frequency)
         {
             _Indexs = new Dictionary<typeIndex, Index>();
             _DataCache = dataCache;

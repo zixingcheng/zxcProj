@@ -31,6 +31,11 @@ namespace zxcCore.zxcData.Cache.Memory
             get { return _standard; }
             set { _standard = value; }
         }
+        public DateTime DateTime
+        {
+            get; set;
+        }
+
 
         public Data_Factor(string id, string code, string name, string standard)
         {

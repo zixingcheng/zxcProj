@@ -20,6 +20,9 @@ namespace zxcCore.zxcData.Cache.Memory
         /// </summary>
         string Standard { get; set; }
 
+        /// <summary>因子起始时间-非必须
+        /// </summary>
+        DateTime DateTime { get; set; }
 
         ///// <summary>数据设置管理对象-注入
         ///// </summary>

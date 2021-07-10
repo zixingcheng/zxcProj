@@ -45,7 +45,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             _dictQuotes = new Dictionary<string, bool>();
             _msger = new DataCheck_Msger_Quote(true, 1000);
             _managerCaches = new DataCaches_Manager();
-            _managerCaches.Init(DateTime.Now);
+            //_managerCaches.Init(DateTime.Now);
 
             this.InitDataSawp();        //初始数据交换对象信息
 
@@ -109,6 +109,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             {
                 //提取信息
                 pFactors = new Data_Factors(exType, exType, "", "");
+                pFactors.DateTime = pData.DateTime;
                 bExist = false;
             }
 
@@ -117,8 +118,10 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             {
                 //提取信息
                 pFactor = new Data_Factor(stockInfo.StockID_Tag, stockInfo.StockID_Tag, stockInfo.StockName, "");
+                pFactor.DateTime = pFactors.DateTime;
 
                 //初始数据所有缓存对象
+                this._managerCaches.Init(pFactors.DateTime);
                 foreach (var item in _setsDataCache)
                 {
                     //提取数据缓存对象、及检查对象集

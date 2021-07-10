@@ -47,7 +47,6 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         /// <returns></returns>
         public override double Calculate()
         {
-
             return double.NaN;
         }
         /// <summary>计算指定时间指标

@@ -153,21 +153,25 @@ namespace zxcCore.zxcRobot.Quote
                 //数据量校检及自动更新补全
                 if (quoteBars > 0)
                 {
-                    int nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.DateTime >= dtStart && e.QuoteTimeType == quoteTime && e.IsDel == false);
-                    if (nCount < quoteBars)
+                    int nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.DateTime >= startTime && e.QuoteTimeType == quoteTime && e.IsDel == false);
+                    while (nCount < quoteBars)
                     {
                         //全部重新取
-                        List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtEnd, quoteBars, quoteTime);
-                        bResult = this.UpdateRange(lstQuote);
-                    }
-                    else
-                    {
-                        bResult = quoteBars == nCount;
+                        DateTime dtEnd0 = dtStart;
+                        dtStart = dtStart.AddDays(-1);
 
-                        //日志信息不匹配，直接更新
-                        if (dtStart != pLog.DateTime_Min || dtEnd != pLog.DateTime_Max)
-                            bResult = Quote_Datas._Datas._quotesLog.Updata_LogQuote(StockInfo.StockID_Tag, dtStart, dtEnd, quoteTime);
+                        //List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtEnd, quoteBars, quoteTime);
+                        List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtStart, dtEnd, quoteTime);
+                        bResult = this.UpdateRange(lstQuote);
+
+                        //再次计算总数
+                        nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.DateTime >= dtStart && e.QuoteTimeType == quoteTime && e.IsDel == false);
                     }
+
+                    //日志信息不匹配，直接更新
+                    bResult = quoteBars <= nCount;
+                    if (dtStart != pLog.DateTime_Min || dtEnd != pLog.DateTime_Max)
+                        bResult = Quote_Datas._Datas._quotesLog.Updata_LogQuote(StockInfo.StockID_Tag, dtStart, dtEnd, quoteTime);
                 }
                 return bResult;
             }
