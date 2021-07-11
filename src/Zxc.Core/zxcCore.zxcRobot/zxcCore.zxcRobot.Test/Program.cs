@@ -27,7 +27,7 @@ namespace zxcCore.zxcRobot.Test
         static void Main(string[] args)
         {
             //数据分析
-            DataAnalyse();
+            //DataAnalyse();
 
             //数据库测试
             //TestDB();
@@ -163,10 +163,10 @@ namespace zxcCore.zxcRobot.Test
 
 
             //初始数据分析对象
-            DataAnalyse_KeyPoints pDataAnalyse = new DataAnalyse_KeyPoints("Test");
-            pDataAnalyse.Init(37.31, 37.31, DateTime.Now, 37.31, 37.31, 0.0025);
+            DataAnalyse_Trend pDataAnalyse = new DataAnalyse_Trend("Test");
+            pDataAnalyse.Init(37.31, DateTime.Now, 0.0025, 37.31, 37.31);
 
-            DataAnalyse_Trend pIndexAnalyse = new DataAnalyse_Trend(Enums.typeTimeFrequency.day);
+            DataAnalyse_Trend pIndexAnalyse = new DataAnalyse_Trend("", Enums.typeTimeFrequency.day);
             pIndexAnalyse.DataAnalyse_Trend_Trigger += new DataAnalyse_Trend_EventHandler(DataAnalyse_Trend_EventHandler);
             pIndexAnalyse.Init(37.31, DateTime.Now, 0.0025, 37.31, 37.31);
             pIndexAnalyse.InitTrend_KeyLine("MA2", 37, true);

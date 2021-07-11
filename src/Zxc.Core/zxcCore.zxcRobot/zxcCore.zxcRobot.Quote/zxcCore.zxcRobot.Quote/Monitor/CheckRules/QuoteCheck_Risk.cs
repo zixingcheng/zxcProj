@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using zxcCore.zxcData.Cache.Memory;
 using zxcCore.Common;
+using zxcCore.Extensions;
 using zxcCore.zxcData.Analysis;
+using zxcCore.zxcData.Cache.Memory;
 using zxcCore.zxcRobot.Quote;
 using zxcCore.zxcRobot.Quote.Data;
 
@@ -16,15 +17,15 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         #region 属性及构造
 
         //数据分析对象 
-        protected internal DataAnalyse_KeyPoints _dataAnalyse = null;
-        protected DataAnalyse_KeyPoints_EventArgs _eventArgs = null;
+        protected internal DataAnalyse_Trend _dataAnalyse = null;
+        protected DataAnalyse_Trend_EventArgs _eventArgs = null;
         protected internal double _valueDelta = 0.0025;         //涨跌拐点判断范围
 
         public QuoteCheck_Risk(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
         {
             _tagAlias = "风控提醒";
-            _dataAnalyse = new DataAnalyse_KeyPoints(tagName);
-            _dataAnalyse.DataAnalyse_Trigger += new DataAnalyse_KeyPoints_EventHandler(EventHandler_DataAnalyse_Trigger);
+            _dataAnalyse = new DataAnalyse_Trend(tagName);
+            _dataAnalyse.DataAnalyse_Trend_Trigger += new DataAnalyse_Trend_EventHandler(EventHandler_DataAnalyse_Trigger);
         }
         ~QuoteCheck_Risk()
         {
@@ -43,11 +44,11 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             bool bResult = base.CheckData(dtTime, data, dataCache);
 
             //数据初始
-            if (this._dataAnalyse.Datas.Values.Count == 0)
+            if (!this._dataAnalyse.IsInited)
             {
                 //修正最小生效间隔
                 double valueDelta = _data.IsIndex() ? _valueDelta * 1.5 : _data.GetStockType() == typeStock.Option ? _valueDelta * 20.0 : _valueDelta * 3;
-                this._dataAnalyse.Init(_data.Price_Per, _data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), _data.Price_High, _data.Price_Low, valueDelta);
+                this._dataAnalyse.Init(_data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), valueDelta, _data.Price_High, _data.Price_Low);
                 return true;
             }
             else
@@ -63,10 +64,11 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             string strMsg = "";
             if (_eventArgs != null)
             {
-                if (_eventArgs.MonitorType == typeKeyPoints.BREAK)
+                DataTrend_LabelInfo pLabelInfo = _eventArgs.Data.LabelInfo;
+                if (pLabelInfo.DataTrend_KeyPoint == typeDataTrend_KeyPoint.INFLECTION)
                 {
-                    string tag0 = _eventArgs.MonitorType2 > 0 ? "上涨拐点" : "下降拐点";
-                    strMsg = string.Format("\n{0}：{1}({2}).", _tagAlias, tag0, this.getValue_str(_eventArgs.Value));
+                    string tag0 = pLabelInfo.DataTrend.Get_Description() + pLabelInfo.DataTrend_KeyPoint.Get_Description();
+                    strMsg = string.Format("\n{0}：{1}({2}).", _tagAlias, tag0, this.getValue_str(pLabelInfo.Value));
                 }
             }
             return strMsg;
@@ -74,10 +76,10 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 
 
         //数据分析触发事件
-        protected void EventHandler_DataAnalyse_Trigger(object sender, DataAnalyse_KeyPoints_EventArgs e)
+        protected void EventHandler_DataAnalyse_Trigger(object sender, DataAnalyse_Trend_EventArgs e)
         {
             _eventArgs = e;
-            zxcConsoleHelper.Debug(true, "{0}:: {1}", DateTime.Now, e.MonitorType.ToString());
+            //zxcConsoleHelper.Debug(true, "{0}:: {1}", DateTime.Now, e.Data.LabelInfo.DataTrend_KeyPoint.ToString());
 
             //组装消息
             string msg = this.getMsg_Infix();

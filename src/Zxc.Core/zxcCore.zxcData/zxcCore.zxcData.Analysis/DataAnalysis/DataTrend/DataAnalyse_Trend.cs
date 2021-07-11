@@ -84,9 +84,9 @@ namespace zxcCore.zxcData.Analysis
         protected internal bool _useFixed = false;
         protected internal bool _useConsole = false;
         protected internal Dictionary<string, DataTrend_KeyLine> _dataKeyLines = null;      //关键点位线集
-        public DataAnalyse_Trend(typeTimeFrequency valueTimeType)
+        public DataAnalyse_Trend(string tag = "", typeTimeFrequency valueTimeType = typeTimeFrequency.none)
         {
-            _tag = "DataAnalyse_Index";
+            _tag = string.IsNullOrEmpty(tag) ? "DataAnalyse_Index" : tag;
             _ValueTimeType = valueTimeType;
             this._dataIndexCaches = new List<DataTrend_Index>();
             this._dataKeyLines = new Dictionary<string, DataTrend_KeyLine>();
@@ -331,6 +331,8 @@ namespace zxcCore.zxcData.Analysis
         {
             bool bResult = true;
             DataTrend_LabelInfo pLabelInfo = data.LabelInfo;
+            DataTrend_LabelInfo pLabelInfo_Orgin = null;
+
             foreach (var item in _dataKeyLines)
             {
                 (typeDataTrend, typeDataTrend_KeyPoint, double) pResult = item.Value.Analysis(data.Value);
@@ -339,12 +341,26 @@ namespace zxcCore.zxcData.Analysis
                     if (_useConsole)
                         zxcConsoleHelper.Debug(true, "监测值：{3}, {0} {1} ({2})", pResult.Item1.ToString(), pResult.Item2.ToString(), pResult.Item3, Math.Round(data.Value, 6));
 
+                    //复制备用
+                    if (pLabelInfo_Orgin == null)
+                        pLabelInfo_Orgin = zxcCloneDeep.Clone<DataTrend_LabelInfo>(pLabelInfo);
+
+                    //更新值
                     pLabelInfo.Tag = item.Key;
                     pLabelInfo.DataTrend = pResult.Item1;
                     pLabelInfo.DataTrend_KeyPoint = pResult.Item2;
                     pLabelInfo.Value_KeyLine = pResult.Item3;
                     bResult = bResult && this.dataHandle_Event(data);
                 }
+            }
+
+            //还原 
+            if (pLabelInfo_Orgin != null)
+            {
+                pLabelInfo.Tag = pLabelInfo_Orgin.Tag;
+                pLabelInfo.DataTrend = pLabelInfo_Orgin.DataTrend;
+                pLabelInfo.DataTrend_KeyPoint = pLabelInfo_Orgin.DataTrend_KeyPoint;
+                pLabelInfo.Value_KeyLine = pLabelInfo_Orgin.Value_KeyLine;
             }
             return bResult;
         }

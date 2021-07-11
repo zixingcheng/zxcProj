@@ -8,7 +8,7 @@ namespace zxcCore.zxcData.Analysis
     /// <summary>数据统计
     /// </summary>
     /// 
-    public class DataStatistics
+    public class DataStatistics : IDataStatistics
     {
         #region 属性及构造
 
@@ -52,10 +52,9 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>前值时间
         /// </summary>
         public DateTime Time_last { get; set; }
-
         /// <summary>数据生效与前值的数据差（间隔倍数）
         /// </summary>
-        protected double Value_delta = 0;
+        public double Value_delta { get; set; }
         /// <summary>生效数据间隔
         /// </summary>
         public double Value_interval { get; set; }
@@ -116,7 +115,7 @@ namespace zxcCore.zxcData.Analysis
             Value = value;
             Value_Original = valueBase;
             Value_Original_last = valueBase;
-            Value_last = value; Time_last = time;
+            Value_last = value; Time_last = time; Time = time;
             if (_useConsole)
                 zxcConsoleHelper.Debug(false, "***Debug*** {7}: {0} (修正：{6})，前值：{2}，差值：{1}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", valueBase, value - valueBase, double.NaN, times * Value_interval, Value_interval, times, value, Tag);
 
@@ -127,6 +126,7 @@ namespace zxcCore.zxcData.Analysis
         public virtual bool Statistics(double value, DateTime time)
         {
             //最小间隔
+            bool bResult = true;
             double value0 = value;
             int times = 0;
             if (_IsInited && Value_interval >= 0)
@@ -136,15 +136,15 @@ namespace zxcCore.zxcData.Analysis
                 Value_delta = delta;
                 if (Value_interval > 0)
                 {
-                    value = Math.Floor((value - Value_last) / Value_interval) * Value_interval + Value_last;
-                    times = (int)Math.Floor(Math.Abs(delta / Value_interval)) * delta < 0 ? -1 : 1;
+                    times = (int)Math.Floor(Math.Abs(delta / Value_interval)) * (delta < 0 ? -1 : 1);
+                    value = times * Value_interval + Value_last;
                     Value_delta = times * Value_interval;
                 }
 
                 //不到最小间隔，忽略
                 if (Math.Abs(delta) < Value_interval)
                 {
-                    value = Value;
+                    value = Value; bResult = false;
                     if (_useConsole)
                         zxcConsoleHelper.Debug(false, "***Debug***{7}: {0} (修正：{6})，前值：{1}，差值：{2}，有效间隔：{3}，最小间隔：{4}，倍数：{5}", value0, Value, delta, 0, Value_interval, 0, value, Tag);
                 }
@@ -154,30 +154,33 @@ namespace zxcCore.zxcData.Analysis
             }
 
             //值更新 
-            Value_last = Value; Time_last = Time;
-            Value = value; Time = time;
-            Value_Original_last = Value_Original; Value_Original = value0;
+            if (bResult)
+            {
+                Value_last = Value; Time_last = Time;
+                Value = value; Time = time;
 
-            //计算
-            if (Time_last != DateTime.MinValue)
-            {
-                Duration_S = (Time - Time_last).TotalSeconds;
-                Duration_M = (Time - Time_last).TotalMinutes;
-            }
+                //计算
+                if (Time_last != DateTime.MinValue)
+                {
+                    Duration_S = (Time - Time_last).TotalSeconds;
+                    Duration_M = (Time - Time_last).TotalMinutes;
+                }
 
-            //统计
-            if (value > Max)
-            {
-                Max_last = Max;
-                Max = value;
-            }
-            else if (value < Min)
-            {
-                Min_last = Min;
-                Min = value;
+                //统计
+                if (value > Max)
+                {
+                    Max_last = Max;
+                    Max = value;
+                }
+                else if (value < Min)
+                {
+                    Min_last = Min;
+                    Min = value;
+                }
             }
 
             //统计-原始值
+            Value_Original_last = Value_Original; Value_Original = value0;
             if (Value_Original > Max_Original)
             {
                 Max_Original = Value_Original;
@@ -186,7 +189,7 @@ namespace zxcCore.zxcData.Analysis
             {
                 Min_Original = Value_Original;
             }
-            return true;
+            return bResult;
         }
 
     }

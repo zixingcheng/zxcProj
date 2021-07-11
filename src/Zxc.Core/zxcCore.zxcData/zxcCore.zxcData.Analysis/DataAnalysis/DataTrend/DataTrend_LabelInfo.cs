@@ -19,9 +19,9 @@ namespace zxcCore.zxcData.Analysis
         /// </summary>
         [EnumAttr("平", 0), Description("平")]
         NONE = 0,
-        /// <summary>上升
+        /// <summary>上涨
         /// </summary>
-        [EnumAttr("上升", 1), Description("上升")]
+        [EnumAttr("上涨", 1), Description("上涨")]
         RAISE = 1
     }
     /// <summary>数据趋势-详情(配合typeDataTrend使用)

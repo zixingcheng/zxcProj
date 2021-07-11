@@ -48,7 +48,7 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         public typeTimeFrequency QuoteTimeType { get { return _QuoteTimeType; } }
 
 
-        public QuantifyIndex(int n = 14, typeTimeFrequency timeFrequency = typeTimeFrequency.m15) : base(timeFrequency)
+        public QuantifyIndex(int n = 14, typeTimeFrequency timeFrequency = typeTimeFrequency.m15) : base("QuantifyIndex", timeFrequency)
         {
             _Tag = "指标 基类";
             _N = n;

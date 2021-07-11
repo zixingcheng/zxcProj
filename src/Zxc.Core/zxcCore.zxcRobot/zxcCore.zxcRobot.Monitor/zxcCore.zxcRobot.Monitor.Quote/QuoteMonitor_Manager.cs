@@ -121,7 +121,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 pFactor.DateTime = pFactors.DateTime;
 
                 //初始数据所有缓存对象
-                this._managerCaches.Init(pFactors.DateTime);
+                if (this._managerCaches.DataCaches_Manages.Count < 1)
+                    this._managerCaches.Init(pFactors.DateTime);
                 foreach (var item in _setsDataCache)
                 {
                     //提取数据缓存对象、及检查对象集

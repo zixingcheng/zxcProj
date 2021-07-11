@@ -52,25 +52,16 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 double dValue_interval = _data.IsIndex() ? _valueRF_step * 0.4 : _data.GetStockType() == typeStock.Option ? _valueRF_step * 4.0 : _valueRF_step;
 
                 //初始统计信息
-                _dataStics.Init(_data.Value_RF, _data.Price_High / _data.Price_Per - 1, _data.Price_Low / _data.Price_Per - 1, _data.DateTime, dValue_interval, _data.GetStockName());
-
-                //组装消息
-                msg += this.getMsg_Suffix();
-                _value_last = _data.Value;
+                _dataStics.Init(0, _data.DateTime, dValue_interval, _data.GetStockName(), _data.Price_High / _data.Price_Per - 1, _data.Price_Low / _data.Price_Per - 1);
             }
-            else
-            {
-                //统计，无效退出
-                if (!_dataStics.Statistics(_data.Value_RF, _data.DateTime)) return false;
 
-                //涨跌超区间处理
-                //int nTimes = 0;
+            //统计，无效退出
+            if (!_dataStics.Statistics(_data.Value_RF, _data.DateTime)) return false;
 
-                //组装消息
-                msg += this.getMsg_Infix();
-                msg += this.getMsg_Suffix();
-                _value_last = _data.Value;
-            }
+            //组装消息
+            msg += this.getMsg_Infix();
+            msg += this.getMsg_Suffix();
+            _value_last = _data.Value;
 
             //ConsoleHelper.Debug("dataSticsInfo: 最大：{0},最小：{1}，前值：{2}", _dataStics.Max, _dataStics.Min, _dataStics.Value_last);
 

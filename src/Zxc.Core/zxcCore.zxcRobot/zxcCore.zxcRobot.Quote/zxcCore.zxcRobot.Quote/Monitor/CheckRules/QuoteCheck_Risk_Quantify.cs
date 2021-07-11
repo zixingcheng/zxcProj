@@ -78,24 +78,24 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
 
 
         //数据分析触发事件
-        protected void EventHandler_DataAnalyse_Trigger(object sender, DataAnalyse_KeyPoints_EventArgs e)
-        {
-            //_eventArgs = e;
-            //zxcConsoleHelper.Debug(true, "{0}:: {1}", DateTime.Now, e.MonitorType.ToString());
+        //protected void EventHandler_DataAnalyse_Trigger(object sender, DataAnalyse_KeyPoints_EventArgs e)
+        //{
+        //    //_eventArgs = e;
+        //    //zxcConsoleHelper.Debug(true, "{0}:: {1}", DateTime.Now, e.MonitorType.ToString());
 
-            ////组装消息
-            //string msg = this.getMsg_Infix();
-            //if (msg != "")
-            //{
-            //    msg = this.getMsg_Perfix() + msg;
-            //    msg += this.getMsg_Suffix();
+        //    ////组装消息
+        //    //string msg = this.getMsg_Infix();
+        //    //if (msg != "")
+        //    //{
+        //    //    msg = this.getMsg_Perfix() + msg;
+        //    //    msg += this.getMsg_Suffix();
 
-            //    //输出、打印信息
-            //    string usrTo = this.getUser_str();
-            //    this.NotifyMsg(msg, usrTo);
-            //    zxcConsoleHelper.Debug(true, "DataCheck_Risk:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
-            //}
-        }
+        //    //    //输出、打印信息
+        //    //    string usrTo = this.getUser_str();
+        //    //    this.NotifyMsg(msg, usrTo);
+        //    //    zxcConsoleHelper.Debug(true, "DataCheck_Risk:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
+        //    //}
+        //}
 
     }
 }

@@ -45,18 +45,21 @@ namespace zxcCore.zxcData.Analysis
 
         /// <summary>数据初始
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="max"></param>
-        /// <param name="min"></param>
+        /// <param name="valueBase"></param>
         /// <param name="time"></param>
         /// <param name="interval">数据最小间隔（统计用，超过该间隔才加入统计）</param>
+        /// <param name="tag"></param>
+        /// <param name="valueMax"></param>
+        /// <param name="valueMin"></param>
         /// <returns></returns>
-        bool Init(double value, double max, double min, DateTime time, double interval = 0, string tag = "");
+        bool Init(double valueBase, DateTime time, double interval = 0, string tag = "", double valueMax = double.MinValue, double valueMin = double.MaxValue);
         /// <summary>数据统计
         /// </summary>
         /// <param name="value"></param>
         /// <param name="time"></param>
         /// <returns></returns>
         bool Statistics(double value, DateTime time);
+
     }
+
 }

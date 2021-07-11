@@ -77,11 +77,11 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                     break;
                 case typeTimeFrequency.real:
                     this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_RiseFall_Fixed<Data_Quote>));
+                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk<Data_Quote>));
                     break;
                 case typeTimeFrequency.s30:
                     break;
                 case typeTimeFrequency.m1:
-                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk<Data_Quote>));
                     break;
                 case typeTimeFrequency.m5:
                     break;
@@ -153,7 +153,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             CacheInfo<Data_Quote> pCacheInfo = (CacheInfo<Data_Quote>)e.CacheInfo;
             if (pCacheInfo.Data.QuoteTimeType == typeTimeFrequency.real)
             {
-                if (pCacheInfo.Data.GetStockName() == "50ETF")
+                if (pCacheInfo.Data.GetStockName() != "50ETF")
                     this.SetData(pCacheInfo.Data, typeTimeFrequency.m15);
             }
 
