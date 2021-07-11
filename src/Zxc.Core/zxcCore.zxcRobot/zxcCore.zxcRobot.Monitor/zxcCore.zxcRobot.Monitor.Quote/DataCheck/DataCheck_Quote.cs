@@ -113,10 +113,12 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         }
 
         //数据分析触发事件
-        protected internal virtual string getUser_str()
+        protected internal virtual string getUser_str(bool isRisk = false)
         {
             string usrTo = _data.GetStockType() == typeStock.Option ? "期权行情" : _data.IsIndex() ? "大盘行情" : "自选行情";
-            usrTo = "@*股票监测--" + usrTo;
+            if (isRisk)
+                usrTo = _data.GetStockType() == typeStock.Option ? "期权" : "股票";
+            usrTo = isRisk ? "@*风控监测--" + usrTo : "@*股票监测--" + usrTo;
             return usrTo;
         }
 

@@ -178,6 +178,12 @@ namespace zxcCore.zxcRobot.Quote.Data
         }
 
         //提取标的信息
+        public virtual bool SetStockInfo(StockInfo pStockInfo)
+        {
+            _stockInfo = pStockInfo;
+            return true;
+        }
+        //提取标的信息
         public virtual StockInfo GetStockInfo()
         {
             return _stockInfo;
@@ -223,6 +229,18 @@ namespace zxcCore.zxcRobot.Quote.Data
 
             string strValue = string.Format("{0}{1}", Math.Round(dValue, digits), tagUnit);
             return strValue;
+        }
+
+
+        //修正行情时间
+        public bool Check_DateTime()
+        {
+            if (this.DateTime.Hour == 9 && this.DateTime.Minute < 30)
+            {
+                this.DateTime = this.DateTime.AddMinutes(30 - this.DateTime.Minute);
+                this.DateTime = zxcTimeHelper.CheckTime(this.DateTime, this.QuoteTimeType, false);
+            }
+            return true;
         }
 
 
@@ -286,6 +304,11 @@ namespace zxcCore.zxcRobot.Quote.Data
                 //MsgLink = MsgLink
             };
             return msgWx;
+        }
+
+        public new object Clone()
+        {
+            return MemberwiseClone();
         }
 
     }

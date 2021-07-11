@@ -34,7 +34,7 @@ namespace zxcCore.Extensions
         public static T Clone<T>(T obj)
         {
             //如果是字符串或值类型则直接返回
-            if (obj is string || obj.GetType().IsValueType) return obj;
+            if (obj == null || obj is string || obj.GetType().IsValueType) return obj;
 
             object retval = Activator.CreateInstance(obj.GetType());
             FieldInfo[] fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);

@@ -333,6 +333,7 @@ namespace zxcCore.zxcRobot.Quote
                     if (pDataQuote.FromJson(jsonData))
                     {
                         pDataQuote.QuoteTimeType = quoteTime;
+                        pDataQuote.Check_DateTime();
                         lstDataQuote.Add(pDataQuote);
                     }
                 }

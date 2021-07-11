@@ -13,7 +13,7 @@ namespace zxcCore.zxcData.Analysis
     {
         /// <summary>下降
         /// </summary>
-        [EnumAttr("下降", -1), Description("下降")]
+        [EnumAttr("下降", -1), Description("下穿")]
         FALL = -1,
         /// <summary>无
         /// </summary>
@@ -21,7 +21,7 @@ namespace zxcCore.zxcData.Analysis
         NONE = 0,
         /// <summary>上涨
         /// </summary>
-        [EnumAttr("上涨", 1), Description("上涨")]
+        [EnumAttr("上涨", 1), Description("上穿")]
         RAISE = 1
     }
     /// <summary>数据趋势-详情(配合typeDataTrend使用)
@@ -61,11 +61,11 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>低点
         /// </summary>
         [EnumAttr("低点", 1), Description("低点")]
-        MIN = 1,
+        MIN = -1,
         /// <summary>高点
         /// </summary>
         [EnumAttr("高点", 9), Description("高点")]
-        MAX = 9,
+        MAX = 1,
         /// <summary>拐点
         /// </summary>
         [EnumAttr("拐点", 1), Description("拐点")]

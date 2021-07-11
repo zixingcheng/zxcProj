@@ -24,10 +24,9 @@ namespace zxcCore.zxcRobot.Quote.Quantify
     {
         #region 属性及构造
 
-        //public string Tag
-        //{
-        //    get { return _tag; }
-        //}
+        /// <summary行情量化分析事件
+        /// </summary>
+        public event Quantify_Quote_EventHandler Quantify_Quote_Trigger;
 
 
         protected internal IDataCache<Data_Quote> _DataCache = null;           //缓存数据对象
@@ -91,12 +90,40 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         //量化因子触发事件
         protected internal void DataAnalyse_QuantifyIndex_EventHandler(object sender, DataAnalyse_Trend_EventArgs e)
         {
-            Console.WriteLine(DateTime.Now + "::");
-            if (e.Data.LabelInfo.DataTrend_KeyPoint == typeDataTrend_KeyPoint.INFLECTION)
+            //Console.WriteLine(DateTime.Now + "::");
+            if (e.Data.LabelInfo.DataTrend_KeyPoint != typeDataTrend_KeyPoint.NONE)
             {
-
+                //触发处理事件
+                this.dataHandle_Event(e.Data);
             }
+        }
 
+        //量化因子处理事件
+        protected virtual bool dataHandle_Event(DataTrend_Index data)
+        {
+            //组装消息
+            if (data.IsValid && this.Quantify_Quote_Trigger != null)
+            {
+                Quantify_Quote_EventArgs pArgs = this.dataHandle_EventArgs(data);
+                this.Quantify_Quote_Trigger(this, pArgs);
+                return true;
+            }
+            return true;
+        }
+        //数量化因子事件返回对象
+        protected virtual Quantify_Quote_EventArgs dataHandle_EventArgs(DataTrend_Index data)
+        {
+            //组装消息
+            Quantify_Quote_EventArgs pArgs = new Quantify_Quote_EventArgs(data);
+
+            //输出信息
+            //if (true)
+            //{
+            //    double profit = data.LabelInfo.Value_Profit;
+            //    var msg = new { DataTrend = data.LabelInfo.DataTrend, DataTrend_KeyPoint = data.LabelInfo.DataTrend_KeyPoint, hitLimit = data.IsHitPoint, Value = data.Value, Ratio = data.LabelInfo.Difference_Ratio, Profit = profit };
+            //    zxcConsoleHelper.Debug(true, "{0}", msg.ToString());
+            //}
+            return pArgs;
         }
 
     }

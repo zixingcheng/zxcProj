@@ -144,7 +144,7 @@ namespace zxcCore.zxcData.Analysis
             return true;
         }
         //初始趋势分析关键点位线对象
-        public virtual bool InitTrend_KeyLine(string tag, double value, bool isSupport, bool bCover = true)
+        public virtual bool InitTrend_KeyLine(string tag, double value, bool isSupport, double valueDelta = 0.0191, bool bCover = true)
         {
             DataTrend_KeyLine pKeyLine = null;
             if (_dataKeyLines.TryGetValue(tag, out pKeyLine))
@@ -154,7 +154,7 @@ namespace zxcCore.zxcData.Analysis
             //初始
             if (bCover || pKeyLine == null)
             {
-                pKeyLine = new DataTrend_KeyLine(value, isSupport, tag);
+                pKeyLine = new DataTrend_KeyLine(value, isSupport, tag, valueDelta);
                 _dataKeyLines[tag] = pKeyLine;
             }
             return pKeyLine != null;
@@ -433,7 +433,8 @@ namespace zxcCore.zxcData.Analysis
             if (data._IsValid && this.DataAnalyse_Trend_Trigger != null)
             {
                 DataAnalyse_Trend_EventArgs pArgs = this.dataHandle_EventArgs(data);
-                this.DataAnalyse_Trend_Trigger(this, pArgs);
+                if (pArgs != null)
+                    this.DataAnalyse_Trend_Trigger(this, pArgs);
                 return true;
             }
             return true;

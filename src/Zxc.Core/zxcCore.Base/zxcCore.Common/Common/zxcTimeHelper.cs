@@ -1,5 +1,6 @@
 ﻿using System;
 using zxcCore.Enums;
+using zxcCore.Extensions;
 
 namespace zxcCore.Common
 {
@@ -68,7 +69,7 @@ namespace zxcCore.Common
         /// <param name="dtBase"></param>
         /// <param name="timeFrequency"></param>
         /// <returns></returns>
-        public static DateTime CheckTime(DateTime dtBase, typeTimeFrequency timeFrequency)
+        public static DateTime CheckTime(DateTime dtBase, typeTimeFrequency timeFrequency, bool bFirst = true)
         {
             DateTime dtTime = dtBase;
             switch (timeFrequency)
@@ -105,6 +106,12 @@ namespace zxcCore.Common
                 //    break;
                 default:
                     break;
+            }
+
+            //向后修正
+            if (!bFirst)
+            {
+                dtTime = dtTime.AddSeconds((int)timeFrequency.Get_Value());
             }
             return dtTime;
         }

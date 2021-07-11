@@ -112,6 +112,7 @@ namespace zxcCore.zxcData.Analysis
 
                 //判断方向: -1、0、1 对应 typeDataTrend
                 int nTrend = nInterval - nInterval_Last;
+                nTrend = nTrend > 1 ? 1 : nTrend < -1 ? -1 : nTrend;
                 pTrend = (typeDataTrend)Enum.Parse(typeof(typeDataTrend), nTrend.ToString());
 
                 //计算关键点信息
@@ -122,8 +123,9 @@ namespace zxcCore.zxcData.Analysis
                 if (nTrend != 0 && Math.Abs(value / _valueLine_Last) > _valueDelta * 0.382)
                 {
                     pTrend_KeyPoint = (typeDataTrend_KeyPoint)Enum.Parse(typeof(typeDataTrend_KeyPoint), nTrend_Point.ToString());
-                    dValue_KeyPoint = _Values_Line[nInterval]; _valueLine_Last = value;
+                    dValue_KeyPoint = _Values_Line[nInterval];
                 }
+                _valueLine_Last = value;
             }
             return (pTrend, pTrend_KeyPoint, dValue_KeyPoint);
         }
@@ -146,6 +148,7 @@ namespace zxcCore.zxcData.Analysis
 
                 //判断方向: -1、0、1 对应 typeDataTrend
                 int nTrend = nInterval - nInterval_Last;
+                nTrend = nTrend > 1 ? 1 : nTrend < -1 ? -1 : nTrend;
                 pTrend = (typeDataTrend)Enum.Parse(typeof(typeDataTrend), nTrend.ToString());
 
                 //计算关键点信息
@@ -156,8 +159,9 @@ namespace zxcCore.zxcData.Analysis
                 if (nTrend != 0 && Math.Abs(value / _valueLine_Last) > _valueDelta * 0.382)
                 {
                     pTrend_KeyPoint = (typeDataTrend_KeyPoint)Enum.Parse(typeof(typeDataTrend_KeyPoint), nTrend_Point.ToString());
-                    dValue_KeyPoint = _Values_Line[nInterval]; _valueLine_Last = value;
+                    dValue_KeyPoint = _Values_Line[nInterval];
                 }
+                _valueLine_Last = value;
             }
             return (pTrend, pTrend_KeyPoint, dValue_KeyPoint);
         }

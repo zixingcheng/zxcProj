@@ -9,16 +9,16 @@
 // 修改描述：
 //===============================================================================
 using System;
+using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
 using zxcCore.Common;
+using zxcCore.Enums;
+using zxcCore.Extensions;
 using zxcCore.zxcData.Cache.Memory;
 using zxcCore.zxcData.Cache.Swap;
-using zxcCore.zxcRobot.Monitor.Msger;
 using zxcCore.zxcRobot.Monitor.DataCheck;
 using zxcCore.zxcRobot.Quote;
 using zxcCore.zxcRobot.Quote.Data;
-using zxcCore.Enums;
 
 namespace zxcCore.zxcRobot.Monitor.Quote
 {
@@ -126,7 +126,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             //查询数据
             dtEnd = dtEnd == DateTime.MinValue ? pSet.Time_End : dtEnd;
             nCaches = nCaches < 0 ? pSet.Sum_Step : nCaches;
-            List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd, nCaches, timeFrequency, true);
+            List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd.AddSeconds(-1), nCaches, timeFrequency, true);
             if (lstQuotes.Count == pSet.Sum_Step)
             {
                 //重新初始数据
@@ -154,9 +154,61 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             if (pCacheInfo.Data.QuoteTimeType == typeTimeFrequency.real)
             {
                 if (pCacheInfo.Data.GetStockName() != "50ETF")
-                    this.SetData(pCacheInfo.Data, typeTimeFrequency.m15);
+                {
+                    this.SetData(pCacheInfo, typeTimeFrequency.m15, typeTimeFrequency.m5);
+                }
             }
+        }
 
+        //设置正数据对象-修正为同时间频率数据
+        public virtual bool SetData(CacheInfo<Data_Quote> pCacheInfo, typeTimeFrequency timeFrequency, typeTimeFrequency timeFrequency2)
+        {
+            Data_Quote pData = pCacheInfo.Data;
+            if (pData == null) return false;
+            StockInfo pStockInfo = pData.GetStockInfo();
+            if (pStockInfo == null) return false;
+
+
+            //获取降级数据
+            DateTime dtTime = zxcTimeHelper.CheckTime(pData.DateTime, timeFrequency2, false);
+            Data_Quote pDataNew = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtTime, 1, timeFrequency2, true).FirstOrDefault();
+            if (pDataNew == null && pDataNew.DateTime != dtTime)
+                return false;
+
+            pDataNew.IsDel = pData.QuoteTimeType != timeFrequency;
+            pDataNew.QuoteTimeType = timeFrequency;
+            pDataNew.DateTime = zxcTimeHelper.CheckTime(pData.DateTime, timeFrequency, false);
+            pDataNew.SetStockInfo(pStockInfo);
+            bool bResult = this.SetData(pDataNew, timeFrequency);
+
+
+            //非时间频率数据，重新获取
+            if (pData.QuoteTimeType != timeFrequency)
+            {
+                string exType = pStockInfo.StockExchange.ToString();
+                IData_Factors pFactors = _managerCaches._GetFactors(exType);
+                if (pFactors != null)
+                {
+                    IData_Factor pFactor = pFactors.GetData_Factor(pStockInfo.StockID_Tag);
+                    DataCache<Data_Quote> pDataCache = (DataCache<Data_Quote>)_managerCaches.GetDataCache<Data_Quote>(pFactors, pFactor, "", timeFrequency);
+
+                    //查询最后有效步长数据总数
+                    int nCount = pDataCache.DataCaches.Values.Count(e => e.Data.IsDel == true);
+
+                    //获取最数据
+                    List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, pDataNew.DateTime, nCount, timeFrequency, true);
+                    foreach (var item in lstQuotes)
+                    {
+                        int nSum = pDataCache.DataCaches.Values.Count(e => e.DateTime == item.DateTime && e.Data.IsDel != true);
+                        if (nSum == 0)
+                        {
+                            item.SetStockInfo(pStockInfo);
+                            bResult = bResult && this.SetData(item, timeFrequency);
+                        }
+                    }
+                }
+            }
+            return bResult;
         }
 
     }

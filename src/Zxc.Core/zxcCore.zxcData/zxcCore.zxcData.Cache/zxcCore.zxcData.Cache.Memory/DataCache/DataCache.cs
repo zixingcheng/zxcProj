@@ -148,7 +148,7 @@ namespace zxcCore.zxcData.Cache.Memory
                 DataCache_Event pArgs = new DataCache_Event(this, pCacheInfo);
                 try
                 {
-                    this.DataCache_Change(null, pArgs);
+                    this.DataCache_Change(this, pArgs);
                 }
                 catch (Exception)
                 {
@@ -168,7 +168,8 @@ namespace zxcCore.zxcData.Cache.Memory
             //校正缓存数量
             while (_DataCaches.Count > _DataCache_Set.Sum_Step)
             {
-                _DataCaches.Remove(_DataCaches.Keys.First());
+                DateTime dtMin = _DataCaches.Keys.OrderByDescending(e => e).Last();
+                _DataCaches.Remove(dtMin);
             }
             return true;
         }

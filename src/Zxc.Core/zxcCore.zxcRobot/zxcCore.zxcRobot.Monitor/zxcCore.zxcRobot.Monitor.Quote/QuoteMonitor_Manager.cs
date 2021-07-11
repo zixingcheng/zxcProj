@@ -14,7 +14,6 @@ using zxcCore.zxcData.Cache.Memory;
 using zxcCore.zxcData.Cache.Swap;
 using zxcCore.Common;
 using zxcCore.zxcRobot.Monitor.DataCheck;
-using System.Reflection;
 using zxcCore.zxcRobot.Monitor.Msger;
 using zxcCore.Enums;
 using zxcCore.zxcRobot.Quote.Data;
@@ -161,18 +160,16 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         {
             StockInfo stockInfo = pData.GetStockInfo();
             if (stockInfo == null) return false;
-            Type p = typeof(Data_Quote);
 
             //默认只设置最底级数据，
             bool bResult = true;
             string exType = stockInfo.StockExchange.ToString();
 
-            Data_Quote dataCheck = this.SetData_ValueCheck(pData, timeFrequency);
-            if (dataCheck != null)
+            //Data_Quote dataCheck = this.SetData_ValueCheck(stockInfo, pData, timeFrequency);
+            if (pData != null)
             {
-                bResult = bResult && _managerCaches.SetData<Data_Quote>(exType, stockInfo.StockID_Tag, "", dataCheck.DateTime, dataCheck, timeFrequency);
+                bResult = bResult && _managerCaches.SetData<Data_Quote>(exType, stockInfo.StockID_Tag, "", pData.DateTime, pData, timeFrequency);
             }
-
             //foreach (var item in _setsDataCache)
             //{
             //    Data_Quote dataCheck = this.SetDataCache_ValueCheck(pData, item.Key);
@@ -184,11 +181,11 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             return bResult;
         }
         //设置缓存数据对象-修正
-        public virtual Data_Quote SetData_ValueCheck(Data_Quote pData, typeTimeFrequency timeFrequency)
-        {
-            pData.QuoteTimeType = timeFrequency;
-            return pData;
-        }
+        //public virtual Data_Quote SetData_ValueCheck(Data_Quote pData, typeTimeFrequency timeFrequency)
+        //{
+        //    pData.QuoteTimeType = timeFrequency;
+        //    return pData;
+        //}
 
 
 
@@ -304,7 +301,8 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             foreach (var item in e.Datas)
             {
                 if (item == null) continue;
-                this.SetDataCache(item);
+                if (item.Check_DateTime())
+                    this.SetDataCache(item);
 
                 //调试筛选
                 //if (pData.name != "50ETF")   //50ETF购3月3500

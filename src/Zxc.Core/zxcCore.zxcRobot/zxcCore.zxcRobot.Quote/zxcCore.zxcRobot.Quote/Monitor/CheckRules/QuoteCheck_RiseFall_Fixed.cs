@@ -86,7 +86,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             //输出、打印信息
             string usrTo = this.getUser_str();
             this.NotifyMsg(msg, usrTo);
-            zxcConsoleHelper.Debug(false, "DataCheck_RiseFall_Fixed: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
+            zxcConsoleHelper.Debug(false, "QuoteCheck_RiseFall_Fixed: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
             return bResult;
         }
 

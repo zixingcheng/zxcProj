@@ -67,7 +67,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 DataTrend_LabelInfo pLabelInfo = _eventArgs.Data.LabelInfo;
                 if (pLabelInfo.DataTrend_KeyPoint == typeDataTrend_KeyPoint.INFLECTION)
                 {
-                    string tag0 = pLabelInfo.DataTrend.Get_Description() + pLabelInfo.DataTrend_KeyPoint.Get_Description();
+                    string tag0 = pLabelInfo.DataTrend.Get_AttrName() + pLabelInfo.DataTrend_KeyPoint.Get_AttrName();
                     strMsg = string.Format("\n{0}：{1}({2}).", _tagAlias, tag0, this.getValue_str(pLabelInfo.Value));
                 }
             }
@@ -91,7 +91,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 //输出、打印信息
                 string usrTo = this.getUser_str();
                 this.NotifyMsg(msg, usrTo);
-                zxcConsoleHelper.Debug(true, "DataCheck_Risk:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
+                zxcConsoleHelper.Debug(true, "QuoteCheck_Risk:: {0}   ---{1}.\n{2}", this.getMsg_Perfix(), _data.DateTime, msg);
             }
         }
 

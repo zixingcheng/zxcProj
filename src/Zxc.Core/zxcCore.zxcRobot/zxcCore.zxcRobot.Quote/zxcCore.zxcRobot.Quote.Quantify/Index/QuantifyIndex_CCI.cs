@@ -19,6 +19,9 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         public QuantifyIndex_CCI(Dictionary<DateTime, CacheInfo<T>> dataCacheInfos, int n = 14, typeTimeFrequency timeFrequency = typeTimeFrequency.m15) :
             base(dataCacheInfos, n, timeFrequency)
         {
+            //设置关键线
+            this.InitTrend_KeyLine("CCI_100", 100, true, 0.191);
+            this.InitTrend_KeyLine("CCI_-100", -100, true, 0.191);
         }
         ~QuantifyIndex_CCI()
         {
@@ -40,9 +43,12 @@ namespace zxcCore.zxcRobot.Quote.Quantify
             DataAnalyse_Trend_EventArgs pArgs = new DataAnalyse_Trend_EventArgs(data);
 
             //输出信息
-            double profit = data.LabelInfo.Value_Profit;
-            var msg = new { DataTrend = data.LabelInfo.DataTrend, DataTrend_KeyPoint = data.LabelInfo.DataTrend_KeyPoint, hitLimit = data.IsHitPoint, Value = data.Value, Ratio = data.LabelInfo.Difference_Ratio, Profit = profit };
-            zxcConsoleHelper.Debug(true, "{0}", msg.ToString());
+            //if (data.LabelInfo.DataTrend_KeyPoint != typeDataTrend_KeyPoint.NONE)
+            //{
+            //    double profit = data.LabelInfo.Value_Profit;
+            //    var msg = new { DataTrend = data.LabelInfo.DataTrend, DataTrend_KeyPoint = data.LabelInfo.DataTrend_KeyPoint, hitLimit = data.IsHitPoint, Value = data.Value, Ratio = data.LabelInfo.Difference_Ratio, Profit = profit };
+            //    zxcConsoleHelper.Debug(true, "{0}", msg.ToString());
+            //}
             return pArgs;
         }
 

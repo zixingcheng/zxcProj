@@ -120,10 +120,10 @@ namespace zxcCore.zxcData.Cache.Memory
             _dtStart = _dtEnd.AddSeconds(-_dtStep * (_sumStep - 1));
             _indStep = this.GetInd(_dtEnd);
 
-            DateTime dtNow = DateTime.Now.AddDays(-1);
-            _dtLast = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, 0, 0, 0);
-            _dtDataNow = _dtLast;
-            return true;
+            //DateTime dtNow = DateTime.Now.AddDays(-1);
+            //_dtLast = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, 0, 0, 0);
+            _dtDataNow = _dtEnd;
+            return this.SetLastTime(_dtEnd);
         }
         public bool Inited()
         {
@@ -168,7 +168,7 @@ namespace zxcCore.zxcData.Cache.Memory
 
         public DateTime CheckTime(DateTime dtBase)
         {
-            return zxcTimeHelper.CheckTime(dtBase, _Time_Frequency);
+            return zxcTimeHelper.CheckTime(dtBase, _Time_Frequency, false);
         }
         public bool IsNewDataTime(DateTime dtTime)
         {
