@@ -62,7 +62,6 @@ namespace zxcCore.zxcData.Analysis
             return true;
         }
 
-
     }
 
 }

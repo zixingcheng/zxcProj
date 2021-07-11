@@ -83,11 +83,13 @@ namespace zxcCore.zxcData.Analysis
         protected internal double _valueDelta_half = 0;
         protected internal bool _useFixed = false;
         protected internal bool _useConsole = false;
+        protected internal Dictionary<string, DataTrend_KeyLine> _dataKeyLines = null;      //关键点位线集
         public DataAnalyse_Trend(typeTimeFrequency valueTimeType)
         {
             _tag = "DataAnalyse_Index";
             _ValueTimeType = valueTimeType;
             this._dataIndexCaches = new List<DataTrend_Index>();
+            this._dataKeyLines = new Dictionary<string, DataTrend_KeyLine>();
         }
 
         #endregion
@@ -110,7 +112,7 @@ namespace zxcCore.zxcData.Analysis
             this._valueBase = this.Create_IndexData(valueBase, dtTime);
             this._value = _valueBase;
             this._valueLast = _valueBase;
-            this._valueStep = valueSetp != double.NaN ? valueSetp : Math.Round(this._valueDelta * this._valueBase.Value, 8);  //计算有效值步长（对应有效值区间）
+            this._valueStep = !double.IsNaN(valueSetp) ? valueSetp : Math.Round(this._valueDelta * this._valueBase.Value, 8);  //计算有效值步长（对应有效值区间）
 
             this.lstDataStatistics = new List<DataStatistics>();
             this.InitStatistics(_valueBase.Value, _valueBase.Time, valueMax, valueMin);
@@ -141,6 +143,23 @@ namespace zxcCore.zxcData.Analysis
             _indTag++;
             return true;
         }
+        //初始趋势分析关键点位线对象
+        public virtual bool InitTrend_KeyLine(string tag, double value, bool isSupport, bool bCover = true)
+        {
+            DataTrend_KeyLine pKeyLine = null;
+            if (_dataKeyLines.TryGetValue(tag, out pKeyLine))
+            {
+            }
+
+            //初始
+            if (bCover || pKeyLine == null)
+            {
+                pKeyLine = new DataTrend_KeyLine(value, isSupport, tag);
+                _dataKeyLines[tag] = pKeyLine;
+            }
+            return pKeyLine != null;
+        }
+
 
 
         //数据分析（趋势、趋势详情、关键点信息等）
@@ -155,7 +174,6 @@ namespace zxcCore.zxcData.Analysis
                 return true;
             return false;
         }
-
 
 
         /// <summary>数据处理
@@ -184,6 +202,7 @@ namespace zxcCore.zxcData.Analysis
                     //修正数据到固定间隔位置，递归计算
                     pDataSetp = this.Create_IndexData(dValue_Last + dDelta, pDataSetp.Time, this._value_Amend, data);
                     pDataSetp._IsHitPoint = true;
+                    pDataSetp._IsValid = true;
                 }
             }
             this._value = data;
@@ -208,7 +227,8 @@ namespace zxcCore.zxcData.Analysis
             if (pDataSetp._DataTrend_Index_Last._DataTrend_Index_Last != null)
             {
                 //bResult = bResult && dataHandle_DataTrend_Detail(pDataSetp);
-                bResult = bResult && dataHandle_DataKeyPoint(pDataSetp, data);
+                bResult = bResult && dataHandle_DataTrend_KeyLine(pDataSetp);
+                bResult = bResult && dataHandle_DataTrend_KeyPoint(pDataSetp, data);
                 bResult = bResult && dataHandle_User(pDataSetp, data);
             }
             if (bResult)
@@ -306,8 +326,30 @@ namespace zxcCore.zxcData.Analysis
             }
             return true;
         }
+        //数据处理--数据趋势关键线
+        protected virtual bool dataHandle_DataTrend_KeyLine(DataTrend_Index data)
+        {
+            bool bResult = true;
+            DataTrend_LabelInfo pLabelInfo = data.LabelInfo;
+            foreach (var item in _dataKeyLines)
+            {
+                (typeDataTrend, typeDataTrend_KeyPoint, double) pResult = item.Value.Analysis(data.Value);
+                if (pResult.Item1 != typeDataTrend.NONE)
+                {
+                    if (_useConsole)
+                        zxcConsoleHelper.Debug(true, "监测值：{3}, {0} {1} ({2})", pResult.Item1.ToString(), pResult.Item2.ToString(), pResult.Item3, Math.Round(data.Value, 6));
+
+                    pLabelInfo.Tag = item.Key;
+                    pLabelInfo.DataTrend = pResult.Item1;
+                    pLabelInfo.DataTrend_KeyPoint = pResult.Item2;
+                    pLabelInfo.Value_KeyLine = pResult.Item3;
+                    bResult = bResult && this.dataHandle_Event(data);
+                }
+            }
+            return bResult;
+        }
         //数据处理--数据趋势关键点
-        protected virtual bool dataHandle_DataKeyPoint(DataTrend_Index data, DataTrend_Index dataLast_Recursion = null)
+        protected virtual bool dataHandle_DataTrend_KeyPoint(DataTrend_Index data, DataTrend_Index dataLast_Recursion = null)
         {
             //计算变化幅度
             DataTrend_LabelInfo pLabelInfo = data.LabelInfo;
@@ -354,6 +396,7 @@ namespace zxcCore.zxcData.Analysis
                     this.InitStatistics(dValue, data.Time, dMax, dMin);
 
                     //标识关键点--拐点信息
+                    pLabelInfo.Value_KeyLine = valueLimit + _valueStep * nDirection_Last;
                     pLabelInfo.DataTrend_KeyPoint = typeDataTrend_KeyPoint.INFLECTION;
                     pLabelInfo.DataTrend = ratioLimit > 0 ? typeDataTrend.RAISE : typeDataTrend.FALL;   //修正当前方向
                     this._valueLast_Amend.LabelInfo.DataTrend = pLabelInfo.DataTrend;                   //修正前一(缓存修正对象)方向
@@ -400,10 +443,6 @@ namespace zxcCore.zxcData.Analysis
 
 
 
-        //return true;
-
-
-
         //提取当前值
         protected virtual DataTrend_Index getValue(bool isAmend = false)
         {
@@ -444,6 +483,7 @@ namespace zxcCore.zxcData.Analysis
             //实例数据
             DataTrend_Index pData = new DataTrend_Index(value, time, this, dataVirtualBase);
             pData._LabelInfo = new DataTrend_LabelInfo();
+            pData._LabelInfo.Tag = "DataTrend";
             if (dataLast != null)
                 pData.InitLastValue(dataLast);
             return pData;

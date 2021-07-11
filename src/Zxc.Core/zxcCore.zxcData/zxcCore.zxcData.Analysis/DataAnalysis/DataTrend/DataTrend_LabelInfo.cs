@@ -70,22 +70,30 @@ namespace zxcCore.zxcData.Analysis
         /// </summary>
         [EnumAttr("拐点", 1), Description("拐点")]
         INFLECTION = 5,
+        /// <summary>临界压力点（压力区间下限）
+        /// </summary>
+        [EnumAttr("临界压力点", 10), Description("临界压力点")]
+        PRESSURE_NEAR = 10,
+        /// <summary>压力点
+        /// </summary>
+        [EnumAttr("压力点", 11), Description("压力点")]
+        PRESSURE = 11,
         /// <summary>突破点
         /// </summary>
-        [EnumAttr("压力点", 10), Description("压力点")]
-        PRESSURE = 10,
-        /// <summary>突破点
+        [EnumAttr("突破点", 12), Description("突破点")]
+        PRESSURE_BREACH = 12,
+        /// <summary>临界支撑点（支撑区间上限）
         /// </summary>
-        [EnumAttr("突破点", 10), Description("突破点")]
-        BREACH = 11,
+        [EnumAttr("临界支撑点", -10), Description("临界支撑点")]
+        SUPPORT_NEAR = -10,
         /// <summary>支撑点
         /// </summary>
-        [EnumAttr("支撑点", -10), Description("支撑点")]
-        SUPPORT = -10,
+        [EnumAttr("支撑点", -11), Description("支撑点")]
+        SUPPORT = -11,
         /// <summary>破位点
         /// </summary>
-        [EnumAttr("破位点", -11), Description("破位点")]
-        Pressure = -10,
+        [EnumAttr("破位点", -12), Description("破位点")]
+        SUPPORT_CRASH = -12,
     }
 
 
@@ -108,6 +116,9 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>当前对应修正值
         /// </summary>
         public double Value_Amend { get; set; }
+        /// <summary>当前关键点位线值
+        /// </summary>
+        public double Value_KeyLine { get; set; }
 
         /// <summary>与前一值的差值
         /// </summary>
