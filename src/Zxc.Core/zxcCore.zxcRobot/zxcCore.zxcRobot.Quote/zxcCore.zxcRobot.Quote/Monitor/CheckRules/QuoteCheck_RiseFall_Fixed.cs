@@ -95,7 +95,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         {
             string tag0 = _dataStics.Value_delta > 0 ? "涨超" : "跌逾";
             int timeInterval = (int)Math.Ceiling(_dataStics.Duration_M);
-            return string.Format("\n{0}：{1}分钟{2} {3}%. 前值：{4}%({5})", _tagAlias, timeInterval, tag0, Math.Round(_dataStics.Value_delta * 100, 1), Math.Round(_dataStics.Value_last * 100, 2), this.getValue_str(_value_last));
+            return string.Format("\n{0}：{1}分钟{2} {3}%. \n前值：{4}%({5})", _tagAlias, timeInterval, tag0, Math.Round(_dataStics.Value_delta * 100, 1), Math.Round(_dataStics.Value_last * 100, 2), this.getValue_str(_value_last));
         }
 
     }

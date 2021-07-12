@@ -49,15 +49,15 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
 
             //初始时间频率信息
-            this.InitData_TimeFrequency(typeTimeFrequency.real, 60 * 2);            //2分钟数据 120 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m1, 60 * 1);              //1小时数据 120 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m5, 12 * 5);              //5小时数据 60 条
-            this.InitData_TimeFrequency(typeTimeFrequency.m15, 4 * 15);             //4天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m30, 2 * 60);             //7.5天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m60, 4 * 15);             //15天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m120, 2 * 30);            //30天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.day, 1 * 60);             //60天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.week, 1 * 60);            //60周数据 60 条
+            this.InitData_TimeFrequency(typeTimeFrequency.real, 60 * 2);            //秒级，2分钟数据 120 条
+            //this.InitData_TimeFrequency(typeTimeFrequency.m1, 60 * 1);              //分钟级，1小时数据 60 条
+            //this.InitData_TimeFrequency(typeTimeFrequency.m5, 12 * 5);              //5分钟级，5小时数据 60 条
+            this.InitData_TimeFrequency(typeTimeFrequency.m15, 4 * 15);             //15分钟级，4天数据 60 条
+            //this.InitData_TimeFrequency(typeTimeFrequency.m30, 2 * 60);             //30分钟级，7.5天数据 60 条
+            //this.InitData_TimeFrequency(typeTimeFrequency.m60, 4 * 15);             //60分钟级，15天数据 60 条
+            //this.InitData_TimeFrequency(typeTimeFrequency.m120, 2 * 30);            //120分钟级，30天数据 60 条
+            //this.InitData_TimeFrequency(typeTimeFrequency.day, 1 * 60);             //日级，60天数据 60 条
+            //this.InitData_TimeFrequency(typeTimeFrequency.week, 1 * 60);            //周级，60周数据 60 条
             return true;
         }
 
@@ -78,6 +78,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 case typeTimeFrequency.real:
                     this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_RiseFall_Fixed<Data_Quote>));
                     this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk<Data_Quote>));
+                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Hourly<Data_Quote>));
                     break;
                 case typeTimeFrequency.s30:
                     break;
@@ -91,7 +92,6 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                     this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk_Quantify<Data_Quote>));
                     break;
                 case typeTimeFrequency.m30:
-                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Hourly<Data_Quote>));
                     break;
                 case typeTimeFrequency.m60:
                     break;
@@ -126,7 +126,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             //查询数据
             dtEnd = dtEnd == DateTime.MinValue ? pSet.Time_End : dtEnd;
             nCaches = nCaches < 0 ? pSet.Sum_Step : nCaches;
-            List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd.AddSeconds(-1), nCaches, timeFrequency, true);
+            List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd, nCaches, timeFrequency, true);
             if (lstQuotes.Count == pSet.Sum_Step)
             {
                 //重新初始数据
@@ -153,7 +153,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             CacheInfo<Data_Quote> pCacheInfo = (CacheInfo<Data_Quote>)e.CacheInfo;
             if (pCacheInfo.Data.QuoteTimeType == typeTimeFrequency.real)
             {
-                if (pCacheInfo.Data.GetStockName() != "50ETF")
+                if (pCacheInfo.Data.GetStockName() == "50ETF")
                 {
                     this.SetData(pCacheInfo, typeTimeFrequency.m15, typeTimeFrequency.m5);
                 }
@@ -168,21 +168,12 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             StockInfo pStockInfo = pData.GetStockInfo();
             if (pStockInfo == null) return false;
 
-
-            //获取降级数据
-            DateTime dtTime = zxcTimeHelper.CheckTime(pData.DateTime, timeFrequency2, false);
-            Data_Quote pDataNew = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtTime, 1, timeFrequency2, true).FirstOrDefault();
-            if (pDataNew == null && pDataNew.DateTime != dtTime)
-                return false;
-
-            pDataNew.IsDel = pData.QuoteTimeType != timeFrequency;
-            pDataNew.QuoteTimeType = timeFrequency;
-            pDataNew.DateTime = zxcTimeHelper.CheckTime(pData.DateTime, timeFrequency, false);
-            pDataNew.SetStockInfo(pStockInfo);
+            //获取当前时间频率数据
+            Data_Quote pDataNew = QuoteQuery._Query.Query(pStockInfo, pData.DateTime, timeFrequency, null);
             bool bResult = this.SetData(pDataNew, timeFrequency);
 
 
-            //非时间频率数据，重新获取
+            //非时间频率数据，重新修正
             if (pData.QuoteTimeType != timeFrequency)
             {
                 string exType = pStockInfo.StockExchange.ToString();
@@ -197,13 +188,16 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
                     //获取最数据
                     List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, pDataNew.DateTime, nCount, timeFrequency, true);
-                    foreach (var item in lstQuotes)
+                    if (lstQuotes != null)
                     {
-                        int nSum = pDataCache.DataCaches.Values.Count(e => e.DateTime == item.DateTime && e.Data.IsDel != true);
-                        if (nSum == 0)
+                        foreach (var item in lstQuotes)
                         {
-                            item.SetStockInfo(pStockInfo);
-                            bResult = bResult && this.SetData(item, timeFrequency);
+                            int nSum = pDataCache.DataCaches.Values.Count(e => e.DateTime == item.DateTime && e.Data.IsDel != true);
+                            if (nSum == 0)
+                            {
+                                item.SetStockInfo(pStockInfo);
+                                bResult = bResult && this.SetData(item, timeFrequency);
+                            }
                         }
                     }
                 }

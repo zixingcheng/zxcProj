@@ -137,7 +137,7 @@ namespace zxcCore.zxcData.Analysis
                 if (Value_interval > 0)
                 {
                     times = (int)Math.Floor(Math.Abs(delta / Value_interval)) * (delta < 0 ? -1 : 1);
-                    value = times * Value_interval + Value_last;
+                    value = times * Value_interval + Value;
                     Value_delta = times * Value_interval;
                 }
 

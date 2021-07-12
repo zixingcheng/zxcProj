@@ -300,14 +300,13 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             //ConsoleHelper.Debug(false, DateTime.Now + "::");
             foreach (var item in e.Datas)
             {
+                //调试筛选
+                //if (item.StockName != "50ETF")   //50ETF购3月3500
+                //    continue;
+
                 if (item == null) continue;
                 if (item.Check_DateTime())
                     this.SetDataCache(item);
-
-                //调试筛选
-                //if (pData.name != "50ETF")   //50ETF购3月3500
-                //    continue;
-                //ConsoleHelper.Debug("\t**********" + pData.Time);
             }
         }
 

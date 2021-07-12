@@ -93,8 +93,9 @@ namespace zxcCore.zxcRobot.Quote.Data
         /// <summary>是否为指数
         /// </summary>
         /// <returns></returns>
-        public virtual bool IsIndex()
+        public override bool IsIndex()
         {
+            if (_stockInfo == null) return false;
             this._isIndex = (bool)this.StockType.Get_AttrValue();
             return _isIndex;
         }
@@ -134,7 +135,7 @@ namespace zxcCore.zxcRobot.Quote.Data
         {
             //组装消息
             string tagRF = Value_RF == 0 ? "平" : (Value_RF > 0 ? "涨" : "跌");
-            string tagUnit = _isIndex ? "" : "元";
+            string tagUnit = IsIndex() ? "" : "元";
             int digits = _isIndex ? 3 : 2;
             string msg = string.Format("{0}：{1}{2}, {3} {4}%.", StockName, Math.Round(Value, digits), tagUnit, tagRF, Math.Round(Value_RF * 100, 2));
             return msg;
@@ -145,10 +146,10 @@ namespace zxcCore.zxcRobot.Quote.Data
         public override string GetValue_str(double dValue)
         {
             //组装消息
-            string tagUnit = _isIndex ? "" : "元";
+            string tagUnit = IsIndex() ? "" : "元";
             int digits = _isIndex ? 3 : 2;
             string strValue = string.Format("{0}{1}", Math.Round(dValue, digits), tagUnit);
-            return strValue;
+            return strValue; 
         }
 
 

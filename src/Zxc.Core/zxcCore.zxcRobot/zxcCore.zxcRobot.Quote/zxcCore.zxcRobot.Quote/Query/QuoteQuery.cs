@@ -8,14 +8,14 @@
 // 修改标识： 
 // 修改描述：
 //===============================================================================
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using zxcCore.Common;
 using zxcCore.Enums;
 using zxcCore.Extensions;
+using zxcCore.zxcData.Analysis;
 using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.zxcRobot.Quote.JQData;
 
@@ -99,6 +99,63 @@ namespace zxcCore.zxcRobot.Quote
             if (pQuoteData == null) return null;
 
             return pQuoteData.Query(startTime, endTime, quoteTime, autoUpdate);
+        }
+        /// <summary>查询历史行情 (含自算实时-当未过时间标识时)
+        /// </summary>
+        /// <param name="pStockInfo">标的信息</param>
+        /// <param name="startTime">开始时间</param>
+        /// <param name="endTime">结束时间</param>
+        /// <param name="quoteTime">时间类型</param>
+        /// <param name="quoteBase">基础行情数据</param>
+        /// <returns></returns>
+        protected internal Data_Quote Query(StockInfo pStockInfo, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.m5, Data_Quote quoteBase = null)
+        {
+            if (pStockInfo == null) return null;
+
+            //校正时间
+            Data_Quote pQuote = null;
+            DateTime dtEnd = zxcTimeHelper.CheckTime(endTime, quoteTime, false);
+            if (DateTime.Now > dtEnd)
+            {
+                pQuote = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd, 1, quoteTime, true).FirstOrDefault();
+                if (pQuote != null && pQuote.DateTime == dtEnd)
+                    return pQuote;
+            }
+
+            //获取最数据，自行计算
+            if ((int)quoteTime < 4) return null;
+            int nCount = (int)quoteTime.Get_Value() / 60;
+            List<Data_Quote> lstQuotes = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd, nCount, typeTimeFrequency.m1, true);
+
+
+            //统计最大最小
+            DataStatistics pStatistics = new DataStatistics();
+            pStatistics.Init(lstQuotes[0].Price_Close, lstQuotes[0].DateTime);
+            foreach (var item in lstQuotes)
+            {
+                pStatistics.Statistics(item.Price_High, item.DateTime);
+                pStatistics.Statistics(item.Price_Low, item.DateTime);
+                pStatistics.Statistics(item.Price_Close, item.DateTime);
+            }
+            if (quoteBase != null)
+            {
+                pStatistics.Statistics(quoteBase.Price_High, quoteBase.DateTime);
+                pStatistics.Statistics(quoteBase.Price_Low, quoteBase.DateTime);
+                pStatistics.Statistics(quoteBase.Price_Close, quoteBase.DateTime);
+            }
+
+            //实例新数据
+            Data_Quote pQuote_New = new Data_Quote(pStockInfo)
+            {
+                Price_Close = pStatistics.Value_Original,
+                Price_High = pStatistics.Max_Original,
+                Price_Low = pStatistics.Min_Original,
+                QuotePlat = typeQuotePlat.none,
+                QuoteTimeType = quoteTime,
+                DateTime = dtEnd,
+                IsDel = true
+            };
+            return pQuote_New;
         }
 
 
@@ -223,6 +280,7 @@ namespace zxcCore.zxcRobot.Quote
             }
             return lstQuote;
         }
+
 
         /// <summary>查询历史行情(聚宽API)
         /// </summary>

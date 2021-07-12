@@ -33,6 +33,7 @@ namespace zxcCore.zxcData.Cache.Swap
 
         #endregion
 
+
         public override List<dynamic> SwapData_In(int nStepSwaps, out AckInfo ackInfo)
         {
             int nums = 0;
@@ -42,7 +43,7 @@ namespace zxcCore.zxcData.Cache.Swap
             nStepSwaps = nStepSwaps <= 0 ? int.MaxValue : nStepSwaps;
 
             var provider = new PhysicalFileProvider(_dirSwap);
-            var contents = provider.GetDirectoryContents(string.Empty);
+            var contents = provider.GetDirectoryContents(string.Empty).OrderBy(e => e.Name);  //升序排序
             if (contents.Count() > 0)
             {
                 if (_canDebug)

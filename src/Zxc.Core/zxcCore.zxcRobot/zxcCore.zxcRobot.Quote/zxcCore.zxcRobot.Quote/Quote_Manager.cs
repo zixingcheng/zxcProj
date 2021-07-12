@@ -86,7 +86,7 @@ namespace zxcCore.zxcRobot.Quote
         //行情监测开始
         public bool StartMonitor()
         {
-            return _Monitor.Start(-1, 1);
+            return _Monitor.Start(-1, 1, 100);
         }
         //行情监测结束
         public bool StopMonitor()
