@@ -51,12 +51,12 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             //初始时间频率信息
             this.InitData_TimeFrequency(typeTimeFrequency.real, 60 * 2);            //秒级，2分钟数据 120 条
             //this.InitData_TimeFrequency(typeTimeFrequency.m1, 60 * 1);              //分钟级，1小时数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m5, 12 * 5);              //5分钟级，5小时数据 60 条
+            this.InitData_TimeFrequency(typeTimeFrequency.m5, 12 * 5);              //5分钟级，5小时数据 60 条
             this.InitData_TimeFrequency(typeTimeFrequency.m15, 4 * 15);             //15分钟级，4天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m30, 2 * 60);             //30分钟级，7.5天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m60, 4 * 15);             //60分钟级，15天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.m120, 2 * 30);            //120分钟级，30天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.day, 1 * 60);             //日级，60天数据 60 条
+            this.InitData_TimeFrequency(typeTimeFrequency.m30, 2 * 60);             //30分钟级，7.5天数据 60 条
+            this.InitData_TimeFrequency(typeTimeFrequency.m60, 4 * 15);             //60分钟级，15天数据 60 条
+            this.InitData_TimeFrequency(typeTimeFrequency.m120, 2 * 30);            //120分钟级，30天数据 60 条
+            this.InitData_TimeFrequency(typeTimeFrequency.day, 1 * 60);             //日级，60天数据 60 条
             //this.InitData_TimeFrequency(typeTimeFrequency.week, 1 * 60);            //周级，60周数据 60 条
             return true;
         }
@@ -85,11 +85,15 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                 case typeTimeFrequency.m1:
                     break;
                 case typeTimeFrequency.m5:
+                    if (pDataChecks.DataCache.DataCache_Set.Info_Factor.Name == "50ETF")
+                    {
+                        this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk_Quantify<Data_Quote>));
+                    }
                     break;
                 case typeTimeFrequency.m10:
                     break;
                 case typeTimeFrequency.m15:
-                    this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk_Quantify<Data_Quote>));
+                    //this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk_Quantify<Data_Quote>));
                     break;
                 case typeTimeFrequency.m30:
                     break;
@@ -115,6 +119,10 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             if (timeFrequency == typeTimeFrequency.real)
             {
                 dataCache.InitDatas(null, false, true);
+                return 0;
+            }
+            if (pDataCache.DataCache_Set.Info_Factor.Name != "50ETF")
+            {
                 return 0;
             }
 
@@ -155,7 +163,12 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             {
                 if (pCacheInfo.Data.GetStockName() == "50ETF")
                 {
+                    this.SetData(pCacheInfo, typeTimeFrequency.m5, typeTimeFrequency.m5);
                     this.SetData(pCacheInfo, typeTimeFrequency.m15, typeTimeFrequency.m5);
+                    this.SetData(pCacheInfo, typeTimeFrequency.m30, typeTimeFrequency.m5);
+                    this.SetData(pCacheInfo, typeTimeFrequency.m60, typeTimeFrequency.m5);
+                    this.SetData(pCacheInfo, typeTimeFrequency.m120, typeTimeFrequency.m5);
+                    this.SetData(pCacheInfo, typeTimeFrequency.day, typeTimeFrequency.m5);
                 }
             }
         }
@@ -170,7 +183,10 @@ namespace zxcCore.zxcRobot.Monitor.Quote
 
             //获取当前时间频率数据
             Data_Quote pDataNew = QuoteQuery._Query.Query(pStockInfo, pData.DateTime, timeFrequency, null);
+            if (pDataNew == null)
+                return false;
             bool bResult = this.SetData(pDataNew, timeFrequency);
+            return bResult;
 
 
             //非时间频率数据，重新修正

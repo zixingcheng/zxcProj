@@ -167,6 +167,15 @@ namespace zxcCore.zxcRobot.Quote.Data
             _isInitAll = true;
             return _isInitAll;
         }
+        /// <summary>初始开盘价(计算涨跌幅)
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool Init_Price_Base(double dPrice)
+        {
+            this.Price_Per = dPrice;                                    //当前价格
+            this._valueRF = this._value / this.Price_Per - 1;           //当前价格涨跌幅
+            return _isInitAll;
+        }
 
         /// <summary>是否为指数
         /// </summary>
@@ -213,7 +222,7 @@ namespace zxcCore.zxcRobot.Quote.Data
                 //组装消息
                 string tagRF = Value_RF == 0 ? "平" : (Value_RF > 0 ? "涨" : "跌");
                 string tagUnit = _stockInfo.StockType == typeStock.Index ? "" : "元";
-                int digits = _stockInfo.StockType == typeStock.Index ? 3 : 2;
+                int digits = this.IsIndex() ? 3 : 2;
                 string msg = string.Format("{0}：{1}{2}, {3} {4}%.", _stockInfo.StockName, Math.Round(Value, digits), tagUnit, tagRF, Math.Round(Value_RF * 100, 2));
                 return msg;
             }
@@ -225,7 +234,7 @@ namespace zxcCore.zxcRobot.Quote.Data
         public virtual string GetValue_str(double dValue)
         {
             string tagUnit = _stockInfo.StockType == typeStock.Index ? "" : "元";
-            int digits = _stockInfo.StockType == typeStock.Index ? 3 : 2;
+            int digits = this.IsIndex() ? 3 : 2;
 
             string strValue = string.Format("{0}{1}", Math.Round(dValue, digits), tagUnit);
             return strValue;

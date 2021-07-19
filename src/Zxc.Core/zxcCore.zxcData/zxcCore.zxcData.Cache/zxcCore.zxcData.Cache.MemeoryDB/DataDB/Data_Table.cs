@@ -346,7 +346,7 @@ namespace zxcCore.zxcData.Cache.MemoryDB
         public virtual bool SaveChanges_ToCache(IEnumerable<T> collection)
         {
             //写入当前数据到文件
-            string path = _dbPathCache + "/" + DateTime.Now.ToString("YYYYMMdd_HHmmss_ffff" + ".json");
+            string path = _dbPathCache + "/" + DateTime.Now.ToString("YYYYMMdd_HHmmss_ffff") + ".json";
             path = Path.GetFullPath(path);
 
             string strJson = Newtonsoft.Json.JsonConvert.SerializeObject(collection);

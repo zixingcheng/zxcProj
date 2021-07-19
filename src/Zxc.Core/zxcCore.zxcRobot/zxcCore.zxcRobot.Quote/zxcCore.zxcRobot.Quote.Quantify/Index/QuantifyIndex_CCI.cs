@@ -20,8 +20,8 @@ namespace zxcCore.zxcRobot.Quote.Quantify
             base(dataCacheInfos, n, timeFrequency)
         {
             //设置关键线
-            this.InitTrend_KeyLine("CCI_100", 100, true, 0.191);
-            this.InitTrend_KeyLine("CCI_-100", -100, true, 0.191);
+            this.InitTrend_KeyLine("CCI上轨", 100, true, 0.191);
+            this.InitTrend_KeyLine("CCI下轨", -100, true, 0.191);
         }
         ~QuantifyIndex_CCI()
         {

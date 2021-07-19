@@ -24,7 +24,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         public QuoteCheck_Risk(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
         {
             _tagAlias = "风控提醒";
-            _dataAnalyse = new DataAnalyse_Trend(tagName);
+            _dataAnalyse = new DataAnalyse_Trend(tagName, dataCache.DataCache_Set.Time_Frequency);
             _dataAnalyse.DataAnalyse_Trend_Trigger += new DataAnalyse_Trend_EventHandler(EventHandler_DataAnalyse_Trigger);
         }
         ~QuoteCheck_Risk()

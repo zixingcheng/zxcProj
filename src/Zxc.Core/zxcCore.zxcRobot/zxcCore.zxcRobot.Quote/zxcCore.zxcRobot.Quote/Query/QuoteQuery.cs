@@ -108,7 +108,7 @@ namespace zxcCore.zxcRobot.Quote
         /// <param name="quoteTime">时间类型</param>
         /// <param name="quoteBase">基础行情数据</param>
         /// <returns></returns>
-        protected internal Data_Quote Query(StockInfo pStockInfo, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.m5, Data_Quote quoteBase = null)
+        protected internal Data_Quote Query(StockInfo pStockInfo, DateTime endTime, typeTimeFrequency quoteTime = typeTimeFrequency.m5, Data_Quote quoteBase = null, bool autoStatics = false)
         {
             if (pStockInfo == null) return null;
 
@@ -119,8 +119,23 @@ namespace zxcCore.zxcRobot.Quote
             {
                 pQuote = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd, 1, quoteTime, true).FirstOrDefault();
                 if (pQuote != null && pQuote.DateTime == dtEnd)
+                {
+                    if (pQuote.GetStockInfo() == null)
+                        pQuote.SetStockInfo(pStockInfo);
+
+                    //修正开盘值
+                    if (pQuote.Price_Per == 0 && double.IsInfinity(pQuote.Value_RF))
+                    {
+                        Data_Quote pQuote_Day = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd, 1, typeTimeFrequency.day, true).FirstOrDefault();
+                        if (pQuote_Day != null)
+                        {
+                            pQuote.Init_Price_Base(pQuote_Day.Price_Per);
+                        }
+                    }
                     return pQuote;
+                }
             }
+            if (!autoStatics) return null;
 
             //获取最数据，自行计算
             if ((int)quoteTime < 4) return null;

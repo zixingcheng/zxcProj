@@ -185,7 +185,7 @@ namespace zxcCore.zxcRobot.Robot
             if (Quote_Manager._Manager.QuoteMonitor._MonitorSets.Updata_APISets(pStockInfo.StockID_TagSina, isValid))
             {
                 MonitorSet pSet = Quote_Manager._Manager.QuoteMonitor._MonitorSets.Get_MonitorSet(pStockInfo.StockID_TagSina);
-                string strMsg = string.Format("标的({0}) {1} 行情监测。", pStockInfo.StockName, pSet.IsValid ? "已启动" : "已暂停");
+                string strMsg = string.Format("标的({0}) {1} 行情监测。", pStockInfo.StockName, pSet == null ? "已移除" : pSet.IsValid ? "已启动" : "已暂停");
                 zxcConsoleHelper.Debug(true, "行情信息：\n{0}", strMsg);
                 this.NotifyMsg(strMsg, msg, "行情信息");
             }

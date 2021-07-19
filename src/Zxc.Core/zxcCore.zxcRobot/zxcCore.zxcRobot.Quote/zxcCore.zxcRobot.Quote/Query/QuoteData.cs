@@ -71,7 +71,7 @@ namespace zxcCore.zxcRobot.Quote
             //自动更新修正数据
             if (autoUpdate)
             {
-                if (!this.Query_Check(DateTime.MinValue, endTime, quoteBars, quoteTime, true))
+                if (!this.Query_Check(endTime.AddSeconds(-quoteBars * (int)quoteTime.Get_Value()), endTime, quoteBars, quoteTime, true))
                     return null;
             }
 
@@ -147,17 +147,17 @@ namespace zxcCore.zxcRobot.Quote
             //数据自动更新
             if (autoUpdate)
             {
-                pQuotes_max.Union(pQuotes_min);
-                bResult = this.UpdateRange(pQuotes_max);
+                bResult = this.UpdateRange(pQuotes_min);
+                bResult = bResult && this.UpdateRange(pQuotes_max);
 
                 //数据量校检及自动更新补全
                 if (quoteBars > 0)
                 {
-                    int nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.DateTime >= startTime && e.QuoteTimeType == quoteTime && e.IsDel == false);
+                    int nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.QuoteTimeType == quoteTime && e.IsDel == false);
                     while (nCount < quoteBars)
                     {
                         //全部重新取
-                        DateTime dtEnd0 = dtStart;
+                        //DateTime dtEnd0 = dtStart;
                         dtStart = dtStart.AddDays(-1);
 
                         //List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtEnd, quoteBars, quoteTime);
@@ -165,7 +165,7 @@ namespace zxcCore.zxcRobot.Quote
                         bResult = this.UpdateRange(lstQuote);
 
                         //再次计算总数
-                        nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.DateTime >= dtStart && e.QuoteTimeType == quoteTime && e.IsDel == false);
+                        nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.QuoteTimeType == quoteTime && e.IsDel == false);
                     }
 
                     //日志信息不匹配，直接更新

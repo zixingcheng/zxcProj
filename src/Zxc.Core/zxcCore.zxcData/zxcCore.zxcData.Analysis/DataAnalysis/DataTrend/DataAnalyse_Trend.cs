@@ -501,6 +501,8 @@ namespace zxcCore.zxcData.Analysis
             DataTrend_Index pData = new DataTrend_Index(value, time, this, dataVirtualBase);
             pData._LabelInfo = new DataTrend_LabelInfo();
             pData._LabelInfo.Tag = "DataTrend";
+            pData._LabelInfo.Value_TimeType = _ValueTimeType;
+
             if (dataLast != null)
                 pData.InitLastValue(dataLast);
             return pData;

@@ -42,17 +42,10 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         public int N { get { return _N; } }
 
 
-        public typeTimeFrequency _QuoteTimeType;
-        /// <summary>数据时间类型
-        /// </summary>
-        public typeTimeFrequency QuoteTimeType { get { return _QuoteTimeType; } }
-
-
         public QuantifyIndex(int n = 14, typeTimeFrequency timeFrequency = typeTimeFrequency.m15) : base("QuantifyIndex", timeFrequency)
         {
             _Tag = "指标 基类";
             _N = n;
-            _QuoteTimeType = timeFrequency;
         }
 
         #endregion
@@ -134,7 +127,6 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         {
             //筛选指定时间指标计算数据
             List<CacheInfo<T>> lstQuote = _DataCacheInfos.Values.Where(e => e.DateTime <= dtNow).OrderByDescending(e => e.DateTime).Take(_N).ToList();
-
 
             //初始指标计算对象
             QuoteIndex<T> pIndex_CCI = this.Create_QuoteIndex();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using zxcCore.Common;
+using zxcCore.Enums;
 using zxcCore.Extensions;
 
 namespace zxcCore.zxcData.Analysis
@@ -119,6 +120,9 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>当前关键点位线值
         /// </summary>
         public double Value_KeyLine { get; set; }
+        /// <summary>数据时间频率类型
+        /// </summary>
+        public typeTimeFrequency Value_TimeType { get; set; }
 
         /// <summary>与前一值的差值
         /// </summary>
@@ -136,7 +140,6 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>数据趋势-关键点
         /// </summary>
         public typeDataTrend_KeyPoint DataTrend_KeyPoint { get; set; }
-
 
 
         //protected internal Data _DataBase = null;
