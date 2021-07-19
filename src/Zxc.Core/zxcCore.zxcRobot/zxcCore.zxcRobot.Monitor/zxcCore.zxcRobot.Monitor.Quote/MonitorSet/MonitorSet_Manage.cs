@@ -152,6 +152,14 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             var result = zxcNetHelper.Get_ByHttpClient(_urlAPI_Set, setInfo.ToJson_Str(), out statusCode);
 
             if (statusCode.ToLower() != "ok") return false;
+            if (!setInfo.IsValid)
+            {
+                int ind = Quote_Datas._Datas._setsMoitor.FindIndex(e => e.IsValid == false && e.SpiderName == setInfo.SpiderName);
+                Quote_Datas._Datas._setsMoitor.RemoveAt(ind);
+                Quote_Datas._Datas._setsMoitor.SaveChanges(true);
+                return true;
+            }
+
             List<MonitorSet> pSets = this.TransTo_MonitorSet(result);
             return this.Updata_MonitorSets(pSets);
         }

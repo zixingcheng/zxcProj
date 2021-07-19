@@ -76,6 +76,7 @@ class myAPI_Quote_Set(myWeb.myAPI):
             
         if(bRes and bRemove):
             bRes = setsSpider._Remove(setInfo['spiderName'])
+            bRes = setsSpider._Find(setInfo["spiderName"]) == None
         else:
             bRes = setsSpider._Edit(setInfo)
             
@@ -83,8 +84,9 @@ class myAPI_Quote_Set(myWeb.myAPI):
         if(bRes):
             pMsg['result'] = True
             spiderInfo = setsSpider._Find(setInfo["spiderName"])
-            if(spiderInfo.isValid and not spiderInfo.isDeled):
-                pMsg['datas'] = [spiderInfo.ToDict()] 
+            if(bRemove != True and spiderInfo != None):
+                if(spiderInfo.isValid and not spiderInfo.isDeled):
+                    pMsg['datas'] = [spiderInfo.ToDict()] 
         #return myData_Json.Trans_ToJson_str(pMsg)
         #使用jsonify来讲定义好的数据转换成json格式，并且返回给前端
         return jsonify(pMsg) 
