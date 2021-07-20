@@ -86,7 +86,7 @@ namespace zxcCore.zxcData.Analysis
         protected internal Dictionary<string, DataTrend_KeyLine> _dataKeyLines = null;      //关键点位线集
         public DataAnalyse_Trend(string tag = "", typeTimeFrequency valueTimeType = typeTimeFrequency.none)
         {
-            _tag = string.IsNullOrEmpty(tag) ? "DataAnalyse_Index" : tag;
+            _tag = string.IsNullOrEmpty(tag) ? "DataAnalyse_Trend" : tag;
             _ValueTimeType = valueTimeType;
             this._dataIndexCaches = new List<DataTrend_Index>();
             this._dataKeyLines = new Dictionary<string, DataTrend_KeyLine>();
@@ -215,9 +215,10 @@ namespace zxcCore.zxcData.Analysis
             //更新差值并统计更新
             pDataSetp.LabelInfo.Difference = dDelta;
             pDataSetp.LabelInfo.Difference_Ratio = Math.Round(dDelta / this._valueBase.Value, 8);
-            pDataSetp.LabelInfo.Value = Math.Round(pDataSetp.Value, 8);
+            pDataSetp.LabelInfo.Value = Math.Round(data.Value, 8);
             pDataSetp.LabelInfo.Value_Amend = Math.Round(this.getValue(true).Value, 8);
             pDataSetp.LabelInfo.Value_Profit = this.getProfit(pDataSetp);
+            pDataSetp.LabelInfo.Value_Time = data.Time;
             this._dataStatistics.Statistics(pDataSetp.Value, pDataSetp.Time);
             _dataIndexCaches.Add(pDataSetp);
 
@@ -227,12 +228,12 @@ namespace zxcCore.zxcData.Analysis
             if (pDataSetp._DataTrend_Index_Last._DataTrend_Index_Last != null)
             {
                 //bResult = bResult && dataHandle_DataTrend_Detail(pDataSetp);
-                bResult = bResult && dataHandle_DataTrend_KeyLine(pDataSetp);
                 bResult = bResult && dataHandle_DataTrend_KeyPoint(pDataSetp, data);
+                bResult = bResult && dataHandle_DataTrend_KeyLine(pDataSetp);
                 bResult = bResult && dataHandle_User(pDataSetp, data);
             }
-            if (bResult)
-                bResult = this.dataHandle_Event(pDataSetp);
+            //if (bResult)
+            //    bResult = this.dataHandle_Event(pDataSetp);
 
 
             //超限点递归处理
@@ -252,8 +253,8 @@ namespace zxcCore.zxcData.Analysis
         {
             //趋势判断
             DataTrend_LabelInfo pLabelInfo = data.LabelInfo;
-            double dDelta = pLabelInfo.Difference_Ratio;
-            if (Math.Abs(dDelta) >= _valueDelta)
+            double dDelta = pLabelInfo.Difference;
+            if (Math.Abs(dDelta) >= _valueStep || Math.Abs(pLabelInfo.Difference_Ratio) >= _valueDelta)
             {
                 pLabelInfo.DataTrend = dDelta > 0 ? typeDataTrend.RAISE : dDelta < 0 ? typeDataTrend.FALL : typeDataTrend.NONE;
             }
@@ -414,11 +415,12 @@ namespace zxcCore.zxcData.Analysis
                     //标识关键点--拐点信息
                     pLabelInfo.Value_KeyLine = valueLimit + _valueStep * nDirection_Last;
                     pLabelInfo.DataTrend_KeyPoint = typeDataTrend_KeyPoint.INFLECTION;
+                    pLabelInfo.Value_KeyLine = ratioLimit > 0 ? dMin : dMax;                            //记录前值极点
                     pLabelInfo.DataTrend = ratioLimit > 0 ? typeDataTrend.RAISE : typeDataTrend.FALL;   //修正当前方向
                     this._valueLast_Amend.LabelInfo.DataTrend = pLabelInfo.DataTrend;                   //修正前一(缓存修正对象)方向
                 }
             }
-            return true;
+            return this.dataHandle_Event(data);
         }
         //数据处理--自定义
         protected virtual bool dataHandle_User(DataTrend_Index data, DataTrend_Index dataLast_Recursion = null)
@@ -500,7 +502,7 @@ namespace zxcCore.zxcData.Analysis
             //实例数据
             DataTrend_Index pData = new DataTrend_Index(value, time, this, dataVirtualBase);
             pData._LabelInfo = new DataTrend_LabelInfo();
-            pData._LabelInfo.Tag = "DataTrend";
+            pData._LabelInfo.Tag = _tag;
             pData._LabelInfo.Value_TimeType = _ValueTimeType;
 
             if (dataLast != null)

@@ -79,7 +79,7 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                     {
                         tag0 = pLabelInfo.DataTrend.Get_Description() + " " + pLabelInfo.DataTrend_KeyPoint.Get_Description();
                     }
-                    strMsg = string.Format("\n{0}：{3}({4})\n{1}({2}).", _tagAlias, tag0, this.getValue_str(pLabelInfo.Value_KeyLine).Replace("元", ""), pLabelInfo.Tag, pLabelInfo.Value_TimeType.Get_AttrName());
+                    strMsg = string.Format("\n{0}：{3}({4})\n{5} {1}({2}).", _tagAlias, tag0, this.getValue_str(Math.Round(pLabelInfo.Value_KeyLine, 1)).Replace("元", ""), pLabelInfo.Tag, pLabelInfo.Value_TimeType.Get_AttrName(), Math.Round(pLabelInfo.Value, 1));
                 }
             }
             return strMsg;

@@ -119,7 +119,7 @@ namespace zxcCore.zxcRobot.Quote
 
 
             //行情数据日志时间区间校正
-            bool bResult = false;
+            bool bResult = true;
             List<Data_Quote> pQuotes_max = new List<Data_Quote>();
             if (pLog.DateTime_Max < endTime)
             {
@@ -129,7 +129,6 @@ namespace zxcCore.zxcRobot.Quote
                 dtEnd = dtMax;
 
                 pQuotes_max = QuoteQuery._Query.QuoteHistory(StockInfo, dtMin, dtMax, quoteTime);
-                bResult = false;
             }
 
             List<Data_Quote> pQuotes_min = new List<Data_Quote>();
@@ -141,14 +140,16 @@ namespace zxcCore.zxcRobot.Quote
                 dtStart = dtMin;
 
                 pQuotes_min = QuoteQuery._Query.QuoteHistory(StockInfo, dtMin, dtMax, quoteTime);
-                bResult = false;
             }
 
             //数据自动更新
             if (autoUpdate)
             {
-                bResult = this.UpdateRange(pQuotes_min);
-                bResult = bResult && this.UpdateRange(pQuotes_max);
+                //同步缺失数据（指定开始到记录开始，记录结束到指定结束）
+                if (pQuotes_min.Count > 0)
+                    bResult = bResult && this.UpdateRange(pQuotes_min);
+                if (pQuotes_max.Count > 0)
+                    bResult = bResult && this.UpdateRange(pQuotes_max);
 
                 //数据量校检及自动更新补全
                 if (quoteBars > 0)
@@ -162,17 +163,18 @@ namespace zxcCore.zxcRobot.Quote
 
                         //List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtEnd, quoteBars, quoteTime);
                         List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtStart, dtEnd, quoteTime);
-                        bResult = this.UpdateRange(lstQuote);
+                        if (lstQuote.Count < 1) break;
+                        bResult = bResult && this.UpdateRange(lstQuote);
 
                         //再次计算总数
                         nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.QuoteTimeType == quoteTime && e.IsDel == false);
                     }
-
-                    //日志信息不匹配，直接更新
                     bResult = quoteBars <= nCount;
-                    if (dtStart != pLog.DateTime_Min || dtEnd != pLog.DateTime_Max)
-                        bResult = Quote_Datas._Datas._quotesLog.Updata_LogQuote(StockInfo.StockID_Tag, dtStart, dtEnd, quoteTime);
                 }
+
+                //日志信息不匹配，直接更新
+                //if (dtStart < pLog.DateTime_Min || dtEnd > pLog.DateTime_Max)
+                //    bResult = Quote_Datas._Datas._quotesLog.Updata_LogQuote(StockInfo.StockID_Tag, dtStart, dtEnd, quoteTime);
                 return bResult;
             }
             return true;

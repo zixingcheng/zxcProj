@@ -67,6 +67,13 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         {
             return double.NaN;
         }
+        /// <summary>计算检查
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool Calculate_Check(DateTime dtNow)
+        {
+            return true;
+        }
 
         /// <summary>缓存指标值
         /// </summary>
@@ -125,6 +132,10 @@ namespace zxcCore.zxcRobot.Quote.Quantify
         /// <returns></returns>
         public override double Calculate(DateTime dtNow, Data_Quote data = null, bool isLastData = false)
         {
+            //忽略已经计算
+            if (!this.Calculate_Check(dtNow))
+                return _valueIndexs[dtNow];
+
             //筛选指定时间指标计算数据
             List<CacheInfo<T>> lstQuote = _DataCacheInfos.Values.Where(e => e.DateTime <= dtNow).OrderByDescending(e => e.DateTime).Take(_N).ToList();
 
@@ -139,6 +150,15 @@ namespace zxcCore.zxcRobot.Quote.Quantify
                 return Math.Round(dIndex, 4);
             }
             return double.NaN;
+        }
+        /// <summary>计算检查
+        /// </summary>
+        /// <returns></returns>
+        public override bool Calculate_Check(DateTime dtNow)
+        {
+            if (_valueIndexs.ContainsKey(dtNow))
+                return false;
+            return true;
         }
 
         /// <summary>创建指标计算对象
@@ -177,7 +197,7 @@ namespace zxcCore.zxcRobot.Quote.Quantify
                 double dValue = (int)(dIndex / 10) * 10;
 
                 this.setConsoleState(false);
-                this.Init(dValue, dtNow, 0.1, dValue, dValue, 10);
+                this.Init(dValue, dtNow, 0.191, dValue, dValue, 19.1);
             }
             return this.Analysis(dIndex, dtNow, !isLastData);
         }

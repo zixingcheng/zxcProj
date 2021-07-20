@@ -120,6 +120,10 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>当前关键点位线值
         /// </summary>
         public double Value_KeyLine { get; set; }
+
+        /// <summary>数据时间
+        /// </summary>
+        public DateTime Value_Time { get; set; }
         /// <summary>数据时间频率类型
         /// </summary>
         public typeTimeFrequency Value_TimeType { get; set; }
