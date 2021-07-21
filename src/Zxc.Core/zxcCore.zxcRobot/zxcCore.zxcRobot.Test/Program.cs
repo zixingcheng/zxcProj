@@ -19,6 +19,7 @@ using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.Common;
 using System.ComponentModel;
 using zxcCore.zxcRobot.Quote.JQData;
+using zxcCore.Common.TimeSet;
 
 namespace zxcCore.zxcRobot.Test
 {
@@ -37,6 +38,7 @@ namespace zxcCore.zxcRobot.Test
 
             //行情库测试 
             //StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == "同花顺");
+            //pStockInfo.Get_StockExchangeInfo().TimeSets.IsValid(DateTime.Now);
             //QuoteData pQuoteData = Quote_Manager._Quotes[pStockInfo.StockID_Tag];
             //Quote_JQData._APIs.Get_TradeDays(DateTime.Now.AddDays(-3), DateTime.Now);
             //pQuoteData.Query(DateTime.Now.AddDays(-2), DateTime.Now);

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using zxcCore.Common;
+using zxcCore.Common.TimeSet;
 using zxcCore.Extensions;
 using zxcCore.zxcData.Cache.MemoryDB;
 
@@ -151,6 +153,81 @@ namespace zxcCore.zxcRobot.Quote.Data
                 StockType = pStockType
             };
             return pStockInfo;
+        }
+
+        /// <summary>获取标的交易所信息
+        /// </summary>
+        public StockExchangeInfo Get_StockExchangeInfo()
+        {
+            return StockExchangeInfo.Get_StockExchangeInfo(this.StockExchange);
+        }
+
+    }
+
+
+    /// <summary>标的交易所信息
+    /// </summary>
+    public class StockExchangeInfo
+    {
+        #region 属性及构造
+        /// <summary>配置文件信息
+        /// </summary>
+        protected static internal zxcConfigurationHelper _configExchangeInfo = new zxcConfigurationHelper("appsettings_zxcRobot_Quote_TimeSet.json");
+        /// <summary>配置文件信息
+        /// </summary>
+        protected static internal Dictionary<typeStockExchange, StockExchangeInfo> _stockExchangeInfos = new Dictionary<typeStockExchange, StockExchangeInfo>();
+
+
+        /// <summary>标的交易所信息
+        /// </summary>
+        protected internal typeStockExchange _StockExchange = typeStockExchange.sh;
+        public typeStockExchange StockExchange { get { return _StockExchange; } }
+
+        /// <summary>标的交易所时间设置
+        /// </summary>
+        protected internal zxcTimeSets _TimeSets = null;
+        public zxcTimeSets TimeSets { get { return _TimeSets; } }
+
+
+        public StockExchangeInfo(typeStockExchange stockExchange)
+        {
+            _StockExchange = stockExchange;
+            this.Init_StockExchangeInfo(_StockExchange);
+        }
+        ~StockExchangeInfo()
+        {
+            // 缓存数据？
+        }
+
+        #endregion
+
+
+        /// <summary>初始标的交易所信息
+        /// </summary>
+        public bool Init_StockExchangeInfo(typeStockExchange stockExchange)
+        {
+            string strTag = stockExchange.ToString();
+            string strSet = _configExchangeInfo.config[strTag + ":timeset"];
+            _TimeSets = new zxcTimeSets(strSet, strTag);
+            return true;
+        }
+
+        /// <summary>提取标的交易所信息
+        /// </summary>
+        public static StockExchangeInfo Get_StockExchangeInfo(typeStockExchange stockExchange)
+        {
+            StockExchangeInfo pStockExchangeInfo = null;
+            if (_stockExchangeInfos.TryGetValue(stockExchange, out pStockExchangeInfo))
+            {
+
+            }
+
+            if (pStockExchangeInfo == null)
+            {
+                pStockExchangeInfo = new StockExchangeInfo(stockExchange);
+                _stockExchangeInfos[stockExchange] = pStockExchangeInfo;
+            }
+            return pStockExchangeInfo;
         }
 
     }
