@@ -14,7 +14,7 @@ namespace zxcCore.zxcData.Analysis
     {
         /// <summary>下降
         /// </summary>
-        [EnumAttr("下降", -1), Description("下穿")]
+        [EnumAttr("下降", -1), EnumValue("跌逾"), Description("下穿")]
         FALL = -1,
         /// <summary>无
         /// </summary>
@@ -22,7 +22,7 @@ namespace zxcCore.zxcData.Analysis
         NONE = 0,
         /// <summary>上涨
         /// </summary>
-        [EnumAttr("上涨", 1), Description("上穿")]
+        [EnumAttr("上涨", 1), EnumValue("张超"), Description("上穿")]
         RAISE = 1
     }
     /// <summary>数据趋势-详情(配合typeDataTrend使用)
@@ -61,15 +61,19 @@ namespace zxcCore.zxcData.Analysis
         NONE = 0,
         /// <summary>低点
         /// </summary>
-        [EnumAttr("低点", 1), Description("低点")]
+        [EnumAttr("低点", -1), Description("低点")]
         MIN = -1,
         /// <summary>高点
         /// </summary>
-        [EnumAttr("高点", 9), Description("高点")]
+        [EnumAttr("高点", 1), Description("高点")]
         MAX = 1,
+        /// <summary>回撤极点
+        /// </summary>
+        [EnumAttr("回撤极点", 2), Description("回撤极点")]
+        RETREAT = 2,
         /// <summary>拐点
         /// </summary>
-        [EnumAttr("拐点", 1), Description("拐点")]
+        [EnumAttr("拐点", 5), Description("拐点")]
         INFLECTION = 5,
         /// <summary>临界压力点（压力区间下限）
         /// </summary>
@@ -120,6 +124,9 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>当前关键点位线值
         /// </summary>
         public double Value_KeyLine { get; set; }
+        /// <summary>当前关键点位线涨跌幅
+        /// </summary>
+        public double Value_Profit_KeyLine { get; set; }
 
         /// <summary>数据时间
         /// </summary>

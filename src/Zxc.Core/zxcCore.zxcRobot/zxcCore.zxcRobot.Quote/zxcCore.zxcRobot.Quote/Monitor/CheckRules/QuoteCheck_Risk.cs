@@ -19,7 +19,8 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
         //数据分析对象 
         protected internal DataAnalyse_Trend _dataAnalyse = null;
         protected DataAnalyse_Trend_EventArgs _eventArgs = null;
-        protected internal double _valueDelta = 0.0025;         //涨跌拐点判断范围
+        protected internal double _valueDelta = 0.0025;             //涨跌拐点判断范围
+        protected internal double _valueRetreatDelta = 0.0191;      //涨跌拐点判断范围
 
         public QuoteCheck_Risk(string tagName, IDataCache<T> dataCache, string setting) : base(tagName, dataCache, setting)
         {
@@ -48,7 +49,8 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
             {
                 //修正最小生效间隔
                 double valueDelta = _data.IsIndex() ? _valueDelta * 1.5 : _data.GetStockType() == typeStock.Option ? _valueDelta * 20.0 : _valueDelta * 3;
-                this._dataAnalyse.Init(_data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), valueDelta, _data.Price_High, _data.Price_Low);
+                double valueRetreatDelta = _data.IsIndex() ? _valueRetreatDelta * 0.25 : _data.GetStockType() == typeStock.Option ? 1 - _valueRetreatDelta * 2 : _valueRetreatDelta;
+                this._dataAnalyse.Init(_data.Price_Per, zxcTimeHelper.checkTimeH(dtTime).AddMinutes(25), valueDelta, _data.Price_High, _data.Price_Low, double.NaN, valueRetreatDelta);
                 return true;
             }
             else
@@ -69,6 +71,11 @@ namespace zxcCore.zxcRobot.Monitor.DataCheck
                 {
                     string tag0 = pLabelInfo.DataTrend.Get_AttrName() + pLabelInfo.DataTrend_KeyPoint.Get_AttrName();
                     strMsg = string.Format("\n{0}：{1}({2}).", _tagAlias, tag0, this.getValue_str(pLabelInfo.Value));
+                }
+                else if (pLabelInfo.DataTrend_KeyPoint == typeDataTrend_KeyPoint.RETREAT)
+                {
+                    string tag0 = pLabelInfo.DataTrend.Get_Value() + " " + pLabelInfo.DataTrend_KeyPoint.Get_AttrName();
+                    strMsg = string.Format("\n{0}：{1}({2}). \n前高：{3}%({4})", _tagAlias, tag0, this.getValue_str(pLabelInfo.Value), Math.Round(pLabelInfo.Value_Profit_KeyLine * 100, 2), this.getValue_str(pLabelInfo.Value_KeyLine));
                 }
             }
             return strMsg;

@@ -197,7 +197,7 @@ namespace zxcCore.zxcRobot.Quote.Quantify
                 double dValue = (int)(dIndex / 10) * 10;
 
                 this.setConsoleState(false);
-                this.Init(dValue, dtNow, 0.191, dValue, dValue, 19.1);
+                this.Init(dValue, dtNow, 0.191, dValue, dValue, 19.1, 0.02, 38.2);
             }
             return this.Analysis(dIndex, dtNow, !isLastData);
         }

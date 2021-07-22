@@ -35,6 +35,12 @@ namespace zxcCore.zxcData.Analysis
         /// <summary>有效差值步长
         /// </summary>
         protected double _valueStep { get; set; }
+        /// <summary>回撤差值范围
+        /// </summary>
+        protected double _valueRetreatDelta { get; set; }
+        /// <summary>回撤差值步长
+        /// </summary>
+        protected double _valueRetreatStep { get; set; }
         /// <summary>当前阶段最大值
         /// </summary>
         protected double _valueMax { get; set; }
@@ -83,6 +89,7 @@ namespace zxcCore.zxcData.Analysis
         protected internal double _valueDelta_half = 0;
         protected internal bool _useFixed = false;
         protected internal bool _useConsole = false;
+        protected internal bool _canRetreat = false;
         protected internal Dictionary<string, DataTrend_KeyLine> _dataKeyLines = null;      //关键点位线集
         public DataAnalyse_Trend(string tag = "", typeTimeFrequency valueTimeType = typeTimeFrequency.none)
         {
@@ -104,7 +111,7 @@ namespace zxcCore.zxcData.Analysis
         /// <param name="min">最小值</param>
         /// <param name="valueDelta">数据变化幅度有效值</param>
         /// <returns></returns>
-        public virtual bool Init(double valueBase, DateTime dtTime, double valueDelta = 0.0025, double valueMax = double.MinValue, double valueMin = double.MaxValue, double valueSetp = double.NaN)
+        public virtual bool Init(double valueBase, DateTime dtTime, double valueDelta = 0.0025, double valueMax = double.MinValue, double valueMin = double.MaxValue, double valueSetp = double.NaN, double valueRetreatDelta = 0.02, double valueRetreatStep = double.NaN)
         {
             if (_IsInited) return true;
             this._valueDelta = valueDelta;
@@ -113,6 +120,8 @@ namespace zxcCore.zxcData.Analysis
             this._value = _valueBase;
             this._valueLast = _valueBase;
             this._valueStep = !double.IsNaN(valueSetp) ? valueSetp : Math.Round(this._valueDelta * this._valueBase.Value, 8);  //计算有效值步长（对应有效值区间）
+            this._valueRetreatDelta = valueRetreatDelta;
+            this._valueRetreatStep = !double.IsNaN(valueRetreatStep) ? valueRetreatStep : Math.Round(this._valueRetreatDelta * this._valueBase.Value, 8);    //回撤步长 
 
             this.lstDataStatistics = new List<DataStatistics>();
             this.InitStatistics(_valueBase.Value, _valueBase.Time, valueMax, valueMin);
@@ -138,6 +147,7 @@ namespace zxcCore.zxcData.Analysis
             this._dataStatistics._useConsole = this._useConsole;
             this.lstDataStatistics.Add(this._dataStatistics);
 
+            _canRetreat = true;
             _valueMax = _dataStatistics.Max;
             _valueMin = _dataStatistics.Min;
             _indTag++;
@@ -391,12 +401,22 @@ namespace zxcCore.zxcData.Analysis
                         pLabelInfo.DataTrend_KeyPoint = typeDataTrend_KeyPoint.MAX;
                     }
                 }
-                else if (dRatio < 0 && _valueMin >= data.Value)     //下降，关键点--阶段新低
+                else if (dRatio < 0 && _valueMin >= data.Value) //下降，关键点--阶段新低
                 {
                     if (_valueMin - data.Value >= 0.5 * _dataStatistics.Value_interval)
                     {
                         _valueMin = data.IsHitPoint ? this._dataStatistics.Min : this._dataStatistics.Min - 0.5 * _dataStatistics.Value_interval;
                         pLabelInfo.DataTrend_KeyPoint = typeDataTrend_KeyPoint.MIN;
+                    }
+                }
+                else if (_canRetreat && dRatio < 0 && _dataStatistics.Max_Original - data.Value >= _valueRetreatStep)     //回撤，关键点--阶段回撤
+                {
+                    if (_dataStatistics.Max_Original > _dataStatistics.Min_Original)
+                    {
+                        pLabelInfo.DataTrend_KeyPoint = typeDataTrend_KeyPoint.RETREAT;
+                        pLabelInfo.Value_KeyLine = this._dataStatistics.Max_Original;       //记录前值极点
+                        pLabelInfo.DataTrend = typeDataTrend.FALL;                          //修正当前方向
+                        _canRetreat = false;
                     }
                 }
             }
@@ -445,6 +465,7 @@ namespace zxcCore.zxcData.Analysis
         protected virtual DataAnalyse_Trend_EventArgs dataHandle_EventArgs(DataTrend_Index data)
         {
             //组装消息
+            data.LabelInfo.Value_Profit_KeyLine = Math.Round(data.LabelInfo.Value_KeyLine / this._valueBase.Value - 1, 6);
             DataAnalyse_Trend_EventArgs pArgs = new DataAnalyse_Trend_EventArgs()
             {
                 _data = data
