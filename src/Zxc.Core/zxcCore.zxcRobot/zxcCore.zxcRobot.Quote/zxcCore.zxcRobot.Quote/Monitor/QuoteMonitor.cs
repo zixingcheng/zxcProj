@@ -57,7 +57,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             this.InitData_TimeFrequency(typeTimeFrequency.m60, 4 * 15);             //60分钟级，15天数据 60 条
             this.InitData_TimeFrequency(typeTimeFrequency.m120, 2 * 30);            //120分钟级，30天数据 60 条
             this.InitData_TimeFrequency(typeTimeFrequency.day, 1 * 60);             //日级，60天数据 60 条
-            //this.InitData_TimeFrequency(typeTimeFrequency.week, 1 * 60);            //周级，60周数据 60 条
+            //this.InitData_TimeFrequency(typeTimeFrequency.week, 1 * 30);            //周级，30周数据 30 条
             return true;
         }
 
@@ -84,24 +84,18 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                     break;
                 case typeTimeFrequency.m1:
                     break;
+                case typeTimeFrequency.m10:
+                    break;
                 case typeTimeFrequency.m5:
+                case typeTimeFrequency.m15:
+                case typeTimeFrequency.m30:
+                case typeTimeFrequency.m60:
+                case typeTimeFrequency.m120:
+                case typeTimeFrequency.day:
                     if (pDataChecks.DataCache.DataCache_Set.Info_Factor.Name == "50ETF")
                     {
                         this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk_Quantify<Data_Quote>));
                     }
-                    break;
-                case typeTimeFrequency.m10:
-                    break;
-                case typeTimeFrequency.m15:
-                    //this.InitDataCheck_Instance(pDataChecks, typeof(QuoteCheck_Risk_Quantify<Data_Quote>));
-                    break;
-                case typeTimeFrequency.m30:
-                    break;
-                case typeTimeFrequency.m60:
-                    break;
-                case typeTimeFrequency.m120:
-                    break;
-                case typeTimeFrequency.day:
                     break;
                 default:
                     break;
@@ -169,6 +163,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
                     this.SetData(pCacheInfo, typeTimeFrequency.m60, typeTimeFrequency.m5);
                     this.SetData(pCacheInfo, typeTimeFrequency.m120, typeTimeFrequency.m5);
                     this.SetData(pCacheInfo, typeTimeFrequency.day, typeTimeFrequency.m5);
+                    //this.SetData(pCacheInfo, typeTimeFrequency.week, typeTimeFrequency.m5);
                 }
             }
         }
@@ -182,6 +177,7 @@ namespace zxcCore.zxcRobot.Monitor.Quote
             if (pStockInfo == null) return false;
 
             //获取当前时间频率数据
+            DateTime dtEnd = zxcTimeHelper.CheckTime(pData.DateTime, typeTimeFrequency.m1, true);
             Data_Quote pDataNew = QuoteQuery._Query.Query(pStockInfo, pData.DateTime, timeFrequency, null);
             if (pDataNew == null)
                 return false;

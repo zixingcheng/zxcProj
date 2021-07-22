@@ -31,12 +31,14 @@ namespace zxcCore.zxcRobot.Quote
             get; set;
         }
 
-
+        protected internal StockExchangeInfo _infoExchange = null;          //标的交易所信息
         protected internal DataTable_Quotes<Data_Quote> _dtQuote = null;    //行情库表对象
         public QuoteData(DataTable_Quotes<Data_Quote> pData_Quotes)
         {
             _dtQuote = pData_Quotes;
             StockInfo = _dtQuote.StockInfo;
+            if (StockInfo != null)
+                _infoExchange = StockInfo.Get_StockExchangeInfo();
         }
         ~QuoteData()
         {
@@ -147,9 +149,9 @@ namespace zxcCore.zxcRobot.Quote
             {
                 //同步缺失数据（指定开始到记录开始，记录结束到指定结束）
                 if (pQuotes_min.Count > 0)
-                    bResult = bResult && this.UpdateRange(pQuotes_min);
+                    bResult = bResult && this.UpdateRange(pQuotes_min, quoteTime);
                 if (pQuotes_max.Count > 0)
-                    bResult = bResult && this.UpdateRange(pQuotes_max);
+                    bResult = bResult && this.UpdateRange(pQuotes_max, quoteTime);
 
                 //数据量校检及自动更新补全
                 if (quoteBars > 0)
@@ -164,7 +166,7 @@ namespace zxcCore.zxcRobot.Quote
                         //List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtEnd, quoteBars, quoteTime);
                         List<Data_Quote> lstQuote = QuoteQuery._Query.QuoteHistory(StockInfo, dtStart, dtEnd, quoteTime);
                         if (lstQuote.Count < 1) break;
-                        bResult = bResult && this.UpdateRange(lstQuote);
+                        bResult = bResult && this.UpdateRange(lstQuote, quoteTime);
 
                         //再次计算总数
                         nCount = _dtQuote.Count(e => e.DateTime <= dtEnd && e.QuoteTimeType == quoteTime && e.IsDel == false);
@@ -184,9 +186,25 @@ namespace zxcCore.zxcRobot.Quote
         /// <summary>更新对象集
         /// </summary>
         /// <param name="collection"></param>
-        protected internal virtual bool UpdateRange(List<Data_Quote> collection)
+        protected internal virtual bool UpdateRange(List<Data_Quote> collection, typeTimeFrequency quoteTime)
         {
-            return this._dtQuote.AddRange(collection, true, true);
+            List<Data_Quote> lstTemp = new List<Data_Quote>();
+            foreach (var item in collection)
+            {
+                //校正时间频率进行添加
+                DateTime dtTime = this._infoExchange.CheckTime(item.DateTime, quoteTime);
+                if (dtTime == item.DateTime)
+                {
+                    lstTemp.Add(item);
+                }
+                else
+                {
+
+                }
+            }
+            if (lstTemp.Count > 0)
+                return this._dtQuote.AddRange(lstTemp, true, true);
+            return true;
         }
 
     }

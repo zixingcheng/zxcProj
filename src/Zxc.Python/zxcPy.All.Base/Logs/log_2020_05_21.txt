@@ -1,0 +1,155 @@
+2020-05-21 ---> 开始尝试连接到 172.21.95.150 
+ 2020-05-21 ---> 成功连接到 172.21.95.150 
+ 2020-05-21 ---> 开始尝试登录到 172.21.95.150 
+ 2020-05-21 ---> 成功登录到 172.21.95.150 
+ 2020-05-21 ---> 220 Microsoft FTP Service 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test2.txt 
+ 2020-05-21 ---> 切换至远程目录: /Test 
+ 2020-05-21 ---> 目录已存在 Ff1 ,具体错误描述为：550 Cannot create a file when that file already exists.  
+ 2020-05-21 ---> upload_file_tree()---> 上传目录： Ff1 
+ 2020-05-21 ---> 切换至远程目录: /Test/Ff1 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Ff1\Test2.txt 
+ 2020-05-21 ---> 目录已存在 FF2 ,具体错误描述为：550 Cannot create a file when that file already exists.  
+ 2020-05-21 ---> upload_file_tree()---> 上传目录： FF2 
+ 2020-05-21 ---> 切换至远程目录: /Test/FF2 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： TempFTP.txt 
+ 2020-05-21 ---> local_file_size:107  , remote_file_size:107 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\TempFTP.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test.txt 
+ 2020-05-21 ---> local_file_size:0  , remote_file_size:0 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\Test.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\Test2.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： TempFTP.txt 
+ 2020-05-21 ---> local_file_size:107  , remote_file_size:107 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/TempFTP.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test.txt 
+ 2020-05-21 ---> local_file_size:0  , remote_file_size:0 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test2.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： 图片1.png 
+ 2020-05-21 ---> local_file_size:294558  , remote_file_size:294558 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/图片1.png 
+ 2020-05-21 ---> close()---> FTP退出 
+ 2020-05-21 ---> 开始尝试连接到 172.21.95.150 
+ 2020-05-21 ---> 成功连接到 172.21.95.150 
+ 2020-05-21 ---> 开始尝试登录到 172.21.95.150 
+ 2020-05-21 ---> 成功登录到 172.21.95.150 
+ 2020-05-21 ---> 220 Microsoft FTP Service 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test2.txt 
+ 2020-05-21 ---> 切换至远程目录: /Test 
+ 2020-05-21 ---> 目录已存在 Ff1 ,具体错误描述为：550 Cannot create a file when that file already exists.  
+ 2020-05-21 ---> upload_file_tree()---> 上传目录： Ff1 
+ 2020-05-21 ---> 切换至远程目录: /Test/Ff1 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Ff1\Test2.txt 
+ 2020-05-21 ---> 目录已存在 FF2 ,具体错误描述为：550 Cannot create a file when that file already exists.  
+ 2020-05-21 ---> upload_file_tree()---> 上传目录： FF2 
+ 2020-05-21 ---> 切换至远程目录: /Test/FF2 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： TempFTP.txt 
+ 2020-05-21 ---> local_file_size:107  , remote_file_size:107 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\TempFTP.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test.txt 
+ 2020-05-21 ---> local_file_size:0  , remote_file_size:0 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\Test.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\Test2.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： TempFTP.txt 
+ 2020-05-21 ---> local_file_size:107  , remote_file_size:107 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/TempFTP.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test.txt 
+ 2020-05-21 ---> local_file_size:0  , remote_file_size:0 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test2.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： 图片1.png 
+ 2020-05-21 ---> local_file_size:294558  , remote_file_size:294558 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/图片1.png 
+ 2020-05-21 ---> close()---> FTP退出 
+ 2020-05-21 ---> 开始尝试连接到 172.21.95.150 
+ 2020-05-21 ---> 成功连接到 172.21.95.150 
+ 2020-05-21 ---> 开始尝试登录到 172.21.95.150 
+ 2020-05-21 ---> 成功登录到 172.21.95.150 
+ 2020-05-21 ---> 220 Microsoft FTP Service 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test2.txt 
+ 2020-05-21 ---> 切换至远程目录: /Test 
+ 2020-05-21 ---> 目录已存在 Ff1 ,具体错误描述为：550 Cannot create a file when that file already exists.  
+ 2020-05-21 ---> upload_file_tree()---> 上传目录： Ff1 
+ 2020-05-21 ---> 切换至远程目录: /Test/Ff1 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Ff1\Test2.txt 
+ 2020-05-21 ---> 目录已存在 FF2 ,具体错误描述为：550 Cannot create a file when that file already exists.  
+ 2020-05-21 ---> upload_file_tree()---> 上传目录： FF2 
+ 2020-05-21 ---> 切换至远程目录: /Test/FF2 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： TempFTP.txt 
+ 2020-05-21 ---> local_file_size:107  , remote_file_size:107 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\TempFTP.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test.txt 
+ 2020-05-21 ---> local_file_size:0  , remote_file_size:0 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\Test.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\Test2.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： TempFTP.txt 
+ 2020-05-21 ---> local_file_size:107  , remote_file_size:107 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/TempFTP.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test.txt 
+ 2020-05-21 ---> local_file_size:0  , remote_file_size:0 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test2.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： 图片1.png 
+ 2020-05-21 ---> local_file_size:294558  , remote_file_size:294558 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/图片1.png 
+ 2020-05-21 ---> close()---> FTP退出 
+ 2020-05-21 ---> 开始尝试连接到 172.21.95.150 
+ 2020-05-21 ---> 成功连接到 172.21.95.150 
+ 2020-05-21 ---> 开始尝试登录到 172.21.95.150 
+ 2020-05-21 ---> 成功登录到 172.21.95.150 
+ 2020-05-21 ---> 220 Microsoft FTP Service 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:-1 
+ 2020-05-21 ---> 上传: C:/Users/16475/Desktop/FTp/ftpFiles/Test2.txt成功! 
+ 2020-05-21 ---> 切换至远程目录: /Test 
+ 2020-05-21 ---> upload_file_tree()---> 上传目录： Ff1 
+ 2020-05-21 ---> 切换至远程目录: /Test/Ff1 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:-1 
+ 2020-05-21 ---> 上传: C:/Users/16475/Desktop/FTp/ftpFiles/Ff1\Test2.txt成功! 
+ 2020-05-21 ---> upload_file_tree()---> 上传目录： FF2 
+ 2020-05-21 ---> 切换至远程目录: /Test/FF2 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： TempFTP.txt 
+ 2020-05-21 ---> local_file_size:107  , remote_file_size:-1 
+ 2020-05-21 ---> 上传: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\TempFTP.txt成功! 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test.txt 
+ 2020-05-21 ---> local_file_size:0  , remote_file_size:-1 
+ 2020-05-21 ---> 上传: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\Test.txt成功! 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:-1 
+ 2020-05-21 ---> 上传: C:/Users/16475/Desktop/FTp/ftpFiles/FF2\Test2.txt成功! 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： TempFTP.txt 
+ 2020-05-21 ---> local_file_size:107  , remote_file_size:-1 
+ 2020-05-21 ---> 上传: C:/Users/16475/Desktop/FTp/ftpFiles/TempFTP.txt成功! 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test.txt 
+ 2020-05-21 ---> local_file_size:0  , remote_file_size:-1 
+ 2020-05-21 ---> 上传: C:/Users/16475/Desktop/FTp/ftpFiles/Test.txt成功! 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： Test2.txt 
+ 2020-05-21 ---> local_file_size:15  , remote_file_size:15 
+ 2020-05-21 ---> 跳过同名、且大小相等的文件: C:/Users/16475/Desktop/FTp/ftpFiles/Test2.txt 
+ 2020-05-21 ---> upload_file_tree()---> 上传文件： 图片1.png 
+ 2020-05-21 ---> local_file_size:294558  , remote_file_size:-1 
+ 2020-05-21 ---> 上传: C:/Users/16475/Desktop/FTp/ftpFiles/图片1.png成功! 
+ 2020-05-21 ---> close()---> FTP退出 
+ 

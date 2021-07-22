@@ -114,7 +114,7 @@ namespace zxcCore.zxcRobot.Quote
 
             //校正时间
             Data_Quote pQuote = null;
-            DateTime dtEnd = zxcTimeHelper.CheckTime(endTime, quoteTime, false);
+            DateTime dtEnd = zxcTimeHelper.CheckTime(endTime, quoteTime, true);
             if (DateTime.Now > dtEnd)
             {
                 pQuote = QuoteQuery._Query.Query(pStockInfo.StockID_Tag, dtEnd, 1, quoteTime, true).FirstOrDefault();

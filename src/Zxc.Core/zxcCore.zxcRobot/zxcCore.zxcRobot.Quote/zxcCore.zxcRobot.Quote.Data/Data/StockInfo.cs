@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using zxcCore.Common;
 using zxcCore.Common.TimeSet;
+using zxcCore.Enums;
 using zxcCore.Extensions;
 using zxcCore.zxcData.Cache.MemoryDB;
 
@@ -189,6 +190,10 @@ namespace zxcCore.zxcRobot.Quote.Data
         public zxcTimeSets TimeSets { get { return _TimeSets; } }
 
 
+        protected internal List<double> _dictTimes_H = null;
+        protected internal List<double> _dictTimes_H2 = null;
+        protected internal List<double> _dictTimes_Day = null;
+        protected internal double _dayTimes_H = 0;
         public StockExchangeInfo(typeStockExchange stockExchange)
         {
             _StockExchange = stockExchange;
@@ -209,8 +214,105 @@ namespace zxcCore.zxcRobot.Quote.Data
             string strTag = stockExchange.ToString();
             string strSet = _configExchangeInfo.config[strTag + ":timeset"];
             _TimeSets = new zxcTimeSets(strSet, strTag);
+
+            //H
+            string strSet_Hours = _configExchangeInfo.config[strTag + ":timesets:hours"];
+            string[] strTemps = strSet_Hours.Replace(" ", "").Split(",");
+            _dictTimes_H = new List<double>();
+            foreach (var item in strTemps)
+            {
+                double dHour = Convert.ToDouble(item);
+                _dictTimes_H.Add(dHour);
+            }
+
+            //H2
+            string strSet_Hours2 = _configExchangeInfo.config[strTag + ":timesets:hours2"];
+            string[] strTemps2 = strSet_Hours2.Replace(" ", "").Split(",");
+            _dictTimes_H2 = new List<double>();
+            foreach (var item in strTemps2)
+            {
+                double dHour = Convert.ToDouble(item);
+                _dictTimes_H2.Add(dHour);
+            }
+
+            //Day
+            string strSet_Day = _configExchangeInfo.config[strTag + ":timesets:dayofweek"];
+            string[] strTemps3 = strSet_Day.Replace(" ", "").Split(",");
+            _dictTimes_Day = new List<double>();
+            foreach (var item in strTemps3)
+            {
+                double dDay = Convert.ToDouble(item);
+                _dictTimes_Day.Add(dDay);
+            }
+            _dayTimes_H = Convert.ToDouble(_configExchangeInfo.config[strTag + ":timesets:dayhour"]);
             return true;
         }
+
+
+        /// <summary>按时间频率修正时间
+        /// </summary>
+        /// <param name="dtBase"></param>
+        /// <param name="timeFrequency"></param>
+        /// <returns></returns>
+        public DateTime CheckTime(DateTime dtBase, typeTimeFrequency timeFrequency)
+        {
+            DateTime dtTime = DateTime.MinValue;
+            if (!this._TimeSets.IsValid(dtBase))
+            {
+                double dH = dtBase.Hour + dtBase.Minute / 60.0 + dtBase.Second / 3600.0;
+                if (dH >= _dayTimes_H)
+                {
+                    int nH60 = (int)Math.Floor(_dayTimes_H);
+                    dtBase = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, nH60, (int)((_dayTimes_H - nH60) * 60), 0);
+                }
+                else if (dH != 0)
+                    return dtTime;
+            }
+
+            switch (timeFrequency)
+            {
+                case typeTimeFrequency.day:
+                case typeTimeFrequency.m1:
+                case typeTimeFrequency.m5:
+                case typeTimeFrequency.m10:
+                case typeTimeFrequency.m15:
+                case typeTimeFrequency.m30:
+                    dtTime = zxcTimeHelper.CheckTime(dtBase, timeFrequency, true);
+                    break;
+                case typeTimeFrequency.m60:
+                    double dH60 = dtBase.Hour + dtBase.Minute / 60.0 + dtBase.Second / 3600.0;
+                    for (int i = _dictTimes_H.Count - 1; i >= 0; i--)
+                    {
+                        if (dH60 >= _dictTimes_H[i])
+                        {
+                            int nH60 = (int)Math.Floor(_dictTimes_H[i]);
+                            dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, nH60, (int)((_dictTimes_H[i] - nH60) * 60), 0);
+                            break;
+                        }
+                    }
+                    break;
+                case typeTimeFrequency.m120:
+                    double dH120 = dtBase.Hour + dtBase.Minute / 60.0 + dtBase.Second / 3600.0;
+                    for (int i = _dictTimes_H2.Count - 1; i >= 0; i--)
+                    {
+                        if (dH120 >= _dictTimes_H2[i])
+                        {
+                            int nH60 = (int)Math.Floor(_dictTimes_H2[i]);
+                            dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, nH60, (int)((_dictTimes_H2[i] - nH60) * 60), 0);
+                            break;
+                        }
+                    }
+                    break;
+                case typeTimeFrequency.week:
+                    if ((int)dtBase.DayOfWeek >= _dictTimes_Day[_dictTimes_Day.Count - 1])
+                        dtTime = new DateTime(dtBase.Year, dtBase.Month, dtBase.Day, 0, 0, 0);
+                    break;
+                default:
+                    break;
+            }
+            return dtTime;
+        }
+
 
         /// <summary>提取标的交易所信息
         /// </summary>

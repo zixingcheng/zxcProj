@@ -148,7 +148,7 @@ namespace zxcCore.Common.TimeSet
         {
             if (this._IsVaildAll) return true;
             if (this.TimeMax > 0 && this.TimeMin > 0)
-                return this.TimeMin <= value && this.TimeMax > value;
+                return this.TimeMin <= value && this.TimeMax >= value;
             if (this._Sets.Count > 0)
             {
                 foreach (var item in this._Sets)
@@ -216,11 +216,23 @@ namespace zxcCore.Common.TimeSet
             if (dtTime == DateTime.MinValue)
                 dtTime = DateTime.Now;
             return _Sets[typeTimeSet.S].IsValid(dtTime.Second)
-                && (_Sets[typeTimeSet.M].IsValid(dtTime.Minute) || _Sets[typeTimeSet.M].IsValid(dtTime.Minute + dtTime.Second / 60))
-                && (_Sets[typeTimeSet.H].IsValid(dtTime.Hour) || _Sets[typeTimeSet.H].IsValid(dtTime.Hour + dtTime.Minute / 60 + dtTime.Second / 3600))
+                && (_Sets[typeTimeSet.M].IsValid(dtTime.Minute) || _Sets[typeTimeSet.M].IsValid(dtTime.Minute + dtTime.Second / 60.0))
+                && (_Sets[typeTimeSet.H].IsValid(dtTime.Hour) || _Sets[typeTimeSet.H].IsValid(dtTime.Hour + dtTime.Minute / 60.0 + dtTime.Second / 3600.0))
                 && _Sets[typeTimeSet.D].IsValid(dtTime.Day)
                 && _Sets[typeTimeSet.m].IsValid(dtTime.Month)
                 && _Sets[typeTimeSet.w].IsValid((int)dtTime.DayOfWeek);
+        }
+
+        /// <summary>提取时间设置信息
+        /// </summary>
+        public virtual zxcTimeSet GetTimeSet(typeTimeSet typeTimeSet)
+        {
+            zxcTimeSet pTimeSet = null;
+            if (_Sets.TryGetValue(typeTimeSet, out pTimeSet))
+            {
+
+            }
+            return pTimeSet;
         }
 
     }
