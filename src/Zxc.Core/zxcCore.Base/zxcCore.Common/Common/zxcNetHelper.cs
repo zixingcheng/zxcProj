@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -27,7 +28,11 @@ namespace zxcCore.Common
             //设置Http的正文、内容标头、字符
             HttpContent httpContent = new StringContent(postData, Encoding.UTF8, "application/json");
             if (headers != "application/json")
-                httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            {
+                httpContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(headers);
+                if (!string.IsNullOrEmpty(postData))
+                    url += postData;
+            }
             if (charSet != "utf-8")
                 httpContent.Headers.ContentType.CharSet = "utf-8";
 
@@ -77,6 +82,29 @@ namespace zxcCore.Common
                 }
             }
             return result;
+        }
+
+
+        /// <summary>下载指定网络路径图片
+        /// </summary>
+        /// <param name="urlImage"></param>
+        /// <returns></returns>
+        public static byte[] Download_Image(string urlImage)
+        {
+            byte[] bytBuffer;
+            HttpWebRequest myReq = (HttpWebRequest)WebRequest.Create(urlImage);
+            myReq.Referer = urlImage;
+            WebResponse myResp = myReq.GetResponse();
+
+            Stream stream = myResp.GetResponseStream();
+            using (BinaryReader br = new BinaryReader(stream))
+            {
+                //i = (int)(stream.Length);
+                bytBuffer = br.ReadBytes(500000);
+                br.Close();
+            }
+            myResp.Close();
+            return bytBuffer;
         }
 
     }

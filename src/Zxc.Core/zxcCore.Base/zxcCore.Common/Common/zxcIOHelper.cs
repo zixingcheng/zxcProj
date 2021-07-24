@@ -29,5 +29,28 @@ namespace zxcCore.Common
             return true;
         }
 
+        /// <summary>写二进制数据到文件
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="content"></param>
+        public static bool WriteBytesToFile(string fileName, byte[] content)
+        {
+            if (checkPath(fileName))
+            {
+                FileStream fs = new FileStream(fileName, FileMode.Create);
+                BinaryWriter w = new BinaryWriter(fs);
+                try
+                {
+                    w.Write(content);
+                }
+                finally
+                {
+                    fs.Close();
+                    w.Close();
+                }
+            }
+            return File.Exists(fileName);
+        }
+
     }
 }

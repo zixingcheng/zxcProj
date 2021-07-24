@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Datas\**" />
+    <EmbeddedResource Remove="Datas\**" />
+    <None Remove="Datas\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\zxcCore.zxcData\zxcCore.zxcData.Cache\zxcCore.zxcData.Cache.MemeoryDB\zxcCore.zxcData.Cache.MemeoryDB.csproj" />
+  </ItemGroup>
+
+</Project>

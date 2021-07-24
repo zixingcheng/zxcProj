@@ -27,8 +27,8 @@ namespace zxcCore.zxcRobot.Quote.JQData
 
         #region 属性及构造
 
-        protected internal string _jqQPI_Token = "";          //行情API接口-Tocken
-        protected internal DateTime _jqQPI_Token_Time;        //行情API接口-Tocken时间
+        protected internal string _jqAPI_Token = "";          //行情API接口-Tocken
+        protected internal DateTime _jqAPI_Token_Time;        //行情API接口-Tocken时间
 
         protected internal string _urlAPI_Base = "";          //行情API接口-根
         protected internal string _urlAPI_Mob = "";           //行情API接口-用户名
@@ -91,13 +91,13 @@ namespace zxcCore.zxcRobot.Quote.JQData
         protected internal bool Check_Token()
         {
             //当天有效
-            if (string.IsNullOrEmpty(_jqQPI_Token) || (_jqQPI_Token_Time.Day - DateTime.Now.Day) > 0)
+            if (string.IsNullOrEmpty(_jqAPI_Token) || (_jqAPI_Token_Time.Day - DateTime.Now.Day) > 0)
             {
                 //重新获取token
-                _jqQPI_Token = this.Get_Token();
-                if (string.IsNullOrEmpty(_jqQPI_Token))
+                _jqAPI_Token = this.Get_Token();
+                if (string.IsNullOrEmpty(_jqAPI_Token))
                     return false;
-                _jqQPI_Token_Time = DateTime.Now;
+                _jqAPI_Token_Time = DateTime.Now;
                 _urlAPI_QueryCount = this.Get_QueryCount();
             }
             return true;
@@ -150,7 +150,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
             string jsonParam = JsonConvert.SerializeObject(new
             {
                 method = "get_query_count",
-                token = _jqQPI_Token
+                token = _jqAPI_Token
             });
 
             //POST请求并等待结果
@@ -176,7 +176,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
             string jsonParam = JsonConvert.SerializeObject(new
             {
                 method = "get_price",
-                token = _jqQPI_Token,
+                token = _jqAPI_Token,
                 code = codeTag,
                 count = bars,
                 unit = barUnit,
@@ -205,7 +205,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
             string jsonParam = JsonConvert.SerializeObject(new
             {
                 method = "get_price_period",
-                token = _jqQPI_Token,
+                token = _jqAPI_Token,
                 code = codeTag,
                 unit = barUnit,
                 date = startTime.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -233,7 +233,7 @@ namespace zxcCore.zxcRobot.Quote.JQData
             string jsonParam = JsonConvert.SerializeObject(new
             {
                 method = "get_trade_days",
-                token = _jqQPI_Token,
+                token = _jqAPI_Token,
                 date = startTime.ToString("yyyy-MM-dd"),
                 end_date = endTime.ToString("yyyy-MM-dd")
             });

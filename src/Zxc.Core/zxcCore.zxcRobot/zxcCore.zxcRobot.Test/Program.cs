@@ -20,6 +20,7 @@ using zxcCore.Common;
 using System.ComponentModel;
 using zxcCore.zxcRobot.Quote.JQData;
 using zxcCore.Common.TimeSet;
+using zxcCore.zxcStudy.Word;
 
 namespace zxcCore.zxcRobot.Test
 {
@@ -35,6 +36,9 @@ namespace zxcCore.zxcRobot.Test
 
             //消息交换测试
             //TestSwapMsg();
+
+            //zxcStudy测试
+            //TestStudy();
 
             //行情库测试 
             //StockInfo pStockInfo = Quote_Datas._Datas._stocksZxc.Find(e => e.StockName == "同花顺");
@@ -80,6 +84,15 @@ namespace zxcCore.zxcRobot.Test
             {
                 Thread.Sleep(2000);         //模拟长时间运算
             }
+        }
+        //zxcStudy测试
+        private static void TestStudy()
+        {
+            Word pWord = Word_Manager._Manager.GetWord("人");
+            Word_Pingyin pWord_Pingyin = pWord.Get_Pinyin(0);
+            string aa1 = pWord.Get_Image();
+            string aa2 = pWord.Get_StrokesImage();
+            string aa3 = pWord.Get_Sound();
         }
 
         //数据库测试

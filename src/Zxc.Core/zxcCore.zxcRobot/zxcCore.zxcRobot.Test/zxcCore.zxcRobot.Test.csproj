@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\zxcCore.zxcStudy\zxcCore.zxcStudy.Word\zxcCore.zxcStudy.Word.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Monitor\zxcCore.zxcRobot.Monitor.Msg\zxcCore.zxcRobot.Monitor.Msg.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Robot\zxcCore.zxcRobot.Robot.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.User\zxcCore.zxcRobot.User.csproj" />
