@@ -20,10 +20,10 @@ namespace zxcCore.Common
         /// <param name="url">url地址</param>
         /// <param name="postData">json格式数据</param>
         /// <param name="statusCode">状态码</param
-        /// <param name="charSet">编码格式</param>
         /// <param name="headers">请求头</param>
+        /// <param name="charSet">编码格式</param>
         /// <returns></returns>
-        public static string Post_ByHttpClient(string url, string postData, out string statusCode, string charSet = "utf-8", string headers = "application/json")
+        public static string Post_ByHttpClient(string url, string postData, out string statusCode, string headers = "application/json", string charSet = "utf-8")
         {
             //设置Http的正文、内容标头、字符
             HttpContent httpContent = new StringContent(postData, Encoding.UTF8, "application/json");

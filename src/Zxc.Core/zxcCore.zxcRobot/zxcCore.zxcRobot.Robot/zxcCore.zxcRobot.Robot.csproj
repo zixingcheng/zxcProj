@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\zxcCore.Base\zxcCore.Base\zxcCore.Base.csproj" />
     <ProjectReference Include="..\..\zxcCore.Base\zxcCore.Common\zxcCore.Common.csproj" />
+    <ProjectReference Include="..\..\zxcCore.zxcStudy\zxcCore.zxcStudy.Word\zxcCore.zxcStudy.Word.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Monitor\zxcCore.zxcRobot.Monitor.Msg\zxcCore.zxcRobot.Monitor.Msg.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Monitor\zxcCore.zxcRobot.Monitor.Quote\zxcCore.zxcRobot.Monitor.Quote.csproj" />
     <ProjectReference Include="..\zxcCore.zxcRobot.Msger\zxcCore.zxcRobot.Msger.csproj" />

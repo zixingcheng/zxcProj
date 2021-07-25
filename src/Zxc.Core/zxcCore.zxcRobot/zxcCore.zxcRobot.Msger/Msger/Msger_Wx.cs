@@ -81,7 +81,7 @@ namespace zxcCore.zxcRobot.Msger
                 usrName = pMsg.IsUserGroup ? "" : userName,
                 msgID = pMsg.msgID,
                 msgType = pMsg.msgType.ToString(),
-                msg = pMsg.msg.Replace("\r", "※r※").Replace("\n", "※n※").Replace("\t", "※t※").Replace("\"", "※i※"),
+                msg = pMsg.msg.Replace("\r", "※r※").Replace("\n", "※n※").Replace("\t", "※t※").Replace("\"", "※i※").Replace("/", "※h※").Replace("\\", "※h※"),
                 groupID = pMsg.IsUserGroup ? pMsg.groupID : "",
                 groupName = pMsg.IsUserGroup ? userName : "",
                 usrPlat = "wx",

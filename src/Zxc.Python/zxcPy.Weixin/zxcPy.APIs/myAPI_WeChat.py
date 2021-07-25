@@ -38,7 +38,7 @@ class myAPI_Robot_msgWx(myWeb.myAPI):
         pJson = myData_Json.Json_Object()
         pJson.Trans_FromStr(msgInfo)
         msg = pJson._dict_
-        msg['msg'] = msg['msg'].replace("※r※", "\r").replace("※n※", "\n").replace("※i※", '"').replace("※t※", "\t")
+        msg['msg'] = msg['msg'].replace("※r※", "\r").replace("※n※", "\n").replace("※i※", '"').replace("※t※", "\t").replace("※h※", "/")
         usrMMsg.OnHandleMsg(msg, 'wx', True)
         pMsg['result'] = True
         pMsg['text'] = "Swap Cached!"

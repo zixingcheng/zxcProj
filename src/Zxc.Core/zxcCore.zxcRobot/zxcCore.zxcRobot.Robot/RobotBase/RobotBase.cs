@@ -128,7 +128,7 @@ namespace zxcCore.zxcRobot.Robot
             //无操作权限提示
             if (bPermission == false)
             {
-                this.NotifyMsg("权限不足，请联系管理员！", msg, "权限检测");
+                this.NotifyMsg("权限不足，请联系管理员！", msg, "权限检测(" + this.Title + ")");
             }
             return bPermission;
         }
@@ -269,11 +269,11 @@ namespace zxcCore.zxcRobot.Robot
         /// <param name="msg"></param>
         /// <param name="userID_To"></param>
         /// <returns></returns>
-        public virtual bool NotifyMsg(dynamic msg, Msg msgSrc, string msgTag = "")
+        public virtual bool NotifyMsg(dynamic msg, Msg msgSrc, string msgTag = "", typeMsg typeMsg = typeMsg.NONE)
         {
             if (msg + "" != null)
             {
-                Msg pMsg = _ReturnMsg(msg, msgSrc, msgTag);
+                Msg pMsg = _ReturnMsg(msg, msgSrc, msgTag, typeMsg);
                 if (pMsg != null)
                     return MsgerHelper.Msger.SendMsg(pMsg, pMsg.usrPlat);
                 //else
@@ -286,9 +286,9 @@ namespace zxcCore.zxcRobot.Robot
         /// <param name="text"></param>
         /// <param name="msgSrc"></param>
         /// <returns></returns>
-        public virtual Msg _ReturnMsg(string text, Msg msgSrc, string msgTag = "")
+        public virtual Msg _ReturnMsg(string text, Msg msgSrc, string msgTag = "", typeMsg typeMsg = typeMsg.NONE)
         {
-            return _ReturnMsg(text, msgSrc, msgSrc.msgType, msgTag);
+            return _ReturnMsg(text, msgSrc, typeMsg == typeMsg.NONE ? msgSrc.msgType : typeMsg, msgTag);
         }
         /// <summary>返回消息
         /// </summary>
@@ -330,8 +330,11 @@ namespace zxcCore.zxcRobot.Robot
                 //添加文件头
                 if (_hasTitle)
                 {
-                    string strTag = string.IsNullOrEmpty(msgTag) ? _Title : msgTag;
-                    text = strTag + "：\n" + text;
+                    if(typeMsg == typeMsg.TEXT)
+                    {
+                        string strTag = string.IsNullOrEmpty(msgTag) ? _Title : msgTag;
+                        text = strTag + "：\n" + text;
+                    }
                 }
             }
 

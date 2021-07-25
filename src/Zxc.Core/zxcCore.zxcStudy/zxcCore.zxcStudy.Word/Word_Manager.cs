@@ -15,6 +15,7 @@ using System.Linq;
 using zxcCore.Common;
 using zxcCore.Extensions;
 using zxcCore.zxcData.Cache.MemoryDB;
+using zxcCore.zxcStudy.Record;
 
 namespace zxcCore.zxcStudy.Word
 {
@@ -33,20 +34,24 @@ namespace zxcCore.zxcStudy.Word
         /// </summary>
         public DataWord_Pingyin<Word_Pingyin> _zxcPinyins { get; set; }
 
+        /// <summary>库表--汉字记录表
+        /// </summary>
+        public DataWord_Records<Word_Record> _zxcWordRecords { get; set; }
+
 
         protected internal string _dirWordBase = "";
         protected internal Word_Manager(string dirBase) : base(dirBase, typePermission_DB.Normal, true, "/Datas/DB_Word")
         {
             _dirWordBase = zxcConfigHelper.ConfigurationHelper.config["ZxcStudy:Word:Word_Datas"] + "/";
-            if(_dirWordBase == "/")
+            if (_dirWordBase == "/")
             {
                 _dirWordBase = Path.GetDirectoryName(this.DirBase) + "/Word_Datas/";
             }
-            zxcIOHelper.checkPath(_dirWordBase + "Fonts");
-            zxcIOHelper.checkPath(_dirWordBase + "Sounds");
-            zxcIOHelper.checkPath(_dirWordBase + "Strokes");
-            zxcIOHelper.checkPath(_dirWordBase + "WordInfos");
-            this.InitUser_system();
+            zxcIOHelper.checkPath(_dirWordBase + "Fonts/");
+            zxcIOHelper.checkPath(_dirWordBase + "Sounds/");
+            zxcIOHelper.checkPath(_dirWordBase + "Strokes/");
+            zxcIOHelper.checkPath(_dirWordBase + "WordInfos/");
+            this.InitWord_system();
         }
 
         #endregion
@@ -59,10 +64,11 @@ namespace zxcCore.zxcStudy.Word
             //初始zxc用户信息
             _zxcWords = new DataWord<Word>(); this.InitDBModel(_zxcWords);
             _zxcPinyins = new DataWord_Pingyin<Word_Pingyin>(); this.InitDBModel(_zxcPinyins);
+            _zxcWordRecords = new DataWord_Records<Word_Record>(); this.InitDBModel(_zxcWordRecords);
         }
         /// <summary>初始系统用户
         /// </summary>
-        protected void InitUser_system()
+        protected void InitWord_system()
         {
             //初始字体库
             string filePath = _dirWordBase + "汉字.csv";
@@ -89,9 +95,18 @@ namespace zxcCore.zxcStudy.Word
                     pWord.WordInd = Convert.ToInt32(strTemps[0]);
                     pWord.WordStr = strTemps[1];
                     pWord.WordType = strTemps[2];
+
+                    //学习日志记录更新
+                    List<Word_Record> lstWordRecord = this._zxcWordRecords.Where(e => e.WordStr == pWord.WordStr && e.IsDel == false).ToList();
+                    foreach (var item in lstWordRecord)
+                    {
+                        item.WordStr = pWord.WordStr;
+                        item.WordInd = pWord.WordInd;
+                        item.WordType = pWord.WordType;
+                    }
                 }
-                this._zxcWords.SaveChanges(true);
             }
+            this._zxcWords.SaveChanges(true);
         }
 
         //初始汉字拼音信息 
@@ -110,8 +125,58 @@ namespace zxcCore.zxcStudy.Word
             pWord = new Word();
             return this._zxcWords.Add(pWord, true, true);
         }
+        //初始汉字学习信息 
+        public bool InitWord_Record(string usrTag, Word pWord, typeWordRecord typeWordRecord, string recordInfo)
+        {
+            if (pWord == null) return false;
+            if (this._zxcWordRecords.Find(e => e.WordStr == pWord.WordStr && e.UserTag == usrTag && e.IsDel == false) != null)
+                return false;
+
+            Word_Record pWord_Record = new Word_Record()
+            {
+                UserTag = usrTag,
+                WordStr = pWord.WordStr,
+                WordInd = pWord.WordInd,
+                WordType = pWord.WordType,
+                RecordType = typeWordRecord,
+                RecordInfo = recordInfo
+            };
+            return this._zxcWordRecords.Add(pWord_Record, true, true);
+        }
 
 
+        /// <summary>提取用户汉字
+        /// </summary>
+        /// <param name="usrTag"></param>
+        /// <returns></returns>
+        public Word GetWord_ByUser(string usrTag)
+        {
+            if (string.IsNullOrEmpty(usrTag)) return null;
+            List<Word_Record> pRecords = this._zxcWordRecords.Where(e => e.UserTag == usrTag && e.IsDel == false).ToList();
+
+            //计算当前下一个汉字序号
+            int nInd = 1;
+            if (pRecords.Count > 0)
+            {
+                //int minInd = pRecords.Min(e => e.WordInd);
+                int maxInd = pRecords.Max(e => e.WordInd);
+                if (maxInd == pRecords.Count)
+                    nInd = pRecords.Count + 1;
+                else
+                {
+                    for (int i = 1; i <= maxInd; i++)
+                    {
+                        if (pRecords.Find(e => e.WordInd == i) == null)
+                        {
+                            nInd = i; break;
+                        }
+                    }
+                }
+            }
+            Word pWord = this._zxcWords.Where(e => e.WordInd == nInd && e.IsDel == false).FirstOrDefault();
+            if (pWord == null) return null;
+            return this.GetWord(pWord.WordStr);
+        }
         /// <summary>提取指定汉字对象
         /// </summary>
         /// <param name="strWord"></param>

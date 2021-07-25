@@ -13,6 +13,7 @@ using zxcCore.Common;
 using zxcCore.zxcRobot.Msger;
 using zxcCore.zxcRobot.Robot.Power;
 using zxcCore.zxcRobot.User;
+using zxcCore.zxcStudy.Word;
 
 namespace zxcCore.zxcRobot.Robot
 {
@@ -106,6 +107,7 @@ namespace zxcCore.zxcRobot.Robot
 
         #endregion
 
+
         /// <summary>初始配置信息
         /// </summary>
         /// <param name="setting"></param>
@@ -135,14 +137,66 @@ namespace zxcCore.zxcRobot.Robot
             {
                 case "新增":
                     return _Done_Points_operation(msg, pRobotCmd);
+                case "识字":
+                    return _Done_Points_StudyWord(msg, pRobotCmd);
+                case "识字ok":
+                    return _Done_Points_StudyWord_ok(msg, pRobotCmd);
                 default:
                     return _Done_Points_operation(msg, pRobotCmd, pRobotCmd.CmdInfos.CmdPermission);
             }
             return false;
         }
 
+        //识字学习
+        protected internal bool _Done_Points_StudyWord(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.Writable)
+        {
+            //用户权限判断
+            Power_Robot pPowerRobot = pRobotCmd.CmdInfos.PowerRobot;
+            if (!this._Check_Permission_usr(pPermission, msg, pPowerRobot))
+                return false;
+
+            //汉字识字
+            Word pWord = Word_Manager._Manager.GetWord_ByUser(pRobotCmd.CmdInfos.NoteUserTag);
+
+            //信息提示
+            CmdInfos_PointsGrowth pGrowthPoints = (CmdInfos_PointsGrowth)pRobotCmd.CmdInfos;
+            string strMsg = string.Format("新汉字：【{0}】\n识字奖励：{1} 宝贝分.\n发布人：{2}", pWord.WordStr, pGrowthPoints.PointsNum, pPowerRobot.NameUserAlias);
+            this.NotifyMsg(strMsg, msg, "宝贝学习（识字）");
+
+
+            //发送字形图片
+            string strWordImg = pWord.Get_Image();
+            this.NotifyMsg(strWordImg, msg, "", typeMsg.IMAGE);
+
+            //发送字音文件
+            string strWordSound = pWord.Get_Sound();
+            this.NotifyMsg(strWordSound, msg, "", typeMsg.FILE);
+
+            //发送字笔画gif
+            //string strWordStrokesImg = pWord.Get_StrokesImage();
+            //this.NotifyMsg(strWordStrokesImg, msg, "", typeMsg.IMAGE);
+            return true;
+        }
+        protected internal bool _Done_Points_StudyWord_ok(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.Writable)
+        {
+            //汉字识字
+            Word pWord = Word_Manager._Manager.GetWord_ByUser(pRobotCmd.CmdInfos.NoteUserTag);
+
+            //积分变动
+            if (Word_Manager._Manager.InitWord_Record(pRobotCmd.CmdInfos.NoteUserTag, pWord, zxcStudy.Record.typeWordRecord.字形, "已学"))
+            {
+                _Done_Points_operation(msg, pRobotCmd, pPermission, string.Format("新识【{0}】字（{1}）", pWord.WordStr, zxcStudy.Record.typeWordRecord.字形.ToString()));
+            }
+            if (Word_Manager._Manager.InitWord_Record(pRobotCmd.CmdInfos.NoteUserTag, pWord, zxcStudy.Record.typeWordRecord.字音, "已学"))
+            {
+                _Done_Points_operation(msg, pRobotCmd, pPermission, string.Format("新识【{0}】字（{1}）", pWord.WordStr, zxcStudy.Record.typeWordRecord.字音.ToString()));
+            }
+            return true;
+        }
+
+
         //积分添加
-        protected internal bool _Done_Points_operation(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.Writable)
+        protected internal bool _Done_Points_operation(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.Writable, string strReasonDetial = "")
         {
             //用户权限判断
             Power_Robot pPowerRobot = pRobotCmd.CmdInfos.PowerRobot;
@@ -171,7 +225,7 @@ namespace zxcCore.zxcRobot.Robot
                 if (pDataLog.IsValid)
                 {
                     string strMsg = string.Format("{0}{1}「{2}」{3} 个宝贝分.", strMidfix, strPerfix, pDataLog.PointsUser, strNumExChange);
-                    strMsg = string.Format("{0}\n{1}：{2}{3}\n审核人：{4}\n当前分：{5} 宝贝分.", strMsg, strReason, pDataLog.PointsNote, strRemark, pDataLog.PointsUser_OP, pDataLog.PointsNow);
+                    strMsg = string.Format("{0}\n{1}：{2}{3}\n审核人：{4}\n当前分：{5} 宝贝分", strMsg, strReason, strReasonDetial != "" ? strReasonDetial : pDataLog.PointsNote, strRemark, pDataLog.PointsUser_OP, pDataLog.PointsNow);
 
                     zxcConsoleHelper.Debug(true, "宝贝分变动：\n{0}", strMsg);
                     this.NotifyMsg(strMsg, msg, "宝贝分变动");
@@ -183,7 +237,6 @@ namespace zxcCore.zxcRobot.Robot
                     zxcConsoleHelper.Debug(true, "宝贝分提示：\n{0}", strMsg);
                     this.NotifyMsg(strMsg, msg, "宝贝分提示");
                 }
-
             }
             return false;
         }

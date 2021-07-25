@@ -8,8 +8,11 @@ namespace zxcCore.zxcRobot.Msger
     public enum typeMsg
     {
         NOTE = -1,
-        TEXT = 0,
-        IMAGE = 1
+        NONE = 0,
+        TEXT = 1,
+        IMAGE = 2,
+        FILE = 3,
+        VIDEO = 4
     }
     public interface IMsg
     {

@@ -423,7 +423,7 @@ namespace zxcCore.zxcRobot.Robot
         /// <returns></returns>
         public virtual Power_Robot Get_Permission(string nameRobot, string nameGroup, string usrID, string usrPlat, bool bOnlyUser = false)
         {
-            Power_Robot pPower_Robot = Robot_Manager._dbRobot._powerRobot.Where(e => e.NameRobot == nameRobot && (e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && e.NameUser == usrID && e.UsrPlat == usrPlat && e.IsDel == false).FirstOrDefault();
+            Power_Robot pPower_Robot = Robot_Manager._dbRobot._powerRobot.Where(e => e.NameRobot == nameRobot && (e.NameGroup == "" || e.NameGroup == nameGroup || e.NameGroup == "@*" + nameGroup) && e.NameUser == usrID && e.UsrPlat == usrPlat && e.IsDel == false).FirstOrDefault();
 
             if (pPower_Robot == null && !bOnlyUser)
             {
