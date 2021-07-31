@@ -19,18 +19,18 @@ namespace zxcCore.zxcRobot.Msger
     public class MsgerHelper
     {
         #region 属性及构造
-
-        /// <summary>消息已缓存事件
-        /// </summary>
-        public event MsgCached_EventHandler MsgCached;
-
         //静态Msg配置信息
-        protected internal static zxcConfigurationHelper _configMsgSet = new zxcConfigurationHelper("appsettings.json");
+        protected internal readonly static zxcConfigurationHelper _configMsgSet = new zxcConfigurationHelper("appsettings.json");
         //消息库
         protected internal static DataDB_Msg _dbMsg = null;
         /// <summary>全局消息缓存对象
         /// </summary>
         public static readonly MsgerHelper Msger = new MsgerHelper(true, -1);
+
+
+        /// <summary>消息已缓存事件
+        /// </summary>
+        public event MsgCached_EventHandler MsgCached;
 
 
         protected internal Dictionary<string, IMsger> _MsgersObj = null;
@@ -64,6 +64,7 @@ namespace zxcCore.zxcRobot.Msger
             _NumsBuffer = numsBuffer;
             _MsgersObj = new Dictionary<string, IMsger>();
             this.InitMsger("Wx", new Msger_Wx());
+            this.InitMsger("Sys", new Msger_Sys());
 
             _dirMsgDB = MsgerHelper._configMsgSet.config["Msgerset:MsgDB_Path"] + "";
             _cacheDebug = Convert.ToBoolean(MsgerHelper._configMsgSet.config["Msgerset:MsgCache_Debug"]);
@@ -150,13 +151,14 @@ namespace zxcCore.zxcRobot.Msger
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="typeMsgs"></param>
+        /// <param name="useMsgServer"></param>
         /// <returns></returns>
-        public virtual bool SendMsg(dynamic msg, List<typeMsger> typeMsgs)
+        public virtual bool SendMsg(dynamic msg, List<typeMsger> typeMsgs, bool useMsgServer = false)
         {
             bool bResult = true;
             for (int i = 0; i < typeMsgs.Count; i++)
             {
-                bool bRes = this.SendMsg(msg, typeMsgs[i]);
+                bool bRes = this.SendMsg(msg, typeMsgs[i], useMsgServer);
                 bResult = bResult && bRes;
             }
             return bResult;
@@ -165,15 +167,16 @@ namespace zxcCore.zxcRobot.Msger
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="typeMsgs"></param>
+        /// <param name="useMsgServer"></param>
         /// <returns></returns>
-        public virtual bool SendMsg(dynamic msg, typeMsger typeMsg)
+        public virtual bool SendMsg(dynamic msg, typeMsger typeMsg, bool useMsgServer = false)
         {
             IMsger msger = null;
             _MsgersObj.TryGetValue(typeMsg.ToString().ToLower(), out msger);
 
             if (msger != null)
             {
-                bool bRes = msger.SendMsg(msg);
+                bool bRes = msger.SendMsg(msg, useMsgServer);
                 if (bRes)
                 {
                     this.CacheMsg(msg);

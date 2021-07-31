@@ -143,7 +143,8 @@ namespace zxcCore.zxcRobot.Robot
         public RobotCmd_Infos(string[] strCmds, Power_Robot powerRobot)
         {
             this.Init_Power(powerRobot);
-            this.Init(strCmds);
+            if (this.PowerRobot != null)
+                this.Init(strCmds);
         }
         ~RobotCmd_Infos()
         {

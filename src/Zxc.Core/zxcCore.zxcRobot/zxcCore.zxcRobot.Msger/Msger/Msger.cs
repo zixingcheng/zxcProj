@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using zxcCore.Common;
 
 namespace zxcCore.zxcRobot.Msger
@@ -66,8 +67,9 @@ namespace zxcCore.zxcRobot.Msger
         /// <summary>发送消息（需重写）
         /// </summary>
         /// <param name="msg"></param>
+        /// <param name="useMsgServer"></param>
         /// <returns></returns>
-        public virtual bool SendMsg(dynamic msg)
+        public virtual bool SendMsg(dynamic msg, bool useMsgServer = false)
         {
             //return this.CacheMsg(msg);
             return false;
@@ -122,6 +124,29 @@ namespace zxcCore.zxcRobot.Msger
         public virtual bool LogMsg(dynamic msg)
         {
             return true;
+        }
+
+
+        protected internal virtual string transMsg(dynamic msg)
+        {
+            //组装消息
+            IMsg pMsg = (IMsg)msg;
+            if (pMsg == null) return null;
+
+            string userName = pMsg.usrName + "" == "" ? pMsg.usrNameNick : pMsg.usrName;
+            var msgWx = new
+            {
+                usrID = pMsg.IsUserGroup ? "" : pMsg.usrID,
+                usrName = pMsg.IsUserGroup ? "" : userName,
+                msgID = pMsg.msgID,
+                msgType = pMsg.msgType.ToString(),
+                msg = pMsg.msg.Replace("\r", "※r※").Replace("\n", "※n※").Replace("\t", "※t※").Replace("\"", "※i※").Replace("/", "※h※").Replace("\\", "※h※"),
+                groupID = pMsg.IsUserGroup ? pMsg.groupID : "",
+                groupName = pMsg.IsUserGroup ? userName : "",
+                usrPlat = pMsg.usrPlat == typeMsger.None ? "wx" : pMsg.usrPlat.ToString(),
+                time = pMsg.msgTime.Ticks
+            };
+            return JsonConvert.SerializeObject(msgWx);
         }
 
     }

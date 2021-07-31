@@ -153,6 +153,8 @@ namespace zxcCore.zxcRobot.Msger
             get; set;
         }
 
+
+        protected internal dynamic _objCoon = null;     //消息连接对象
         public Msg()
         {
         }
@@ -230,6 +232,7 @@ namespace zxcCore.zxcRobot.Msger
             };
             return msgWx;
         }
+
 
         public override dynamic ToJson()
         {

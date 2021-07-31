@@ -12,7 +12,7 @@ namespace zxcCore.zxcRobot.Monitor.Msger
     {
         #region 属性及构造
 
-        protected internal static Msger_Wx _msger = new Msger_Wx();
+        protected internal static Msger_Wx _msger = (Msger_Wx)MsgerHelper.Msger.Find(typeMsger.wx);
         public DataCheck_Msger_Quote(bool isBuffer, int numsBuffer) : base(isBuffer, numsBuffer)
         {
             _IsBuffer = isBuffer;

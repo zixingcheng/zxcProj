@@ -12,6 +12,7 @@
     <ProjectReference Include="..\..\zxcCore.Base\zxcCore.Common\zxcCore.Common.csproj" />
     <ProjectReference Include="..\..\zxcCore.zxcData\zxcCore.zxcData.Cache\zxcCore.zxcData.Cache.MemeoryDB\zxcCore.zxcData.Cache.MemeoryDB.csproj" />
     <ProjectReference Include="..\..\zxcCore.zxcData\zxcCore.zxcData.Cache\zxcCore.zxcData.Cache.Swap\zxcCore.zxcData.Cache.Swap.csproj" />
+    <ProjectReference Include="..\zxcCore.WebSocket\zxcCore.WebSocket.csproj" />
   </ItemGroup>
 
 </Project>

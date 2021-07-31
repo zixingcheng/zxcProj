@@ -39,7 +39,7 @@ namespace zxcCore.zxcRobot.Msger
         //    UserID_Src = "System",
         //    MsgTime = DateTime.Now
         //};
-        public override bool SendMsg(dynamic msg)
+        public override bool SendMsg(dynamic msg, bool useMsgServer = false)
         {
             if (_useApi)
                 return SendMsg(msg, _url);
@@ -66,28 +66,6 @@ namespace zxcCore.zxcRobot.Msger
             }
             this.CacheMsg(msg);     //缓存消息
             return true;
-        }
-
-        protected internal virtual string transMsg(dynamic msg)
-        {
-            //组装消息
-            IMsg pMsg = (IMsg)msg;
-            if (pMsg == null) return null;
-
-            string userName = pMsg.usrName + "" == "" ? pMsg.usrNameNick : pMsg.usrName;
-            var msgWx = new
-            {
-                usrID = pMsg.IsUserGroup ? "" : pMsg.usrID,
-                usrName = pMsg.IsUserGroup ? "" : userName,
-                msgID = pMsg.msgID,
-                msgType = pMsg.msgType.ToString(),
-                msg = pMsg.msg.Replace("\r", "※r※").Replace("\n", "※n※").Replace("\t", "※t※").Replace("\"", "※i※").Replace("/", "※h※").Replace("\\", "※h※"),
-                groupID = pMsg.IsUserGroup ? pMsg.groupID : "",
-                groupName = pMsg.IsUserGroup ? userName : "",
-                usrPlat = "wx",
-                time = pMsg.msgTime.Ticks
-            };
-            return JsonConvert.SerializeObject(msgWx);
         }
 
     }

@@ -37,8 +37,9 @@ namespace zxcCore.zxcRobot.Msger
         /// <summary>消息发送(但一发送，单条单目标)
         /// </summary>
         /// <param name="msg">消息内容(建议格式：new { XX1 = 0, XX2 = aa })</param>
+        /// <param name="useMsgServer">是否消息服务器发送</param>
         /// <returns></returns>
-        bool SendMsg(dynamic msg);
+        bool SendMsg(dynamic msg, bool useMsgServer = false);
         /// <summary>消息发送(但一发送，单条单目标)
         /// </summary>
         /// <param name="msg">消息内容(建议格式：new { XX1 = 0, XX2 = aa })</param>
