@@ -71,7 +71,7 @@ namespace zxcCore.zxcStudy.Word
         protected void InitWord_system()
         {
             //初始字体库
-            string filePath = _dirWordBase + "汉字.csv";
+            string filePath = _dirWordBase + "Word.csv";
             string[] lineSets = File.ReadAllLines(filePath);
             for (int i = 1; i < lineSets.Length; i++)
             {

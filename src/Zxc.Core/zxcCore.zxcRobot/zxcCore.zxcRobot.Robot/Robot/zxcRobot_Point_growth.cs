@@ -58,12 +58,19 @@ namespace zxcCore.zxcRobot.Robot
             else
             {
                 PointsNum = Convert.ToInt32(strCmds[1].Replace("分", ""));
-                NoteInfo = strCmds[2];
-                if (strCmds.Length > 3)
-                    NoteLabel = strCmds[3];
-                else
-                    if (NoteInfo.Contains("赠送"))
-                    NoteLabel = "赠送";
+                if (strCmds[0] == "宝贝分")
+                {
+                    NoteInfo = strCmds[2];
+                    if (strCmds.Length > 3)
+                        NoteLabel = strCmds[3];
+                    else
+                    {
+                        if (NoteInfo.Contains("赠送"))
+                            NoteLabel = "赠送";
+                        else
+                            NoteLabel = PointsNum >= 0 ? "奖励" : "惩罚";
+                    }
+                }
             }
             this.IsVaild = true;
             return base.Init(strCmds);
@@ -160,7 +167,7 @@ namespace zxcCore.zxcRobot.Robot
 
             //信息提示
             CmdInfos_PointsGrowth pGrowthPoints = (CmdInfos_PointsGrowth)pRobotCmd.CmdInfos;
-            string strMsg = string.Format("新汉字：【{0}】\n识字奖励：{1} 宝贝分.\n发布人：{2}", pWord.WordStr, pGrowthPoints.PointsNum, pPowerRobot.NameUserAlias);
+            string strMsg = string.Format("新汉字：【{0}】\n识字奖励：{1} 宝贝分.\n任务提示：回复字音，确认后获得奖励！\n发布人：{2}", pWord.WordStr, pGrowthPoints.PointsNum, pPowerRobot.NameUserAlias);
             this.NotifyMsg(strMsg, msg, "宝贝学习（识字）");
 
 
@@ -208,7 +215,7 @@ namespace zxcCore.zxcRobot.Robot
             Data_PointsLog pDataLog = _growthPoints.Add_Points((CmdInfos_PointsGrowth)pRobotCmd.CmdInfos, pPowerRobot.NameUserAlias, checkPoints);
             if (pDataLog != null)
             {
-                string strPerfix = pDataLog.PointExChange > 0 ? "恭喜！" : pDataLog.PointsNote_Label != "" ? "" : "很遗憾！";
+                string strPerfix = pDataLog.PointExChange > 0 ? "恭喜！" : "很遗憾！";
                 string strMidfix = pDataLog.PointExChange > 0 ? "获得" + pDataLog.PointsNote_Label + "！" : pDataLog.PointsNote_Label == "兑换" ? "兑换成功！" : "被" + pDataLog.PointsNote_Label + "！";
 
                 string strNumExChange = pDataLog.PointExChange > 0 ? "+" + pDataLog.PointExChange.ToString() : pDataLog.PointExChange.ToString();
@@ -224,18 +231,18 @@ namespace zxcCore.zxcRobot.Robot
 
                 if (pDataLog.IsValid)
                 {
-                    string strMsg = string.Format("{0}{1}「{2}」{3} 个宝贝分.", strMidfix, strPerfix, pDataLog.PointsUser, strNumExChange);
+                    string strMsg = string.Format("{0}「{1}」{2} 个宝贝分.", strPerfix, pDataLog.PointsUser, strNumExChange);
                     strMsg = string.Format("{0}\n{1}：{2}{3}\n审核人：{4}\n当前分：{5} 宝贝分", strMsg, strReason, strReasonDetial != "" ? strReasonDetial : pDataLog.PointsNote, strRemark, pDataLog.PointsUser_OP, pDataLog.PointsNow);
 
-                    zxcConsoleHelper.Debug(true, "宝贝分变动：\n{0}", strMsg);
-                    this.NotifyMsg(strMsg, msg, "宝贝分变动");
+                    zxcConsoleHelper.Debug(true, "宝贝分变动：{0}\n{1}", strMidfix, strMsg);
+                    this.NotifyMsg(strMsg, msg, "宝贝分变动：" + strMidfix);
                     return true;
                 }
                 else
                 {
-                    string strMsg = string.Format("兑换失败！{0}：{1}{2} 需要 {3} 宝贝分，当前 {4} 个宝贝分，不足以兑换.", strReason, pDataLog.PointsNote, strRemark, strNumExChange, pDataLog.PointsNow);
-                    zxcConsoleHelper.Debug(true, "宝贝分提示：\n{0}", strMsg);
-                    this.NotifyMsg(strMsg, msg, "宝贝分提示");
+                    string strMsg = string.Format("{0}：{1}{2} \n兑换消耗：{3} 宝贝分 \n兑换失败：当前 {4} 宝贝分，不足以兑换.", strReason, pDataLog.PointsNote, strRemark, strNumExChange, pDataLog.PointsNow);
+                    zxcConsoleHelper.Debug(true, "宝贝分提示：兑换失败！\n{0}", strMsg);
+                    this.NotifyMsg(strMsg, msg, "宝贝分提示：兑换失败！");
                 }
             }
             return false;

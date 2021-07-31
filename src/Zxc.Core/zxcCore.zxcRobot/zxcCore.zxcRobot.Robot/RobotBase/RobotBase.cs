@@ -330,10 +330,11 @@ namespace zxcCore.zxcRobot.Robot
                 //添加文件头
                 if (_hasTitle)
                 {
-                    if(typeMsg == typeMsg.TEXT)
+                    if (typeMsg == typeMsg.TEXT)
                     {
                         string strTag = string.IsNullOrEmpty(msgTag) ? _Title : msgTag;
-                        text = strTag + "：\n" + text;
+                        if (!strTag.Contains("：")) strTag += "：";
+                        text = strTag + "\n" + text;
                     }
                 }
             }

@@ -21,6 +21,7 @@ using System.ComponentModel;
 using zxcCore.zxcRobot.Quote.JQData;
 using zxcCore.Common.TimeSet;
 using zxcCore.zxcStudy.Word;
+using System.Text;
 
 namespace zxcCore.zxcRobot.Test
 {
@@ -50,6 +51,9 @@ namespace zxcCore.zxcRobot.Test
             //pQuoteData.Query(DateTime.Now.AddDays(-2), DateTime.Now);
             //pQuoteData.Query(DateTime.Now);
             //pQuoteData.Query();
+
+            // 注册代码页提供器实例
+            //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); 
 
 
             //机器人测试
