@@ -129,7 +129,7 @@ namespace zxcCore.zxcStudy.Word
         public bool InitWord_Record(string usrTag, Word pWord, typeWordRecord typeWordRecord, string recordInfo)
         {
             if (pWord == null) return false;
-            if (this._zxcWordRecords.Find(e => e.WordStr == pWord.WordStr && e.UserTag == usrTag && e.IsDel == false) != null)
+            if (this._zxcWordRecords.Find(e => e.WordStr == pWord.WordStr && e.RecordType == typeWordRecord && e.UserTag == usrTag && e.IsDel == false) != null)
                 return false;
 
             Word_Record pWord_Record = new Word_Record()
@@ -152,7 +152,7 @@ namespace zxcCore.zxcStudy.Word
         public Word GetWord_ByUser(string usrTag)
         {
             if (string.IsNullOrEmpty(usrTag)) return null;
-            List<Word_Record> pRecords = this._zxcWordRecords.Where(e => e.UserTag == usrTag && e.IsDel == false).ToList();
+            List<Word_Record> pRecords = this._zxcWordRecords.Where(e => e.UserTag == usrTag && e.RecordType == typeWordRecord.字形 && e.IsDel == false).ToList();
 
             //计算当前下一个汉字序号
             int nInd = 1;
@@ -166,7 +166,7 @@ namespace zxcCore.zxcStudy.Word
                 {
                     for (int i = 1; i <= maxInd; i++)
                     {
-                        if (pRecords.Find(e => e.WordInd == i) == null)
+                        if (pRecords.Find(e => e.WordInd == i) != null)
                         {
                             nInd = i; break;
                         }
