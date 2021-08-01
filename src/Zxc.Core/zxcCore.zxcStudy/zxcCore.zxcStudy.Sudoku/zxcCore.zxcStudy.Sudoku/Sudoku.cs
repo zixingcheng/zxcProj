@@ -162,7 +162,7 @@ namespace zxcCore.Sudoku
         {
             //剔除重复
             List<int> values = getValues(row, col);
-            List<int> valuesSpare = CloneDeep.Clone<int>(_valuesSpare);
+            List<int> valuesSpare = zxcCloneDeep.Clone_List<int>(_valuesSpare);
             for (int i = 0; i < values.Count; i++)
             {
                 int valueInd = valuesSpare.FindIndex(s => s == values[i]);
@@ -217,7 +217,7 @@ namespace zxcCore.Sudoku
         //创建随机空白处-9宫随机
         protected bool InitValue_Space_Cells(int cells)
         {
-            List<int> lstCell = CloneDeep.Clone<int>(_valuesSpare);
+            List<int> lstCell = zxcCloneDeep.Clone_List<int>(_valuesSpare);
             int ind, nCells = cells;
             while (nCells > 0)
             {
@@ -329,7 +329,7 @@ namespace zxcCore.Sudoku
         {
             //剔除重复
             List<int> values = getValues(row, col);
-            List<int> valuesSpare = CloneDeep.Clone<int>(_valuesSpare);
+            List<int> valuesSpare = zxcCloneDeep.Clone_List<int>(_valuesSpare);
             for (int i = 0; i < values.Count; i++)
             {
                 int valueInd = valuesSpare.FindIndex(s => s == values[i]);

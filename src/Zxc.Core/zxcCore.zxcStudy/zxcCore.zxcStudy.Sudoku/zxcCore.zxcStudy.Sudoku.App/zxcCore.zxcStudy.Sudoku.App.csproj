@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\zxcCore.Study.Sudoku\zxcCore.Sudoku.csproj" />
+    <ProjectReference Include="..\zxcCore.zxcStudy.Sudoku\zxcCore.zxcStudy.Sudoku.csproj" />
   </ItemGroup>
 
 </Project>
