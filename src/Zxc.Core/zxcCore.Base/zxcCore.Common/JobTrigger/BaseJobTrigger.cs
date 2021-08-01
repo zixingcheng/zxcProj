@@ -1,8 +1,5 @@
-﻿
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,11 +22,13 @@ namespace zxcCore.Common.JobTrigger
         /// <param name="jobExcutor">任务执行者</param>
         protected BaseJobTrigger(TimeSpan dueTime,
              TimeSpan periodTime,
-             IJobExecutor jobExcutor)
+             IJobExecutor jobExcutor, bool cacheExcutor = false)
         {
             _dueTime = dueTime;
             _periodTime = periodTime;
             _jobExcutor = jobExcutor;
+            if (cacheExcutor)
+                JobMananger.Add(jobExcutor);
         }
 
         #region  计时器相关方法
@@ -60,8 +59,8 @@ namespace zxcCore.Common.JobTrigger
                 //LogUtil.Error($"执行任务({nameof(GetType)})时出错，信息：{e}");
             }
         }
-        #endregion
 
+        #endregion
 
         /// <summary>
         ///  系统级任务执行启动
@@ -75,7 +74,6 @@ namespace zxcCore.Common.JobTrigger
             }
             catch (Exception e)
             {
-                zxcConsoleHelper.Debug(true, "错误信息：{0}", e.ToString());
                 //LogUtil.Error($"启动定时任务({nameof(GetType)})时出错，信息：{e}");
             }
             return Task.CompletedTask;
@@ -94,15 +92,21 @@ namespace zxcCore.Common.JobTrigger
             }
             catch (Exception e)
             {
-                zxcConsoleHelper.Debug(true, "错误信息：{0}", e.ToString());
                 //LogUtil.Error($"停止定时任务({nameof(GetType)})时出错，信息：{e}");
             }
             return Task.CompletedTask;
         }
 
+        public void Print(bool isStart = true)
+        {
+            string name = this.GetType().Name.Replace("Excutor", "");
+            string prefix = isStart ? "Do" : "Done";
+            Console.WriteLine(DateTime.Now.ToString("yy-MM-dd HH:mm:ss ") + prefix + " " + name + " ::");
+        }
         public void Dispose()
         {
             _timer?.Dispose();
         }
     }
+
 }

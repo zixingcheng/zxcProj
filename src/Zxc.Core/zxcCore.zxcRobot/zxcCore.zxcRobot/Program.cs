@@ -22,7 +22,7 @@ namespace zxcCore.zxcRobot
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>()
-                            .UseUrls("http://*:5001");
+                            .UseUrls("http://*:8668");
                 });
 
     }

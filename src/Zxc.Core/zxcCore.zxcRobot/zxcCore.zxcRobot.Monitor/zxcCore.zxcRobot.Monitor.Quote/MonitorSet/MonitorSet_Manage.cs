@@ -61,18 +61,25 @@ namespace zxcCore.zxcRobot.Monitor.Quote
         public bool SyncData_MonitorSet(string spiderTag = "quote")
         {
             //同步API接口设置数据
-            List<MonitorSet> pSets = this.Get_APISets("");
-            bool bRes = this.Updata_MonitorSets(pSets);
-
-
-            //更新本地数据到API接口 
-            pSets = Quote_Datas._Datas._setsMoitor.FindAll(e => e.SpiderTag == spiderTag && e.IsDel == false);
-            foreach (var item in pSets)
+            try
             {
-                bRes = bRes && this.Updata_APISets(item);
-            }
+                List<MonitorSet> pSets = this.Get_APISets("");
+                bool bRes = this.Updata_MonitorSets(pSets);
 
-            return bRes;
+
+                //更新本地数据到API接口 
+                pSets = Quote_Datas._Datas._setsMoitor.FindAll(e => e.SpiderTag == spiderTag && e.IsDel == false);
+                foreach (var item in pSets)
+                {
+                    bRes = bRes && this.Updata_APISets(item);
+                }
+                return bRes;
+            }
+            catch (Exception)
+            {
+                return false;
+                //throw;
+            }
         }
 
         /// <summary>提取本地监测设置信息

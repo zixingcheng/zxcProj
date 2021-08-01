@@ -11,6 +11,8 @@ namespace zxcCore.zxcStudy.Record
     /// </summary>
     public enum typeWordRecord
     {
+        [EnumAttr("None", "-1"), EnumValue(5)]
+        None = -1,
         [EnumAttr("字形", "0"), EnumValue(5)]
         字形 = 0,
         [EnumAttr("字义", "1"), EnumValue(5)]

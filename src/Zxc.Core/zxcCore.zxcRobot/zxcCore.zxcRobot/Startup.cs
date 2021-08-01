@@ -1,16 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Serialization;
 using zxcCore.WebSocket;
 using zxcCore.zxcRobot.Models;
 using zxcCore.zxcRobot.Msger;
+using zxcCore.zxcRobot.JobTrigger;
 
 namespace zxcCore.zxcRobot
 {
@@ -26,7 +33,14 @@ namespace zxcCore.zxcRobot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            //Json返回页面栏位按照定义输出
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
+
+            // 添加定时任务
+            services.AddHostedService<Robot_ManagerJobTrigger>(); //国控站点
         }
 
 

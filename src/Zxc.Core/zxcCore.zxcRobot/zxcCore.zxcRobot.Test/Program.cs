@@ -6,22 +6,15 @@ using System.Linq;
 using System.Diagnostics;
 using zxcCore.zxcData.Cache.Memory;
 using zxcCore.zxcData.Cache.Swap;
-using zxcCore.zxcRobot.Monitor;
 using zxcCore.zxcData.Analysis;
 using zxcCore.zxcRobot.Monitor.Quote;
 using zxcCore.zxcRobot.User;
 using zxcCore.zxcData.Cache.MemoryDB;
 using zxcCore.zxcData.Cache.MemoryDB.Test;
-using zxcCore.zxcRobot.Robot;
 using zxcCore.zxcRobot.Msger;
-using zxcCore.zxcRobot.Quote;
-using zxcCore.zxcRobot.Quote.Data;
 using zxcCore.Common;
-using System.ComponentModel;
-using zxcCore.zxcRobot.Quote.JQData;
-using zxcCore.Common.TimeSet;
 using zxcCore.zxcStudy.Word;
-using System.Text;
+using zxcCore.zxcRobot.Robot;
 
 namespace zxcCore.zxcRobot.Test
 {
@@ -54,6 +47,9 @@ namespace zxcCore.zxcRobot.Test
 
             // 注册代码页提供器实例
             //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); 
+
+            //zxcCore.zxcAI.Baidu.Class1.ConvertMP3toWAV(@"/root/Public/myPrjs/zxcProj/zxcCore.zxcRobot.Test/Datas/210727-224432.mp3", @"/root/Public/myPrjs/zxcProj/zxcCore.zxcRobot.Test/Datas/210727-224432.wav");
+            //zxcCore.zxcAI.Baidu.Class1.AsrData(@"/root/Public/myPrjs/zxcProj/zxcCore.zxcRobot.Test/Datas/210727-224432.wav");
 
 
             //机器人测试

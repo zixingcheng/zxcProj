@@ -9,10 +9,12 @@
 // 修改描述：
 //===============================================================================
 using System;
+using System.Linq;
 using zxcCore.Common;
 using zxcCore.zxcRobot.Msger;
 using zxcCore.zxcRobot.Robot.Power;
 using zxcCore.zxcRobot.User;
+using zxcCore.zxcStudy.Record;
 using zxcCore.zxcStudy.Word;
 
 namespace zxcCore.zxcRobot.Robot
@@ -164,6 +166,11 @@ namespace zxcCore.zxcRobot.Robot
 
             //汉字识字
             Word pWord = Word_Manager._Manager.GetWord_ByUser(pRobotCmd.CmdInfos.NoteUserTag);
+            if (pWord == null)
+            {
+                this.NotifyMsg("字库汉字已经学完，请检查！", msg, "宝贝学习（识字）");
+                return false;
+            }
 
             //信息提示
             CmdInfos_PointsGrowth pGrowthPoints = (CmdInfos_PointsGrowth)pRobotCmd.CmdInfos;
@@ -182,12 +189,22 @@ namespace zxcCore.zxcRobot.Robot
             //发送字笔画gif
             //string strWordStrokesImg = pWord.Get_StrokesImage();
             //this.NotifyMsg(strWordStrokesImg, msg, "", typeMsg.IMAGE);
-            return true;
+
+            //记录日志
+            if (Word_Manager._Manager.InitWord_Record(pRobotCmd.CmdInfos.NoteUserTag, pWord, zxcStudy.Record.typeWordRecord.None, "已学"))
+                return true;
+            return false;
         }
         protected internal bool _Done_Points_StudyWord_ok(Msg msg, RobotCmd pRobotCmd, typePermission_PowerRobot pPermission = typePermission_PowerRobot.Writable)
         {
             //汉字识字
             Word pWord = Word_Manager._Manager.GetWord_ByUser(pRobotCmd.CmdInfos.NoteUserTag);
+            Word_Record pRecord = Word_Manager._Manager._zxcWordRecords.Where(e => e.WordStr == pWord.WordStr && e.RecordType == typeWordRecord.None && e.IsDel == false).FirstOrDefault();
+            if (pRecord == null)
+            {
+                this.NotifyMsg("当前没有正在学习的汉字，请检查！", msg, "宝贝学习（识字）");
+                return false;
+            }
 
             //积分变动
             if (Word_Manager._Manager.InitWord_Record(pRobotCmd.CmdInfos.NoteUserTag, pWord, zxcStudy.Record.typeWordRecord.字形, "已学"))
